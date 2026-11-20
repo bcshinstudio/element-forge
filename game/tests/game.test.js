@@ -170,3 +170,38 @@ test('Campaign progress survives reload, ignores unknown levels and tolerates un
  temporary.complete(ids[1]);
  assert.equal(temporary.hasCompleted(ids[1]),true);
 });
+
+test('Construction and multiple draft routes can be interleaved',()=>{
+ const session=river();
+ assert.equal(session.start({bridge:1}).ok,true);
+ draw(session,fireLand.slice(0,3));
+ draw(session,water.slice(0,3));
+ assert.equal(session.place(113,'bridge').ok,true);
+ draw(session,water.slice(3));
+ draw(session,fireLand.slice(2));
+ assert.equal(session.verify().ok,true);
+});
+
+test('A paired tunnel places and removes atomically with bidirectional travel',()=>{
+ const session=createSession(catalog[8]);
+ session.start({tunnel:2});
+ assert.equal(session.placeTunnel(38,57).ok,false);
+ assert.deepEqual(session.state.placements,{});
+ assert.equal(session.placeTunnel(38,45).ok,true);
+ assert.equal(E.linkPartner(session.map,38,session.state.placements),45);
+ assert.equal(E.linkPartner(session.map,45,session.state.placements),38);
+ assert.equal(session.remove(45).ok,true);
+ assert.deepEqual(session.state.placements,{});
+ assert.equal(session.undo(),true);
+ assert.equal(E.linkPartner(session.map,38,session.state.placements),45);
+});
+
+test('Campaign unlocks only through the first incomplete level',()=>{
+ const {createProgress}=require('../progress.js');
+ const progress=createProgress(null,['one','two','three']);
+ assert.equal(progress.unlockedIndex(),0);
+ progress.complete('two');
+ assert.equal(progress.unlockedIndex(),0);
+ progress.complete('one');
+ assert.equal(progress.unlockedIndex(),2);
+});

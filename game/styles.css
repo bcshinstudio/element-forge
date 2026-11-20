@@ -112,3 +112,6 @@ footer { padding: 0 16px 20px; text-align: center; color: var(--muted); font-siz
  padding: 1px; border-radius: 3px; background: #142219; color: #fff;
  font: 700 clamp(8px, 1vw, 12px)/1.1 system-ui,sans-serif;
 }
+
+.tile.tunnel-preview { outline: 3px dashed #fff3b0; outline-offset: -4px; z-index: 2; }
+.tile.tunnel-preview .mark { font-weight: 900; }

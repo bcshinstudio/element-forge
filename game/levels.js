@@ -20,6 +20,12 @@
    return {terrain:'land',node:{element,role:mark===mark.toUpperCase()?'source':'destination'}};
   });
   map.constraints=constraints;
+  if(rows.some(row=>row.includes('*'))){
+   for(const element of ['fire','water','electricity','arcane']){
+    const rule=constraints[element]??{};
+    constraints[element]={...rule,forbidTerrain:[...new Set([...(rule.forbidTerrain??[]),'forest'])]};
+   }
+  }
   if(construction)map.construction=construction;
   return {id:name.toLowerCase().replaceAll(' ','-'),format:'element-forge-level',schemaVersion:1,rulesVersion:construction?2:1,map};
  }
@@ -49,15 +55,15 @@
    '############','####....####','###......###','##....~...##','##N...~..n##','####..~..###',
    '############','###...~..###','##w...~...##','##....~..W##','###...~..###','############'
   ],{bridge:1},undefined,{nature:{forbidTerrain:['water']}}),
-  level('Briar Hollow','Fire cannot pass through forest. Keep its route in the clearing and find Nature a route around it.',[
+  level('Briar Hollow','N is Nature. Nature can route through woods. Fire must stay in the clearing.',[
    '############','##***N***###','#**....****#','#*.F......*#','#*.....f..*#','#***###...*#',
    '#**********#','##*******n*#','##*********#','###******###','############','############'
   ],{},undefined,{fire:{forbidTerrain:['forest']}}),
-  level('Granite Gate','Place two matching tunnel ends in one row or column with blocked terrain between them. Tap the other end to continue your route.',[
+  level('Granite Gate','Select Tunnel, then choose two open tiles in the same row or column with blocked terrain between them. Either opening works in both directions.',[
    '############','############','###..##...##','##...##...##','##F..##...##','##...##.f.##',
    '###..##...##','############','############','############','############','############'
   ],{tunnel:2}),
-  level('Under the Escarpment','A tunnel needs two ends. Each end costs a point, so check the full price before choosing your loadout.',[
+  level('Under the Escarpment','One tunnel connects two openings and costs two points. Budget for the whole tunnel before building.',[
    '############','###..#####.#','##...###.f.#','##...###...#','##...###...#','##...###...#',
    '##F..###...#','##...###...#','###..###..##','############','############','############'
   ],{tunnel:2,bridge:1},{budget:2,prices:{tunnel:1,bridge:1}}),

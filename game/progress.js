@@ -13,6 +13,10 @@
    try{storage?.setItem(KEY,JSON.stringify({selected,completed:[...completed]}));}catch{}
   }
   return {
+   unlockedIndex:()=>{
+    const firstIncomplete=levelIds.findIndex(id=>!completed.has(id));
+    return firstIncomplete<0?levelIds.length-1:firstIncomplete;
+   },
    selected:()=>selected,
    completedCount:()=>completed.size,
    hasCompleted:id=>completed.has(id),
