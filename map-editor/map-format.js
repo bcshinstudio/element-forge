@@ -64,7 +64,7 @@ function parseConstruction(source,inventory){
     !record(source.prices))throw Error('Invalid construction budget.');
  const prices={};
  for(const [kind,price] of Object.entries(source.prices)){
-  if(!['bridge','intersection'].includes(kind)||!Number.isInteger(price)||price<1||price>999){
+  if(!['bridge','intersection','tunnel'].includes(kind)||!Number.isInteger(price)||price<1||price>999){
    throw Error('Invalid construction tool price.');
   }
   prices[kind]=price;

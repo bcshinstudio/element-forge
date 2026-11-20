@@ -4,20 +4,24 @@
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <meta name="theme-color" content="#102019">
- <title>Element Forge · G1</title>
+ <title>Element Forge · G2</title>
  <link rel="stylesheet" href="styles.css">
  <script defer src="../map-editor/engine.js"></script>
  <script defer src="../map-editor/map-format.js"></script>
  <script defer src="levels.js"></script>
+ <script defer src="progress.js"></script>
  <script defer src="session.js"></script>
  <script defer src="app.js"></script>
 </head>
 <body>
  <header class="masthead">
   <a href="./index.html" class="brand">Element Forge</a>
+  <div class="campaign-picker">
   <label for="level">Puzzle
    <select id="level"></select>
   </label>
+  <span id="campaign-progress"></span>
+ </div>
  </header>
  <main class="layout">
   <section class="field" aria-labelledby="puzzle">
@@ -36,6 +40,8 @@
     <button class="primary" id="start">Start building</button>
    </form>
    <div id="build" hidden>
+    <div id="bridge-count" class="inventory-count" role="status" hidden></div>
+    <p id="bridge-hint" hidden>Tap an empty water tile to place a bridge, even mid-route.</p>
     <div id="tools" class="tools" role="group" aria-label="Build tools"></div>
     <label id="link-field" hidden>Link ID <input id="link-id" value="A" maxlength="12"></label>
     <div class="build-actions">

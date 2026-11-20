@@ -98,3 +98,20 @@ footer { padding: 0 16px 20px; text-align: center; color: var(--muted); font-siz
 .custom-level .import { display: block; margin-top: 6px; }
 #status,#import-error { min-height: 0; margin: 0; color: #ffda92; }
 #status:not(:empty),#import-error:not(:empty) { margin-top: 12px; }
+
+.campaign-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-width: 0; }
+.campaign-picker label { min-width: 0; }
+.campaign-picker select { min-width: 0; max-width: min(65vw, 285px); }
+#campaign-progress { color: var(--muted); font-size: .88rem; }
+
+.inventory-count { color: var(--accent); font-weight: 700; }
+#bridge-hint { color: var(--muted); margin: 4px 0 10px; font-size: .9rem; }
+.mark.destination { border-radius: 22%; }
+.endpoint-role {
+ position: absolute; right: -3px; bottom: -3px; min-width: 1.1em; text-align: center;
+ padding: 1px; border-radius: 3px; background: #142219; color: #fff;
+ font: 700 clamp(8px, 1vw, 12px)/1.1 system-ui,sans-serif;
+}
+
+.tile.tunnel-preview { outline: 3px dashed #fff3b0; outline-offset: -4px; z-index: 2; }
+.tile.tunnel-preview .mark { font-weight: 900; }
