@@ -129,7 +129,13 @@ def test_reedwater_endpoints_and_lock(browser, url):
     expect(page.locator("#status")).to_contain_text("This is a destination (D)")
     right.click()
     expect(right.locator(".track")).to_have_count(1)
-    expect(page.locator('#level option[value="6"]')).to_be_disabled()
+    assert page.locator('#level option[value="6"]').evaluate("option => option.disabled")
+    page.locator("#level").evaluate("""select => {
+        select.value = '6';
+        select.dispatchEvent(new Event('change'));
+    }""")
+    expect(page.get_by_role("heading", name="Reedwater Ford")).to_be_visible()
+    expect(page.locator("#level")).to_have_value("5")
     expect(page.get_by_role("button", name="Skip to next puzzle")).to_have_count(0)
     expect(page.locator("#campaign-progress")).to_have_text("5 / 15 complete")
     page.close()
