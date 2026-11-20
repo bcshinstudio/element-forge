@@ -2,7 +2,7 @@
 (function(root){
  const E=typeof module==='undefined'?root.EFEngine:require('../map-editor/engine');
  const ground=['land','forest','ice'];
- const componentKinds=['bridge','intersection','checkpoint'];
+ const componentKinds=['bridge','metalSpan','intersection','checkpoint'];
  const edgeKey=(previous,cell,next)=>previous+':'+cell+':'+next;
 
  // Each low-level search respects the current's bans and optional player prefix.
@@ -18,7 +18,7 @@
   const passable=map.cells.map((cell,i)=>{
    const kind=E.effective(map,placements,i);
    return !bans.has(i)&&(!cell.node||cell.node.element===pair.element)&&
-    (ground.includes(cell.terrain)||(cell.terrain==='water'&&kind==='bridge'))&&
+    !E.terrainError(map,pair.element,i,kind)&&
     !rules.forbidTerrain?.includes(cell.terrain)&&!rules.forbidComponents?.includes(kind)&&
     (kind!=='checkpoint'||!cell.props?.element||['any',pair.element].includes(cell.props.element));
   });
@@ -32,7 +32,7 @@
   if(start[0]!==pair.source||new Set(start).size!==start.length)return null;
   for(let i=0;i<start.length;i++){
    const cell=start[i];
-   if(!passable[cell]||(i>0&&!adjacency[start[i-1]].includes(cell))||
+   if(!passable[cell]||(i>0&&(!adjacency[start[i-1]].includes(cell)||!E.allowedTransition(map,pair.element,start[i-1],cell,placements)))||
      (i>1&&bans.has(edgeKey(start[i-2],start[i-1],cell)))||
      (cell===pair.destination&&i!==start.length-1))return null;
    mask|=flags(cell);
@@ -48,7 +48,7 @@
      continue;
     }
     for(const next of adjacency[cell]){
-     if(next===pair.source||!passable[next]||bans.has(edgeKey(previous,cell,next))||
+     if(next===pair.source||!E.allowedTransition(map,pair.element,cell,next,placements)||!passable[next]||bans.has(edgeKey(previous,cell,next))||
        (simple?state.path.includes(next):start.includes(next)))continue;
      const nextMask=state.mask|flags(next);
      const path=[...state.path,next];
@@ -88,16 +88,16 @@
   const adjacency=map.cells.map((_,i)=>E.neighbors(i,map.width,map.height).map(([next])=>next));
   const pairs=E.pairs(map);
   const supported=pairs.length>0&&pairs.every(pair=>pair.source>=0&&pair.destination>=0)&&
-   map.cells.every(cell=>[...ground,'water','mountain','wall'].includes(cell.terrain)&&
+   map.cells.every(cell=>[...ground,'water','mountain','wall','river','bank','shallow','scree','heated','abrasive','exposed','covered','lava'].includes(cell.terrain)&&
     (!cell.component||componentKinds.includes(cell.component)))&&
-   Object.keys(map.inventory).every(kind=>['bridge','intersection'].includes(kind)||!map.inventory[kind])&&
+   Object.keys(map.inventory).every(kind=>['bridge','metalSpan','intersection'].includes(kind)||!map.inventory[kind])&&
    map.cells.filter(cell=>cell.component==='checkpoint').length<20&&
    Object.values(map.constraints).every(rule=>(rule.requireComponents?.length||0)<10);
   const requiredIntersection=Object.values(map.constraints).some(rule=>rule.requireComponents?.includes('intersection'));
-  const canCross=i=>adjacency[i].length===4&&adjacency[i].every(j=>
+  const canCross=i=>map.rulesVersion===3||adjacency[i].length===4&&adjacency[i].every(j=>
    ground.includes(map.cells[j].terrain)||
    (map.cells[j].terrain==='water'&&(map.cells[j].component==='bridge'||map.inventory.bridge)));
-  const sites=map.cells.flatMap((_,i)=>['bridge','intersection'].flatMap(kind=>
+  const sites=map.cells.flatMap((_,i)=>['bridge','metalSpan','intersection'].flatMap(kind=>
    map.inventory[kind]&&E.canPlace(map,{},i,kind)&&
    (kind!=='intersection'||requiredIntersection||canCross(i))?[{i,kind}]:[]));
   return {map,adjacency,pairs,supported,sites};

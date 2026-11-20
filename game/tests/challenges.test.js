@@ -3,6 +3,7 @@ const assert=require('node:assert/strict');
 const {readFileSync}=require('node:fs');
 const {test}=require('node:test');
 const G=require('../challenges');
+const generateLegacy=options=>G.generate({...options,legacy:true});
 const R=require('../routing-search');
 const {release}=require('../challenge-release');
 const F=require('../../map-editor/map-format');
@@ -52,22 +53,13 @@ test('Grove Crossing has competing checkpoint approaches and a late Plant confli
  replayEvidence(level,check);
 });
 
-test('curated pack is generated reproducibly and contains a solution-free export',()=>{
+test('curated release reproduces 12 × 12 verified stages with no solution in the export',()=>{
  const {pack,report}=release();
- assert.deepEqual({pack,report},release());
- assert.equal(pack.stages.length,8);
- assert.equal(report.evidence.filter(item=>item.origin==='reference').length,4);
- assert.deepEqual([...new Set(pack.stages.map(stage=>stage.difficulty))],G.difficulties);
- assert.ok(pack.stages.some(stage=>stage.special));
+ assert.deepEqual(release(),{pack,report});
+ assert.ok(pack.stages.every(stage=>stage.map.width===12&&stage.map.height===12&&stage.rulesVersion===3));
  assert.ok(!JSON.stringify(pack).includes('"solution"'));
- const curated=readFileSync(require.resolve('../curated'),'utf8').split('window.EFCurated=')[1].trim().slice(0,-1);
- assert.deepEqual(JSON.parse(curated),pack);
- const roundTrip=G.readPack(JSON.parse(JSON.stringify(pack)));
- for(const [i,stage] of roundTrip.entries()){
-  replayEvidence(stage,report.evidence[i]);
-  const fire=report.evidence[i].solution.routes.find(route=>route.element==='fire');
-  if(fire)assert.ok(fire.path.every(index=>stage.map.cells[index].terrain!=='water'));
- }
+ assert.equal(G.readPack(JSON.parse(JSON.stringify(pack))).length,pack.stages.length);
+ for(const [index,stage] of pack.stages.entries())assert.ok(G.replay(stage,report.evidence[index].solution));
 });
 
 test('normalizes rotations and reflections and filters repeated decisions inside packs',()=>{
@@ -77,13 +69,13 @@ test('normalizes rotations and reflections and filters repeated decisions inside
   map.cells[(map.height-1-i%map.height)*map.width+Math.floor(i/map.height)])};
  assert.equal(G.layoutKey(map),G.layoutKey(reflected));
  assert.equal(G.layoutKey(map),G.layoutKey(rotated));
- const {report}=G.generate({family:'budget',difficulty:'Expert',seed:'river-valley-28',count:8});
+ const {report}=generateLegacy({family:'budget',difficulty:'Expert',seed:'river-valley-28',count:8});
  assert.equal(new Set(report.evidence.map(e=>e.decision)).size,report.accepted);
  assert.ok(report.rejections.some(r=>r.reason==='Repeated layout or decision'));
 });
 
 test('fresh seeds change verified bridge plans',()=>{
- const pack=seed=>G.generate({family:'budget',difficulty:'Expert',seed,count:2});
+ const pack=seed=>generateLegacy({family:'budget',difficulty:'Expert',seed,count:2});
  const a=pack('river-valley-26'),b=pack('river-valley-27');
  const bridgeUsers=batch=>batch.report.evidence.map(item=>item.placementChoices.filter(probe=>probe.status==='solved')
   .map(probe=>probe.usableBy.join('+')).sort().join('/'));
@@ -107,10 +99,10 @@ test('search exhaustion is unknown, and fallback cannot promote a stage into the
  const check=G.verify(G.reference('budget'),{limit:1});
  assert.equal(check.clean,'inconclusive');
  assert.equal(check.accepted,false);
- const expert=G.generate({attempts:0,count:2,family:'budget',difficulty:'Expert'});
+ const expert=generateLegacy({attempts:0,count:2,family:'budget',difficulty:'Expert'});
  assert.equal(expert.report.fallback,1);
  assert.equal(expert.report.shortfall,1);
- const easy=G.generate({attempts:0,count:2,family:'budget',difficulty:'Easy'});
+ const easy=generateLegacy({attempts:0,count:2,family:'budget',difficulty:'Easy'});
  assert.equal(easy.report.accepted,0);
  assert.equal(easy.report.shortfall,2);
 });

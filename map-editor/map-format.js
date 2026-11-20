@@ -1,15 +1,15 @@
 'use strict';
 (function(root){
 const E=typeof module==='undefined'?root.EFEngine:require('./engine.js');
-const TERRAIN=[['land','Land','·'],['mountain','Mountain','▲'],['water','Water','≈'],['wall','Wall','▦'],['forest','Forest','♣'],['lava','Lava','♨'],['ice','Ice','❄'],['void','Void','◼'],['oneway','One-way','➜']];
-const COMPONENTS=[['bridge','Bridge','═'],['intersection','Intersection','╋'],['tunnel','Tunnel end','◉'],['portal','Portal','◎'],['junction','Junction','⑂'],['sorter','Sorter','◇'],['converter','Converter','⬡'],['gate','Gate','⊣'],['checkpoint','Checkpoint','⚑'],['remover','Remover','✕'],['booster','Booster','»']];
-const ELEMENTS={fire:{name:'Fire',color:'#d55b4e'},water:{name:'Water',color:'#377fd1'},nature:{name:'Plant',icon:'🌿',symbol:'P',color:'#419d66'},electricity:{name:'Electricity',color:'#d5ac29'},arcane:{name:'Arcane',color:'#9368c5'},wind:{name:'Wind',color:'#7dc8bc'}};
+const TERRAIN=[['land','Land','·'],['mountain','Mountain','▲'],['water','Water','≈'],['wall','Wall','▦'],['forest','Forest','♣'],['lava','Lava','♨'],['ice','Ice','❄'],['void','Void','◼'],['oneway','One-way','➜'],['river','Deep river','≈'],['bank','River bank','⇆'],['shallow','Shallow water','≋'],['scree','Scree','⋰'],['heated','Heated ground','♨'],['abrasive','Abrasive ground','▒'],['exposed','Exposed channel','☀'],['covered','Covered channel','☾']];
+const COMPONENTS=[['bridge','Light bridge','═'],['metalSpan','Metal span','▤'],['intersection','Intersection','╋'],['tunnel','Tunnel end','◉'],['portal','Portal','◎'],['junction','Junction','⑂'],['sorter','Sorter','◇'],['converter','Converter','⬡'],['gate','Gate','⊣'],['checkpoint','Checkpoint','⚑'],['remover','Remover','✕'],['booster','Booster','»']];
+const ELEMENTS={fire:{name:'Fire',color:'#d55b4e'},water:{name:'Water',color:'#377fd1'},nature:{name:'Plant',icon:'🌿',symbol:'P',color:'#419d66'},electricity:{name:'Electricity',color:'#d5ac29'},arcane:{name:'Arcane',color:'#9368c5'},wind:{name:'Wind',color:'#7dc8bc'},earth:{name:'Earth',color:'#d8a37d',symbol:'R'},ice:{name:'Ice',color:'#b8eaff',symbol:'I'},metal:{name:'Metal',color:'#c3c9db',symbol:'M'},light:{name:'Light',color:'#fff197',symbol:'L'},shadow:{name:'Shadow',color:'#ba9bf6',symbol:'H'}};
 const TIDS=new Set(TERRAIN.map(x=>x[0])),CIDS=new Set(COMPONENTS.map(x=>x[0])),DIRECTIONS=['N','E','S','W'];
 const fresh=(w=12,h=12)=>({format:'element-forge-map',schemaVersion:2,name:'Untitled Map',description:'',width:w,height:h,cells:Array.from({length:w*h},()=>({terrain:'land'})),constraints:{},inventory:Object.fromEntries(COMPONENTS.map(([id])=>[id,['bridge','intersection'].includes(id)?1:0]))});
 const RULES=['forbidTerrain','forbidComponents','requireComponents'];
 const LINKS=['portal','tunnel'];
-const PLAYABLE=['bridge','intersection','portal','tunnel','gate','checkpoint'];
-const PLACEABLE=['bridge','intersection','portal','tunnel'];
+const PLAYABLE=['bridge','metalSpan','intersection','portal','tunnel','gate','checkpoint'];
+const PLACEABLE=['bridge','metalSpan','intersection','portal','tunnel'];
 const record=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
 function parseConstraints(value){
  const result={};if(value===undefined)return result;
@@ -64,7 +64,7 @@ function parseConstruction(source,inventory){
     !record(source.prices))throw Error('Invalid construction budget.');
  const prices={};
  for(const [kind,price] of Object.entries(source.prices)){
-  if(!['bridge','intersection','tunnel'].includes(kind)||!Number.isInteger(price)||price<1||price>999){
+  if(!['bridge','metalSpan','intersection','tunnel','portal'].includes(kind)||!Number.isInteger(price)||price<1||price>999){
    throw Error('Invalid construction tool price.');
   }
   prices[kind]=price;
@@ -84,6 +84,7 @@ function parseMap(source){
     !Array.isArray(source.cells)||source.cells.length!==width*height)throw Error('Invalid dimensions or cell count.');
  if(source.inventory!=null&&!record(source.inventory))throw Error('Invalid inventory.');
  const result=fresh(width,height);
+ if(source.rulesVersion===3)result.rulesVersion=3;
  result.name=String(source.name||'Untitled Map').slice(0,80);
  result.description=String(source.description||'').slice(0,500);
  result.cells=Array.from(source.cells,(cell,index)=>parseCell(cell,index,source.schemaVersion));
@@ -141,7 +142,8 @@ function assertPlayable(map){
  for(const [i,{component,terrain}] of map.cells.entries()){
   if(!component)continue;
   if(!PLAYABLE.includes(component))throw Error(`Cell ${i+1}: unsupported game component ${component}.`);
-  const allowed=component==='bridge'?['water','land','forest','ice','oneway']:['land','forest','ice','oneway'];
+  const ground=['land','forest','ice','oneway','bank','exposed','covered'];
+  const allowed=E.spanKinds.includes(component)?['water','river','shallow',...ground]:ground;
   if(!allowed.includes(terrain))throw Error(`Cell ${i+1}: ${component} cannot be used on ${terrain}.`);
  }
 }
@@ -153,14 +155,14 @@ function createLevel(source){
  if(result.status!=='solved')throw Error(`Could not verify a solution (${result.status}): ${result.message||'unknown result'}`);
  const errors=E.checkAll(map,result.routes,result.placements);
  if(errors.length)throw Error(errors.join(' '));
- return {format:'element-forge-level',schemaVersion:1,rulesVersion:map.construction?2:1,map};
+ return {format:'element-forge-level',schemaVersion:1,rulesVersion:map.rulesVersion===3?3:map.construction?2:1,map};
 }
 
 function readLevel(source){
  if(!record(source)||source.format!=='element-forge-level'||source.schemaVersion!==1||
-    ![1,2].includes(source.rulesVersion)||source.map?.schemaVersion!==2||
-    (source.rulesVersion===2)!==(source.map.construction!==undefined))throw Error('Unsupported game level or rules version.');
- const map=parseMap(source.map);
+    ![1,2,3].includes(source.rulesVersion)||source.map?.schemaVersion!==2||
+    (source.rulesVersion!==3&&(source.rulesVersion===2)!==(source.map.construction!==undefined)))throw Error('Unsupported game level or rules version.');
+ const map=parseMap({...source.map,rulesVersion:source.rulesVersion});
  assertPlayable(map);
  return map;
 }

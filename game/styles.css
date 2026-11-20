@@ -138,3 +138,23 @@ footer { padding: 0 16px 20px; text-align: center; color: var(--muted); font-siz
  .engine-wheel { animation: engine-turn 2s ease-out both; }
 }
 @keyframes engine-turn { to { transform: rotate(720deg); } }
+
+[hidden] { display: none !important; }
+button.brand { background: transparent; border: 0; text-align: left; }
+#challenge-menu { margin-top: 1rem; }
+.tile.river { background: #235b79; }
+.tile.bank { background: #9c8b5d; }
+.tile.shallow { background: #4b8c99; }
+.tile.scree { background: #675f53; }
+.tile.heated, .tile.lava { background: #943f38; }
+.tile.abrasive { background: #6d5d71; }
+.tile.exposed { background: #a28b51; }
+.tile.covered { background: #514c73; }
+#check.ready { outline: 2px solid #caff9c; outline-offset: 3px; }
+.harmony-pulse { animation: harmony 750ms ease-out; }
+@keyframes harmony {
+  35% { box-shadow: 0 0 32px #caff9caa; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .harmony-pulse { animation: none; }
+}

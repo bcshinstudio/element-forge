@@ -8,14 +8,20 @@
  try{storage=window.localStorage;}catch{}
  const progress=window.EFProgress.createProgress(storage,levels.slice(0,campaignSize).map(level=>level.id));
  const challengeStart=campaignSize+2;
- let challengeEnd=challengeStart;
+ let challengeEnd=challengeStart,activePack=null,challengeBest={};
  const $=id=>document.getElementById(id);
  const board=$('board');
  const colors={fire:'#ff9875',water:'#79d7ff',nature:'#bdec81',electricity:'#ffdd72',arcane:'#d9b5ff',wind:'#a8f0dd'};
  const symbols={fire:'F',water:'W',nature:'P',electricity:'E',arcane:'A',wind:'V'};
+ for(const [id,element] of Object.entries(F.ELEMENTS)){
+  colors[id]??=element.color;
+  symbols[id]??=element.symbol;
+ }
  const toolNames=Object.fromEntries(F.COMPONENTS.map(([id,name])=>[id,name]));
  const componentSymbols=Object.fromEntries(F.COMPONENTS.map(([id,,icon])=>[id,icon]));
  const terrainSymbols={forest:'♣',mountain:'▲',water:'≈',wall:'▦',void:'◌',ice:'✧',lava:'≋',land:''};
+ for(const [id,,glyph] of F.TERRAIN)terrainSymbols[id]??=glyph;
+ const terrainNames=Object.fromEntries(F.TERRAIN.map(([id,name])=>[id,name]));
  const arrows={N:'↑',E:'→',S:'↓',W:'←'};
  toolNames.tunnel='Tunnel';
  let session,tiles,tool,tunnelStart=null,levelIndex,timer=null,drag=null,importTicket=0;
@@ -24,7 +30,13 @@
  function canOpen(index){
   return index>=campaignSize||index<=progress.unlockedIndex();
  }
- function openLevel(index){
+ function openLevel(index,saved=null){
+  if(!levels[index])return;
+  $('home').hidden=true;
+  $('play-view').hidden=false;
+  document.querySelector('.campaign-picker').hidden=false;
+  intro.hidden=index!==0||introSeen;
+  tool='route';
   if(!canOpen(index)){ $('level').value=levelIndex;return; }
   stopAnimation();
   drag=null;
@@ -32,6 +44,8 @@
   session=window.EFSession.createSession(levels[index]);
   const {map}=session;
   levelIndex=index;
+  const restored=session.restore(saved);
+  if(restored&&session.state.phase==='complete')drawResult(session.evaluate());
   if(index<campaignSize){progress.select(levels[index].id);updateLevelLabels();}
   $('level').value=index;
   $('puzzle-options').open=false;
@@ -63,7 +77,33 @@
   $('link-id').value='A';
   drawPlan();
   update();
-  message('');
+  persist();
+  message(saved&&!restored?'This board changed. Your unlocked stages and scores were kept.':'');
+ }
+
+ function campaignSnapshot(){
+  return {id:levels[levelIndex].id,rules:levels[levelIndex].rulesVersion,board:session.snapshot()};
+ }
+
+ function persist(){
+  if(levelIndex<campaignSize)progress.saveCampaign(campaignSnapshot());
+  else if(levelIndex>=challengeStart&&activePack)progress.saveChallenge({
+   pack:activePack,index:levelIndex-challengeStart,best:challengeBest,board:session.snapshot()
+  });
+ }
+
+ function drawResult(result){
+  const {points,available,tiles,unspent}=result;
+  $('score').textContent=`${points} points · ${available} board tiles − 2 × ${tiles} route tiles + 10 × ${unspent} unspent construction points`;
+  const best=levelIndex<campaignSize?progress.best(levels[levelIndex].id):challengeBest[levelIndex-challengeStart];
+  $('totals').textContent=best==null?'':`Stage best ${best}`+(levelIndex<campaignSize?` · Campaign total ${progress.total()}`:'');
+ }
+
+ function ready(){
+  const result=session.evaluate();
+  $('projected').hidden=!result.ok;
+  $('check').classList.toggle('ready',result.ok);
+  $('projected').textContent=result.ok?`Projected score ${result.points} points`:'';
  }
 
  function toolEntries(){return Object.entries(session.map.inventory).filter(([,count])=>count>0);}
@@ -84,7 +124,13 @@
     field.max=quantity;
     field.required=true;
     field.value=Math.floor((state.loadout[kind]??0)/unit);
-    field.addEventListener('input',updateBudget);
+    field.addEventListener('input',()=>{
+     updateBudget();
+     if(!$('start').disabled&&field.validity.valid){
+      state.loadout=selection();
+      persist();
+     }
+    });
     label.append(field);
    }else label.append(document.createTextNode(' × '+quantity));
    return label;
@@ -135,6 +181,7 @@
   $('replan').hidden=!session.map.construction;
   $('link-field').hidden=tool!=='portal';
   syncDragHandles();
+  ready();
   $('instructions').textContent=tool==='remove'?'Choose a tool on the map to remove it.':
    tool==='route'?'Tap a source or unfinished tip to draw. Swipe elsewhere on the board to scroll.':
    tool==='tunnel'?(tunnelStart===null?'Choose the first open tile for your tunnel.':
@@ -157,7 +204,8 @@
   if(phase==='build')drawToolBar();
   $('next').disabled=levelIndex<campaignSize?levelIndex===campaignSize-1:
    levelIndex<challengeStart||levelIndex+1>=challengeEnd;
-  $('next').textContent=levelIndex>=challengeStart?'Next Stage':'Next puzzle';
+  $('next').textContent=levelIndex===campaignSize-1?'Campaign summary':'Next Stage';
+  if(levelIndex===campaignSize-1)$('next').disabled=false;
   drawBoard();
  }
 
@@ -221,7 +269,7 @@
    tile.replaceChildren(fragments[i]);
    const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
    const label=`Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, `+
-    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):cell.terrain);
+    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[cell.terrain]||cell.terrain));
    tile.title=label;
    tile.setAttribute('aria-label',label);
   }
@@ -240,7 +288,7 @@
   if(result.message==='Element component restriction violated'){
    return F.ELEMENTS[element].name+' cannot use '+toolNames[E.effective(map,state.placements,index)].toLowerCase()+' on this level.';
   }
-  if(/^Blocked terrain/.test(result.message)&&map.cells[index].terrain==='water'){
+  if(/^Blocked terrain/.test(result.message)&&E.canPlace(map,state.placements,index,'bridge')&&state.loadout.bridge){
    return 'This water tile needs a bridge. Click or tap it to build one.';
   }
   return result.message;
@@ -257,8 +305,10 @@
  function act(index,direct=false){
   if(session.state.phase!=='build')return;
   const {map,state}=session;
-  const bridgeTile=direct&&tool==='route'&&map.cells[index].terrain==='water'&&
-   !E.effective(map,state.placements,index);
+  const element=state.active?.element;
+  const bridgeTile=direct&&tool==='route'&&state.loadout.bridge>(E.placementCounts(state.placements).bridge||0)&&
+   E.canPlace(map,state.placements,index,'bridge')&&(!element||
+    Boolean(E.terrainError(map,element,index,null))&&!E.terrainError(map,element,index,'bridge'));
   if(tool==='tunnel'&&tunnelStart===index){cancelTool();return true;}
   if(tool==='tunnel'&&tunnelStart===null){
    if(!E.canPlace(map,state.placements,index,'tunnel')){message('Choose an open tile for the tunnel opening.');return false;}
@@ -275,6 +325,8 @@
   tunnelStart=null;
   drawBoard();
   if(bridgeTile||tool!=='route'){tool='route';drawToolBar();}
+  else ready();
+  persist();
   return true;
  }
 
@@ -283,6 +335,8 @@
   timer=null;
   board.querySelectorAll('.orb').forEach(orb=>orb.remove());
   $('replay').disabled=false;
+  $('skip-animation').hidden=true;
+  board.classList.remove('harmony-pulse');
  }
 
  function animate(){
@@ -291,9 +345,10 @@
   const {routes}=session.state;
   const count=Math.max(...routes.map(route=>route.path.length));
   $('replay').disabled=true;
+  $('skip-animation').hidden=false;
   const advance=()=>{
    board.querySelectorAll('.orb').forEach(orb=>orb.remove());
-   if(step>=count){stopAnimation();return;}
+   if(step>=count){stopAnimation();board.classList.add('harmony-pulse');return;}
    for(const {element,path} of routes){
     const orb=document.createElement('span');
     orb.className='orb';
@@ -302,7 +357,7 @@
    }
    step++;
   };
-  timer=setInterval(advance,145);
+  timer=setInterval(advance,Math.min(115,Math.ceil(2400/count)));
   advance();
  }
 
@@ -315,6 +370,7 @@
   update();
   message('');
   focusSource();
+  persist();
  });
  $('tools').addEventListener('click',event=>{
   const kind=event.target.dataset.tool;
@@ -344,21 +400,33 @@
   update();
   message(replan?'Choose a new loadout.':'The board has been reset.');
   if(replan)$('start').focus();else focusSource();
+  persist();
  }
  $('restart').onclick=()=>reset(false);
  $('replan').onclick=()=>reset(true);
  $('replay').onclick=()=>reset(true);
- $('undo').onclick=()=>{if(tool!=='route'){cancelTool();return;}if(session.undo()){drawBoard();drawToolBar();message('Last change undone.');}};
+ $('undo').onclick=()=>{if(tool!=='route'){cancelTool();return;}if(session.undo()){drawBoard();drawToolBar();message('Last change undone.');persist();}};
  $('check').onclick=()=>{
   const result=session.verify();
   if(!result.ok){message(result.message);return;}
-  if(levelIndex<campaignSize){progress.complete(levels[levelIndex].id);updateLevelLabels();}
-  $('score').textContent=`Track length ${result.track}`+(result.spend===null?'':` · Construction spend ${result.spend} pt`);
+  if(levelIndex<campaignSize){
+   progress.complete(levels[levelIndex].id,result.points,campaignSnapshot());
+   updateLevelLabels();
+  }else if(levelIndex>=challengeStart){
+   const index=levelIndex-challengeStart;
+   challengeBest={...challengeBest,[index]:Math.max(challengeBest[index]??0,result.points)};
+   persist();
+  }
+  drawResult(result);
   update();
   message('');
   animate();
  };
- $('next').onclick=()=>{if(session.state.phase==='complete')openLevel(levelIndex+1);};
+ $('skip-animation').onclick=stopAnimation;
+ $('next').onclick=()=>{if(session.state.phase==='complete'){
+  if(levelIndex===campaignSize-1)showHome();
+  else openLevel(levelIndex+1);
+ }};
  $('level').onchange=()=>{importTicket++;openLevel(Number($('level').value));};
  $('import').onchange=async event=>{
   const input=event.target,file=input.files[0],ticket=++importTicket;
@@ -379,8 +447,10 @@
    openLevel(index);
   }catch(error){if(ticket===importTicket)$('import-error').textContent='Import failed. '+error.message;}
  };
- function loadPack(pack){
+ function loadPack(pack,saved){
   const stages=window.EFChallenges.readPack(pack);
+  activePack=pack;
+  challengeBest=saved?.best||{};
   $('level').querySelector('[data-challenge-pack]')?.remove();
   const group=document.createElement('optgroup');
   group.label='Challenge pack';
@@ -390,7 +460,8 @@
   challengeEnd=challengeStart+stages.length;
   stages.forEach((stage,index)=>group.append(new Option(stage.map.name,challengeStart+index)));
   $('level').append(group);
-  openLevel(challengeStart);
+  const index=Number.isInteger(saved?.index)&&saved.index>=0&&saved.index<stages.length?saved.index:0;
+  openLevel(challengeStart+index,saved?.board);
  }
 
  $('curated-pack').onclick=()=>{loadPack(window.EFCurated);$('challenge-library').open=false;};
@@ -454,12 +525,13 @@
   drawBoard();
   drawToolBar();
   message('Tool removed. Any track using it was cleared.');
+  persist();
  });
  document.addEventListener('keydown',event=>{
-  if(event.key==='Escape'&&session.state.phase==='build'&&tool!=='route'){event.preventDefault();cancelTool();}
+  if(event.key==='Escape'&&session?.state.phase==='build'&&tool!=='route'){event.preventDefault();cancelTool();}
  });
  document.addEventListener('pointerdown',event=>{
-  if(session.state.phase==='build'&&tool==='tunnel'&&!board.contains(event.target)&&
+  if(session?.state.phase==='build'&&tool==='tunnel'&&!board.contains(event.target)&&
      !$('tools').contains(event.target))cancelTool();
  });
  board.addEventListener('keydown',event=>{
@@ -498,13 +570,77 @@
  }
  const introKey='element-forge.world-engine-intro.v1';
  const intro=$('world-intro');
- try{intro.hidden=storage?.getItem(introKey)==='seen';}catch{}
+ let introSeen=false;
+ try{introSeen=storage?.getItem(introKey)==='seen';}catch{}
  function dismissIntro(){
   intro.hidden=true;
+  introSeen=true;
   try{storage?.setItem(introKey,'seen');}catch{}
+ }
+ function continueCampaign(){
+  const saved=progress.campaign();
+  const index=levels.findIndex(level=>level?.id===saved?.id);
+  if(index>=0&&index<campaignSize&&canOpen(index)&&saved.board?.phase!=='complete'){
+   openLevel(index,saved.rules===levels[index].rulesVersion?saved.board:{});
+  }else openLevel(progress.unlockedIndex());
+ }
+ function showHome(){
+  stopAnimation();
+  $('home').hidden=false;
+  $('play-view').hidden=true;
+  document.querySelector('.campaign-picker').hidden=true;
+  intro.hidden=true;
+  const saved=progress.campaign();
+  const started=saved||progress.selected()||progress.completedCount()>0;
+  const target=saved?.board?.phase!=='complete'?levels.findIndex(level=>level?.id===saved?.id):-1;
+  const done=progress.completedCount()===campaignSize;
+  $('continue').textContent=done&&target<0?'Campaign complete · Replay final stage':started?
+   `Continue · Stage ${(target>=0&&target<campaignSize&&canOpen(target)?target:progress.unlockedIndex())+1}`:'Start Campaign';
+  $('home-total').textContent=started?`Campaign total ${progress.total()} · ${progress.completedCount()} of ${campaignSize} stages cleared`:'';
+  $('stage-select').hidden=!started;
+  $('new-campaign').hidden=!started;
+  $('resume-challenge').hidden=!progress.challenge()?.pack;
+  $('continue').focus();
  }
  $('intro-begin').onclick=dismissIntro;
  $('intro-skip').onclick=dismissIntro;
+ $('home-button').onclick=showHome;
+ $('continue').onclick=continueCampaign;
+ $('stage-select').onclick=()=>{
+  continueCampaign();
+  $('level').focus();
+  if(typeof $('level').showPicker==='function')try{$('level').showPicker();}catch{}
+ };
+ $('new-campaign').onclick=()=>{
+  if(!confirm('Start a new campaign and reset campaign progress and scores?'))return;
+  progress.reset();updateLevelLabels();openLevel(0);
+ };
+ $('choose-challenge').onclick=()=>{$('challenge-menu').hidden=!$('challenge-menu').hidden;};
+ $('home-curated').onclick=()=>loadPack(window.EFCurated);
+ $('resume-challenge').onclick=()=>{
+  const saved=progress.challenge();
+  try{loadPack(saved.pack,saved);}catch{progress.saveChallenge(null);$('resume-challenge').hidden=true;
+   $('challenge-status').textContent='This saved challenge could not be opened.';}
+ };
+ $('generate-challenge').onclick=()=>{
+  const button=$('generate-challenge'),status=$('challenge-status');
+  const difficulty=$('challenge-tier').value;
+  button.disabled=true;
+  status.textContent='Verifying a puzzle…';
+  setTimeout(()=>{
+   try{
+    const {pack}=window.EFChallenges.generate({difficulty,count:1,attempts:48,seed:String(Date.now())});
+    if(pack.stages.length)loadPack(pack);
+    else{
+     const reference=window.EFCurated.stages.find(stage=>stage.difficulty===difficulty);
+     if(reference)loadPack({...window.EFCurated,stages:[reference]});
+     else status.textContent='No verified puzzle found at this difficulty. Try again or open the curated pack.';
+    }
+   }catch(error){status.textContent=error.message;}
+   finally{button.disabled=false;}
+  },0);
+ };
  for(const [index,level] of levels.entries())$('level').add(new Option(level.map.name+(index===campaignSize?' · Optional':''),index));
- openLevel(Math.min(progress.unlockedIndex(),Math.max(0,levels.findIndex(level=>level.id===progress.selected()))));
+ updateLevelLabels();
+ showHome();
 })();

@@ -52,7 +52,7 @@ with sync_playwright() as pw:
     assert draft['cells'][37]['node']['role'] == 'source'
     level = download('#saveLevel')
     assert level['format'] == 'element-forge-level'
-    assert level['rulesVersion'] == 1
+    assert level['rulesVersion'] == 3
     assert level['map'] == draft
 
     page.once('dialog', lambda dialog: dialog.accept())
