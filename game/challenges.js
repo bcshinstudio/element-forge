@@ -346,11 +346,11 @@
   const board=Array.from({length:12},()=>Array(12).fill('#'));
   const put=(x,y,tile)=>{board[y][x]=tile;};
   for(let y=2;y<=9;y++)put(4,y,'=');
-  for(const y of [3,5,8])for(let x=5;x<=10;x++)put(x,y,x===5?':':'.');
-  for(let y=3;y<=8;y++)put(10,y,'.');
-  put(8,5,'.');put(9,6,'E');put(5,6,'e');
+  for(const y of [3,5,8])for(let x=5;x<=11;x++)put(x,y,x===5?':':'.');
+  for(let y=3;y<=8;y++)put(11,y,'.');
+  put(8,5,'.');put(9,6,'.');put(9,7,'E');put(5,6,'e');
   put(5,1,'p');put(5,2,'*');put(5,4,'P');
-  put(2,7,'w');put(3,7,':');put(10,7,'W');
+  put(1,7,'w');put(2,7,'.');put(3,7,'.');put(11,7,'W');
   const rows=board.map(row=>row.join(''));
   const level=fromRows(rows,'budget');
   for(const [i,tile] of rows.join('').split('').entries()){
@@ -374,7 +374,7 @@
   const alternatives=[3,5,8].map(exit=>{
    const placements={};
    const vertical=Array.from({length:Math.abs(exit-7)+1},(_,i)=>(7+i*Math.sign(exit-7))*12+4);
-   const prefix=[7*12+2,7*12+3,...vertical,exit*12+5];
+   const prefix=[7*12+1,7*12+2,7*12+3,...vertical,exit*12+5];
    const options={placements,prefixes:{water:prefix}};
    return {exit,solo:solve({...options,solo:'water'}).status,status:solve(options).status,
     plant:solve({...options,only:['water','nature']}).status,electricity:solve({...options,only:['water','electricity']}).status};
