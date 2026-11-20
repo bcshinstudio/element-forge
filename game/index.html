@@ -19,6 +19,7 @@
 <body>
  <header class="masthead">
   <button id="home-button" class="brand" type="button">Element Forge</button>
+  <button id="mobile-menu" type="button" hidden>Menu</button>
   <div class="campaign-picker">
   <label for="level">Puzzle
    <select id="level"></select>
@@ -73,7 +74,7 @@
     <p id="bridge-hint" hidden>Tap an empty water tile to place a bridge, even mid-route.</p>
     <div id="tools" class="tools" role="group" aria-label="Build tools"></div>
     <button id="remove" hidden>Remove tool</button>
-    <label id="link-field" hidden>Link ID <input id="link-id" value="A" maxlength="12"></label>
+    <label id="link-field" hidden>Portal pair <input id="link-id" value="A" maxlength="12"><select id="phone-link-id" aria-label="Portal pair"><option value="auto">Automatic pair</option></select></label>
     <p id="projected" role="status" hidden></p>
     <div class="build-actions">
      <button id="check" class="primary">Restore Harmony</button>
@@ -115,6 +116,10 @@
   </details>
   </div>
  </main>
+ <dialog id="game-menu" aria-label="Puzzle menu">
+  <form method="dialog"><button autofocus>Close menu</button></form>
+  <div id="menu-content"></div>
+ </dialog>
  <footer>BC Shin Studio</footer>
 </body>
 </html>

@@ -153,7 +153,7 @@
    '############','############','####...#####','####...#####','####...#####','##V..o...v##',
    '####.oo#####','############','############','############','############','############'
   ],{tunnel:2}),
-  level('Shifting Ridge','Earth crosses scree. Lightweight bridges cannot carry it.',[
+  level('Shifting Ridge','Earth crosses scree. Bridges cannot carry it.',[
    '############','############','##...~...###','##R..~..r###','##...~...###','##...%...###',
    '##...%...###','############','############','############','############','############'
   ],{bridge:1}),
@@ -161,7 +161,7 @@
    '############','############','##...^...###','##I..^..i###','##..._...###','##..._...###',
    '############','############','############','############','############','############'
   ]),
-  level('Foundry Run','Metal crosses heated and abrasive ground. It cannot use lightweight bridges.',[
+  level('Foundry Run','Metal crosses heated and abrasive ground. It cannot use bridges.',[
    '############','############','##..^.&..###','##M.^.&.m###','##..^.&..###','##..~.&..###',
    '############','############','############','############','############','############'
   ],{bridge:1}),
@@ -222,7 +222,7 @@
   lesson('Shallow Freeze','Ice can freeze shallow water to cross. Heated ground blocks Ice.',[
    'I..^..i','..._...','###_###'
   ],{requires:['shallow']}),
-  lesson('Foundry Floor','Metal crosses heated and abrasive terrain. Scree and lightweight bridges won’t carry it.',[
+  lesson('Foundry Floor','Metal crosses heated and abrasive terrain. Scree and bridges won’t carry it.',[
    'M.~.%.m','..^.&..','##^#&##'
   ],{requires:['heated','abrasive'],components:[[2,0,'bridge']]}),
   lesson('Open Sky','Light uses exposed channels. Covered passages block it.',[
@@ -231,7 +231,7 @@
   lesson('Under Cover','Shadow uses covered channels. Exposed passages block it.',[
    'H..+..h','...-...','###.###'
   ],{requires:['covered']}),
-  lesson('Build a Bridge','Give Plant a light bridge across the pool. Tap an empty water tile to place it.',[
+  lesson('Build a Bridge','Give Plant a bridge across the pool. Tap an empty water tile to place it.',[
    'N..~..n','...~...','###~###'
   ],{tools:{bridge:1},requires:['bridge']}),
   lesson('Cross at Right Angles','Use an intersection so two currents can cross. Both must go straight through.',[

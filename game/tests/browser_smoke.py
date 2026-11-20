@@ -191,6 +191,7 @@ def test_offline_touch_and_import(browser, offline):
                      "width": 4, "height": 4, "cells": cells, "inventory": {}}}
     field = page.locator("#import")
     expect(field).to_be_hidden()
+    page.locator("#mobile-menu").tap()
     page.get_by_text("Open a custom level", exact=True).tap()
     expect(field).to_be_visible()
     field.set_input_files({"name": "legacy.level.json", "mimeType": "application/json",
@@ -280,22 +281,19 @@ def test_portrait_tunnels(browser, url):
     page.goto(url + BASE)
     page.locator("#continue").click()
     unlock_through(page, 7)
+    page.locator("#mobile-menu").tap()
     page.locator("#level").select_option("7")
+    page.locator("#mobile-menu").tap()
     assert page.evaluate("document.documentElement.scrollWidth === innerWidth")
     page.locator("#puzzle-hint summary").tap()
     expect(page.locator("#hint-text")).to_contain_text("Either opening")
+    page.get_by_role("button", name="Close menu").tap()
     page.locator("#start").tap()
     assert tile(page, 50).evaluate("tile => getComputedStyle(tile).touchAction") == "none"
-    assert page.locator("#board").evaluate("board => getComputedStyle(board).touchAction") == "pan-y pinch-zoom"
-    session = page.context.new_cdp_session(page)
-    page.evaluate("scrollTo(0, 0)")
-    rect = tile(page, 52).bounding_box()
-    x, y = rect["x"] + rect["width"] / 2, rect["y"] + rect["height"] / 2
-    session.send("Input.dispatchTouchEvent", {"type": "touchStart", "touchPoints": [{"x": x, "y": y}]})
-    for distance in range(20, 141, 20):
-        session.send("Input.dispatchTouchEvent", {"type": "touchMove", "touchPoints": [{"x": x, "y": y-distance}]})
-    session.send("Input.dispatchTouchEvent", {"type": "touchEnd", "touchPoints": []})
-    page.wait_for_function("scrollY > 0")
+    assert page.locator("#board").evaluate("board => getComputedStyle(board).touchAction") == "pinch-zoom"
+    for selector in ("#board", "#check", "#undo"):
+        assert page.locator(selector).evaluate("e => e.getBoundingClientRect().bottom <= innerHeight"), selector
+    assert page.evaluate("scrollY === 0")
     expect(page.locator(".track")).to_have_count(0)
     tunnel = page.get_by_role("button", name="Tunnel (1)", exact=True)
     tunnel.tap()
@@ -313,7 +311,6 @@ def test_portrait_tunnels(browser, url):
     tile(page, 56).tap()
     for index in (51, 56):
         expect(tile(page, index)).to_have_attribute("aria-label", re.compile("Tunnel T1$"))
-    page.get_by_role("button", name="Remove tool").tap()
     tile(page, 56).tap()
     for index in (51, 56):
         expect(tile(page, index)).to_have_attribute("aria-label", re.compile("Land$"))
@@ -328,6 +325,7 @@ def test_world_engine_offline(browser, offline):
     use_harmony_catalog(page)
     page.goto(offline.as_uri())
     page.locator("#continue").tap()
+    page.locator("#mobile-menu").tap()
     expect(page.locator("#world-intro")).to_be_visible()
     page.locator("#intro-skip").tap()
     expect(page.locator("#world-intro")).to_be_hidden()
@@ -364,11 +362,13 @@ def test_challenge_pack_offline(browser, offline):
     plans = page.evaluate("EFCurated.stages.map(level => level.map.name === 'Scarce Crossing' ? EFChallenges.verifyScarce().solution : EFEngine.solveConstruction(EFMap.readLevel(level)))")
     assert all(plan and plan["status"] == "solved" for plan in plans)
     for i, plan in enumerate(plans):
-        page.locator("#start").scroll_into_view_if_needed()
-        for index, tool in plan["placements"].items():
+        assert page.locator("#start").evaluate("e => e.getBoundingClientRect().bottom <= innerHeight")
+        for tool in set(plan["placements"].values()):
             field = page.locator(f'#loadout input[name="{tool}"]')
             if field.count():
-                field.fill(str(list(plan["placements"].values()).count(tool)))
+                assert field.evaluate("e => e.readOnly")
+                for _ in range(list(plan["placements"].values()).count(tool)):
+                    page.get_by_role("button", name="Add " + tool.title(), exact=True).tap()
         page.locator("#start").tap()
         for index, tool in plan["placements"].items():
             if tool != "bridge":
@@ -388,6 +388,7 @@ def test_challenge_pack_offline(browser, offline):
             page.get_by_role("button", name="Next Stage").tap()
     expect(page.locator("#next")).to_be_disabled()
     expect(page.locator("#campaign-progress")).to_have_text("0 / 17 complete")
+    page.locator("#mobile-menu").tap()
     page.locator("#challenge-library summary").tap()
     page.locator("#pack-file").set_input_files({"name": "pack.json", "mimeType": "application/json",
                                                "buffer": json.dumps(pack).encode()})
@@ -472,7 +473,7 @@ if __name__ == "__main__":
                     test_offline_touch_and_import(browser, offline)
                     print("PASS standalone mobile emulation: responsive board, legacy import, touch routing and reduced motion")
                     test_portrait_tunnels(browser, url)
-                    print("PASS portrait touch: scroll, hints, cancel either way, paired placement and removal")
+                    print("PASS portrait touch: compact viewport, hints, cancel either way, paired placement and tap removal")
                     test_world_engine_offline(browser, offline)
                     print("PASS offline World-Engine intro, Wind jump, reduced motion and replay")
                     test_challenge_pack_offline(browser, offline)
