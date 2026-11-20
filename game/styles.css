@@ -127,3 +127,14 @@ footer { padding: 0 16px 20px; text-align: center; color: var(--muted); font-siz
  .sidebar summary { display: list-item; padding-block: 12px; }
  .endpoint-role { right: -2px; bottom: -2px; font-size: 9px; }
 }
+
+.world-intro { max-width: 48rem; margin: 1rem auto; padding: 1rem; background: #263b2c; border-radius: 12px; }
+.world-intro button { min-height: 44px; margin: 4px 4px 0 0; }
+.tile.void { background: radial-gradient(ellipse, #050907 32%, #35493c 74%); color: #94aa9a; }
+.tile.wind-landing { outline: 2px dashed #a8f0dd; outline-offset: -4px; z-index: 2; }
+.restoration { display: flex; align-items: center; gap: 12px; color: #ffda92; }
+.engine-wheel { display: inline-block; font-size: 2rem; }
+@media (prefers-reduced-motion: no-preference) {
+ .engine-wheel { animation: engine-turn 2s ease-out both; }
+}
+@keyframes engine-turn { to { transform: rotate(720deg); } }

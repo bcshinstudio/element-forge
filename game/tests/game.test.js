@@ -205,3 +205,37 @@ test('Campaign unlocks only through the first incomplete level',()=>{
  progress.complete('one');
  assert.equal(progress.unlockedIndex(),2);
 });
+
+test('legacy nature IDs retain saved maps and use the Plant label',()=>{
+ const packageData=structuredClone(catalog[6]);
+ const map=F.readLevel(packageData);
+ assert.ok(map.cells.some(cell=>cell.node?.element==='nature'));
+ assert.equal(F.ELEMENTS.nature.name,'Plant');
+ assert.equal(F.ELEMENTS.nature.symbol,'P');
+ assert.deepEqual(F.readLevel(F.createLevel(map)),map);
+});
+
+test('Wind prototype solves, but only Wind may jump a single hole in a straight line',()=>{
+ const {prototype}=require('../levels.js');
+ const map=F.readLevel(prototype);
+ const solved=E.solveConstruction(map);
+ assert.equal(solved.status,'solved');
+ assert.deepEqual(E.checkAll(map,solved.routes,solved.placements),[]);
+ const session=createSession(prototype);
+ session.start();
+ const path=solved.routes[0].path;
+ for(const index of path)assert.equal(session.route(index).ok,true);
+ assert.equal(session.verify().ok,true);
+ const [start,landing]=[64,66];
+ assert.ok(E.windLandings(map,start).includes(landing));
+ assert.ok(E.windLandings(map,landing).includes(start));
+ assert.ok(!E.windLandings(map,76).includes(79));
+ assert.ok(!E.windLandings(map,start).includes(78));
+ assert.equal(E.allowedTransition(map,'fire',start,landing),false);
+ const tunnelMap=F.fresh(4,4);
+ tunnelMap.cells[0].node={element:'wind',role:'source'};
+ tunnelMap.cells[3].node={element:'wind',role:'destination'};
+ tunnelMap.cells[2].terrain='mountain';
+ const openings={1:{kind:'tunnel',pairId:'A'},3:{kind:'tunnel',pairId:'A'}};
+ assert.match(E.validatePath(tunnelMap,'wind',[0,1,3],[],openings),/cannot use tunnels/);
+});

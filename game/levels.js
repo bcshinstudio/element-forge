@@ -5,8 +5,8 @@
  // Scenic sketches are row-major. Uppercase endpoints are sources.
  function level(name,description,rows,inventory={},construction,constraints={}){
   const map=F.fresh();
-  const terrain={'.':'land','#':'mountain','~':'water','*':'forest'};
-  const elements={f:'fire',w:'water',n:'nature',e:'electricity'};
+  const terrain={'.':'land','#':'mountain','~':'water','*':'forest','o':'void'};
+  const elements={f:'fire',w:'water',n:'nature',e:'electricity',v:'wind'};
   const checkpoints={'1':'fire','2':'water','3':'nature'};
   if(rows.length!==12||rows.some(row=>row.length!==12))throw Error('Expected a 12 × 12 level.');
   map.name=name;
@@ -21,7 +21,7 @@
   });
   map.constraints=constraints;
   if(rows.some(row=>row.includes('*'))){
-   for(const element of ['fire','water','electricity','arcane']){
+   for(const element of ['fire','water','electricity','arcane','wind']){
     const rule=constraints[element]??{};
     constraints[element]={...rule,forbidTerrain:[...new Set([...(rule.forbidTerrain??[]),'forest'])]};
    }
@@ -39,7 +39,7 @@
    '#####~######','##...~...###','#....~....##','#....~.w..##','#..W.~....##','#....~....##',
    '##...~...###','###..~..####','####.~.#####','#####~######','#####~######','#####~######'
   ],{bridge:1}),
-  level('Stone Pass','Fire and Nature meet in a narrow pass. Place an intersection where the two routes cross, then pass straight through it.',[
+  level('Stone Pass','Fire and Plant meet in a narrow pass. Place an intersection where the two routes cross, then pass straight through it.',[
    '############','######N#####','######.#####','######.#####','######.#####','######.#####',
    '#F........f#','######.#####','######.#####','######n#####','############','############'
   ],{intersection:1}),
@@ -51,11 +51,11 @@
    '############','###....#####','###.##..####','##..#~...###','#F...~..f..#','##..#~.#..##',
    '###..~.#.###','####.~..####','#####~..####','#####~.#####','#####~######','############'
   ],{bridge:1},undefined,{fire:{forbidTerrain:['water']}}),
-  level('Reedwater Ford','Nature avoids water. Water can cross with a bridge. Leave room for both routes on the east bank.',[
+  level('Reedwater Ford','Plant avoids water. Water can cross with a bridge. Leave room for both routes on the east bank.',[
    '############','####....####','###......###','##....~...##','##N...~..n##','####..~..###',
    '#######..###','###...~..###','##w...~...##','##....~..W##','###...~..###','############'
   ],{bridge:1},undefined,{nature:{forbidTerrain:['water']}}),
-  level('Briar Hollow','N is Nature. Nature can route through woods. Fire must stay in the clearing.',[
+  level('Briar Hollow','P is Plant. Plant can route through woods. Fire must stay in the clearing.',[
    '############','##***N***###','#**....****#','#*.F......*#','#*.....f..*#','#***###...*#',
    '#**********#','##*******n*#','##*********#','###******###','############','############'
   ],{},undefined,{fire:{forbidTerrain:['forest']}}),
@@ -79,7 +79,7 @@
    '############','###.1....###','##.......###','##F....f..##','###......###','############',
    '###.....2###','##........##','##w.#..W..##','###.......##','####.....###','############'
   ]),
-  level('Signal at the Pass','Nature stops at its checkpoint. The two routes must still cross straight at the intersection.',[
+  level('Signal at the Pass','Plant stops at its checkpoint. The two routes must still cross straight at the intersection.',[
    '############','#####N######','#####.######','#####3######','#####.######','#####.######',
    '#F........f#','#####.######','#####.######','#####n######','############','############'
   ],{intersection:1}),
@@ -87,7 +87,7 @@
    '############','##...~...###','##W..~...###','##...~.2w###','###..~..####','############',
    '####....####','###.1....###','##...~.f..##','##F..~....##','###..~...###','#####~######'
   ],{bridge:2,intersection:1},{budget:2,prices:{bridge:2,intersection:1}},{fire:{forbidTerrain:['water']}}),
-  level('The Threefold Divide','Plan two intersections, a bridge, and Nature’s checkpoint. Tap a different source to switch routes. You can build with routes unfinished.',[
+  level('The Threefold Divide','Plan two intersections, a bridge, and Plant’s checkpoint. Tap a different source to switch routes. You can build with routes unfinished.',[
    '############','###.N###w.##','###.3###..##','####.###.###','####.###.###','####.###.###',
    '#F........f#','####.###.###','####n###~###','####.###.###','#######.W.##','############'
   ],{intersection:2,bridge:2,tunnel:2},{budget:4,prices:{intersection:1,bridge:2,tunnel:1}},
@@ -101,8 +101,8 @@
   'An intersection lets two routes cross at right angles. Both must go straight through.',
   'Check whether either element can go around the water before spending the only bridge.',
   'Fire cannot enter a water tile, even with a bridge. Trace the edge of the fen.',
-  'Nature needs dry land. Leave some space between the bridge and each destination.',
-  'N stands for Nature. Only Nature can cross the trees in this campaign.',
+  'Plant needs dry land. Leave some space between the bridge and each destination.',
+  'P stands for Plant. Only Plant can cross the trees in this campaign.',
   'Both tunnel openings go on open tiles across a barrier. Either opening can be entered first.',
   'The tunnel price shown buys both openings. Compare the tool costs with the available budget.',
   'A bridge spans water and a tunnel connects open tiles across a barrier. Account for both jobs.',
@@ -114,7 +114,12 @@
  ];
  for(const [index,entry] of catalog.entries())entry.hint=hints[index];
 
- const api={catalog};
+ const prototype=level('Wind over the Rift','Tap a highlighted landing tile to carry Wind straight over one hole. Wind cannot use tunnels.',[
+  '############','############','#####..#####','####..######','####...##..#','##V..o...v.#',
+  '####.oo##..#','####...#####','############','############','############','############'
+ ]);
+ prototype.hint='Land directly across one hole. Two holes in a row and diagonal jumps cannot be crossed.';
+ const api={catalog,prototype};
  root.EFLevels=api;
  if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

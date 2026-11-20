@@ -1,7 +1,7 @@
 'use strict';
 /* Shared rules: browser global and Node test export. Prototype scope deliberately explicit. */
 (function(root){
-const ELEMENTS=['fire','water','nature','electricity','arcane'];
+const ELEMENTS=['fire','water','nature','electricity','arcane','wind'];
 const neighbors=(i,w,h)=>[[i-w,'N'],[i+1,'E'],[i+w,'S'],[i-1,'W']].filter(([j,d])=>j>=0&&j<w*h&&(d!=='E'||Math.floor(j/w)===Math.floor(i/w))&&(d!=='W'||Math.floor(j/w)===Math.floor(i/w)));
 const axis=(a,b,w)=>Math.floor(a/w)===Math.floor(b/w)?'h':'v';
 const pairs=m=>ELEMENTS.map(element=>({element,source:m.cells.findIndex(c=>c.node?.element===element&&c.node.role==='source'),destination:m.cells.findIndex(c=>c.node?.element===element&&c.node.role==='destination')})).filter(p=>p.source>=0||p.destination>=0);
@@ -23,12 +23,28 @@ const linkPartner=(m,i,placements={})=>{
  }
  return other;
 };
-const routeNeighbors=(m,i,placements={})=>[...neighbors(i,m.width,m.height).map(([j])=>j),...(linkPartner(m,i,placements)>=0?[linkPartner(m,i,placements)]:[])];
+function windLandings(m,i){
+ const ground=cell=>['land','forest','ice'].includes(cell?.terrain);
+ if(!ground(m.cells[i]))return [];
+ return neighbors(i,m.width,m.height).flatMap(([hole,heading])=>{
+  if(m.cells[hole].terrain!=='void')return [];
+  const landing=neighbors(hole,m.width,m.height).find(([,dir])=>dir===heading)?.[0];
+  return ground(m.cells[landing])?[landing]:[];
+ });
+}
+function routeNeighbors(m,i,placements={},element){
+ const result=neighbors(i,m.width,m.height).map(([j])=>j);
+ const partner=linkPartner(m,i,placements);
+ if(partner>=0&&(element!=='wind'||effective(m,placements,i)!=='tunnel'))result.push(partner);
+ if(element==='wind')result.push(...windLandings(m,i));
+ return result;
+}
 const terrainOK=(c,component)=>['land','forest','ice','oneway'].includes(c.terrain)||(c.terrain==='water'&&component==='bridge');
 const direction=(a,b,w)=>b===a-w?'N':b===a+w?'S':b===a+1&&Math.floor(a/w)===Math.floor(b/w)?'E':b===a-1&&Math.floor(a/w)===Math.floor(b/w)?'W':null;
 function allowedTransition(m,element,from,to,placements={}){
  const c=m.cells[from],next=m.cells[to],step=direction(from,to,m.width);
- if(!step)return linkPartner(m,from,placements)===to;
+ if(!step)return (element==='wind'&&windLandings(m,from).includes(to))||
+  (linkPartner(m,from,placements)===to&&(element!=='wind'||effective(m,placements,from)!=='tunnel'));
  if(c.terrain==='oneway'&&step!==(c.props?.direction||'E'))return false;
  if(c.component==='gate'&&step!==(c.props?.direction||'E'))return false;
  if(next.component==='gate'&&step!==(next.props?.direction||'E'))return false;
@@ -47,11 +63,12 @@ function validatePath(m,element,path,other=[],placements={},partial=false){
  const p=pairs(m).find(x=>x.element===element);if(!p||p.source<0||p.destination<0)return 'Missing endpoints';
  if(!Array.isArray(path)||path.length<(partial?1:2)||path[0]!==p.source||(!partial&&path.at(-1)!==p.destination))return 'Route must connect its source to destination';
  const seen=new Set();for(let k=0;k<path.length;k++){const i=path[k],c=m.cells[i];if(!Number.isInteger(i)||!c||seen.has(i))return 'Route leaves board or loops';seen.add(i);
- const comp=effective(m,placements,i);if(!terrainOK(c,comp))return `Blocked terrain at cell ${i+1}`;
+ const comp=effective(m,placements,i);if(element==='wind'&&comp==='tunnel')return 'Wind cannot use tunnels';
+ if(!terrainOK(c,comp))return `Blocked terrain at cell ${i+1}`;
  if(comp&&!['bridge','intersection','checkpoint','portal','tunnel','gate'].includes(comp))return `Unsupported component: ${comp}`;
  if(c.node&&(c.node.element!==element||(k!==0&&(k!==path.length-1||i!==p.destination))))return 'Another endpoint blocks route';
  if(c.component==='checkpoint'&&c.props?.element&&!['any',element].includes(c.props.element))return 'Checkpoint belongs to another element';
- if(k&& !routeNeighbors(m,path[k-1],placements).includes(i))return 'Routes must use adjacent cells or valid paired links';
+ if(k&& !routeNeighbors(m,path[k-1],placements,element).includes(i))return 'Routes must use adjacent cells or valid paired links';
  if(k&&!allowedTransition(m,element,path[k-1],i,placements))return 'One-way direction violated';
  }
  const restriction=constraintError(m,element,path,placements,partial);if(restriction)return restriction;
@@ -100,7 +117,7 @@ function solve(m,{limit=120000,maxPairs=3,allowPlacement=true,initialPlacements=
  const p=ordered[pi],stack=[{path:[p.source],seen:new Set([p.source]),placements}];
  while(stack.length){if(++nodes>limit){exhausted=true;return null;}const state=stack.pop(),cur=state.path.at(-1);
  if(cur===p.destination){if(validatePath(m,p.element,state.path,routes,state.placements))continue;const needed=m.cells.map((c,i)=>c.component==='checkpoint'&&['any',p.element].includes(c.props?.element)?i:-1).filter(i=>i>=0);if(needed.some(i=>!state.seen.has(i)))continue;const found=visitPair(pi+1,[...routes,{element:p.element,path:state.path}],state.placements);if(found)return found;if(exhausted)return null;continue;}
- const ns=routeNeighbors(m,cur,state.placements).filter(i=>!state.seen.has(i));ns.sort((a,b)=>distance(b,p.destination)-distance(a,p.destination));
+ const ns=routeNeighbors(m,cur,state.placements,p.element).filter(i=>!state.seen.has(i));ns.sort((a,b)=>distance(b,p.destination)-distance(a,p.destination));
  for(const i of ns){if(!allowedTransition(m,p.element,cur,i,state.placements))continue;const c=m.cells[i];if(c.node&&!(c.node.element===p.element&&c.node.role==='destination'))continue;let pl=state.placements,comp=effective(m,pl,i);const overlaps=routes.filter(r=>r.path.includes(i));let wanted=null;
  if(!terrainOK(c,comp)){if(c.terrain==='water'&&!comp)wanted='bridge';else continue;}
  if(comp&&!['bridge','intersection','checkpoint','portal','tunnel','gate'].includes(comp))continue;
@@ -146,5 +163,5 @@ function solveConstruction(m,{limit=120000,maxPairs=3,maxCandidates=180}={}){
  }
  return {status:hitLimit||direct.status==='inconclusive'?'inconclusive':'unsolved',message:hitLimit?'Some construction searches exceeded their limits':'No solution found within supported construction candidates',constructionAttempts:attempts};
 }
-const api={constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
+const api={windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
