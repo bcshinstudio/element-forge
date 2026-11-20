@@ -1,0 +1,82 @@
+:root {
+ color-scheme: dark;
+ font-family: "Trebuchet MS", system-ui, sans-serif;
+ color: #f8f3e5;
+ background: #102019;
+ --muted: #b6c7b5;
+ --border: #465a4c;
+ --accent: #f1c777;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; min-height: 100vh; }
+.masthead {
+ max-width: 1260px; margin: auto; padding: 22px clamp(16px,4vw,52px);
+ display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;
+ border-bottom: 1px solid var(--border);
+}
+.brand { color: var(--accent); font: 700 clamp(24px,4vw,36px) Georgia,serif; text-decoration: none; }
+.masthead label { display: flex; align-items: center; gap: 8px; }
+.layout {
+ max-width: 1260px; margin: auto; padding: 24px clamp(16px,4vw,52px);
+ display: grid; grid-template-columns: minmax(0, 720px) minmax(255px, 1fr); gap: clamp(16px,3vw,40px); align-items: start;
+}
+h1,h2 { font-family: Georgia,serif; margin: 0 0 10px; }
+h1 { font-size: clamp(29px,5vw,46px); }
+p { line-height: 1.5; }
+#description,#instructions,.legend,.import { color: var(--muted); }
+#board {
+ display: grid; grid-template-columns: repeat(var(--cols,12), minmax(0,1fr)); width: 100%;
+ padding: 4px; border: 1px solid var(--border); border-radius: 12px;
+ background: #1a2c22; touch-action: none; user-select: none;
+}
+.tile {
+ position: relative; display: grid; place-items: center; aspect-ratio: 1; min-width: 0;
+ padding: 0; border: 1px solid #18281d36; border-radius: 0; isolation: isolate;
+ background: #a5a370; color: #101f1a; font-size: clamp(12px,2.7vw,22px); line-height: 1;
+}
+.tile.forest { background: #59774f; }
+.tile.mountain,.tile.wall,.tile.void { background: #48524b; color: #eaf0e0; }
+.tile.water { background: #276983; color: #e2f6ff; }
+.tile.ice { background: #b6e0e4; }
+.tile.lava { background: #a8412c; color: #ffead2; }
+.tile:focus-visible { outline: 3px solid #fff; z-index: 3; }
+.track { position: absolute; inset: 0; pointer-events: none; }
+.track i { position: absolute; background: var(--line); box-shadow: inset 0 0 1px #000; }
+.track .dot { inset: 38%; border-radius: 50%; }
+.track .north { inset: 0 39% 48%; }
+.track .south { inset: 48% 39% 0; }
+.track .west { inset: 39% 48% 39% 0; }
+.track .east { inset: 39% 0 39% 48%; }
+.mark {
+ position: relative; z-index: 1; pointer-events: none; display: grid; place-items: center;
+ font-weight: 800;
+}
+.mark.endpoint {
+ width: 75%; height: 75%; max-width: 34px; max-height: 34px; border-radius: 50%;
+ background: var(--element); color: #121b16; border: 2px solid #fff8;
+}
+.mark.destination { border-style: double; border-width: 4px; }
+.mark.structure { border-radius: 4px; padding: 1px 3px; background: #19271edb; color: #fff4cc; }
+.orb { z-index: 2; position: absolute; inset: 24%; border-radius: 50%; background: var(--line); border: 2px solid white; box-shadow: 0 0 10px var(--line); pointer-events: none; }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; padding-top: 12px; }
+.legend b { color: var(--element); }
+.controls { border: 1px solid var(--border); border-radius: 14px; background: #1c3025; padding: 20px; }
+.tools,.actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+button,select,input { font: inherit; }
+button,select,input[type=number],input[type=text],#link-id {
+ background: #263b2c; color: #fff5df; border: 1px solid #728775; border-radius: 7px; padding: 8px 10px;
+}
+button { cursor: pointer; }
+button:disabled { opacity: .62; cursor: default; }
+button[aria-pressed=true] { box-shadow: inset 0 0 0 2px var(--accent); }
+.primary { background: var(--accent); color: #17251a; border-color: var(--accent); font-weight: 700; }
+.loadout-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.loadout-row input { width: 68px; }
+#import { display: block; max-width: 100%; margin-top: 6px; }
+#status { min-height: 1.5em; color: #ffda92; margin-bottom: 12px; }
+footer { padding: 0 16px 20px; text-align: center; color: var(--muted); font-size: .9rem; }
+@media (max-width: 790px) {
+ .layout { grid-template-columns: minmax(0, 1fr); max-width: 690px; }
+ .controls { padding: 14px; }
+}

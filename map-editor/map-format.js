@@ -59,6 +59,22 @@ function parseCell(cell,index,version){
  return next;
 }
 
+function parseConstruction(source,inventory){
+ if(!record(source)||!Number.isSafeInteger(source.budget)||source.budget<0||
+    !record(source.prices))throw Error('Invalid construction budget.');
+ const prices={};
+ for(const [kind,price] of Object.entries(source.prices)){
+  if(!['bridge','intersection'].includes(kind)||!Number.isInteger(price)||price<1||price>999){
+   throw Error('Invalid construction tool price.');
+  }
+  prices[kind]=price;
+ }
+ for(const [kind,count] of Object.entries(inventory)){
+  if(count&&!Object.hasOwn(prices,kind))throw Error(`Missing construction price for ${kind}.`);
+ }
+ return {budget:source.budget,prices};
+}
+
 function parseMap(source){
  if(!record(source)||source.format!=='element-forge-map'||![1,2].includes(source.schemaVersion)){
   throw Error('Unsupported map format/schema version.');
@@ -77,6 +93,7 @@ function parseMap(source){
   if(!Number.isInteger(count)||count<0||count>99)throw Error(`Invalid ${kind} inventory.`);
   result.inventory[kind]=count;
  }
+ if(source.construction!==undefined)result.construction=parseConstruction(source.construction,result.inventory);
  return result;
 }
 
@@ -136,12 +153,13 @@ function createLevel(source){
  if(result.status!=='solved')throw Error(`Could not verify a solution (${result.status}): ${result.message||'unknown result'}`);
  const errors=E.checkAll(map,result.routes,result.placements);
  if(errors.length)throw Error(errors.join(' '));
- return {format:'element-forge-level',schemaVersion:1,rulesVersion:1,map};
+ return {format:'element-forge-level',schemaVersion:1,rulesVersion:map.construction?2:1,map};
 }
 
 function readLevel(source){
  if(!record(source)||source.format!=='element-forge-level'||source.schemaVersion!==1||
-    source.rulesVersion!==1||source.map?.schemaVersion!==2)throw Error('Unsupported game level or rules version.');
+    ![1,2].includes(source.rulesVersion)||source.map?.schemaVersion!==2||
+    (source.rulesVersion===2)!==(source.map.construction!==undefined))throw Error('Unsupported game level or rules version.');
  const map=parseMap(source.map);
  assertPlayable(map);
  return map;

@@ -35,30 +35,42 @@ function allowedTransition(m,element,from,to,placements={}){
  if(next.terrain==='oneway'&&step!==(next.props?.direction||'E'))return false;
  return true;
 }
-function constraintError(m,element,path,placements={}){
+function constraintError(m,element,path,placements={},partial=false){
  const rules=m.constraints?.[element]||{};
  if(rules.forbidTerrain?.some(t=>path.some(i=>m.cells[i].terrain===t)))return 'Element terrain restriction violated';
  if(rules.forbidComponents?.some(t=>path.some(i=>effective(m,placements,i)===t)))return 'Element component restriction violated';
- if(rules.requireComponents?.some(t=>!path.some(i=>effective(m,placements,i)===t)))return 'Required component not used';
+ if(!partial&&rules.requireComponents?.some(t=>!path.some(i=>effective(m,placements,i)===t)))return 'Required component not used';
  return null;
 }
 function canPlace(m,placements,i,kind){const c=m.cells[i];return !!c&&!c.node&&!c.component&&!placements[i]&&(kind==='bridge'?c.terrain==='water':['intersection','portal','tunnel'].includes(kind)?['land','forest','ice'].includes(c.terrain):false)}
-function validatePath(m,element,path,other=[],placements={}){
+function validatePath(m,element,path,other=[],placements={},partial=false){
  const p=pairs(m).find(x=>x.element===element);if(!p||p.source<0||p.destination<0)return 'Missing endpoints';
- if(!Array.isArray(path)||path.length<2||path[0]!==p.source||path.at(-1)!==p.destination)return 'Route must connect its source to destination';
+ if(!Array.isArray(path)||path.length<(partial?1:2)||path[0]!==p.source||(!partial&&path.at(-1)!==p.destination))return 'Route must connect its source to destination';
  const seen=new Set();for(let k=0;k<path.length;k++){const i=path[k],c=m.cells[i];if(!Number.isInteger(i)||!c||seen.has(i))return 'Route leaves board or loops';seen.add(i);
  const comp=effective(m,placements,i);if(!terrainOK(c,comp))return `Blocked terrain at cell ${i+1}`;
  if(comp&&!['bridge','intersection','checkpoint','portal','tunnel','gate'].includes(comp))return `Unsupported component: ${comp}`;
- if(c.node&&(c.node.element!==element||(k!==0&&k!==path.length-1)))return 'Another endpoint blocks route';
+ if(c.node&&(c.node.element!==element||(k!==0&&(k!==path.length-1||i!==p.destination))))return 'Another endpoint blocks route';
  if(c.component==='checkpoint'&&c.props?.element&&!['any',element].includes(c.props.element))return 'Checkpoint belongs to another element';
  if(k&& !routeNeighbors(m,path[k-1],placements).includes(i))return 'Routes must use adjacent cells or valid paired links';
  if(k&&!allowedTransition(m,element,path[k-1],i,placements))return 'One-way direction violated';
  }
- const restriction=constraintError(m,element,path,placements);if(restriction)return restriction;
- for(const r of other){if(r.element===element)continue;for(const i of path){if(!r.path.includes(i))continue;if(effective(m,placements,i)!=='intersection')return 'Different elements cannot share a cell';const a=path.indexOf(i),b=r.path.indexOf(i);if(a===0||a===path.length-1||b===0||b===r.path.length-1)return 'Crossing cannot be at an endpoint';const a1=axis(path[a-1],i,m.width),a2=axis(i,path[a+1],m.width),b1=axis(r.path[b-1],i,m.width),b2=axis(i,r.path[b+1],m.width);if(!direction(path[a-1],i,m.width)||!direction(i,path[a+1],m.width)||!direction(r.path[b-1],i,m.width)||!direction(i,r.path[b+1],m.width)||a1!==a2||b1!==b2||a1===b1)return 'Intersection needs straight perpendicular routes';}}
+ const restriction=constraintError(m,element,path,placements,partial);if(restriction)return restriction;
+ for(const r of other){if(r.element===element)continue;for(const i of path){if(!r.path.includes(i))continue;if(effective(m,placements,i)!=='intersection')return 'Different elements cannot share a cell';const a=path.indexOf(i),b=r.path.indexOf(i);if(partial&&a===path.length-1&&a>0&&b>0&&b<r.path.length-1)continue;if(a===0||a===path.length-1||b===0||b===r.path.length-1)return 'Crossing cannot be at an endpoint';const a1=axis(path[a-1],i,m.width),a2=axis(i,path[a+1],m.width),b1=axis(r.path[b-1],i,m.width),b2=axis(i,r.path[b+1],m.width);if(!direction(path[a-1],i,m.width)||!direction(i,path[a+1],m.width)||!direction(r.path[b-1],i,m.width)||!direction(i,r.path[b+1],m.width)||a1!==a2||b1!==b2||a1===b1)return 'Intersection needs straight perpendicular routes';}}
  return null;
 }
-function checkAll(m,routes,placements={}){const errors=[];const counts={};for(const [i,v] of Object.entries(placements)){const k=placementKind(v);if(!canPlace(m,Object.fromEntries(Object.entries(placements).filter(([j])=>j!==i)),+i,k))errors.push(`Invalid ${k} placement at ${+i+1}`);counts[k]=(counts[k]||0)+1;}for(const [k,n] of Object.entries(counts))if(n>(m.inventory?.[k]||0))errors.push(`Inventory exceeded: ${k}`);
+function constructionCost(m,counts){
+ return Object.entries(counts).reduce((sum,[kind,count])=>sum+(m.construction?.prices[kind]??0)*count,0);
+}
+function placementCounts(placements){
+ const counts=Object.create(null);
+ for(const value of Object.values(placements)){
+  const kind=placementKind(value);
+  counts[kind]=(counts[kind]||0)+1;
+ }
+ return counts;
+}
+function checkAll(m,routes,placements={}){const errors=[];const counts=placementCounts(placements);for(const [i,v] of Object.entries(placements)){const k=placementKind(v);if(!canPlace(m,Object.fromEntries(Object.entries(placements).filter(([j])=>j!==i)),+i,k))errors.push(`Invalid ${k} placement at ${+i+1}`);}for(const [k,n] of Object.entries(counts))if(n>(m.inventory?.[k]||0))errors.push(`Inventory exceeded: ${k}`);
+ if(m.construction&&constructionCost(m,counts)>m.construction.budget)errors.push('Construction budget exceeded');
  for(let i=0;i<m.cells.length;i++)if(['portal','tunnel'].includes(effective(m,placements,i))&&linkPartner(m,i,placements)<0)errors.push(`Invalid or unpaired ${effective(m,placements,i)} at cell ${i+1}`);
  const boardPairs=pairs(m);
  if(!boardPairs.length)errors.push('Add at least one source/destination pair');
@@ -93,7 +105,7 @@ function solve(m,{limit=120000,maxPairs=3,allowPlacement=true,initialPlacements=
  if(!terrainOK(c,comp)){if(c.terrain==='water'&&!comp)wanted='bridge';else continue;}
  if(comp&&!['bridge','intersection','checkpoint','portal','tunnel','gate'].includes(comp))continue;
  if(overlaps.length){if(overlaps.length>1)continue;if(comp==='bridge')continue;if(comp!=='intersection')wanted='intersection';}
- if(wanted){if(!allowPlacement||!canPlace(m,pl,i,wanted))continue;const used=Object.values(pl).filter(x=>placementKind(x)===wanted).length;if(used>=budget[wanted])continue;pl={...pl,[i]:wanted};}
+ if(wanted){if(!allowPlacement||!canPlace(m,pl,i,wanted))continue;const used=Object.values(pl).filter(x=>placementKind(x)===wanted).length;if(used>=budget[wanted])continue;pl={...pl,[i]:wanted};if(m.construction&&constructionCost(m,placementCounts(pl))>m.construction.budget)continue;}
  const path=[...state.path,i];if(overlaps.length){const r=overlaps[0],j=r.path.indexOf(i);if(j===0||j===r.path.length-1||path.length<3)continue;const b1=axis(r.path[j-1],i,m.width),b2=axis(i,r.path[j+1],m.width);if(b1!==b2)continue;const a1=axis(path[path.length-2],i,m.width);if(a1===b1)continue; /* require straight exit on next step */}
  if(path.length>m.width*m.height)continue;
  stack.push({path,seen:new Set([...state.seen,i]),placements:pl});
@@ -134,5 +146,5 @@ function solveConstruction(m,{limit=120000,maxPairs=3,maxCandidates=180}={}){
  }
  return {status:hitLimit||direct.status==='inconclusive'?'inconclusive':'unsolved',message:hitLimit?'Some construction searches exceeded their limits':'No solution found within supported construction candidates',constructionAttempts:attempts};
 }
-const api={placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
+const api={constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
