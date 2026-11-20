@@ -166,6 +166,40 @@ button.brand { background: transparent; border: 0; text-align: left; }
 @media (prefers-reduced-motion: reduce) {
   .harmony-pulse { animation: none; }
 }
+
+.stepper { display: inline-flex; align-items: center; gap: 4px; }
+.stepper button { min-width: 42px; font-weight: 800; }
+.stepper input { text-align: center; }
+#phone-link-id { display: none; }
+#game-menu { width: min(94vw, 420px); max-height: 88svh; overflow: auto; padding: 14px; border: 1px solid var(--border); border-radius: 14px; background: #1c3025; color: #f8f3e5; }
+#game-menu::backdrop { background: #0b1715aa; }
+#game-menu .campaign-picker { margin-block: 12px; }
+#game-menu button, #game-menu select, #game-menu summary { min-height: 44px; }
+@media (max-width: 600px) {
+ .masthead { padding: 4px 10px; gap: 4px; }
+ .masthead .brand { font-size: clamp(21px, 6vw, 28px); padding-inline: 3px; }
+ #mobile-menu { min-height: 40px; }
+ .layout { padding: 4px 6px; gap: 5px; }
+ .field h1 { font-size: clamp(17px, 5vw, 24px); line-height: 1.12; margin: 3px 0 5px; }
+ #board { width: min(100%, max(130px, calc((100svh - var(--mobile-chrome, 240px)) * var(--board-ratio, 1)))); margin-inline: auto; touch-action: pinch-zoom; }
+ .controls { padding: 6px 8px; }
+ .controls h2 { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+ .controls #bridge-hint, .controls #remove { display: none; }
+ #status:not(:empty) { margin-top: 3px; font-size: .8rem; }
+ .loadout-row { margin: 0; gap: 2px; font-size: .85rem; }
+ .stepper input { width: 32px; padding: 0; border: 0; background: transparent; appearance: textfield; }
+ .stepper input::-webkit-inner-spin-button { appearance: none; }
+ #budget, #projected { margin: 3px 0; font-size: .82rem; }
+ #start { width: 100%; }
+ .tools, .actions { margin: 2px 0; gap: 3px; }
+ .tools button, #start, .build-actions button { min-height: 44px; }
+ .build-actions { margin-top: 4px; gap: 4px; }
+ #bridge-count { font-size: .85rem; }
+ #link-id, footer { display: none; }
+ #phone-link-id { display: inline-block; min-height: 44px; }
+ .controls .restoration p, #score, #totals { margin: 3px 0; }
+ #score-details { margin-top: 3px; }
+}
 </style>
  
  
@@ -180,6 +214,7 @@ button.brand { background: transparent; border: 0; text-align: left; }
 <body>
  <header class="masthead">
   <button id="home-button" class="brand" type="button">Element Forge</button>
+  <button id="mobile-menu" type="button" hidden>Menu</button>
   <div class="campaign-picker">
   <label for="level">Puzzle
    <select id="level"></select>
@@ -234,7 +269,7 @@ button.brand { background: transparent; border: 0; text-align: left; }
     <p id="bridge-hint" hidden>Tap an empty water tile to place a bridge, even mid-route.</p>
     <div id="tools" class="tools" role="group" aria-label="Build tools"></div>
     <button id="remove" hidden>Remove tool</button>
-    <label id="link-field" hidden>Link ID <input id="link-id" value="A" maxlength="12"></label>
+    <label id="link-field" hidden>Portal pair <input id="link-id" value="A" maxlength="12"><select id="phone-link-id" aria-label="Portal pair"><option value="auto">Automatic pair</option></select></label>
     <p id="projected" role="status" hidden></p>
     <div class="build-actions">
      <button id="check" class="primary">Restore Harmony</button>
@@ -276,6 +311,10 @@ button.brand { background: transparent; border: 0; text-align: left; }
   </details>
   </div>
  </main>
+ <dialog id="game-menu" aria-label="Puzzle menu">
+  <form method="dialog"><button autofocus>Close menu</button></form>
+  <div id="menu-content"></div>
+ </dialog>
  <footer>BC Shin Studio</footer>
 <script>
 'use strict';
@@ -330,7 +369,7 @@ function terrainError(m,element,index,component){
  if(!(m.rulesVersion>=3))return ordinaryGround.includes(terrain)||(terrain==='water'&&component==='bridge')?null:blocked;
  if(terrain==='forest'&&element!=='nature')return 'Only Plant can move through woods.';
  if(element==='nature'&&component==='portal')return 'Plant cannot use portals.';
- if(['earth','metal'].includes(element)&&component==='bridge')return 'This current cannot use lightweight bridges.';
+ if(['earth','metal'].includes(element)&&component==='bridge')return 'This current cannot use ordinary bridges.';
  if(element==='ice'&&terrain==='heated')return 'Ice cannot enter heated ground.';
  if(terrain==='exposed'&&element==='shadow')return 'Shadow needs covered channels.';
  if(terrain==='covered'&&element==='light')return 'Light needs exposed channels.';
@@ -485,7 +524,7 @@ const api={terrainError,spanKinds,windLandings,constructionCost,placementCounts,
 (function(root){
 const E=typeof module==='undefined'?root.EFEngine:require('./engine.js');
 const TERRAIN=[['land','Land','·'],['mountain','Mountain','▲'],['water','Water','≈'],['wall','Wall','▦'],['forest','Forest','♣'],['lava','Lava','♨'],['ice','Ice','❄'],['void','Void','◼'],['oneway','One-way','➜'],['river','Deep river','∿'],['bank','River bank','⇆'],['shallow','Shallow water','≋'],['scree','Scree','⋰'],['heated','Heated ground','▥'],['abrasive','Abrasive ground','▒'],['exposed','Exposed channel','☀'],['covered','Covered channel','☾']];
-const COMPONENTS=[['bridge','Light bridge','═'],['metalSpan','Metal span','▤'],['intersection','Intersection','╋'],['tunnel','Tunnel end','◉'],['portal','Portal','◎'],['junction','Junction','⑂'],['sorter','Sorter','◇'],['converter','Converter','⬡'],['gate','Gate','⊣'],['checkpoint','Checkpoint','⚑'],['remover','Remover','✕'],['booster','Booster','»']];
+const COMPONENTS=[['bridge','Bridge','═'],['metalSpan','Metal span','▤'],['intersection','Intersection','╋'],['tunnel','Tunnel end','◉'],['portal','Portal','◎'],['junction','Junction','⑂'],['sorter','Sorter','◇'],['converter','Converter','⬡'],['gate','Gate','⊣'],['checkpoint','Checkpoint','⚑'],['remover','Remover','✕'],['booster','Booster','»']];
 const ELEMENTS={fire:{name:'Fire',color:'#d55b4e'},water:{name:'Water',color:'#377fd1'},nature:{name:'Plant',icon:'🌿',symbol:'P',color:'#419d66'},electricity:{name:'Electricity',color:'#d5ac29'},arcane:{name:'Arcane',color:'#9368c5'},wind:{name:'Wind',color:'#7dc8bc'},earth:{name:'Earth',color:'#d8a37d',symbol:'R'},ice:{name:'Ice',color:'#b8eaff',symbol:'I'},metal:{name:'Metal',color:'#c3c9db',symbol:'M'},light:{name:'Light',color:'#fff197',symbol:'L'},shadow:{name:'Shadow',color:'#ba9bf6',symbol:'H'}};
 const TIDS=new Set(TERRAIN.map(x=>x[0])),CIDS=new Set(COMPONENTS.map(x=>x[0])),DIRECTIONS=['N','E','S','W'];
 const fresh=(w=12,h=12)=>({format:'element-forge-map',schemaVersion:2,name:'Untitled Map',description:'',width:w,height:h,cells:Array.from({length:w*h},()=>({terrain:'land'})),constraints:{},inventory:Object.fromEntries(COMPONENTS.map(([id])=>[id,['bridge','intersection'].includes(id)?1:0]))});
@@ -811,7 +850,7 @@ if(typeof module!=='undefined')module.exports=api;
    '############','############','####...#####','####...#####','####...#####','##V..o...v##',
    '####.oo#####','############','############','############','############','############'
   ],{tunnel:2}),
-  level('Shifting Ridge','Earth crosses scree. Lightweight bridges cannot carry it.',[
+  level('Shifting Ridge','Earth crosses scree. Bridges cannot carry it.',[
    '############','############','##...~...###','##R..~..r###','##...~...###','##...%...###',
    '##...%...###','############','############','############','############','############'
   ],{bridge:1}),
@@ -819,7 +858,7 @@ if(typeof module!=='undefined')module.exports=api;
    '############','############','##...^...###','##I..^..i###','##..._...###','##..._...###',
    '############','############','############','############','############','############'
   ]),
-  level('Foundry Run','Metal crosses heated and abrasive ground. It cannot use lightweight bridges.',[
+  level('Foundry Run','Metal crosses heated and abrasive ground. It cannot use bridges.',[
    '############','############','##..^.&..###','##M.^.&.m###','##..^.&..###','##..~.&..###',
    '############','############','############','############','############','############'
   ],{bridge:1}),
@@ -880,7 +919,7 @@ if(typeof module!=='undefined')module.exports=api;
   lesson('Shallow Freeze','Ice can freeze shallow water to cross. Heated ground blocks Ice.',[
    'I..^..i','..._...','###_###'
   ],{requires:['shallow']}),
-  lesson('Foundry Floor','Metal crosses heated and abrasive terrain. Scree and lightweight bridges won’t carry it.',[
+  lesson('Foundry Floor','Metal crosses heated and abrasive terrain. Scree and bridges won’t carry it.',[
    'M.~.%.m','..^.&..','##^#&##'
   ],{requires:['heated','abrasive'],components:[[2,0,'bridge']]}),
   lesson('Open Sky','Light uses exposed channels. Covered passages block it.',[
@@ -889,7 +928,7 @@ if(typeof module!=='undefined')module.exports=api;
   lesson('Under Cover','Shadow uses covered channels. Exposed passages block it.',[
    'H..+..h','...-...','###.###'
   ],{requires:['covered']}),
-  lesson('Build a Bridge','Give Plant a light bridge across the pool. Tap an empty water tile to place it.',[
+  lesson('Build a Bridge','Give Plant a bridge across the pool. Tap an empty water tile to place it.',[
    'N..~..n','...~...','###~###'
   ],{tools:{bridge:1},requires:['bridge']}),
   lesson('Cross at Right Angles','Use an intersection so two currents can cross. Both must go straight through.',[
@@ -1411,6 +1450,15 @@ if(typeof module!=='undefined')module.exports=api;
   return session.verify().ok;
  }
 
+ // Repair the mislabeled river channels in older generated Rules 4 packs.
+ // Authored and custom maps can still contain open water.
+ function repairGeneratedRivers(pack){
+  if(pack?.revision!=='tutorial-v4'||!Array.isArray(pack.stages))return pack;
+  return {...pack,revision:'tutorial-v4-river-fix',stages:pack.stages.map(stage=>{
+   if(stage?.rulesVersion!==4||!['budget','combined'].includes(stage.family)||!Array.isArray(stage.map?.cells))return stage;
+   return {...stage,map:{...stage.map,cells:stage.map.cells.map(cell=>cell?.terrain==='water'?{...cell,terrain:'river'}:cell)}};
+  })};
+ }
  function readPack(value){
   if(value?.format!=='element-forge-challenges'||value.version!==1||!Array.isArray(value.stages)||
      value.stages.length<1||value.stages.length>20)throw Error('Invalid challenge pack.');
@@ -1420,7 +1468,7 @@ if(typeof module!=='undefined')module.exports=api;
     hint:typeof stage.hint==='string'?stage.hint.slice(0,200):''};
   });
  }
- const revision='tutorial-v4';
+ const revision='mobile-v4';
  const families=['budget','passage','checkpoint','combined'];
  const difficulties=['Easy','Medium','Hard','Expert'];
  const names={budget:'Scarce Crossing',passage:'Contested Pass',checkpoint:'Grove Crossing',combined:'Valley Relay'};
@@ -1705,6 +1753,7 @@ if(typeof module!=='undefined')module.exports=api;
   const cells=Array.from({length:144},()=>({terrain:'mountain'}));
   for(const [i,cell] of map.cells.entries())cells[(y+Math.floor(i/map.width))*12+x+i%map.width]=cell;
   if(map.inventory.bridge){
+   for(const cell of cells)if(cell.terrain==='water')cell.terrain='river';
    // A bridge budget is meaningful for bridge-capable currents.
    for(const cell of cells){
     if(cell.node?.element==='electricity')cell.node={...cell.node,element:'light'};
@@ -1814,7 +1863,7 @@ if(typeof module!=='undefined')module.exports=api;
    report:{revision:activeRevision,seed:String(seed),family,difficulty,limit,attempts,includeReferences,requested:count,accepted:stages.length,shortfall,fallback,rejections,evidence}};
  }
 
- const api={families,difficulties,revision,reference,verify,replay,generate,readPack,layoutKey,recipe,random,fromRows,scarceCrossing,verifyScarce};
+ const api={families,difficulties,revision,reference,verify,replay,generate,readPack,repairGeneratedRivers,layoutKey,recipe,random,fromRows,scarceCrossing,verifyScarce};
  root.EFChallenges=api;
  if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);
@@ -1851,6 +1900,33 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
  const arrows={N:'↑',E:'→',S:'↓',W:'←'};
  toolNames.tunnel='Tunnel';
  let session,tiles,tool,tunnelStart=null,levelIndex,timer=null,drag=null,importTicket=0;
+ const phone=matchMedia('(max-width: 600px)');
+ const menu=$('game-menu');
+ const menuItems=[document.querySelector('.campaign-picker'),$('description'),$('elements'),$('instructions'),
+  $('puzzle-hint'),$('puzzle-options'),$('challenge-library'),$('custom-level'),$('world-intro')];
+ const menuHomes=menuItems.map(item=>{
+  const marker=document.createComment('desktop location');
+  item.before(marker);
+  return marker;
+ });
+ function adjustPhone(){
+  for(const [i,item] of menuItems.entries()){
+   if(phone.matches)$('menu-content').append(item);
+   else menuHomes[i].after(item);
+  }
+  if(!phone.matches&&menu.open)menu.close();
+  $('mobile-menu').hidden=!phone.matches||$('play-view').hidden;
+ }
+ function fitBoard(){
+  if(!phone.matches||$('play-view').hidden)return;
+  const height=['.masthead','#puzzle','.controls'].reduce((total,selector)=>
+   total+document.querySelector(selector).getBoundingClientRect().height,24);
+  board.style.setProperty('--mobile-chrome',height+'px');
+ }
+ phone.addEventListener('change',()=>{adjustPhone();if(session)drawPlan();fitBoard();});
+ const fitObserver=new ResizeObserver(fitBoard);
+ for(const selector of ['.masthead','#puzzle','.controls'])fitObserver.observe(document.querySelector(selector));
+ $('mobile-menu').onclick=()=>menu.showModal();
  const message=value=>{$('status').textContent=value;};
 
  function canOpen(index){
@@ -1860,6 +1936,8 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   if(!levels[index])return;
   $('home').hidden=true;
   $('play-view').hidden=false;
+  adjustPhone();
+  if(menu.open)menu.close();
   document.querySelector('.campaign-picker').hidden=false;
   intro.hidden=index!==0||introSeen;
   tool='route';
@@ -1883,6 +1961,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   $('puzzle-hint').hidden=!levels[index].hint;
   $('hint-text').textContent=levels[index].hint??'';
   board.style.setProperty('--cols',map.width);
+  board.style.setProperty('--board-ratio',map.width/map.height);
   const firstSource=E.pairs(map)[0].source;
   tiles=map.cells.map((cell,i)=>{
    const tile=document.createElement('button');
@@ -1901,6 +1980,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   });
   $('elements').replaceChildren(...legend,document.createTextNode('S = source · D = destination'));
   $('link-id').value='A';
+  $('phone-link-id').value='auto';
   drawPlan();
   update();
   persist();
@@ -1963,7 +2043,24 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
       persist();
      }
     });
-    label.append(field);
+    const stepper=document.createElement('span');
+    stepper.className='stepper';
+    const step=(sign,caption)=>{
+     const button=document.createElement('button');
+     button.type='button';
+     button.textContent=caption;
+     button.setAttribute('aria-label',(sign>0?'Add ':'Subtract ')+toolNames[kind]);
+     button.onclick=()=>{
+      field.value=Number(field.value)+sign;
+      field.dispatchEvent(new Event('input'));
+     };
+     return button;
+    };
+    field.setAttribute('aria-label',toolNames[kind]+' quantity');
+    field.readOnly=phone.matches;
+    field.inputMode=phone.matches?'none':'numeric';
+    stepper.append(step(-1,'−'),field,step(1,'+'));
+    label.append(stepper);
    }else label.append(document.createTextNode(' × '+quantity));
    return label;
   });
@@ -1985,6 +2082,12 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   const remaining=construction.budget-E.constructionCost(session.map,selection());
   $('budget').textContent=remaining<0?`${-remaining} points over budget`:`${remaining} of ${construction.budget} points available`;
   $('start').disabled=remaining<0;
+  for(const field of $('loadout').querySelectorAll('input')){
+   const [less,,more]=field.parentElement.children;
+   const unit=field.name==='tunnel'?2:1;
+   less.disabled=Number(field.value)<=0;
+   more.disabled=Number(field.value)>=Number(field.max)||remaining<construction.prices[field.name]*unit;
+  }
  }
 
  function drawToolBar(){
@@ -2012,10 +2115,20 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   $('remove').setAttribute('aria-pressed',String(tool==='remove'));
   $('replan').hidden=!session.map.construction;
   $('link-field').hidden=tool!=='portal';
+  if(tool==='portal'){
+   const counts=new Map();
+   for(const value of Object.values(state.placements))if(E.placementKind(value)==='portal')
+    counts.set(value.pairId,(counts.get(value.pairId)||0)+1);
+   const picker=$('phone-link-id');
+   const previous=picker.value;
+   picker.replaceChildren(new Option('Automatic pair','auto'),
+    ...[...counts].filter(([,count])=>count===1).map(([id])=>new Option('Pair '+id,id)));
+   if([...picker.options].some(option=>option.value===previous))picker.value=previous;
+  }
   syncDragHandles();
   ready();
   $('instructions').textContent=tool==='remove'?'Choose a tool on the map to remove it.':
-   tool==='route'?'Tap a source or unfinished tip to draw. Swipe elsewhere on the board to scroll.':
+   tool==='route'?'Tap a source or unfinished tip to draw. Tap a placed tool to remove it when no route is active.':
    tool==='tunnel'?(tunnelStart===null?'Choose the first open tile for your tunnel.':
     'Choose the other opening in the same row or column, across blocked terrain. Tap the first opening again or tap outside the board to cancel.'):
    'Choose a tile for your '+toolNames[tool].toLowerCase()+'.';
@@ -2030,6 +2143,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
    complete:'Every element reached its destination.'
   }[phase];
   $('plan').hidden=phase!=='inspect';
+  $('puzzle-options').hidden=phase!=='build';
   $('build').hidden=phase!=='build';
   $('finish').hidden=phase!=='complete';
   $('engine-restoration').hidden=phase!=='complete';
@@ -2134,10 +2248,22 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   message('');
  }
 
+ function portalPair(){
+  if(!phone.matches)return $('link-id').value.trim();
+  const picker=$('phone-link-id');
+  if(picker.value!=='auto')return picker.value;
+  if(picker.options.length>1)return picker.options[1].value;
+  const {map,state}=session;
+  let number=1;
+  const ids=new Set(map.cells.map((_,i)=>E.pairIdAt(map,state.placements,i)).filter(Boolean));
+  while(ids.has('P'+number))number++;
+  return 'P'+number;
+ }
  function act(index,direct=false){
   if(session.state.phase!=='build')return;
   const {map,state}=session;
   const element=state.active?.element;
+  const removePlaced=direct&&tool==='route'&&!element&&Object.hasOwn(state.placements,index);
   const bridgeTile=direct&&tool==='route'&&state.loadout.bridge>(E.placementCounts(state.placements).bridge||0)&&
    E.canPlace(map,state.placements,index,'bridge')&&(!element||
     Boolean(E.terrainError(map,element,index,null))&&!E.terrainError(map,element,index,'bridge'));
@@ -2150,13 +2276,13 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
    message('');
    return true;
   }
-  const result=bridgeTile?session.place(index,'bridge'):tool==='tunnel'?session.placeTunnel(tunnelStart,index):
-   tool==='route'?session.route(index):tool==='remove'?session.remove(index):session.place(index,tool,$('link-id').value.trim());
+  const result=removePlaced?session.remove(index):bridgeTile?session.place(index,'bridge'):tool==='tunnel'?session.placeTunnel(tunnelStart,index):
+   tool==='route'?session.route(index):tool==='remove'?session.remove(index):session.place(index,tool,tool==='portal'?portalPair():undefined);
   if(!result.ok){message(explainMove(result,index));return false;}
-  message('');
+  message(removePlaced?'Tool removed.':'');
   tunnelStart=null;
   drawBoard();
-  if(bridgeTile||tool!=='route'){tool='route';drawToolBar();}
+  if(removePlaced||bridgeTile||tool!=='route'){tool='route';drawToolBar();}
   else ready();
   persist();
   return true;
@@ -2223,6 +2349,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   message('');
  };
  function reset(replan){
+  if(menu.open)menu.close();
   stopAnimation();
   session.restart(replan);
   tunnelStart=null;
@@ -2280,6 +2407,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   }catch(error){if(ticket===importTicket)$('import-error').textContent='Import failed. '+error.message;}
  };
  function loadPack(pack,saved){
+  pack=window.EFChallenges.repairGeneratedRivers(pack);
   const stages=window.EFChallenges.readPack(pack);
   activePack=pack;
   challengeBest=saved?.best||{};
@@ -2420,6 +2548,8 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   stopAnimation();
   $('home').hidden=false;
   $('play-view').hidden=true;
+  adjustPhone();
+  if(menu.open)menu.close();
   document.querySelector('.campaign-picker').hidden=true;
   intro.hidden=true;
   const saved=progress.campaign();
@@ -2440,6 +2570,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
  $('continue').onclick=continueCampaign;
  $('stage-select').onclick=()=>{
   continueCampaign();
+  if(phone.matches&&!menu.open)menu.showModal();
   $('level').focus();
   if(typeof $('level').showPicker==='function')try{$('level').showPicker();}catch{}
  };
