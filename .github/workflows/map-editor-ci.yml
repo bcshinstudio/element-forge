@@ -27,3 +27,16 @@ jobs:
 
       - name: Check JavaScript syntax
         run: npm run check
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Playwright Chromium
+        run: |
+          python -m pip install playwright==1.51.0
+          python -m playwright install --with-deps chromium
+
+      - name: Run browser integration tests
+        run: python tests/browser_smoke.py

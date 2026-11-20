@@ -24,5 +24,5 @@ test('maze dropdown is wired to browser generator handler and version matches',(
  const js=fs.readFileSync(path.join(__dirname,'../generator.js'),'utf8');
  assert.match(html,/<option value="maze">Crossing: route maze<\/option>/);
  assert.match(js,/difficulty==='maze'\?window\.EFGenerator\.generateMaze\(seed\)/);
- assert.match(html,/v1\.7\.0/);
+ assert.ok(html.includes(`<b>v${require('../package.json').version}</b>`));
 });

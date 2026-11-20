@@ -1,14 +1,15 @@
 'use strict';
 // Editor data is renderer-independent. Future generator/solver should use this schema.
-const TERRAIN=[['land','Land','·'],['mountain','Mountain','▲'],['water','Water','≈'],['wall','Wall','▦'],['forest','Forest','♣'],['lava','Lava','♨'],['ice','Ice','❄'],['void','Void','◼'],['oneway','One-way','➜']];
-const COMPONENTS=[['bridge','Bridge','═'],['intersection','Intersection','╋'],['tunnel','Tunnel end','◉'],['portal','Portal','◎'],['junction','Junction','⑂'],['sorter','Sorter','◇'],['converter','Converter','⬡'],['gate','Gate','⊣'],['checkpoint','Checkpoint','⚑'],['remover','Remover','✕'],['booster','Booster','»']];
-const ELEMENTS={fire:{name:'Fire',color:'#d55b4e'},water:{name:'Water',color:'#377fd1'},nature:{name:'Nature',color:'#419d66'},electricity:{name:'Electricity',color:'#d5ac29'},arcane:{name:'Arcane',color:'#9368c5'}};
-const TIDS=new Set(TERRAIN.map(x=>x[0])),CIDS=new Set(COMPONENTS.map(x=>x[0])),DIRECTIONS=['N','E','S','W'];
+const {TERRAIN,COMPONENTS,ELEMENTS,DIRECTIONS,fresh,parseConstraints,parseMap,structuralErrors}=window.EFMap;
 const $=id=>document.getElementById(id),clone=o=>JSON.parse(JSON.stringify(o));
-const fresh=(w=12,h=12)=>({format:'element-forge-map',schemaVersion:2,name:'Untitled Map',description:'',width:w,height:h,cells:Array.from({length:w*h},()=>({terrain:'land'})),constraints:{},inventory:Object.fromEntries(COMPONENTS.map(([id])=>[id,['bridge','intersection'].includes(id)?1:0]))});
 let map=fresh(),tool='terrain:mountain',element='fire',direction='E',pairId='A',checkpointElement='any',history=[],future=[],drawing=false,changedStroke=false,lastIndex=-1,dirty=false,assets={terrain:{},components:{}};
 function snapshot(){history.push(clone(map));if(history.length>100)history.shift();future=[];updateHistory()}
-function updateHistory(){$('undo').disabled=!history.length;$('redo').disabled=!future.length}
+function updateHistory(){
+ const inPlay=window.EFPlay?.isActive();
+ $('undo').disabled=inPlay||!history.length;
+ $('redo').disabled=inPlay||!future.length;
+}
+window.EFEditor={updateHistory};
 function markDirty(){window.EFPlay?.refresh();dirty=true;$('dirty').textContent='Unsaved changes'}
 function glyph(type,id){const item=(type==='terrain'?TERRAIN:COMPONENTS).find(x=>x[0]===id);return item?.[2]||''}
 function setTool(t){tool=t;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));$('selected').textContent='Selected: '+(t==='erase'?'Eraser':t==='inspect'?'Inspect':t.startsWith('node:')?`${ELEMENTS[element].name} ${t.split(':')[1]}`:t.split(':')[1]);updateProperties()}
@@ -17,9 +18,12 @@ function updateProperties(){const type=tool.split(':')[1];let html='';if(['onewa
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 function cellMarkup(c){let out='';const url=c.component?assets.components?.[c.component]:assets.terrain?.[c.terrain];if(url)out+=`<img class="asset" src="${escapeHtml(url)}" alt="">`;else out+=`<span class="glyph">${c.component?glyph('component',c.component):glyph('terrain',c.terrain)}</span>`;if(c.node){const e=ELEMENTS[c.node.element];out+=`<span class="node-shape ${c.node.role}" style="background:${e.color};${c.node.role==='destination'?`border-color:${e.color};`:''}">${c.node.role==='source'?'S':'D'}</span>`}if(c.component&&c.props?.pairId)out+=`<span class="overlay">${escapeHtml(c.props.pairId)}</span>`;if((c.terrain==='oneway'||c.props?.direction)&&!c.node)out+=`<span class="direction">${{N:'↑',E:'→',S:'↓',W:'←'}[c.props?.direction||'E']}</span>`;return out}
 function cellClass(c){return `cell ${c.terrain} ${c.component?'has-component':''} ${c.node?'node':''}`}
-function render(){const b=$('board');b.style.setProperty('--cols',map.width);b.style.setProperty('--rows',map.height);b.innerHTML=map.cells.map((c,i)=>`<div class="${cellClass(c)}" data-i="${i}" role="gridcell" aria-label="Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, ${c.node?c.node.element+' '+c.node.role:c.component||c.terrain}">${cellMarkup(c)}</div>`).join('');$('count').textContent=`${map.width} × ${map.height} · ${map.width*map.height} cells`;$('width').value=map.width;$('height').value=map.height;updateHistory();window.EFPlay?.refresh()}
+function cellLabel(c,i){
+ return `Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, ${c.node?c.node.element+' '+c.node.role:c.component||c.terrain}`;
+}
+function render(){const b=$('board');b.style.setProperty('--cols',map.width);b.style.setProperty('--rows',map.height);b.innerHTML=map.cells.map((c,i)=>`<div class="${cellClass(c)}" data-i="${i}" role="gridcell" aria-label="${cellLabel(c,i)}">${cellMarkup(c)}</div>`).join('');$('count').textContent=`${map.width} × ${map.height} · ${map.width*map.height} cells`;$('width').value=map.width;$('height').value=map.height;updateHistory();window.EFPlay?.refresh()}
 function inspect(i){const c=map.cells[i];$('messages').className='messages';$('messages').textContent=`Cell (${i%map.width+1}, ${Math.floor(i/map.width)+1}):\n${JSON.stringify(c,null,2)}`;if(c.props?.direction)direction=c.props.direction;if(c.props?.pairId)pairId=c.props.pairId;if(c.props?.element)checkpointElement=c.props.element}
-function paint(i){if(i<0||i>=map.cells.length||i===lastIndex)return;lastIndex=i;if(tool==='inspect'){inspect(i);return}const prev=map.cells[i];let next=clone(prev);const [kind,id]=tool.split(':');if(tool==='erase'||tool==='terrain:land')next={terrain:'land'};else if(kind==='terrain')next={terrain:id,...(id==='oneway'?{props:{direction}}:{})};else if(kind==='node')next={terrain:prev.terrain==='land'?prev.terrain:'land',node:{element,role:id}};else if(kind==='component'){next={terrain:prev.terrain,component:id};if(['portal','tunnel'].includes(id))next.props={pairId:pairId.trim()||'A'};else if(['junction','sorter','gate','booster'].includes(id))next.props={direction};else if(id==='checkpoint')next.props={element:checkpointElement};if(prev.node)delete next.node;}if(JSON.stringify(prev)===JSON.stringify(next))return;if(!changedStroke){snapshot();changedStroke=true}map.cells[i]=next;const el=$('board').children[i];el.className=cellClass(next);el.innerHTML=cellMarkup(next);markDirty()}
+function paint(i){if(i<0||i>=map.cells.length||i===lastIndex)return;lastIndex=i;if(tool==='inspect'){inspect(i);return}const prev=map.cells[i];let next=clone(prev);const [kind,id]=tool.split(':');if(tool==='erase'||tool==='terrain:land')next={terrain:'land'};else if(kind==='terrain')next={terrain:id,...(id==='oneway'?{props:{direction}}:{})};else if(kind==='node')next={terrain:prev.terrain==='land'?prev.terrain:'land',node:{element,role:id}};else if(kind==='component'){next={terrain:prev.terrain,component:id};if(['portal','tunnel'].includes(id))next.props={pairId:pairId.trim()||'A'};else if(['junction','sorter','gate','booster'].includes(id))next.props={direction};else if(id==='checkpoint')next.props={element:checkpointElement};if(prev.node)delete next.node;}if(JSON.stringify(prev)===JSON.stringify(next))return;if(!changedStroke){snapshot();changedStroke=true}map.cells[i]=next;const el=$('board').children[i];el.className=cellClass(next);el.innerHTML=cellMarkup(next);el.setAttribute('aria-label',cellLabel(next,i));markDirty()}
 function indexFromPointer(e){const el=document.elementFromPoint(e.clientX,e.clientY)?.closest('.cell');return el&&$('board').contains(el)?Number(el.dataset.i):-1}
 $('board').addEventListener('pointerdown',e=>{if(window.EFPlay?.isActive()){window.EFPlay.pointer(e);return;}if(e.button!==0)return;e.preventDefault();lastIndex=-1;changedStroke=false;drawing=true;$('board').setPointerCapture(e.pointerId);paint(indexFromPointer(e))});$('board').addEventListener('pointermove',e=>{if(window.EFPlay?.isActive()){window.EFPlay.pointer(e);return;}const i=indexFromPointer(e);if(i>=0)$('coords').textContent=`Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}`;if(drawing)paint(i)});for(const event of ['pointerup','pointercancel','lostpointercapture'])$('board').addEventListener(event,()=>{drawing=false;lastIndex=-1;changedStroke=false});$('board').addEventListener('contextmenu',e=>e.preventDefault());
 function resize(){const w=Number($('width').value),h=Number($('height').value);if(!Number.isInteger(w)||!Number.isInteger(h)||w<4||h<4||w>24||h>24){alert('Width and height must be whole numbers from 4 to 24.');return}if(w===map.width&&h===map.height)return;snapshot();const old=map;map={...old,width:w,height:h,cells:Array.from({length:w*h},(_,i)=>{const x=i%w,y=Math.floor(i/w);return x<old.width&&y<old.height?clone(old.cells[y*old.width+x]):{terrain:'land'}})};render();markDirty()}
@@ -27,29 +31,60 @@ $('resize').onclick=resize;$('newMap').onclick=()=>{if(!confirm('Start a new map
 function syncMeta(){$('constraints').value=JSON.stringify(map.constraints||{},null,2);$('mapName').value=map.name;$('description').value=map.description;for(const [id,n] of Object.entries(map.inventory))if($('inv-'+id))$('inv-'+id).value=n}
 $('mapName').onchange=e=>{const name=e.target.value.trim()||'Untitled Map';if(name!==map.name){snapshot();map.name=name;markDirty()}};$('description').onchange=e=>{if(e.target.value!==map.description){snapshot();map.description=e.target.value;markDirty()}};
 $('inventory').innerHTML=COMPONENTS.map(([id,label])=>`<label class="inventory-row">${label}<input id="inv-${id}" type="number" min="0" max="99" value="${map.inventory[id]}"></label>`).join('');for(const [id] of COMPONENTS)$('inv-'+id).onchange=e=>{const n=Number(e.target.value);if(!Number.isInteger(n)||n<0||n>99){e.target.value=map.inventory[id];return}if(n!==map.inventory[id]){snapshot();map.inventory[id]=n;markDirty()}};
-function structuralErrors(m){const issues=[],counts=Object.fromEntries(Object.keys(ELEMENTS).map(id=>[id,{source:0,destination:0}])),pairs={portal:{},tunnel:{}};for(let i=0;i<m.cells.length;i++){const c=m.cells[i];if(c.node)counts[c.node.element][c.node.role]++;if(c.component==='portal'||c.component==='tunnel'){const p=c.props?.pairId;if(!p)issues.push(`Cell ${i+1}: ${c.component} needs a connection ID.`);else pairs[c.component][p]=(pairs[c.component][p]||0)+1}if(c.component==='bridge'&&c.terrain==='void')issues.push(`Cell ${i+1}: bridge cannot be placed on void.`);if(c.node&&c.terrain!=='land')issues.push(`Cell ${i+1}: endpoint must be on land.`);if(c.component&&c.node)issues.push(`Cell ${i+1}: component and node overlap.`)}let matched=0;for(const [id,c] of Object.entries(counts)){if(c.source!==c.destination)issues.push(`${ELEMENTS[id].name}: ${c.source} source(s) vs ${c.destination} destination(s).`);if(c.source>1||c.destination>1)issues.push(`${ELEMENTS[id].name}: only one source/destination pair currently supported.`);if(c.source===1&&c.destination===1)matched++}if(!matched)issues.push('Add at least one source/destination pair.');for(const [kind,groups] of Object.entries(pairs))for(const [id,count] of Object.entries(groups))if(count!==2)issues.push(`${kind} connection ${id}: expected 2 endpoints, found ${count}.`);return {issues,matched}}
 $('validate').onclick=()=>{const {issues,matched}=structuralErrors(map),box=$('messages');box.className='messages '+(issues.length?'warn':'ok');box.textContent=issues.length?'Structure needs attention:\n• '+issues.join('\n• '):`Structure valid: ${matched} matched element pair(s).\nSolvability and component transport rules have NOT been checked.`};
-function json(){map.name=$('mapName').value.trim()||'Untitled Map';map.description=$('description').value;return JSON.stringify(map,null,2)}
-$('save').onclick=()=>{const blob=new Blob([json()],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(map.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'element-forge-map')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);dirty=false;$('dirty').textContent='Exported JSON'};
-$('copyJSON').onclick=async()=>{try{await navigator.clipboard.writeText(json());$('messages').textContent='Map JSON copied.'}catch{const a=document.createElement('textarea');a.value=json();document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();$('messages').textContent='Map JSON copied (fallback).'}};
-$('load').onclick=()=>$('file').click();
-function parseConstraints(value){
- const result={};if(value===undefined)return result;
- if(!value||typeof value!=='object'||Array.isArray(value))throw Error('Invalid constraints.');
- for(const [element,rule] of Object.entries(value)){
-  if(!ELEMENTS[element]||!rule||typeof rule!=='object'||Array.isArray(rule))throw Error('Invalid element constraints.');
-  result[element]={};
-  for(const key of ['forbidTerrain','forbidComponents','requireComponents']){
-   if(rule[key]===undefined)continue;
-   if(!Array.isArray(rule[key])||rule[key].length>20||rule[key].some(id=>typeof id!=='string'||!(key==='forbidTerrain'?TIDS:CIDS).has(id)))throw Error('Invalid '+key+' constraint.');
-   result[element][key]=[...new Set(rule[key])];
-  }
- }return result;
+function json(){return JSON.stringify(parseMap(map),null,2)}
+function downloadJSON(contents,suffix){
+ const blob=new Blob([contents],{type:'application/json'}),url=URL.createObjectURL(blob);
+ const a=document.createElement('a');
+ a.href=url;
+ const slug=map.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'element-forge-map';
+ a.download=slug+suffix;
+ a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function parseMap(o){if(!o||o.format!=='element-forge-map'||![1,2].includes(o.schemaVersion))throw Error('Unsupported map format/schema version.');const w=o.width,h=o.height;if(!Number.isInteger(w)||!Number.isInteger(h)||w<4||h<4||w>24||h>24||!Array.isArray(o.cells)||o.cells.length!==w*h)throw Error('Invalid dimensions or cell count.');const cells=o.cells.map(c=>{if(!c||!TIDS.has(c.terrain))throw Error('Invalid terrain.');if(c.component&&!CIDS.has(c.component))throw Error('Unknown component.');if(c.node&&(!ELEMENTS[c.node.element]||!['source','destination'].includes(c.node.role)))throw Error('Invalid node.');if(c.node&&c.component)throw Error('Node and component overlap.');const next={terrain:c.terrain};if(c.component)next.component=c.component;if(c.node)next.node={element:c.node.element,role:c.node.role};if(c.props){if(typeof c.props!=='object'||Array.isArray(c.props))throw Error('Invalid properties.');const p={};if(c.props.direction!==undefined){if(!DIRECTIONS.includes(c.props.direction))throw Error('Invalid direction.');if(!['bridge','tunnel','portal','intersection'].includes(c.component))p.direction=c.props.direction}if(c.props.pairId!==undefined){if(typeof c.props.pairId!=='string'||!/^[a-zA-Z0-9_-]{1,12}$/.test(c.props.pairId))throw Error('Invalid connection ID.');p.pairId=c.props.pairId}if(c.props.element!==undefined){if(c.props.element!=='any'&&!ELEMENTS[c.props.element])throw Error('Invalid checkpoint element.');p.element=c.props.element}next.props=p}if(o.schemaVersion===1&&['portal','tunnel'].includes(c.component)&&!next.props)next.props={pairId:'A'};return next});const inventory={};for(const [id] of COMPONENTS){const n=o.inventory?.[id]??0;if(!Number.isInteger(n)||n<0||n>99)throw Error('Invalid inventory.');inventory[id]=n}return {...fresh(w,h),name:String(o.name||'Untitled Map').slice(0,80),description:String(o.description||'').slice(0,500),cells,inventory,constraints:parseConstraints(o.constraints)}}
-$('applyConstraints').onclick=()=>{try{const value=parseConstraints(JSON.parse($('constraints').value));snapshot();map.constraints=value;markDirty();$('messages').className='messages ok';$('messages').textContent='Element restrictions applied.';}catch(err){$('messages').className='messages warn';$('messages').textContent='Invalid restrictions: '+err.message;}};
-$('file').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const next=parseMap(JSON.parse(await f.text()));if(dirty&&!confirm('Replace current map?'))return;map=next;history=[];future=[];syncMeta();render();dirty=false;$('dirty').textContent='Imported JSON';$('messages').className='messages';$('messages').textContent='Map imported. Run structural validation.'}catch(err){alert('Import failed: '+err.message)}finally{e.target.value=''}};
+function showMessage(message,ok){
+ $('messages').className='messages '+(ok?'ok':'warn');
+ $('messages').textContent=message;
+}
+$('save').onclick=()=>{
+ try{downloadJSON(json(),'.json');dirty=false;$('dirty').textContent='Exported JSON';}
+ catch(err){showMessage('Export failed: '+err.message,false);}
+};
+$('saveLevel').onclick=()=>{
+ try{
+  const level=window.EFMap.createLevel(map);
+  downloadJSON(JSON.stringify(level,null,2),'.level.json');
+  showMessage('Verified game level exported.',true);
+ }catch(err){showMessage('Level export failed: '+err.message,false);}
+};
+$('copyJSON').onclick=async()=>{
+ try{
+  const value=json();
+  try{await navigator.clipboard.writeText(value);}
+  catch{
+   const field=document.createElement('textarea');
+   field.value=value;
+   document.body.appendChild(field);
+   try{
+    field.select();
+    if(!document.execCommand('copy'))throw Error('Clipboard unavailable. Use Export JSON.');
+   }finally{field.remove();}
+  }
+  showMessage('Map JSON copied.',true);
+ }catch(err){showMessage('Copy failed: '+err.message,false);}
+};
+$('load').onclick=()=>$('file').click();
+$('applyConstraints').onclick=()=>{try{const value=parseConstraints(JSON.parse($('constraints').value));if(JSON.stringify(map.constraints)!==JSON.stringify(value)){snapshot();map.constraints=value;markDirty();}$('messages').className='messages ok';$('messages').textContent='Element restrictions applied.';}catch(err){$('messages').className='messages warn';$('messages').textContent='Invalid restrictions: '+err.message;}};
+let importSequence=0;
+$('file').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;const sequence=++importSequence;try{
+ if(window.EFPlay.isActive())throw Error('Exit Playtest before importing.');
+ if(f.size>1024*1024)throw Error('Map files must be 1 MiB or smaller.');
+ const contents=await f.text();
+ if(sequence!==importSequence)return;
+ const source=JSON.parse(contents.replace(/^\uFEFF/,''));
+ const next=source?.format==='element-forge-level'?window.EFMap.readLevel(source):parseMap(source);
+ if(window.EFPlay.isActive())throw Error('Exit Playtest before importing.');if(dirty&&!confirm('Replace current map?'))return;snapshot();map=next;syncMeta();render();dirty=false;$('dirty').textContent='Imported JSON';$('messages').className='messages';$('messages').textContent='Map imported. Run structural validation.'}catch(err){alert('Import failed: '+err.message)}finally{if(sequence===importSequence)e.target.value=''}};
 document.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?$('redo').click():$('undo').click()}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();$('redo').click()}});
 // Optional assets manifest; local file:// browsers may block fetch, so built-in glyphs always work.
-fetch('assets.json').then(r=>r.ok?r.json():null).then(a=>{if(!a)return;for(const kind of ['terrain','components'])for(const [id,path] of Object.entries(a[kind]||{})){if(typeof path==='string'&&path&&/^(assets\/|\.\/assets\/)[\w./-]+\.(svg|png|webp)$/i.test(path))assets[kind][id]=path}render()}).catch(()=>{});
+fetch('assets.json').then(r=>r.ok?r.json():null).then(a=>{if(!a)return;for(const kind of ['terrain','components'])for(const [id,path] of Object.entries(a[kind]||{})){if(typeof path==='string'&&path&&/^(assets\/|\.\/assets\/)[\w./-]+\.(svg|png|webp)$/i.test(path))assets[kind][id]=path}if(!window.EFPlay?.isActive())render()}).catch(()=>{});
 buildPalette();render();syncMeta();
