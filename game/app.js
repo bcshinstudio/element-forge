@@ -7,6 +7,8 @@
  let storage;
  try{storage=window.localStorage;}catch{}
  const progress=window.EFProgress.createProgress(storage,levels.slice(0,campaignSize).map(level=>level.id));
+ const challengeStart=campaignSize+2;
+ let challengeEnd=challengeStart;
  const $=id=>document.getElementById(id);
  const board=$('board');
  const colors={fire:'#ff9875',water:'#79d7ff',nature:'#bdec81',electricity:'#ffdd72',arcane:'#d9b5ff',wind:'#a8f0dd'};
@@ -153,7 +155,9 @@
   $('finish').hidden=phase!=='complete';
   $('engine-restoration').hidden=phase!=='complete';
   if(phase==='build')drawToolBar();
-  $('next').disabled=levelIndex>=campaignSize-1;
+  $('next').disabled=levelIndex<campaignSize?levelIndex===campaignSize-1:
+   levelIndex<challengeStart||levelIndex+1>=challengeEnd;
+  $('next').textContent=levelIndex>=challengeStart?'Next Stage':'Next puzzle';
   drawBoard();
  }
 
@@ -374,6 +378,34 @@
    $('level').add(option);
    openLevel(index);
   }catch(error){if(ticket===importTicket)$('import-error').textContent='Import failed. '+error.message;}
+ };
+ function loadPack(pack){
+  const stages=window.EFChallenges.readPack(pack);
+  $('level').querySelector('[data-challenge-pack]')?.remove();
+  const group=document.createElement('optgroup');
+  group.label='Challenge pack';
+  group.dataset.challengePack='';
+  levels.length=challengeStart;
+  levels.push(...stages);
+  challengeEnd=challengeStart+stages.length;
+  stages.forEach((stage,index)=>group.append(new Option(stage.map.name,challengeStart+index)));
+  $('level').append(group);
+  openLevel(challengeStart);
+ }
+
+ $('curated-pack').onclick=()=>{loadPack(window.EFCurated);$('challenge-library').open=false;};
+ $('pack-file').onchange=async event=>{
+  const file=event.target.files[0];
+  event.target.value='';
+  if(!file)return;
+  const ticket=++importTicket;
+  try{
+   if(file.size>1024*1024)throw Error('Choose a pack smaller than 1 MiB.');
+   const pack=JSON.parse((await file.text()).replace(/^\uFEFF/,''));
+   if(ticket!==importTicket)return;
+   loadPack(pack);
+   $('challenge-library').open=false;
+  }catch(error){if(ticket===importTicket)message('Pack import failed. '+error.message);}
  };
  board.addEventListener('click',event=>{
   const tile=event.target.closest('.tile');

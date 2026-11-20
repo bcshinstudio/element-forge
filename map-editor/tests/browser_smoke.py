@@ -6,14 +6,14 @@ import json
 import os
 from playwright.sync_api import expect, sync_playwright
 p=Path(__file__).resolve().parents[1]/'index.html'
-server=ThreadingHTTPServer(('127.0.0.1',0),partial(SimpleHTTPRequestHandler,directory=str(p.parent)))
+server=ThreadingHTTPServer(('127.0.0.1',0),partial(SimpleHTTPRequestHandler,directory=str(p.parent.parent)))
 threading.Thread(target=server.serve_forever,daemon=True).start()
 with sync_playwright() as pw:
     browser=pw.chromium.launch(headless=True,executable_path=os.environ.get('CHROMIUM_EXECUTABLE'))
     page=browser.new_page(viewport={'width':1600,'height':1000})
     errors=[]
     page.on('pageerror',lambda e: errors.append(str(e)))
-    page.goto(f'http://127.0.0.1:{server.server_port}/index.html')
+    page.goto(f'http://127.0.0.1:{server.server_port}/map-editor/index.html')
     assert page.locator('#board .cell').count()==144
     page.locator('[data-tool="node:source"]').click()
     page.locator('#board .cell').nth(37).click()
@@ -92,4 +92,15 @@ with sync_playwright() as pw:
     expect(page.locator('#generatorMessages')).to_contain_text('4 verified choices')
     assert not errors, errors
     print('PASS browser integration: edit, history, JSON round-trip, failed import, solve check, animation and interior generator')
+    page.locator('#challenge-count').fill('2')
+    page.locator('#challenge-generate').click()
+    expect(page.locator('#challenge-status')).to_contain_text('2/2 verified')
+    expect(page.locator('#challenge-details')).to_be_hidden()
+    with page.expect_download() as capture:
+        page.locator('#challenge-export').click()
+    assert len(json.loads(capture.value.path().read_text())['stages']) == 2
+    page.locator('#challenge-evidence summary').click()
+    expect(page.locator('#challenge-details')).to_contain_text('placement consequence')
+    assert not errors, errors
+    print('PASS challenge editor: generation, hidden verification and export')
     browser.close()
