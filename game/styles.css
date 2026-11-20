@@ -80,3 +80,21 @@ footer { padding: 0 16px 20px; text-align: center; color: var(--muted); font-siz
  .layout { grid-template-columns: minmax(0, 1fr); max-width: 690px; }
  .controls { padding: 14px; }
 }
+.sidebar { min-width: 0; }
+.controls #instructions { margin: 0 0 16px; }
+.tools { gap: 6px; margin: 0 0 14px; }
+.tools button { background: transparent; }
+.tools button[aria-pressed=true] {
+ background: #3a4b36; border-color: var(--accent); box-shadow: none; color: #fff1cf;
+}
+.build-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 14px; }
+.build-actions button { min-height: 42px; }
+#undo { background: transparent; }
+.disclosure { color: var(--muted); font-size: .9rem; margin-top: 14px; }
+.disclosure summary { width: fit-content; cursor: pointer; padding: 6px 0; }
+.disclosure summary:hover { color: #fff5df; }
+.option-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.custom-level { padding: 0 4px; }
+.custom-level .import { display: block; margin-top: 6px; }
+#status,#import-error { min-height: 0; margin: 0; color: #ffda92; }
+#status:not(:empty),#import-error:not(:empty) { margin-top: 12px; }

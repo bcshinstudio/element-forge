@@ -72,9 +72,15 @@ def test_main_loop(browser, url):
     route(page, FIRE_SHORTCUT)
     page.get_by_role("button", name="Test delivery").click()
     expect(page.get_by_role("status")).to_contain_text("water: missing route")
+    expect(page.get_by_role("button", name="Restart", exact=True)).to_be_hidden()
+    expect(page.locator("#import")).to_be_hidden()
+    expect(page.get_by_role("button", name="Bridge (0)")).to_have_count(0)
+    page.get_by_text("Puzzle options", exact=True).click()
+    expect(page.get_by_role("button", name="Remove tool")).to_be_visible()
     page.get_by_role("button", name="Restart", exact=True).click()
     expect(page.get_by_role("button", name="Bridge (1)")).to_be_visible()
     expect(tile(page, 53)).to_have_attribute("aria-label", "Row 5, column 6, water")
+    page.get_by_text("Puzzle options", exact=True).click()
     page.get_by_role("button", name="Replan tools").click()
     expect(page.get_by_role("heading", name="Plan your route")).to_be_visible()
     expect(bridge_count).to_have_value("1")
@@ -112,6 +118,9 @@ def test_offline_touch_and_import(browser, offline):
              "map": {"format": "element-forge-map", "schemaVersion": 2, "name": "Legacy path",
                      "width": 4, "height": 4, "cells": cells, "inventory": {}}}
     field = page.locator("#import")
+    expect(field).to_be_hidden()
+    page.get_by_text("Open a custom level", exact=True).tap()
+    expect(field).to_be_visible()
     field.set_input_files({"name": "legacy.level.json", "mimeType": "application/json",
                            "buffer": json.dumps(level).encode()})
     expect(page.get_by_role("heading", name="Legacy path")).to_be_visible()

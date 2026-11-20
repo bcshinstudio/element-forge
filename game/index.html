@@ -26,6 +26,7 @@
    <div id="board" role="group" aria-label="Puzzle board"></div>
    <div id="elements" class="legend"></div>
   </section>
+  <div class="sidebar">
   <section class="controls" aria-labelledby="phase">
    <h2 id="phase">Plan your route</h2>
    <p id="instructions"></p>
@@ -35,20 +36,33 @@
     <button class="primary" id="start">Start building</button>
    </form>
    <div id="build" hidden>
-    <div id="tools" class="tools"></div>
+    <div id="tools" class="tools" role="group" aria-label="Build tools"></div>
     <label id="link-field" hidden>Link ID <input id="link-id" value="A" maxlength="12"></label>
-    <div class="actions">
-     <button id="undo">Undo</button><button id="restart">Restart</button><button id="replan">Replan tools</button>
+    <div class="build-actions">
+     <button id="check" class="primary">Test delivery</button>
+     <button id="undo">Undo</button>
     </div>
-    <button id="check" class="primary">Test delivery</button>
+    <details id="puzzle-options" class="disclosure">
+     <summary>Puzzle options</summary>
+     <div class="option-actions">
+      <button id="remove" hidden>Remove tool</button>
+      <button id="restart">Restart</button>
+      <button id="replan">Replan tools</button>
+     </div>
+    </details>
    </div>
    <div id="finish" hidden>
     <p id="score"></p>
     <div class="actions"><button id="replay">Replay puzzle</button><button id="next" class="primary">Next puzzle</button></div>
    </div>
    <p id="status" role="status" aria-live="polite"></p>
-   <label class="import">Try an editor-exported level <input type="file" id="import" accept=".json,application/json"></label>
   </section>
+  <details id="custom-level" class="disclosure custom-level">
+   <summary>Open a custom level</summary>
+   <label class="import">Choose an editor-exported level <input type="file" id="import" accept=".json,application/json"></label>
+   <p id="import-error" role="status"></p>
+  </details>
+  </div>
  </main>
  <footer>BC Shin Studio</footer>
 </body>

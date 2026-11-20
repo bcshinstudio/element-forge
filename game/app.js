@@ -20,6 +20,9 @@
   const {map}=session;
   levelIndex=index;
   $('level').value=index;
+  $('puzzle-options').open=false;
+  $('custom-level').open=false;
+  $('import-error').textContent='';
   $('puzzle').textContent=map.name;
   $('description').textContent=map.description;
   board.style.setProperty('--cols',map.width);
@@ -88,8 +91,10 @@
  function drawToolBar(){
   const {state}=session;
   const counts=E.placementCounts(state.placements);
-  const choices=[['route','Draw track'],...toolEntries().filter(([kind])=>state.loadout[kind]>0)
-   .map(([kind])=>[kind,`${toolNames[kind]} (${state.loadout[kind]-(counts[kind]||0)})`]),['remove','Remove tool']];
+  const remaining=Object.fromEntries(toolEntries().map(([kind])=>[kind,(state.loadout[kind]||0)-(counts[kind]||0)]));
+  const choices=[['route','Draw track'],...Object.entries(remaining).filter(([,count])=>count>0)
+   .map(([kind,count])=>[kind,`${toolNames[kind]} (${count})`])];
+  if(tool==='remove'&&!Object.keys(state.placements).length||Object.hasOwn(remaining,tool)&&remaining[tool]<=0)tool='route';
   const buttons=choices.map(([kind,label])=>{
    const button=document.createElement('button');
    button.type='button';
@@ -99,7 +104,13 @@
    return button;
   });
   $('tools').replaceChildren(...buttons);
+  $('remove').hidden=!Object.keys(state.placements).length;
+  $('remove').setAttribute('aria-pressed',String(tool==='remove'));
+  $('replan').hidden=!session.map.construction;
   $('link-field').hidden=!['portal','tunnel'].includes(tool);
+  $('instructions').textContent=tool==='remove'?'Choose a tool on the map to remove it.':
+   tool==='route'?'Start at a source. Tap or drag through adjacent tiles.':
+   'Choose a tile for your '+toolNames[tool].toLowerCase()+'.';
  }
 
  function update(){
@@ -107,7 +118,7 @@
   $('phase').textContent={inspect:'Plan your route',build:'Build the network',complete:'Delivery complete'}[phase];
   $('instructions').textContent={
    inspect:'Inspect the board before choosing tools.',
-   build:'Tap a source, then tap or drag through adjacent tiles. Backtrack or undo to revise a route.',
+   build:'',
    complete:'Every element reached its destination.'
   }[phase];
   $('plan').hidden=phase!=='inspect';
@@ -219,9 +230,18 @@
   $('tools').querySelector(`[data-tool="${kind}"]`).focus();
   message('');
  });
+ $('remove').onclick=()=>{
+  if(session.state.active){message('Finish or undo your current route first.');return;}
+  tool='remove';
+  $('puzzle-options').open=false;
+  drawToolBar();
+  $('tools').querySelector('button').focus();
+  message('');
+ };
  function reset(replan){
   stopAnimation();
   session.restart(replan);
+  $('puzzle-options').open=false;
   tool='route';
   drawPlan();
   update();
@@ -246,6 +266,7 @@
   const input=event.target,file=input.files[0],ticket=++importTicket;
   input.value='';
   if(!file)return;
+  $('import-error').textContent='';
   try{
    if(file.size>1024*1024)throw Error('Choose a level file smaller than 1 MiB.');
    const level=JSON.parse((await file.text()).replace(/^\uFEFF/,''));
@@ -258,7 +279,7 @@
    option.dataset.import='true';
    $('level').add(option);
    openLevel(index);
-  }catch(error){if(ticket===importTicket)message('Import failed. '+error.message);}
+  }catch(error){if(ticket===importTicket)$('import-error').textContent='Import failed. '+error.message;}
  };
  board.addEventListener('click',event=>{
   const tile=event.target.closest('.tile');
