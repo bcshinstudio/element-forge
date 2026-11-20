@@ -28,7 +28,7 @@ p { line-height: 1.5; }
 #board {
  display: grid; grid-template-columns: repeat(var(--cols,12), minmax(0,1fr)); width: 100%;
  padding: 4px; border: 1px solid var(--border); border-radius: 12px;
- background: #1a2c22; touch-action: none; user-select: none;
+ background: #1a2c22; touch-action: pan-y pinch-zoom; user-select: none;
 }
 .tile {
  position: relative; display: grid; place-items: center; aspect-ratio: 1; min-width: 0;
@@ -115,3 +115,15 @@ footer { padding: 0 16px 20px; text-align: center; color: var(--muted); font-siz
 
 .tile.tunnel-preview { outline: 3px dashed #fff3b0; outline-offset: -4px; z-index: 2; }
 .tile.tunnel-preview .mark { font-weight: 900; }
+
+.tile.route-handle { touch-action: none; }
+#puzzle-hint { margin: 0 0 12px; }
+#hint-text { margin: 4px 0 10px; }
+@media (max-width: 600px) {
+ .layout { padding-inline: 8px; gap: 12px; }
+ .field h1, #description { margin-inline: 6px; }
+ #board { padding: 2px; }
+ .sidebar button, .sidebar summary, .campaign-picker select { min-height: 44px; }
+ .sidebar summary { display: list-item; padding-block: 12px; }
+ .endpoint-role { right: -2px; bottom: -2px; font-size: 9px; }
+}

@@ -225,7 +225,7 @@ def test_campaign_and_progress(browser, url):
                 if kind != "bridge":
                     page.locator(f'[data-tool="{kind}"]').click()
                 tile(page, index).click()
-            expect(page.locator("#instructions")).to_contain_text("Tap or drag")
+            expect(page.locator("#instructions")).to_contain_text("Tap a source")
         for path in plan["routes"]:
             route(page, path["path"])
         page.get_by_role("button", name="Test delivery").click()
@@ -241,6 +241,52 @@ def test_campaign_and_progress(browser, url):
     expect(page.locator("#level option").first).to_have_text("1. Ember Meadow ✓")
     expect(page.locator("#campaign-progress")).to_have_text("15 / 15 complete")
     assert not errors, errors
+    page.close()
+
+
+def test_portrait_tunnels(browser, url):
+    page = browser.new_page(viewport={"width": 360, "height": 640},
+                            is_mobile=True, has_touch=True, reduced_motion="reduce")
+    page.goto(url + BASE)
+    unlock_through(page, 7)
+    page.locator("#level").select_option("7")
+    assert page.evaluate("document.documentElement.scrollWidth === innerWidth")
+    page.locator("#puzzle-hint summary").tap()
+    expect(page.locator("#hint-text")).to_contain_text("Either opening")
+    page.locator("#start").tap()
+    assert tile(page, 50).evaluate("tile => getComputedStyle(tile).touchAction") == "none"
+    assert page.locator("#board").evaluate("board => getComputedStyle(board).touchAction") == "pan-y pinch-zoom"
+    session = page.context.new_cdp_session(page)
+    page.evaluate("scrollTo(0, 0)")
+    rect = tile(page, 52).bounding_box()
+    x, y = rect["x"] + rect["width"] / 2, rect["y"] + rect["height"] / 2
+    session.send("Input.dispatchTouchEvent", {"type": "touchStart", "touchPoints": [{"x": x, "y": y}]})
+    for distance in range(20, 141, 20):
+        session.send("Input.dispatchTouchEvent", {"type": "touchMove", "touchPoints": [{"x": x, "y": y-distance}]})
+    session.send("Input.dispatchTouchEvent", {"type": "touchEnd", "touchPoints": []})
+    page.wait_for_function("scrollY > 0")
+    expect(page.locator(".track")).to_have_count(0)
+    tunnel = page.get_by_role("button", name="Tunnel (1)", exact=True)
+    tunnel.tap()
+    tile(page, 51).tap()
+    expect(tile(page, 51)).to_have_class(re.compile("tunnel-preview"))
+    tile(page, 51).tap()
+    expect(page.locator(".tunnel-preview")).to_have_count(0)
+    tunnel.tap()
+    tile(page, 51).tap()
+    page.locator("#puzzle").tap()
+    expect(page.locator(".tunnel-preview")).to_have_count(0)
+    expect(tunnel).to_be_visible()
+    tunnel.tap()
+    tile(page, 51).tap()
+    tile(page, 56).tap()
+    for index in (51, 56):
+        expect(tile(page, index)).to_have_attribute("aria-label", re.compile("Tunnel T1$"))
+    page.get_by_role("button", name="Remove tool").tap()
+    tile(page, 56).tap()
+    for index in (51, 56):
+        expect(tile(page, index)).to_have_attribute("aria-label", re.compile("land$"))
+    expect(tunnel).to_be_visible()
     page.close()
 
 
@@ -282,6 +328,8 @@ if __name__ == "__main__":
                     print("PASS Reedwater: distinguish Water endpoints, start from its source and keep the next puzzle locked")
                     test_offline_touch_and_import(browser, offline)
                     print("PASS standalone mobile emulation: responsive board, legacy import, touch routing and reduced motion")
+                    test_portrait_tunnels(browser, url)
+                    print("PASS portrait touch: scroll, hints, cancel either way, paired placement and removal")
                     test_keyboard(browser, url)
                     print("PASS keyboard: start, navigate, draw and deliver without a pointer")
                     test_campaign_and_progress(browser, url)
