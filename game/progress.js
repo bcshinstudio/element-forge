@@ -2,21 +2,22 @@
 (function(root){
  const KEY='element-forge.campaign.v2';
  const LEGACY='element-forge.campaign.v1';
- function createProgress(storage,levelIds){
+ function createProgress(storage,levelIds,campaignRules=3){
+  const key=campaignRules>=4?'element-forge.tutorial-campaign.v4':KEY;
   const ids=new Set(levelIds);
   function read(key){
    try{return JSON.parse(storage?.getItem(key)??'null');}catch{return null;}
   }
-  const current=read(KEY);
-  const saved=current?.version===2?current:read(LEGACY);
+  const current=read(key);
+  const saved=current?.version===2?current:key===KEY?read(LEGACY):{challenge:read(KEY)?.challenge};
   const completed=new Set(Array.isArray(saved?.completed)?saved.completed.filter(id=>ids.has(id)):[]);
   const best=Object.fromEntries(levelIds.filter(id=>Number.isSafeInteger(saved?.best?.[id])&&saved.best[id]>=0&&completed.has(id))
    .map(id=>[id,saved.best[id]]));
   let selected=ids.has(saved?.selected)?saved.selected:null;
   let campaign=saved?.version===2?saved.campaign:null;
-  let challenge=saved?.version===2?saved.challenge:null;
+  let challenge=saved?.challenge??null;
   function save(){
-   try{storage?.setItem(KEY,JSON.stringify({version:2,selected,completed:[...completed],best,campaign,challenge}));}catch{}
+   try{storage?.setItem(key,JSON.stringify({version:2,selected,completed:[...completed],best,campaign,challenge}));}catch{}
   }
   return {
    unlockedIndex:()=>{

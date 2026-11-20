@@ -56,7 +56,7 @@ test('Grove Crossing has competing checkpoint approaches and a late Plant confli
 test('curated release reproduces 12 × 12 verified stages with no solution in the export',()=>{
  const {pack,report}=release();
  assert.deepEqual(release(),{pack,report});
- assert.ok(pack.stages.every(stage=>stage.map.width===12&&stage.map.height===12&&stage.rulesVersion===3));
+ assert.ok(pack.stages.every(stage=>stage.map.width===12&&stage.map.height===12&&stage.rulesVersion===4));
  assert.ok(!JSON.stringify(pack).includes('"solution"'));
  assert.equal(G.readPack(JSON.parse(JSON.stringify(pack))).length,pack.stages.length);
  for(const [index,stage] of pack.stages.entries())assert.ok(G.replay(stage,report.evidence[index].solution));

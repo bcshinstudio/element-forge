@@ -35,6 +35,17 @@ def route(page, path, drag=False):
     page.mouse.up()
 
 
+def use_harmony_catalog(page):
+    page.add_init_script("""Object.defineProperty(window, 'EFLevels', {
+        configurable: true,
+        set(levels) {
+            Object.defineProperty(window, 'EFLevels', {
+                value: {...levels, catalog: levels.harmonyCatalog}, configurable: true
+            });
+        }
+    });""")
+
+
 def unlock_through(page, count):
     page.evaluate("""count => {
         const completed = EFLevels.catalog.slice(0, count).map(level => level.id);
@@ -49,6 +60,7 @@ def test_main_loop(browser, url):
     page = browser.new_page(viewport={"width": 1280, "height": 1000})
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
+    use_harmony_catalog(page)
     page.goto(url + BASE)
     page.locator("#continue").click()
     expect(page.get_by_role("heading", name="Ember Meadow")).to_be_visible()
@@ -125,6 +137,7 @@ def test_main_loop(browser, url):
 
 def test_reedwater_endpoints_and_lock(browser, url):
     page = browser.new_page(viewport={"width": 1280, "height": 1000})
+    use_harmony_catalog(page)
     page.goto(url + BASE)
     page.locator("#continue").click()
     unlock_through(page, 5)
@@ -155,6 +168,7 @@ def test_offline_touch_and_import(browser, offline):
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.context.set_offline(True)
+    use_harmony_catalog(page)
     page.goto(offline.as_uri())
     page.locator("#continue").tap()
     expect(page.locator(".tile")).to_have_count(144)
@@ -205,7 +219,7 @@ def test_campaign_and_progress(browser, url):
         const solution = EFEngine.solveConstruction(map);
         return {name: map.name, budget: !!map.construction, ...solution};
     })""")
-    assert len(plans) == 21
+    assert len(plans) == 17
     for i, plan in enumerate(plans):
         expect(page.get_by_role("heading", name=plan["name"], exact=True)).to_be_visible()
         assert plan["status"] == "solved", plan
@@ -243,18 +257,18 @@ def test_campaign_and_progress(browser, url):
             route(page, path["path"])
         page.get_by_role("button", name="Restore Harmony").click()
         expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
-        expect(page.locator("#campaign-progress")).to_have_text(f"{i+1} / 21 complete")
+        expect(page.locator("#campaign-progress")).to_have_text(f"{i+1} / 17 complete")
         if i < len(plans) - 1:
             page.get_by_role("button", name="Next Stage").click()
     expect(page.get_by_role("button", name="Campaign summary")).to_be_visible()
     page.reload()
     expect(page.locator("#continue")).to_contain_text("Campaign complete")
     page.locator("#continue").click()
-    expect(page.get_by_role("heading", name="The Living Basin")).to_be_visible()
-    expect(page.locator("#campaign-progress")).to_have_text("21 / 21 complete")
+    expect(page.get_by_role("heading", name="Two Currents, One Crossing")).to_be_visible()
+    expect(page.locator("#campaign-progress")).to_have_text("17 / 17 complete")
     page.locator("#level").select_option("0")
-    expect(page.locator("#level option").first).to_have_text("1. Ember Meadow ✓")
-    expect(page.locator("#campaign-progress")).to_have_text("21 / 21 complete")
+    expect(page.locator("#level option").first).to_have_text("1. First Spark ✓")
+    expect(page.locator("#campaign-progress")).to_have_text("17 / 17 complete")
     assert not errors, errors
     page.close()
 
@@ -262,6 +276,7 @@ def test_campaign_and_progress(browser, url):
 def test_portrait_tunnels(browser, url):
     page = browser.new_page(viewport={"width": 360, "height": 640},
                             is_mobile=True, has_touch=True, reduced_motion="reduce")
+    use_harmony_catalog(page)
     page.goto(url + BASE)
     page.locator("#continue").click()
     unlock_through(page, 7)
@@ -310,6 +325,7 @@ def test_world_engine_offline(browser, offline):
     page = browser.new_page(viewport={"width": 390, "height": 844},
                             is_mobile=True, has_touch=True, reduced_motion="reduce")
     page.context.set_offline(True)
+    use_harmony_catalog(page)
     page.goto(offline.as_uri())
     page.locator("#continue").tap()
     expect(page.locator("#world-intro")).to_be_visible()
@@ -369,7 +385,7 @@ def test_challenge_pack_offline(browser, offline):
         if i < len(plans)-1:
             page.get_by_role("button", name="Next Stage").tap()
     expect(page.locator("#next")).to_be_disabled()
-    expect(page.locator("#campaign-progress")).to_have_text("0 / 21 complete")
+    expect(page.locator("#campaign-progress")).to_have_text("0 / 17 complete")
     page.locator("#challenge-library summary").tap()
     page.locator("#pack-file").set_input_files({"name": "pack.json", "mimeType": "application/json",
                                                "buffer": json.dumps(pack).encode()})
@@ -383,17 +399,23 @@ def test_autosave_and_scoring(browser, url):
     expect(page.locator("#continue")).to_have_text("Start Campaign")
     page.locator("#continue").click()
     page.locator("#start").click()
-    path = [40, 52, 64, 76, 88, 89, 90, 102, 103, 104, 92]
+    path = page.evaluate("EFEngine.solveConstruction(EFMap.readLevel(EFLevels.catalog[0])).routes[0].path")
+    points = 144 - 2 * len(path)
     route(page, path[:3])
     page.reload()
     expect(page.locator("#continue")).to_have_text("Continue · Stage 1")
     page.locator("#continue").click()
-    expect(tile(page, 64).locator(".track")).to_have_count(1)
+    expect(tile(page, path[2]).locator(".track")).to_have_count(1)
     route(page, path[3:])
-    expect(page.locator("#projected")).to_have_text("Projected score 122 points")
+    expect(page.locator("#projected")).to_have_text(f"Projected score {points} points")
     page.locator("#check").click()
     expect(page.locator("#skip-animation")).to_be_visible()
-    expect(page.locator("#totals")).to_have_text("Stage best 122 · Campaign total 122")
+    expect(page.locator("#totals")).to_have_text(f"Stage best {points} · Campaign total {points}")
+    expect(page.locator("#score")).to_have_text(f"{points} points")
+    expect(page.locator("#score-route")).to_be_hidden()
+    page.get_by_text("Score details", exact=True).click()
+    expect(page.locator("#score-route")).to_have_text(f"Route tiles −{2 * len(path)}")
+    expect(page.locator("#score-bonus")).to_be_hidden()
     page.reload()
     expect(page.locator("#continue")).to_have_text("Continue · Stage 2")
     page.locator("#continue").click()
@@ -401,7 +423,7 @@ def test_autosave_and_scoring(browser, url):
     page.locator("#start").click()
     route(page, path)
     page.locator("#check").click()
-    expect(page.locator("#totals")).to_have_text("Stage best 122 · Campaign total 122")
+    expect(page.locator("#totals")).to_have_text(f"Stage best {points} · Campaign total {points}")
     page.locator("#skip-animation").click()
     expect(page.locator("#skip-animation")).to_be_hidden()
     page.close()
@@ -409,6 +431,7 @@ def test_autosave_and_scoring(browser, url):
 
 def test_keyboard(browser, url):
     page = browser.new_page(reduced_motion="reduce")
+    use_harmony_catalog(page)
     page.goto(url + BASE)
     page.locator("#continue").click()
     page.locator("#start").focus()
@@ -457,7 +480,7 @@ if __name__ == "__main__":
                     test_keyboard(browser, url)
                     print("PASS keyboard: start, navigate, draw and deliver without a pointer")
                     test_campaign_and_progress(browser, url)
-                    print("PASS campaign: all 21 levels playable, next and replay navigation, completed progress survives reload")
+                    print("PASS campaign: all 17 new lessons playable, next and replay navigation, completed progress survives reload")
                     browser.close()
             finally:
                 server.shutdown()

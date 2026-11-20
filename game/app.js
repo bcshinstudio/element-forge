@@ -6,7 +6,7 @@
  levels.push(window.EFLevels.prototype);
  let storage;
  try{storage=window.localStorage;}catch{}
- const progress=window.EFProgress.createProgress(storage,levels.slice(0,campaignSize).map(level=>level.id));
+ const progress=window.EFProgress.createProgress(storage,levels.slice(0,campaignSize).map(level=>level.id),levels[0].rulesVersion);
  const challengeStart=campaignSize+2;
  let challengeEnd=challengeStart,activePack=null,challengeBest={};
  const $=id=>document.getElementById(id);
@@ -19,7 +19,7 @@
  }
  const toolNames=Object.fromEntries(F.COMPONENTS.map(([id,name])=>[id,name]));
  const componentSymbols=Object.fromEntries(F.COMPONENTS.map(([id,,icon])=>[id,icon]));
- const terrainSymbols={forest:'♣',mountain:'▲',water:'≈',wall:'▦',void:'◌',ice:'✧',lava:'≋',land:''};
+ const terrainSymbols={forest:'♣',mountain:'▲',water:'≈',wall:'▦',void:'◌',ice:'✧',lava:'♨',land:''};
  for(const [id,,glyph] of F.TERRAIN)terrainSymbols[id]??=glyph;
  const terrainNames=Object.fromEntries(F.TERRAIN.map(([id,name])=>[id,name]));
  const arrows={N:'↑',E:'→',S:'↓',W:'←'};
@@ -94,7 +94,13 @@
 
  function drawResult(result){
   const {points,available,tiles,unspent}=result;
-  $('score').textContent=`${points} points · ${available} board tiles − 2 × ${tiles} route tiles + 10 × ${unspent} unspent construction points`;
+  $('score').textContent=`${points} points`;
+  $('score-details').open=false;
+  $('score-base').textContent=`Board points ${available}`;
+  $('score-route').textContent=`Route tiles −${2*tiles}`;
+  $('score-bonus').hidden=!unspent;
+  $('score-bonus').textContent=`Unused construction +${10*unspent}`;
+  $('score-floor').hidden=available-2*tiles+10*unspent>=0;
   const best=levelIndex<campaignSize?progress.best(levels[levelIndex].id):challengeBest[levelIndex-challengeStart];
   $('totals').textContent=best==null?'':`Stage best ${best}`+(levelIndex<campaignSize?` · Campaign total ${progress.total()}`:'');
  }
@@ -241,7 +247,7 @@
     fragments[i].append(line);
    }
   }
-  const landings=state.active?.element==='wind'?new Set(E.windLandings(map,state.active.path.at(-1))):new Set();
+  const landings=state.active?.element==='wind'?new Set(E.windLandings(map,state.active.path.at(-1),state.placements)):new Set();
   for(const [i,cell] of map.cells.entries()){
    const tile=tiles[i];
    const mark=document.createElement('span');
@@ -505,7 +511,7 @@
   const map=session.map;
   const stride=Math.floor(tip/map.width)===Math.floor(index/map.width)?1:tip%map.width===index%map.width?map.width:0;
   if(stride&&index!==tip&&E.linkPartner(map,tip,session.state.placements)!==index&&
-     !(session.state.active.element==='wind'&&E.windLandings(map,tip).includes(index))){
+     !(session.state.active.element==='wind'&&E.windLandings(map,tip,session.state.placements).includes(index))){
    const delta=Math.sign(index-tip)*stride;
    for(let next=tip+delta;session.state.active;next+=delta){
     if(!act(next)||next===index)break;

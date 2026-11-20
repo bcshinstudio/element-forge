@@ -23,21 +23,22 @@ const linkPartner=(m,i,placements={})=>{
  }
  return other;
 };
-function windLandings(m,i){
+function windLandings(m,i,placements={}){
  const ground=cell=>['land','forest','ice','bank','exposed','covered'].includes(cell?.terrain)&&
-  (m.rulesVersion!==3||cell.terrain!=='forest');
- if(!ground(m.cells[i]))return [];
+  (!(m.rulesVersion>=3)||cell.terrain!=='forest');
+ const legal=index=>ground(m.cells[index])&&(m.rulesVersion!==4||((!m.cells[index].node||m.cells[index].node.element==='wind')&&effective(m,placements,index)!=='tunnel'));
+ if(!legal(i))return [];
  return neighbors(i,m.width,m.height).flatMap(([hole,heading])=>{
   if(m.cells[hole].terrain!=='void')return [];
   const landing=neighbors(hole,m.width,m.height).find(([,dir])=>dir===heading)?.[0];
-  return ground(m.cells[landing])?[landing]:[];
+  return legal(landing)?[landing]:[];
  });
 }
 function routeNeighbors(m,i,placements={},element){
  const result=neighbors(i,m.width,m.height).map(([j])=>j);
  const partner=linkPartner(m,i,placements);
  if(partner>=0&&(element!=='wind'||effective(m,placements,i)!=='tunnel'))result.push(partner);
- if(element==='wind')result.push(...windLandings(m,i));
+ if(element==='wind')result.push(...windLandings(m,i,placements));
  return result;
 }
 const spanKinds=['bridge','metalSpan'];
@@ -46,7 +47,7 @@ const newTerrain=['river','bank','shallow','scree','heated','abrasive','exposed'
 function terrainError(m,element,index,component){
  const {terrain}=m.cells[index];
  const blocked=`Blocked terrain at cell ${index+1}`;
- if(m.rulesVersion!==3)return ordinaryGround.includes(terrain)||(terrain==='water'&&component==='bridge')?null:blocked;
+ if(!(m.rulesVersion>=3))return ordinaryGround.includes(terrain)||(terrain==='water'&&component==='bridge')?null:blocked;
  if(terrain==='forest'&&element!=='nature')return 'Only Plant can move through woods.';
  if(element==='nature'&&component==='portal')return 'Plant cannot use portals.';
  if(['earth','metal'].includes(element)&&component==='bridge')return 'This current cannot use lightweight bridges.';
@@ -58,6 +59,8 @@ function terrainError(m,element,index,component){
  if(terrain==='scree')return element==='earth'?null:'Only Earth can cross scree.';
  if(['heated','abrasive'].includes(terrain))return element==='metal'?null:'Only Metal can cross this ground.';
  if(!['water','river','shallow'].includes(terrain))return blocked;
+ if(element==='fire'&&m.rulesVersion>=4)return 'Fire cannot cross water, even on a bridge.';
+ if(element==='electricity'&&m.rulesVersion>=4)return 'Electricity needs dry ground. Bridges do not carry it over water.';
  if(element==='fire'&&terrain!=='shallow')return 'Deep water blocks Fire even on a span.';
  if(element==='electricity')return component==='metalSpan'?null:'Electricity needs a metal span over water.';
  if(element==='water'&&terrain==='river')return null;
@@ -73,8 +76,8 @@ function bankError(m,element,from,to){
 const direction=(a,b,w)=>b===a-w?'N':b===a+w?'S':b===a+1&&Math.floor(a/w)===Math.floor(b/w)?'E':b===a-1&&Math.floor(a/w)===Math.floor(b/w)?'W':null;
 function allowedTransition(m,element,from,to,placements={}){
  const c=m.cells[from],next=m.cells[to],step=direction(from,to,m.width);
- if(bankError(m,element,from,to)||(!step&&m.rulesVersion===3&&element==='water'&&(c.terrain==='river'||next.terrain==='river')))return false;
- if(!step)return (element==='wind'&&windLandings(m,from).includes(to))||
+ if(bankError(m,element,from,to)||(!step&&m.rulesVersion>=3&&element==='water'&&(c.terrain==='river'||next.terrain==='river')))return false;
+ if(!step)return (element==='wind'&&windLandings(m,from,placements).includes(to))||
   (linkPartner(m,from,placements)===to&&(element!=='wind'||effective(m,placements,from)!=='tunnel'));
  if(c.terrain==='oneway'&&step!==(c.props?.direction||'E'))return false;
  if(c.component==='gate'&&step!==(c.props?.direction||'E'))return false;
@@ -89,7 +92,7 @@ function constraintError(m,element,path,placements={},partial=false){
  if(!partial&&rules.requireComponents?.some(t=>!path.some(i=>effective(m,placements,i)===t)))return 'Required component not used';
  return null;
 }
-function canPlace(m,placements,i,kind){const c=m.cells[i];return !!c&&!c.node&&!c.component&&!placements[i]&&(spanKinds.includes(kind)?(c.terrain==='water'||m.rulesVersion===3&&['river','shallow'].includes(c.terrain)):['intersection','portal','tunnel'].includes(kind)?['land','forest','ice','bank','exposed','covered'].includes(c.terrain):false)}
+function canPlace(m,placements,i,kind){const c=m.cells[i];return !!c&&!c.node&&!c.component&&!placements[i]&&(spanKinds.includes(kind)?(c.terrain==='water'||m.rulesVersion>=3&&['river','shallow'].includes(c.terrain)):['intersection','portal','tunnel'].includes(kind)?['land','forest','ice','bank','exposed','covered'].includes(c.terrain):false)}
 function validatePath(m,element,path,other=[],placements={},partial=false){
  const p=pairs(m).find(x=>x.element===element);if(!p||p.source<0||p.destination<0)return 'Missing endpoints';
  if(!Array.isArray(path)||path.length<(partial?1:2)||path[0]!==p.source||(!partial&&path.at(-1)!==p.destination))return 'Route must connect its source to destination';
