@@ -66,27 +66,28 @@ def test_main_loop(browser, url):
     bridge_count.fill("1")
     page.get_by_role("button", name="Start building").click()
 
-    page.get_by_role("button", name="Bridge (1)").click()
-    tile(page, 51).click()
-    expect(page.get_by_role("status")).to_contain_text("cannot be placed")
+    expect(page.locator("#bridge-count")).to_have_text("Bridges left: 1")
+    tile(page, 53).click()
+    expect(page.locator("#bridge-count")).to_have_text("Bridges left: 0")
+    tile(page, 53).click(button="right")
+    expect(page.locator("#bridge-count")).to_have_text("Bridges left: 1")
     tile(page, 53).click()
     route(page, FIRE_SHORTCUT)
     page.get_by_role("button", name="Test delivery").click()
-    expect(page.get_by_role("status")).to_contain_text("water: missing route")
+    expect(page.locator("#status")).to_contain_text("water: missing route")
     expect(page.get_by_role("button", name="Restart", exact=True)).to_be_hidden()
     expect(page.locator("#import")).to_be_hidden()
     expect(page.get_by_role("button", name="Bridge (0)")).to_have_count(0)
     page.get_by_text("Puzzle options", exact=True).click()
     expect(page.get_by_role("button", name="Remove tool")).to_be_visible()
     page.get_by_role("button", name="Restart", exact=True).click()
-    expect(page.get_by_role("button", name="Bridge (1)")).to_be_visible()
+    expect(page.locator("#bridge-count")).to_have_text("Bridges left: 1")
     expect(tile(page, 53)).to_have_attribute("aria-label", "Row 5, column 6, water")
     page.get_by_text("Puzzle options", exact=True).click()
     page.get_by_role("button", name="Replan tools").click()
     expect(page.get_by_role("heading", name="Plan your route")).to_be_visible()
     expect(bridge_count).to_have_value("1")
     page.get_by_role("button", name="Start building").click()
-    page.get_by_role("button", name="Bridge (1)").click()
     tile(page, 113).click()
     route(page, FIRE_DETOUR)
     route(page, WATER)
@@ -103,6 +104,25 @@ def test_main_loop(browser, url):
     page.close()
 
 
+def test_reedwater_endpoints_and_skip(browser, url):
+    page = browser.new_page(viewport={"width": 1280, "height": 1000})
+    page.goto(url + BASE)
+    page.locator("#level").select_option("5")
+    page.locator("#start").click()
+    left, right = tile(page, 98), tile(page, 117)
+    expect(left.locator(".endpoint-role")).to_have_text("D")
+    expect(right.locator(".endpoint-role")).to_have_text("S")
+    left.click()
+    expect(page.locator("#status")).to_contain_text("This is a destination (D)")
+    right.click()
+    expect(right.locator(".track")).to_have_count(1)
+    page.get_by_text("Puzzle options", exact=True).click()
+    page.get_by_role("button", name="Skip to next puzzle").click()
+    expect(page.get_by_role("heading", name="Briar Hollow")).to_be_visible()
+    expect(page.locator("#campaign-progress")).to_have_text("0 / 15 complete")
+    page.close()
+
+
 def test_offline_touch_and_import(browser, offline):
     page = browser.new_page(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True,
                             reduced_motion="reduce")
@@ -112,6 +132,10 @@ def test_offline_touch_and_import(browser, offline):
     page.goto(offline.as_uri())
     expect(page.locator(".tile")).to_have_count(144)
     assert page.evaluate("document.documentElement.scrollWidth === window.innerWidth")
+    page.locator("#level").select_option("1")
+    page.locator("#start").tap()
+    tile(page, 53).tap()
+    expect(page.locator("#bridge-count")).to_have_text("Bridges left: 0")
     cells = [{"terrain": "land"} for _ in range(16)]
     for index, role in ((0, "source"), (3, "destination")):
         cells[index]["node"] = {"role": role, "element": "fire"}
@@ -161,7 +185,8 @@ def test_campaign_and_progress(browser, url):
         page.get_by_role("button", name="Start building").click()
         for index, placement in plan["placements"].items():
             kind = placement if isinstance(placement, str) else placement["kind"]
-            page.locator(f'[data-tool="{kind}"]').click()
+            if kind != "bridge":
+                page.locator(f'[data-tool="{kind}"]').click()
             if isinstance(placement, dict):
                 page.locator("#link-id").fill(placement["pairId"])
             tile(page, index).click()
@@ -217,7 +242,9 @@ if __name__ == "__main__":
                 with sync_playwright() as playwright:
                     browser = playwright.chromium.launch(executable_path=os.getenv("CHROMIUM_EXECUTABLE"))
                     test_main_loop(browser, url)
-                    print("PASS desktop: start and resume drag routing, overspend, invalid placement, wrong bridge, restart, replan, undo, animation, next and replay")
+                    print("PASS desktop: start and resume drag routing, overspend, direct bridge placement and removal, wrong bridge, restart, replan, undo, animation, next and replay")
+                    test_reedwater_endpoints_and_skip(browser, url)
+                    print("PASS Reedwater: distinguish Water endpoints, start from its source and skip without completing")
                     test_offline_touch_and_import(browser, offline)
                     print("PASS standalone mobile emulation: responsive board, legacy import, touch routing and reduced motion")
                     test_keyboard(browser, url)

@@ -27,12 +27,17 @@ the resulting offline file. No account or network connection is required.
 Inspect the board first, then select a loadout if the level has a shared
 budget. In Build mode, tap a source or drag from it to draw a route. Release
 and resume from the unfinished tip. Arrow keys move board focus and Enter
-or Space activates a tile. Place a selected tool to return to routing.
+or Space activates a tile. Tap empty water to place a bridge before starting a route.
+The bridge counter shows how many are left. Select intersections or link
+ends explicitly, since they can share the same placement tiles. Place a
+selected tool to return to routing.
 Choose the highlighted tool again to cancel placement. For a tunnel jump,
 tap its paired end and continue from there.
 
 Undo cancels an unfinished route or restores the previous action. Restart
 resets the board using the same loadout. Replan returns to tool selection.
+Right-click a placed tool to remove it, or use Remove tool in Puzzle options.
+Skip to next puzzle in Puzzle options leaves the current puzzle incomplete.
 Test delivery checks every route and animates success. Use the puzzle
 selector to revisit any campaign level. Completion marks and the last
 selected campaign puzzle are saved in browser storage when available.

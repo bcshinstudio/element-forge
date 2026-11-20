@@ -47,7 +47,7 @@
    item.textContent=symbols[element]+' · '+F.ELEMENTS[element].name;
    return item;
   });
-  $('elements').replaceChildren(...legend,document.createTextNode('Solid ring = source · Double ring = destination'));
+  $('elements').replaceChildren(...legend,document.createTextNode('S = source · D = destination'));
   $('link-id').value='A';
   drawPlan();
   update();
@@ -99,7 +99,7 @@
   const {state}=session;
   const counts=E.placementCounts(state.placements);
   const remaining=Object.fromEntries(toolEntries().map(([kind])=>[kind,(state.loadout[kind]||0)-(counts[kind]||0)]));
-  const choices=Object.entries(remaining).filter(([,count])=>count>0)
+  const choices=Object.entries(remaining).filter(([kind,count])=>kind!=='bridge'&&count>0)
    .map(([kind,count])=>[kind,`${toolNames[kind]} (${count})`]);
   if(tool==='remove'&&!Object.keys(state.placements).length||Object.hasOwn(remaining,tool)&&remaining[tool]<=0)tool='route';
   const buttons=choices.map(([kind,label])=>{
@@ -112,6 +112,9 @@
   });
   $('tools').replaceChildren(...buttons);
   $('tools').hidden=!buttons.length;
+  $('bridge-count').hidden=!state.loadout.bridge;
+  $('bridge-count').textContent=`Bridges left: ${remaining.bridge??0}`;
+  $('bridge-hint').hidden=!remaining.bridge;
   $('remove').hidden=!Object.keys(state.placements).length;
   $('remove').setAttribute('aria-pressed',String(tool==='remove'));
   $('replan').hidden=!session.map.construction;
@@ -133,7 +136,8 @@
   $('build').hidden=phase!=='build';
   $('finish').hidden=phase!=='complete';
   if(phase==='build')drawToolBar();
-  $('next').disabled=levelIndex<0||levelIndex>=window.EFLevels.catalog.length-1;
+  $('next').disabled=levelIndex>=campaignSize-1;
+  $('skip').hidden=$('next').disabled;
   drawBoard();
  }
 
@@ -169,6 +173,11 @@
     mark.classList.add('endpoint',cell.node.role);
     mark.style.setProperty('--element',colors[cell.node.element]);
     mark.textContent=symbols[cell.node.element];
+    const role=document.createElement('small');
+    role.className='endpoint-role';
+    role.textContent=cell.node.role==='source'?'S':'D';
+    role.setAttribute('aria-hidden','true');
+    mark.append(role);
    }else if(kind){
     mark.classList.add('structure');
     const element=kind==='checkpoint'?cell.props?.element:null;
@@ -188,6 +197,9 @@
  function explainMove(result,index){
   const {map,state}=session;
   const element=state.active?.element;
+  if(result.message==='Start at an element source.'&&map.cells[index].node?.role==='destination'){
+   return 'This is a destination (D). Start at the matching source (S).';
+  }
   if(result.message==='Element terrain restriction violated'){
    return F.ELEMENTS[element].name+' cannot cross '+map.cells[index].terrain+' on this level.';
   }
@@ -195,18 +207,22 @@
    return F.ELEMENTS[element].name+' cannot use '+toolNames[E.effective(map,state.placements,index)].toLowerCase()+' on this level.';
   }
   if(/^Blocked terrain/.test(result.message)&&map.cells[index].terrain==='water'){
-   return 'This water tile needs a bridge.';
+   return 'This tile needs a bridge. Place it before drawing the route.';
   }
   return result.message;
  }
 
- function act(index){
+ function act(index,direct=false){
   if(session.state.phase!=='build')return;
-  const result=tool==='route'?session.route(index):tool==='remove'?session.remove(index):session.place(index,tool,$('link-id').value.trim());
+  const {map,state}=session;
+  const bridgeTile=direct&&tool==='route'&&!state.active&&map.cells[index].terrain==='water'&&
+   !E.effective(map,state.placements,index);
+  const result=bridgeTile?session.place(index,'bridge'):
+   tool==='route'?session.route(index):tool==='remove'?session.remove(index):session.place(index,tool,$('link-id').value.trim());
   if(!result.ok){message(explainMove(result,index));return false;}
   message('');
   drawBoard();
-  if(tool!=='route'){tool='route';drawToolBar();}
+  if(bridgeTile||tool!=='route'){tool='route';drawToolBar();}
   return true;
  }
 
@@ -287,7 +303,7 @@
   message('');
   animate();
  };
- $('next').onclick=()=>openLevel(levelIndex+1);
+ $('next').onclick=$('skip').onclick=()=>openLevel(levelIndex+1);
  $('level').onchange=()=>{importTicket++;openLevel(Number($('level').value));};
  $('import').onchange=async event=>{
   const input=event.target,file=input.files[0],ticket=++importTicket;
@@ -310,7 +326,7 @@
  };
  board.addEventListener('click',event=>{
   const tile=event.target.closest('.tile');
-  if(tile&&event.detail===0)act(Number(tile.dataset.index));
+  if(tile&&event.detail===0)act(Number(tile.dataset.index),true);
  });
  board.addEventListener('pointerdown',event=>{
   const tile=event.target.closest('.tile');
@@ -322,7 +338,7 @@
    drag={pointer:event.pointerId,index};
    board.setPointerCapture(event.pointerId);
   }
-  act(index);
+  act(index,true);
  });
  board.addEventListener('pointermove',event=>{
   if(drag?.pointer!==event.pointerId||!session.state.active)return;
@@ -340,6 +356,19 @@
     if(!act(next)||next===index)break;
    }
   }else act(index);
+ });
+ board.addEventListener('contextmenu',event=>{
+  const tile=event.target.closest('.tile');
+  if(!tile||session.state.phase!=='build')return;
+  const index=Number(tile.dataset.index);
+  if(!Object.hasOwn(session.state.placements,index))return;
+  event.preventDefault();
+  const result=session.remove(index);
+  if(!result.ok){message(result.message);return;}
+  tool='route';
+  drawBoard();
+  drawToolBar();
+  message('Tool removed. Any track using it was cleared.');
  });
  board.addEventListener('keydown',event=>{
   const tile=event.target.closest('.tile');
