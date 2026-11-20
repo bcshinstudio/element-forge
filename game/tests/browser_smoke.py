@@ -301,7 +301,7 @@ def test_portrait_tunnels(browser, url):
     page.get_by_role("button", name="Remove tool").tap()
     tile(page, 56).tap()
     for index in (51, 56):
-        expect(tile(page, index)).to_have_attribute("aria-label", re.compile("land$"))
+        expect(tile(page, index)).to_have_attribute("aria-label", re.compile("Land$"))
     expect(tunnel).to_be_visible()
     page.close()
 
@@ -356,9 +356,14 @@ def test_challenge_pack_offline(browser, offline):
             if tool != "bridge":
                 page.locator(f'[data-tool="{tool}"]').tap()
             tile(page, index).tap()
-        for current in plan["routes"]:
-            for index in current["path"]:
+        for route_index, current in enumerate(plan["routes"]):
+            for step, index in enumerate(current["path"]):
                 tile(page, index).tap()
+                if i == 0 and route_index == 0 and step == 1:
+                    page.reload()
+                    page.locator("#choose-challenge").tap()
+                    page.locator("#resume-challenge").tap()
+                    expect(tile(page, index).locator(".track")).to_have_count(1)
         page.locator("#check").tap()
         expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
         if i < len(plans)-1:
@@ -446,7 +451,7 @@ if __name__ == "__main__":
                     test_world_engine_offline(browser, offline)
                     print("PASS offline World-Engine intro, Wind jump, reduced motion and replay")
                     test_challenge_pack_offline(browser, offline)
-                    print("PASS offline touch challenge pack: all eight stages, next and import")
+                    print("PASS offline touch challenge pack: all eight stages, exact resume, next and import")
                     test_autosave_and_scoring(browser, url)
                     print("PASS autosave: exact unfinished route, interrupted completion, projected score, replay best and animation skip")
                     test_keyboard(browser, url)

@@ -4,11 +4,11 @@
  const LEGACY='element-forge.campaign.v1';
  function createProgress(storage,levelIds){
   const ids=new Set(levelIds);
-  let saved;
-  try{
-   const current=JSON.parse(storage?.getItem(KEY)??'null');
-   saved=current?.version===2?current:JSON.parse(storage?.getItem(LEGACY)??'null');
-  }catch{}
+  function read(key){
+   try{return JSON.parse(storage?.getItem(key)??'null');}catch{return null;}
+  }
+  const current=read(KEY);
+  const saved=current?.version===2?current:read(LEGACY);
   const completed=new Set(Array.isArray(saved?.completed)?saved.completed.filter(id=>ids.has(id)):[]);
   const best=Object.fromEntries(levelIds.filter(id=>Number.isSafeInteger(saved?.best?.[id])&&saved.best[id]>=0&&completed.has(id))
    .map(id=>[id,saved.best[id]]));
