@@ -206,12 +206,13 @@ button.brand { background: transparent; border: 0; text-align: left; }
  .home-actions { grid-template-columns:1fr; }
 }
 
+:root { --world-engine-art: url(../art/world-engine.webp); }
 body {
- background: linear-gradient(#102019ee,#102019eb), url(../art/world-engine.webp) center / cover fixed;
+ background: linear-gradient(#102019ee,#102019eb), var(--world-engine-art) center / cover fixed;
 }
 #home {
  background: linear-gradient(90deg,#14271cf2 0%,#14271cd9 42%,#14271c22 100%),
-  url(../art/world-engine.webp) 68% center / cover;
+  var(--world-engine-art) 68% center / cover;
  min-height: 23rem;
  padding: clamp(1rem,4vw,2rem);
 }
@@ -219,7 +220,7 @@ body {
 #home .home-actions .primary:disabled { opacity:.65; }
 .chapter-restored #home {
  background: radial-gradient(ellipse at 81% 28%,#ffdea366,transparent 44%),
-  linear-gradient(90deg,#14271cf2,#14271c44), url(../art/world-engine.webp) 68% center / cover;
+  linear-gradient(90deg,#14271cf2,#14271c44), var(--world-engine-art) 68% center / cover;
 }
 @media (hover:none) and (min-width:601px) and (max-width:950px) and (orientation:landscape) {
  .masthead { padding-block:4px; }

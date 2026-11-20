@@ -100,6 +100,10 @@
   for(const route of session.state.routes)heardRoutes.add(route.element);
   if(index<campaignSize&&mode==='run')progress.select(levels[index].id);
   updateLevelLabels();
+  for(const option of $('level').options){
+   const candidate=Number(option.value);
+   if(candidate>=campaignSize&&candidate<importIndex)option.hidden=candidate!==index;
+  }
   $('level').value=index;
   $('menu-tip').hidden=!levels[index].lesson;
   $('puzzle-options').open=false;

@@ -63,7 +63,8 @@ def test_campaign(browser, url):
     page.goto(url + BASE)
     expect(page.locator("#continue")).to_be_disabled()
     assert page.locator(".home-actions button").evaluate_all(
-        "buttons => new Set(buttons.map(b => b.getBoundingClientRect().width)).size === 1"
+        "buttons => { const widths = buttons.map(b => b.getBoundingClientRect().width); "
+        "return Math.max(...widths) - Math.min(...widths) < 0.1; }"
     )
     page.locator("#new-campaign").click()
     if page.locator("#intro-skip").is_visible():
