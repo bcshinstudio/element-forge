@@ -34,6 +34,10 @@
   <section class="controls" aria-labelledby="phase">
    <h2 id="phase">Plan your route</h2>
    <p id="instructions"></p>
+   <details id="puzzle-hint" class="disclosure" hidden>
+    <summary>Puzzle hint</summary>
+    <p id="hint-text"></p>
+   </details>
    <form id="plan">
     <div id="loadout"></div>
     <p id="budget"></p>
@@ -43,6 +47,7 @@
     <div id="bridge-count" class="inventory-count" role="status" hidden></div>
     <p id="bridge-hint" hidden>Tap an empty water tile to place a bridge, even mid-route.</p>
     <div id="tools" class="tools" role="group" aria-label="Build tools"></div>
+    <button id="remove" hidden>Remove tool</button>
     <label id="link-field" hidden>Link ID <input id="link-id" value="A" maxlength="12"></label>
     <div class="build-actions">
      <button id="check" class="primary">Test delivery</button>
@@ -51,7 +56,6 @@
     <details id="puzzle-options" class="disclosure">
      <summary>Puzzle options</summary>
      <div class="option-actions">
-      <button id="remove" hidden>Remove tool</button>
       <button id="restart">Restart</button>
       <button id="replan">Replan tools</button>
      </div>

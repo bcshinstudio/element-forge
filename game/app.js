@@ -36,6 +36,9 @@
   $('import-error').textContent='';
   $('puzzle').textContent=map.name;
   $('description').textContent=map.description;
+  $('puzzle-hint').open=false;
+  $('puzzle-hint').hidden=!levels[index].hint;
+  $('hint-text').textContent=levels[index].hint??'';
   board.style.setProperty('--cols',map.width);
   const firstSource=E.pairs(map)[0].source;
   tiles=map.cells.map((cell,i)=>{
@@ -128,10 +131,11 @@
   $('remove').setAttribute('aria-pressed',String(tool==='remove'));
   $('replan').hidden=!session.map.construction;
   $('link-field').hidden=tool!=='portal';
+  syncDragHandles();
   $('instructions').textContent=tool==='remove'?'Choose a tool on the map to remove it.':
-   tool==='route'?'Tap or drag from a source. Resume an unfinished route from its end.':
+   tool==='route'?'Tap a source or unfinished tip to draw. Swipe elsewhere on the board to scroll.':
    tool==='tunnel'?(tunnelStart===null?'Choose the first open tile for your tunnel.':
-    'Choose the other opening in the same row or column, across blocked terrain. Click the first opening or press Escape to cancel.'):
+    'Choose the other opening in the same row or column, across blocked terrain. Tap the first opening again or tap outside the board to cancel.'):
    'Choose a tile for your '+toolNames[tool].toLowerCase()+'.';
  }
 
@@ -151,7 +155,17 @@
   drawBoard();
  }
 
+ function syncDragHandles(){
+  const {state,map}=session;
+  const tips=new Set(Object.values(state.drafts).map(route=>route.path.at(-1)));
+  for(const [i,tile] of tiles.entries()){
+   tile.classList.toggle('route-handle',state.phase==='build'&&tool==='route'&&
+    (tips.has(i)||map.cells[i].node?.role==='source'));
+  }
+ }
+
  function drawBoard(){
+  syncDragHandles();
   const {map,state}=session;
   const fragments=tiles.map(()=>document.createDocumentFragment());
   for(const {element,path} of [...state.routes.filter(route=>!state.drafts[route.element]),...Object.values(state.drafts)]){
@@ -357,7 +371,7 @@
  };
  board.addEventListener('click',event=>{
   const tile=event.target.closest('.tile');
-  if(tile&&event.detail===0)act(Number(tile.dataset.index),true);
+  if(tile)act(Number(tile.dataset.index),true);
  });
  board.addEventListener('pointerdown',event=>{
   const tile=event.target.closest('.tile');
@@ -368,8 +382,8 @@
   if(tool==='route'&&routeStart&&!drag){
    drag={pointer:event.pointerId,index};
    board.setPointerCapture(event.pointerId);
+   act(index,true);
   }
-  act(index,true);
  });
  board.addEventListener('pointermove',event=>{
   if(drag?.pointer!==event.pointerId||!session.state.active)return;

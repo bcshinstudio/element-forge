@@ -31,11 +31,11 @@
  }
 
  const catalog=[
-  level('Ember Meadow','Draw a route from the Fire spring to its matching forge. The ridge leaves a way around both ends.',[
+  level('Ember Meadow','Draw a route from the Fire spring to its matching forge. Tap the source (S), then tap adjacent tiles or drag toward its destination (D). Trees block Fire.',[
    '************','***......***','**........**','*...F.#....*','*.....##...*','*.....##...*',
    '*.....##...*','*......#f..*','**........**','***......***','************','************'
   ]),
-  level('Brook Bridge','Build a bridge on one water tile to carry Water across the brook.',[
+  level('Brook Bridge','Tap an empty water tile to build a bridge to carry Water across the brook.',[
    '#####~######','##...~...###','#....~....##','#....~.w..##','#..W.~....##','#....~....##',
    '##...~...###','###..~..####','####.~.#####','#####~######','#####~######','#####~######'
   ],{bridge:1}),
@@ -51,15 +51,15 @@
    '############','###....#####','###.##..####','##..#~...###','#F...~..f..#','##..#~.#..##',
    '###..~.#.###','####.~..####','#####~..####','#####~.#####','#####~######','############'
   ],{bridge:1},undefined,{fire:{forbidTerrain:['water']}}),
-  level('Reedwater Ford','Nature avoids water. Water can cross it with a bridge. Plan both routes before using the crossing.',[
+  level('Reedwater Ford','Nature avoids water. Water can cross with a bridge. Leave room for both routes on the east bank.',[
    '############','####....####','###......###','##....~...##','##N...~..n##','####..~..###',
-   '############','###...~..###','##w...~...##','##....~..W##','###...~..###','############'
+   '#######..###','###...~..###','##w...~...##','##....~..W##','###...~..###','############'
   ],{bridge:1},undefined,{nature:{forbidTerrain:['water']}}),
   level('Briar Hollow','N is Nature. Nature can route through woods. Fire must stay in the clearing.',[
    '############','##***N***###','#**....****#','#*.F......*#','#*.....f..*#','#***###...*#',
    '#**********#','##*******n*#','##*********#','###******###','############','############'
   ],{},undefined,{fire:{forbidTerrain:['forest']}}),
-  level('Granite Gate','Select Tunnel, then choose two open tiles in the same row or column with blocked terrain between them. Either opening works in both directions.',[
+  level('Granite Gate','Tap Tunnel, then tap two open tiles in the same row or column with blocked terrain between them. Either opening works in both directions.',[
    '############','############','###..##...##','##...##...##','##F..##...##','##...##.f.##',
    '###..##...##','############','############','############','############','############'
   ],{tunnel:2}),
@@ -87,13 +87,32 @@
    '############','##...~...###','##W..~...###','##...~.2w###','###..~..####','############',
    '####....####','###.1....###','##...~.f..##','##F..~....##','###..~...###','#####~######'
   ],{bridge:2,intersection:1},{budget:2,prices:{bridge:2,intersection:1}},{fire:{forbidTerrain:['water']}}),
-  level('The Threefold Divide','Plan two intersections, the brook crossing, and Nature’s checkpoint. Give each color room to finish its route.',[
+  level('The Threefold Divide','Plan two intersections, a bridge, and Nature’s checkpoint. Tap a different source to switch routes. You can build with routes unfinished.',[
    '############','###.N###w.##','###.3###..##','####.###.###','####.###.###','####.###.###',
    '#F........f#','####.###.###','####n###~###','####.###.###','#######.W.##','############'
   ],{intersection:2,bridge:2,tunnel:2},{budget:4,prices:{intersection:1,bridge:2,tunnel:1}},
   {fire:{forbidTerrain:['water']}})
 
  ];
+
+ const hints=[
+  'Look for open ground around a ridge tip. Fire stays out of the woods.',
+  'A bridge makes one water tile usable. Check that both banks have reachable land.',
+  'An intersection lets two routes cross at right angles. Both must go straight through.',
+  'Check whether either element can go around the water before spending the only bridge.',
+  'Fire cannot enter a water tile, even with a bridge. Trace the edge of the fen.',
+  'Nature needs dry land. Leave some space between the bridge and each destination.',
+  'N stands for Nature. Only Nature can cross the trees in this campaign.',
+  'Both tunnel openings go on open tiles across a barrier. Either opening can be entered first.',
+  'The tunnel price shown buys both openings. Compare the tool costs with the available budget.',
+  'A bridge spans water and a tunnel connects open tiles across a barrier. Account for both jobs.',
+  'A connected route still has to visit its matching checkpoint before delivery.',
+  'Check the letter on each station to see which element must visit it.',
+  'Plan the checkpoint visit and approach each intersection in a straight line.',
+  'Check each element’s terrain rule and station before using the bridge budget.',
+  'Tap another source to start its route. Tap an unfinished tip to return to it, and place tools whenever needed.'
+ ];
+ for(const [index,entry] of catalog.entries())entry.hint=hints[index];
 
  const api={catalog};
  root.EFLevels=api;

@@ -43,11 +43,13 @@ tracks and click an unfinished tip to resume it. Construction stays available.
 
 Undo cancels an unfinished route or restores the previous action. Restart
 resets the board using the same loadout. Replan returns to tool selection.
-Right-click a placed tool to remove it, or use Remove tool in Puzzle options.
+Tap Remove tool, then tap the structure. Removing either tunnel opening removes the pair. Right-click also works on desktop.
 Test delivery checks every route and animates success. Use the puzzle
 selector to revisit unlocked campaign levels. Finishing a puzzle unlocks the next. Completion marks and the last
 selected campaign puzzle are saved in browser storage when available.
-Custom levels and unfinished boards are session-only.
+Custom levels and unfinished boards are session-only. Puzzle hint opens a rule reminder.
+On portrait screens, swipe vertically from a tile other than a source or
+an unfinished tip to scroll. Begin a route drag on a source or tip.
 
 ## Level format
 
