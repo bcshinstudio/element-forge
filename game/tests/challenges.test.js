@@ -1,56 +1,155 @@
 'use strict';
 const assert=require('node:assert/strict');
+const {readFileSync}=require('node:fs');
 const {test}=require('node:test');
 const G=require('../challenges');
+const R=require('../routing-search');
+const {release}=require('../challenge-release');
 const F=require('../../map-editor/map-format');
 const E=require('../../map-editor/engine');
+const weak=require('./fixtures/corridor-stages.json');
 
-for(const family of G.families)test(family+' reference has a verified solution and unsuccessful placement',()=>{
- const candidate=G.reference(family,'Medium');
- const result=G.verify(candidate);
- assert.ok(result.accepted,result.reason);
- assert.ok(result.alternatives.some(a=>a.status==='unsolved'));
- assert.ok(G.replay(candidate.level,result.solution));
+function replayEvidence(level,result){
+ assert.ok(G.replay(level,result.solution));
+ for(const alternative of [...result.alternatives,...result.placementChoices]){
+  if(alternative.status==='solved')assert.ok(G.replay(level,alternative.witness));
+ }
+}
+
+test('Scarce Crossing offers two winning bridge plans and a locally useful bridge that strands no current individually',()=>{
+ const level=G.reference('budget');
+ const check=G.verify(level);
+ assert.ok(check.accepted,check.reason);
+ assert.ok(check.placementChoices.filter(choice=>choice.status==='solved').length>=2);
+ const trap=check.placementChoices.find(choice=>choice.status==='unsolved'&&!choice.stranded.length);
+ assert.ok(trap?.usableBy.includes('water'));
+ assert.ok(check.linked);
+ replayEvidence(level,check);
 });
 
-test('a seed reproduces the complete pack and report without exposing solution routes in the pack',()=>{
- const a=G.generate({seed:'curated-v1',count:8});
- assert.deepEqual(a,G.generate({seed:'curated-v1',count:8}));
- assert.equal(a.pack.stages.length,8);
- assert.deepEqual(a.pack.stages.map(stage=>stage.difficulty),['Easy','Easy','Medium','Medium','Hard','Hard','Expert','Expert']);
- assert.ok(a.pack.stages.some(stage=>stage.special));
- assert.ok(!JSON.stringify(a.pack).includes('"solution"'));
- assert.equal(G.readPack(JSON.parse(JSON.stringify(a.pack))).length,8);
- for(const level of a.pack.stages){
-  const result=E.solveConstruction(F.readLevel(level));
-  assert.equal(result.status,'solved');
-  assert.ok(G.replay(level,result));
+test('Contested Pass has independent winning prefixes that cannot coexist',()=>{
+ const level=G.reference('passage');
+ const check=G.verify(level);
+ assert.ok(check.accepted,check.reason);
+ assert.equal(check.linked?.status,'unsolved');
+ assert.notEqual(check.linked.first.element,check.linked.second.element);
+ assert.ok(check.solution.routes.some(route=>route.element==='fire'));
+ assert.ok(check.alternatives.some(probe=>probe.element==='fire'&&probe.status==='unsolved'));
+ replayEvidence(level,check);
+});
+
+test('Grove Crossing has competing checkpoint approaches and a late Plant conflict',()=>{
+ const level=G.reference('checkpoint');
+ const check=G.verify(level);
+ assert.ok(check.accepted,check.reason);
+ const waypoint=level.map.cells.findIndex(cell=>cell.component==='checkpoint');
+ const plant=check.alternatives.filter(probe=>probe.element==='nature');
+ const win=plant.find(probe=>probe.status==='solved');
+ const loss=plant.find(probe=>probe.status==='unsolved');
+ assert.ok(loss.firstBlockedAt>=3);
+ assert.ok(loss.blocks.includes('water'));
+ assert.notEqual(win.soloPath[win.soloPath.indexOf(waypoint)-1],loss.soloPath[loss.soloPath.indexOf(waypoint)-1]);
+ replayEvidence(level,check);
+});
+
+test('curated pack is generated reproducibly and contains a solution-free export',()=>{
+ const {pack,report}=release();
+ assert.deepEqual({pack,report},release());
+ assert.equal(pack.stages.length,8);
+ assert.equal(report.evidence.filter(item=>item.origin==='reference').length,4);
+ assert.deepEqual([...new Set(pack.stages.map(stage=>stage.difficulty))],G.difficulties);
+ assert.ok(pack.stages.some(stage=>stage.special));
+ assert.ok(!JSON.stringify(pack).includes('"solution"'));
+ const curated=readFileSync(require.resolve('../curated'),'utf8').split('window.EFCurated=')[1].trim().slice(0,-1);
+ assert.deepEqual(JSON.parse(curated),pack);
+ const roundTrip=G.readPack(JSON.parse(JSON.stringify(pack)));
+ for(const [i,stage] of roundTrip.entries()){
+  replayEvidence(stage,report.evidence[i]);
+  const fire=report.evidence[i].solution.routes.find(route=>route.element==='fire');
+  if(fire)assert.ok(fire.path.every(index=>stage.map.cells[index].terrain!=='water'));
  }
 });
 
-test('recognizes a mirrored layout, while generation filters repeated decisions',()=>{
- const map=F.readLevel(G.reference('budget','Easy').level);
+test('normalizes rotations and reflections and filters repeated decisions inside packs',()=>{
+ const map=F.readLevel(G.reference('passage'));
  const reflected={...map,cells:map.cells.map((_,i)=>map.cells[Math.floor(i/map.width)*map.width+map.width-1-(i%map.width)])};
+ const rotated={...map,width:map.height,height:map.width,cells:map.cells.map((_,i)=>
+  map.cells[(map.height-1-i%map.height)*map.width+Math.floor(i/map.height)])};
  assert.equal(G.layoutKey(map),G.layoutKey(reflected));
- const {report}=G.generate({family:'budget',difficulty:'Easy',seed:'repeat',count:20});
+ assert.equal(G.layoutKey(map),G.layoutKey(rotated));
+ const {report}=G.generate({family:'budget',difficulty:'Expert',seed:'river-valley-28',count:8});
  assert.equal(new Set(report.evidence.map(e=>e.decision)).size,report.accepted);
  assert.ok(report.rejections.some(r=>r.reason==='Repeated layout or decision'));
 });
 
-test('rejects tool-free bypasses and independent routes with irrelevant equipment',()=>{
- const candidate=G.reference('budget','Hard');
- for(const i of candidate.probes)candidate.level.map.cells[i]={terrain:'land'};
- const check=G.verify(candidate);
- assert.equal(check.accepted,false);
- assert.equal(check.reason,'Tool-free bypass');
+test('fresh seeds change verified bridge plans',()=>{
+ const pack=seed=>G.generate({family:'budget',difficulty:'Expert',seed,count:2});
+ const a=pack('river-valley-26'),b=pack('river-valley-27');
+ const bridgeUsers=batch=>batch.report.evidence.map(item=>item.placementChoices.filter(probe=>probe.status==='solved')
+  .map(probe=>probe.usableBy.join('+')).sort().join('/'));
+ assert.equal(a.report.accepted,2);
+ assert.equal(b.report.accepted,2);
+ assert.notDeepEqual(bridgeUsers(a),bridgeUsers(b));
 });
 
-test('search exhaustion is inconclusive and fallback packs still replay',()=>{
- const check=G.verify(G.reference('budget','Hard'),{limit:1});
+test('rejects the three reported corridor puzzles and an optional bridge with a tool-free bypass',()=>{
+ for(const level of weak){
+  const check=G.verify(level);
+  assert.equal(check.accepted,false,level.map.name);
+  assert.equal(check.reason,'Visible corridors or independent lanes');
+ }
+ const level=G.reference('budget');
+ level.map.cells=level.map.cells.map(cell=>cell.terrain==='water'?{terrain:'land'}:cell);
+ assert.equal(G.verify(level).reason,'Tool-free bypass');
+});
+
+test('search exhaustion is unknown, and fallback cannot promote a stage into the requested tier',()=>{
+ const check=G.verify(G.reference('budget'),{limit:1});
  assert.equal(check.clean,'inconclusive');
  assert.equal(check.accepted,false);
- const {report,pack}=G.generate({attempts:0,count:6,seed:'fallback-test'});
- assert.equal(report.fallback,6);
- assert.equal(pack.stages.length,6);
- assert.ok(report.evidence.every(e=>e.accepted));
+ const expert=G.generate({attempts:0,count:2,family:'budget',difficulty:'Expert'});
+ assert.equal(expert.report.fallback,1);
+ assert.equal(expert.report.shortfall,1);
+ const easy=G.generate({attempts:0,count:2,family:'budget',difficulty:'Easy'});
+ assert.equal(easy.report.accepted,0);
+ assert.equal(easy.report.shortfall,2);
+});
+
+test('routing search matches independent simple-path enumeration on tiny boards',()=>{
+ const cases=[
+  ['passage',['.w..','p..P','....','..W.']],
+  ['passage',['.w..','p.#P','....','..W.']],
+  ['budget',['w~.W','.#..','p.~P','....']],
+  ['checkpoint',['p.P.','##.#','##@#','####']],
+  ['checkpoint',['p..P','..@.','#.#.','....']]
+ ];
+ for(const [family,rows] of cases){
+  const level=G.fromRows(rows,family);
+  const map=F.readLevel(level),model=R.prepare(map);
+  const plans=[{}];
+  for(const kind of ['bridge','intersection'])if(map.inventory[kind]){
+   map.cells.forEach((_,i)=>{if(E.canPlace(map,{},i,kind))plans.push({[i]:kind});});
+  }
+  function* enumerate(pair,path){
+   const cell=path.at(-1);
+   if(cell===pair.destination){yield path;return;}
+   for(const [next] of E.neighbors(cell,map.width,map.height)){
+    if(!path.includes(next))yield* enumerate(pair,[...path,next]);
+   }
+  }
+  function oracle(plan,index,routes){
+   if(index===model.pairs.length)return !E.checkAll(map,routes,plan).length;
+   const pair=model.pairs[index];
+   for(const path of enumerate(pair,[pair.source])){
+    if(!E.validatePath(map,pair.element,path,routes,plan)&&oracle(plan,index+1,[...routes,{element:pair.element,path}]))return true;
+   }
+   return false;
+  }
+  for(const placements of plans){
+   const result=R.solve(model,{placements,limit:32000});
+   assert.equal(result.status,oracle(placements,0,[])?'solved':'unsolved',rows.join('/'));
+  }
+  const result=R.solve(model,{limit:32000});
+  assert.equal(result.status,plans.some(plan=>oracle(plan,0,[]))?'solved':'unsolved',rows.join('/'));
+ }
 });

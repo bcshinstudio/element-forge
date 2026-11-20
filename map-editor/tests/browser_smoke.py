@@ -98,9 +98,21 @@ with sync_playwright() as pw:
     expect(page.locator('#challenge-details')).to_be_hidden()
     with page.expect_download() as capture:
         page.locator('#challenge-export').click()
-    assert len(json.loads(capture.value.path().read_text())['stages']) == 2
+    pack = json.loads(capture.value.path().read_text())
+    assert len(pack['stages']) == 2
+    with page.expect_download() as capture:
+        page.locator('#challenge-export-stage').click()
+    selected = json.loads(capture.value.path().read_text())
+    assert selected == pack['stages'][0]
+    game = browser.new_page()
+    game.goto(f'http://127.0.0.1:{server.server_port}/game/index.html')
+    game.locator('#import').set_input_files({
+        'name': 'verified.json', 'mimeType': 'application/json', 'buffer': json.dumps(selected).encode()
+    })
+    expect(game.locator('#puzzle')).to_contain_text(selected['map']['name'])
+    game.close()
     page.locator('#challenge-evidence summary').click()
-    expect(page.locator('#challenge-details')).to_contain_text('placement consequence')
+    expect(page.locator('#challenge-details')).to_contain_text('whole-board routing consequence')
     assert not errors, errors
     print('PASS challenge editor: generation, hidden verification and export')
     browser.close()
