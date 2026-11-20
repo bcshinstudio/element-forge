@@ -1,0 +1,57 @@
+/* Shared illustrated terrain. Cell data and accessibility labels stay in the renderers. */
+#board :is(.tile, .cell).land { background-image: url(tiles/land.webp); }
+#board :is(.tile, .cell).forest { background-image: url(tiles/forest.webp); }
+#board :is(.tile, .cell).mountain { background-image: url(tiles/mountain.webp); }
+#board :is(.tile, .cell).void { background-image: url(tiles/void.webp); }
+#board :is(.tile, .cell).water { background-image: url(tiles/water.webp); }
+#board :is(.tile, .cell).river { background-image: url(tiles/river.webp); }
+#board :is(.tile, .cell).shallow { background-image: url(tiles/shallow.webp); }
+#board :is(.tile, .cell).heated { background-image: url(tiles/heated.webp); }
+#board :is(.tile, .cell).lava { background-image: url(tiles/lava.webp); }
+
+#board :is(.tile, .cell) {
+ background-size: 100% 100%;
+ background-repeat: no-repeat;
+}
+
+#board [data-structure="bridge"] { --structure-art: url(tiles/bridge.webp); }
+#board [data-structure="intersection"] { --structure-art: url(tiles/intersection.webp); }
+#board [data-structure="tunnel"] { --structure-art: url(tiles/tunnel.webp); }
+#board [data-structure="portal"] { --structure-art: url(tiles/portal.webp); }
+
+#board .structure-art {
+ position: absolute;
+ inset: 8%;
+ background: var(--structure-art) center / contain no-repeat;
+ pointer-events: none;
+ z-index: 1;
+}
+#board [data-structure="bridge"] .structure-art { inset: 0; }
+#board .track { z-index: 2; }
+#board .mark.endpoint, #board .mark.structure, #board .overlay { z-index: 3; }
+#board .orb { z-index: 4; }
+
+#board .art-structure-label {
+ position: absolute;
+ right: 1px;
+ bottom: 1px;
+ max-width: calc(100% - 2px);
+ overflow: hidden;
+ text-overflow: ellipsis;
+ background: #14231c;
+ color: #fff7db;
+ font: 700 clamp(9px, 1.4vw, 14px)/1.15 system-ui, sans-serif;
+ padding: 1px 2px;
+ border-radius: 3px;
+ z-index: 4;
+ pointer-events: none;
+}
+
+#board [data-structure="bridge"]:has(.track .north, .track .south, .vertical-route) .structure-art {
+ transform: rotate(90deg);
+}
+#board .cell.node .node-shape.destination {
+ background: #26382c !important;
+ color: white;
+ z-index: 4;
+}

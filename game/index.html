@@ -14,6 +14,10 @@
  <script defer src="routing-search.js"></script>
  <script defer src="challenges.js"></script>
  <script defer src="curated.js"></script>
+ <link rel="stylesheet" href="../art/board.css">
+ <script defer src="../art/board.js"></script>
+ <script defer src="chapter.js"></script>
+ <script defer src="audio.js"></script>
  <script defer src="app.js"></script>
 </head>
 <body>
@@ -30,10 +34,26 @@
  <section id="home" class="world-intro" aria-labelledby="home-title">
   <h1 id="home-title">Element Forge</h1>
   <p id="home-total"></p>
-  <button id="continue" class="primary" type="button"></button>
-  <button id="stage-select" type="button">Stage Select</button>
-  <button id="choose-challenge" type="button">Challenges</button>
-  <button id="new-campaign" type="button">Start New Campaign</button>
+  <div class="home-actions">
+   <button id="continue" class="primary" type="button">Continue</button>
+   <button id="stage-select" type="button">Stage Select</button>
+   <button id="choose-challenge" type="button">Challenges</button>
+   <button id="new-campaign" type="button">New</button>
+  </div>
+  <div class="home-secondary">
+   <button id="information" type="button">Information</button>
+   <button id="settings" type="button">Settings</button>
+  </div>
+  <div id="stage-list" class="stage-list" hidden></div>
+  <section id="information-panel" hidden>
+   <h2>Tutorials</h2>
+   <div id="tutorial-list" class="stage-list"></div>
+  </section>
+  <fieldset id="audio-settings" hidden>
+   <legend>Audio</legend>
+   <label><input id="music-enabled" type="checkbox"> Music</label>
+   <label><input id="effects-enabled" type="checkbox"> Sound Effects</label>
+  </fieldset>
   <div id="challenge-menu" hidden>
    <label>Difficulty <select id="challenge-tier"><option>Easy</option><option>Medium</option><option>Hard</option><option>Expert</option></select></label>
    <button id="generate-challenge" type="button">Find puzzle</button>
@@ -49,9 +69,16 @@
   <button id="intro-begin" class="primary" type="button">Begin weaving</button>
   <button id="intro-skip" type="button">Skip introduction</button>
  </section>
+ <dialog id="mechanic-tip" aria-labelledby="tip-name">
+  <h2 id="tip-name"></h2>
+  <p id="tip-description"></p>
+  <button type="button" id="try-lesson">Try a Lesson</button>
+  <button type="button" id="continue-stage">Continue to Stage</button>
+ </dialog>
  <main id="play-view" class="layout" hidden>
   <section class="field" aria-labelledby="puzzle">
    <h1 id="puzzle"></h1>
+   <button type="button" id="return-lesson" hidden>Leave Lesson</button>
    <p id="description"></p>
    <div id="board" role="group" aria-label="Puzzle board"></div>
    <div id="elements" class="legend"></div>
@@ -117,7 +144,9 @@
   </div>
  </main>
  <dialog id="game-menu" aria-label="Puzzle menu">
-  <form method="dialog"><button autofocus>Close menu</button></form>
+  <button type="button" id="back-to-game" autofocus>Back to Game</button>
+  <button type="button" id="menu-tip" hidden>Mechanic tip</button>
+  <button type="button" id="menu-home">Main menu</button>
   <div id="menu-content"></div>
  </dialog>
  <footer>BC Shin Studio</footer>
