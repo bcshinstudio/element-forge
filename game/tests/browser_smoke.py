@@ -318,6 +318,41 @@ def test_world_engine_offline(browser, offline):
     page.close()
 
 
+def test_challenge_pack_offline(browser, offline):
+    page = browser.new_page(viewport={"width": 390, "height": 844},
+                            is_mobile=True, has_touch=True, reduced_motion="reduce")
+    page.context.set_offline(True)
+    page.goto(offline.as_uri())
+    page.locator("#challenge-library summary").tap()
+    page.locator("#curated-pack").tap()
+    expect(page.locator("#puzzle")).to_contain_text("Scarce Crossing")
+    pack = page.evaluate("EFCurated")
+    plans = page.evaluate("""EFCurated.stages.map(level => EFEngine.solveConstruction(EFMap.readLevel(level)))""")
+    for i, plan in enumerate(plans):
+        page.locator("#start").scroll_into_view_if_needed()
+        for index, tool in plan["placements"].items():
+            page.locator(f'#loadout input[name="{tool}"]').fill("1")
+        page.locator("#start").tap()
+        for index, tool in plan["placements"].items():
+            if tool != "bridge":
+                page.locator(f'[data-tool="{tool}"]').tap()
+            tile(page, index).tap()
+        for current in plan["routes"]:
+            for index in current["path"]:
+                tile(page, index).tap()
+        page.locator("#check").tap()
+        expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
+        if i < len(plans)-1:
+            page.get_by_role("button", name="Next Stage").tap()
+    expect(page.locator("#next")).to_be_disabled()
+    expect(page.locator("#campaign-progress")).to_have_text("0 / 15 complete")
+    page.locator("#challenge-library summary").tap()
+    page.locator("#pack-file").set_input_files({"name": "pack.json", "mimeType": "application/json",
+                                               "buffer": json.dumps(pack).encode()})
+    expect(page.locator("#puzzle")).to_contain_text("Scarce Crossing")
+    page.close()
+
+
 def test_keyboard(browser, url):
     page = browser.new_page(reduced_motion="reduce")
     page.goto(url + BASE)
@@ -360,6 +395,8 @@ if __name__ == "__main__":
                     print("PASS portrait touch: scroll, hints, cancel either way, paired placement and removal")
                     test_world_engine_offline(browser, offline)
                     print("PASS offline World-Engine intro, Wind jump, reduced motion and replay")
+                    test_challenge_pack_offline(browser, offline)
+                    print("PASS offline touch challenge pack: all eight stages, next and import")
                     test_keyboard(browser, url)
                     print("PASS keyboard: start, navigate, draw and deliver without a pointer")
                     test_campaign_and_progress(browser, url)

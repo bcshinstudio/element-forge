@@ -11,6 +11,8 @@
  <script defer src="levels.js"></script>
  <script defer src="progress.js"></script>
  <script defer src="session.js"></script>
+ <script defer src="challenges.js"></script>
+ <script defer src="curated.js"></script>
  <script defer src="app.js"></script>
 </head>
 <body>
@@ -78,6 +80,11 @@
    </div>
    <p id="status" role="status" aria-live="polite"></p>
   </section>
+  <details id="challenge-library" class="disclosure custom-level">
+   <summary>Challenge stages</summary>
+   <button id="curated-pack" type="button">Play curated pack</button>
+   <label class="import">Import challenge pack <input type="file" id="pack-file" accept=".json,application/json"></label>
+  </details>
   <details id="custom-level" class="disclosure custom-level">
    <summary>Open a custom level</summary>
    <label class="import">Choose an editor-exported level <input type="file" id="import" accept=".json,application/json"></label>
