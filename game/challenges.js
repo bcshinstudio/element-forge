@@ -2,111 +2,12 @@
 (function(root){
  const E=typeof module==='undefined'?root.EFEngine:require('../map-editor/engine.js');
  const F=typeof module==='undefined'?root.EFMap:require('../map-editor/map-format.js');
+ const R=typeof module==='undefined'?root.EFRoutingSearch:require('./routing-search');
  const S=typeof module==='undefined'?root.EFSession:require('./session.js');
- const revision='challenge-v1';
- const families=['budget','passage','checkpoint','combined'];
- const difficulties=['Easy','Medium','Hard','Expert'];
- const hints={
-  budget:'Before spending the bridge, check whether either current can get around the water.',
-  passage:'Trace both currents through the disputed passage. An intersection only works when both pass straight through.',
-  checkpoint:'Trace the checkpoint route first. Compare what each current can reach without the bridge.',
-  combined:'Plan the checkpoint and the crossing together. Check which current has no dry route.'
- };
-
  function random(seed){
   let state=2166136261;
   for(const letter of String(seed))state=Math.imul(state^letter.charCodeAt(0),16777619);
   return n=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return Math.floor(state/4294967296*n);};
- }
-
- function sketch(width,height){
-  const map=F.fresh(width,height);
-  map.cells=map.cells.map(()=>({terrain:'mountain'}));
-  const at=(x,y)=>y*width+x;
-  const write=(x,y,value)=>{map.cells[at(x,y)]=value;};
-  const line=(x,y,a,b)=>{
-   const dx=Math.sign(a-x),dy=Math.sign(b-y);
-   while(x!==a||y!==b){write(x,y,{terrain:'land'});x+=dx;y+=dy;}
-   write(a,b,{terrain:'land'});
-  };
-  const node=(x,y,element,role)=>write(x,y,{terrain:'land',node:{element,role}});
-  return {map,at,write,line,node};
- }
-
- function recipe(family,tier,pick){
-  const width=9+pick(3),height=12;
-  const {map,at,write,line,node}=sketch(width,height);
-  const west=1,east=width-2,mid=3+pick(width-6);
-  const swap=pick(2)===1,reverse=pick(2)===1;
-  const A=family==='checkpoint'||family==='combined'?'nature':swap?'water':'fire';
-  const B=A==='water'||(A==='nature'&&swap)?'fire':'water';
-  const nodes=(x,y,a,b,element)=>{
-   node(x,y,element,reverse?'destination':'source');
-   node(a,b,element,reverse?'source':'destination');
-  };
-  let tool,probes,profile;
-  if(family==='passage'){
-   tool='intersection';
-   const cross=2+pick(2),turn=5+pick(2),bottom=height-2;
-   const westTip=mid-1,eastTip=mid+1;
-   line(mid,0,mid,bottom);
-   line(west,cross,east,cross);
-   line(west,turn,mid,turn);
-   line(west,cross,west,turn);
-   line(east,cross,east,turn+1);
-   line(mid,turn+1,east,turn+1);
-   if(tier>0){line(westTip,cross-1,westTip,cross);line(eastTip,cross+1,eastTip,cross);}
-   if(tier>1){line(west,turn+1,west,turn+2);line(west,turn+2,westTip,turn+2);}
-   if(tier>2){line(east,turn+1,east,turn+3);line(eastTip,turn+3,east,turn+3);}
-   nodes(west,cross,east,turn+1,A);
-   nodes(mid,0,mid,bottom,B);
-   probes=[at(mid,cross),at(mid,turn),at(mid,turn+1)];
-   profile=[family,tier,A,cross,turn,mid-west,east-mid];
-  }else{
-   tool='bridge';
-   const upper=3,lower=8,dry=1;
-   const optional=swap?lower:upper,required=swap?upper:lower;
-   const endWest=west+pick(2),endEast=east-pick(2);
-   for(const row of [upper,lower]){
-    line(west,row,east,row);
-    write(mid,row,{terrain:'water'});
-   }
-   const bypass=optional===upper?dry:10;
-   line(west,optional,west,bypass);line(east,optional,east,bypass);
-   line(west,bypass,east,bypass);
-   nodes(endWest,optional,endEast,optional,A);
-   // Connect the detour to the usable side of each endpoint without passing through it.
-   if(endWest!==west){line(endWest,optional,endWest,bypass);node(endWest,optional,A,reverse?'destination':'source');}
-   if(endEast!==east){line(endEast,optional,endEast,bypass);node(endEast,optional,A,reverse?'source':'destination');}
-   nodes(west,required,east,required,B);
-   probes=[at(mid,optional),at(mid,required)];
-   for(let offset=1;offset<=tier;offset++){
-    const row=lower+offset<=10&&required===upper?upper+offset:lower-offset;
-    if(Math.abs(row-required)>3||row===optional||row===bypass)continue;
-    // Higher tiers may open a second viable crossing farther from the endpoints.
-    line(mid-1,required,mid-1,row);
-    if(offset===tier&&tier>1&&family!=='combined')line(mid+1,required,mid+1,row);
-    write(mid,row,{terrain:'water'});
-    probes.push(at(mid,row));
-   }
-   if(family==='checkpoint'||family==='combined'){
-    const station=mid+(pick(2)?1:-1);
-    write(station,bypass,{terrain:'forest',component:'checkpoint',props:{element:A}});
-    map.constraints[B]={forbidTerrain:['forest']};
-   }
-   if(family==='combined'){
-    // A fixed crossing couples a third current to the required bridge route.
-    const col=mid+1;
-    line(col,required-1,col,required+1);
-    write(col,required,{terrain:'land',component:'intersection'});
-    nodes(col,required-1,col,required+1,'electricity');
-   }
-   profile=[family,tier,A,B,optional===upper,probes.length,mid-endWest,endEast-mid];
-  }
-  map.inventory={[tool]:1};
-  map.construction={budget:1,prices:{[tool]:1}};
-  const level={format:'element-forge-level',schemaVersion:1,rulesVersion:2,map,hint:hints[family]};
-  return {level,tool,probes:[...new Set(probes)],profile};
  }
 
  function layoutKey(map){
@@ -138,71 +39,6 @@
   return session.verify().ok;
  }
 
- function verify(candidate,{limit=100000}={}){
-  const {level,tool,probes}=candidate,map=F.readLevel(level);
-  const solve=placements=>E.solve(map,{limit,allowPlacement:false,initialPlacements:placements});
-  const clean=E.solveConstruction(map,{limit});
-  const empty=solve({});
-  const alternatives=probes.map(index=>{
-   const result=solve({[index]:tool});
-   return {index,status:result.status==='solved'&&!replay(level,result)?'replay-failed':result.status,nodes:result.nodes,track:result.score?.track};
-  });
-  const summary={clean:clean.status,empty:empty.status,alternatives};
-  if(clean.status!=='solved')return {...summary,accepted:false,reason:'Clean-board solve: '+clean.status};
-  if(!replay(level,clean))return {...summary,accepted:false,reason:'Game replay failed'};
-  if(empty.status!=='unsolved')return {...summary,accepted:false,reason:empty.status==='solved'?'Tool-free bypass':'Tool necessity inconclusive'};
-  if(alternatives.some(a=>!['solved','unsolved'].includes(a.status)))return {...summary,accepted:false,reason:'Alternative search inconclusive'};
-  const winning=alternatives.filter(a=>a.status==='solved');
-  const distinctLengths=new Set(winning.map(a=>a.track));
-  if(!winning.length||(!alternatives.some(a=>a.status==='unsolved')&&distinctLengths.size<2)){
-   return {...summary,accepted:false,reason:'No verified placement consequence'};
-  }
-  if(!winning.some(a=>Object.hasOwn(clean.placements,a.index)))return {...summary,accepted:false,reason:'Unmodeled winning placement'};
-  const metrics={placementChoices:alternatives.length,winningPlacements:winning.length,
-   failedPlacements:alternatives.length-winning.length,budgetSlack:map.construction.budget-E.constructionCost(map,E.placementCounts(clean.placements)),
-   activeCurrents:clean.routes.length,requiredCheckpoints:map.cells.filter(cell=>cell.component==='checkpoint').length};
-  return {...summary,metrics,accepted:true,reason:'Verified tool necessity and placement consequence',solution:clean};
- }
-
- const referenceSeeds={budget:'river-reference',passage:'pass-reference',checkpoint:'grove-reference',combined:'relay-reference'};
- function reference(family,difficulty){
-  return recipe(family,difficulties.indexOf(difficulty),random(referenceSeeds[family]+difficulty));
- }
- function generate({seed='forge',family='mixed',difficulty='mixed',count=6,attempts=count*8}={}){
-  if(!Number.isInteger(count)||count<1||count>20||!Number.isInteger(attempts)||attempts<0||attempts>400||
-     !['mixed',...families].includes(family)||!['mixed',...difficulties].includes(difficulty))throw Error('Invalid generator options.');
-  const pick=random(revision+':'+seed);
-  const stages=[],evidence=[],rejections=[],layouts=new Set(),decisions=new Set();
-  let fallback=0;
-  function add(candidate,f,t,origin){
-   const key=layoutKey(candidate.level.map),decision=candidate.profile.join(':');
-   if(layouts.has(key)||decisions.has(decision)){rejections.push({family:f,difficulty:difficulties[t],reason:'Repeated layout or decision'});return;}
-   const check=verify(candidate);
-   if(!check.accepted){rejections.push({family:f,difficulty:difficulties[t],reason:check.reason});return;}
-   layouts.add(key);decisions.add(decision);
-   const special=f==='combined';
-   candidate.level.map.name=difficulties[t]+' · '+({budget:'Scarce Crossing',passage:'Contested Pass',checkpoint:'Grove Crossing',combined:'Crossing Relay'})[f]+' '+(stages.length+1);
-   candidate.level.map.description=hints[f];
-   Object.assign(candidate.level,{family:f,difficulty:difficulties[t],special});
-   stages.push(candidate.level);
-   evidence.push({origin,decision,...check});
-   if(origin==='fallback')fallback++;
-  }
-  const requested=index=>({f:family==='mixed'?families[index%families.length]:family,
-   t:difficulty==='mixed'?Math.min(3,Math.floor(index*4/count)):difficulties.indexOf(difficulty)});
-  for(let i=0;i<attempts&&stages.length<count;i++){
-   const {f,t}=requested(stages.length);
-   add(recipe(f,t,pick),f,t,'generated');
-  }
-  // Reproducible reference-derived fallback pool, with the same checks and filters.
-  for(let i=0;i<count*24&&stages.length<count;i++){
-   const {f,t}=requested(stages.length);
-   const candidate=i%24===0?reference(f,difficulties[t]):recipe(f,t,random('fallback:'+f+':'+t+':'+(i%24)));
-   add(candidate,f,t,'fallback');
-  }
-  return {pack:{format:'element-forge-challenges',version:1,revision,seed:String(seed),stages},
-   report:{revision,seed:String(seed),requested:count,accepted:stages.length,fallback,rejections,evidence}};
- }
  function readPack(value){
   if(value?.format!=='element-forge-challenges'||value.version!==1||!Array.isArray(value.stages)||
      value.stages.length<1||value.stages.length>20)throw Error('Invalid challenge pack.');
@@ -212,7 +48,335 @@
     hint:typeof stage.hint==='string'?stage.hint.slice(0,200):''};
   });
  }
- const api={families,difficulties,revision,reference,verify,replay,generate,readPack,layoutKey};
+ const revision='routing-v2';
+ const families=['budget','passage','checkpoint','combined'];
+ const difficulties=['Easy','Medium','Hard','Expert'];
+ const names={budget:'Scarce Crossing',passage:'Contested Pass',checkpoint:'Grove Crossing',combined:'Valley Relay'};
+ const hints={
+  budget:'Compare what each current can still reach after you spend the bridge.',
+  passage:'A route can reach its inlet and still take space another current needs.',
+  checkpoint:'Check what space Plant leaves for other currents on either side of its checkpoint.',
+  combined:'Compare approaches to the checkpoint before committing construction.'
+ };
+
+ function fromRows(rows,family){
+  const map=F.fresh(rows[0].length,rows.length);
+  const elements={w:'water',p:'nature',f:'fire',e:'electricity'};
+  map.cells=rows.join('').split('').map(char=>{
+   const element=elements[char.toLowerCase()];
+   if(element)return {terrain:'land',node:{element,role:char===char.toLowerCase()?'source':'destination'}};
+   if(char==='@')return {terrain:'forest',component:'checkpoint',props:{element:'nature'}};
+   if(char==='+')return {terrain:'land',component:'intersection'};
+   return {terrain:({'#':'mountain','~':'water','*':'forest'})[char]||'land'};
+  });
+  map.inventory={bridge:Number(family==='budget'||family==='combined'),intersection:Number(family==='passage'||family==='combined')};
+  map.construction={budget:1,prices:Object.fromEntries(Object.keys(map.inventory).filter(kind=>map.inventory[kind]).map(kind=>[kind,1]))};
+  return {format:'element-forge-level',schemaVersion:1,rulesVersion:2,map,hint:hints[family],family};
+ }
+
+ function recipe(family,pick,{intro=false}={}){
+  const width=6+pick(2),height=6+pick(2);
+  const river=['budget','combined'].includes(family)?2+pick(width-4):-1;
+  const gap=pick(height);
+  const board=Array.from({length:height},(_,y)=>Array.from({length:width},(_,x)=>
+   x===river&&y!==gap?'~':pick(100)<14?'#':'.'));
+  if(river>=0)board[gap][river]='.';
+  const open=[];
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++)if(board[y][x]==='.')open.push([x,y]);
+  const use=(choices,char)=>{
+   const [x,y]=choices[pick(choices.length)];
+   board[y][x]=char;
+   open.splice(open.findIndex(([a,b])=>a===x&&b===y),1);
+   return [x,y];
+  };
+  const checkpoint=['checkpoint','combined'].includes(family);
+  if(checkpoint){
+   const interior=open.filter(([x,y])=>x>0&&y>0&&x<width-1&&y<height-1);
+   if(!interior.length)return null;
+   use(interior,'@');
+  }
+  const elements=intro?(checkpoint?'pw':'we'):(checkpoint?'pwe':'wep');
+  for(const element of elements){
+   if(open.length<2)return null;
+   const [x,y]=use(open,element);
+   const targets=open.filter(([a,b])=>Math.abs(x-a)+Math.abs(y-b)>=3);
+   if(!targets.length)return null;
+   use(targets,element.toUpperCase());
+  }
+  return fromRows(board.map(row=>row.join('')),family);
+ }
+
+ const defaultLimit=32000;
+ function verify(level,{limit=defaultLimit}={}){
+  const map=F.readLevel(level);
+  const model=R.prepare(map);
+  let work=0;
+  const solve=options=>{
+   const result=R.solve(model,{limit:Math.max(0,limit-work),...options});
+   work+=result.nodes;
+   return result;
+  };
+  const reject=(reason,details={})=>({accepted:false,reason,nodes:work,...details});
+  const dry=solve({placements:{}});
+  if(!['solved','unsolved'].includes(dry.status))return reject('Starting board '+dry.status,{clean:dry.status});
+  const clean=dry.status==='solved'?dry:solve({});
+  if(clean.status!=='solved')return reject('Construction search '+clean.status,{clean:clean.status});
+  if(!replay(level,clean))return reject('Game replay failed',{clean:'invalid'});
+  if(['budget','combined'].includes(level.family)&&dry.status==='solved')return reject('Tool-free bypass',{clean:'solved'});
+  const open=map.cells.filter(cell=>['land','forest'].includes(cell.terrain)).length;
+  const shared=model.adjacency.filter((neighbors,i)=>
+   ['land','forest'].includes(map.cells[i].terrain)&&
+   neighbors.filter(next=>['land','forest'].includes(map.cells[next].terrain)).length>=3).length;
+  if(open<map.cells.length/2||shared<5)return reject('Visible corridors or independent lanes',{clean:'solved'});
+
+  const solo=[];
+  const plans=[{},...model.sites.filter(site=>site.kind==='bridge').map(({i,kind})=>({[i]:kind}))];
+  for(const pair of model.pairs){
+   const candidates=[];
+   for(const placement of plans){
+    const path=solve({solo:pair.element,placements:placement});
+    if(path.status==='inconclusive')return reject('Solo comparison inconclusive',{clean:'solved'});
+    if(path.status==='solved')candidates.push(path);
+   }
+   candidates.sort((a,b)=>a.score.track-b.score.track||a.score.components-b.score.components);
+   solo.push(candidates);
+  }
+  const obvious=solo.map(paths=>paths[0]?.routes[0]).filter(Boolean);
+  const obviousPlacement=Object.assign({},...solo.map(paths=>paths[0]?.placements));
+  if(!E.checkAll(map,obvious,obviousPlacement).length)return reject('Independent shortest routes win',{clean:'solved'});
+
+  const alternatives=[];
+  const prefixes=[];
+  for(const candidates of solo){
+   if(!candidates.length)continue;
+   const best=candidates[0], {element,path}=best.routes[0];
+   const waypoint=path.findIndex(index=>map.cells[index].component==='checkpoint');
+   const handoff=waypoint>1?waypoint-1:Math.max(1,Math.floor((path.length-1)/2));
+   const avoid=[...new Set([path[handoff],path[1]])];
+   const detours=avoid.map(index=>solve({solo:element,placements:best.placements,avoid:{[element]:[index]}}));
+   if(detours.some(route=>route.status==='inconclusive'))return reject('Solo comparison inconclusive',{clean:'solved'});
+   const local=new Set();
+   for(const candidate of [best,...detours.filter(route=>route.status==='solved'),...candidates.slice(1)]){
+    const route=candidate.routes[0].path;
+    if(route.length>path.length+3||route.length<4)continue;
+    const checkpoint=route.findIndex(index=>map.cells[index].component==='checkpoint');
+    const prefix=route.slice(0,Math.max(3,Math.ceil(route.length*.65),checkpoint+1));
+    const used=Object.keys(candidate.placements).every(index=>route.includes(Number(index)));
+    const key=prefix.join(',');
+    if(!used||local.has(key))continue;
+    local.add(key);
+    prefixes.push({element,prefix,placement:candidate.placements,soloPath:route});
+    if(local.size===3)break;
+   }
+  }
+  for(const probe of prefixes){
+   const {element,prefix,placement}=probe;
+   const result=solve({prefixes:{[element]:prefix},required:placement});
+   if(result.status==='solved'&&!replay(level,result))return reject('Alternative replay failed',{clean:'solved'});
+   alternatives.push({...probe,status:result.status,witness:result.status==='solved'?result:undefined});
+  }
+  const failed=alternatives.filter(probe=>probe.status==='unsolved');
+  let inconclusive=alternatives.some(probe=>probe.status==='inconclusive');
+  for(const probe of failed){
+   let left=1,right=probe.prefix.length;
+   while(left<right){
+    const mid=Math.floor((left+right)/2);
+    const test=solve({prefixes:{[probe.element]:probe.prefix.slice(0,mid)},required:probe.placement});
+    if(test.status==='inconclusive'){inconclusive=true;break;}
+    if(test.status==='solved')left=mid+1;
+    else if(test.status==='unsolved')right=mid;
+    else return reject('Prefix verification failed',{clean:'solved'});
+   }
+   if(left===right)probe.firstBlockedAt=left;
+   probe.blocks=[];
+   for(const pair of model.pairs.filter(pair=>pair.element!==probe.element)){
+    const test=solve({only:[probe.element,pair.element],prefixes:{[probe.element]:probe.prefix},required:probe.placement});
+    if(test.status==='unsolved')probe.blocks.push(pair.element);
+    if(test.status==='inconclusive')inconclusive=true;
+   }
+  }
+  const placementChoices=[];
+  const usefulBridgeSites=[...new Set(solo.flatMap(paths=>paths.flatMap(path=>
+   Object.entries(path.placements).filter(([index,kind])=>kind==='bridge'&&path.routes[0].path.includes(Number(index))).map(([index])=>Number(index)))))];
+  for(const index of usefulBridgeSites){
+   const placement={[index]:'bridge'};
+   const result=solve({placements:placement});
+   if(result.status==='solved'&&!replay(level,result))return reject('Construction alternative replay failed',{clean:'solved'});
+   const soloStates=solo.map(paths=>({
+    element:paths[0]?.routes[0].element,
+    reachable:paths.some(path=>!Object.keys(path.placements).length||path.placements[index]),
+    usesBridge:paths.some(path=>path.placements[index]&&path.routes[0].path.includes(index))
+   }));
+   placementChoices.push({index,usableBy:soloStates.filter(state=>state.usesBridge).map(state=>state.element),
+    stranded:soloStates.filter(state=>!state.reachable).map(state=>state.element),
+    status:result.status,witness:result.status==='solved'?result:undefined});
+  }
+
+  // Either commitment can extend to a win independently. Together they must
+  // leave each committed route individually viable but prevent a whole-board win.
+  let linked;
+  let linkUnknown=false;
+  const winners=alternatives.filter(item=>item.status==='solved');
+  if(model.pairs.length>=3)for(const first of winners){
+   if(linked)break;
+   const trials=[
+    ...placementChoices.filter(choice=>choice.status==='solved').map(choice=>({placement:{[choice.index]:'bridge'}})),
+    ...winners.filter(other=>other.element!==first.element).map(other=>({other}))
+   ];
+   for(const {placement,other} of trials){
+    const construction=other?.placement||placement;
+    if(Object.keys(first.placement).some(i=>!Object.hasOwn(construction,i)))continue;
+    if(other?.prefix.some(cell=>first.prefix.includes(cell)))continue;
+    if(!other&&Object.keys(first.placement).length)continue;
+    const options={required:construction,prefixes:{[first.element]:first.prefix}};
+    if(other)options.prefixes[other.element]=other.prefix;
+    const local=solve({...options,solo:first.element});
+    if(local.status==='inconclusive'){linkUnknown=true;break;}
+    if(local.status!=='solved')continue;
+    const joint=solve(options);
+    if(joint.status==='inconclusive'){linkUnknown=true;break;}
+    if(joint.status==='unsolved'){
+     if(other){
+      const secondLocal=solve({...options,solo:other.element});
+      if(secondLocal.status==='inconclusive'){linkUnknown=true;break;}
+      if(secondLocal.status!=='solved')continue;
+     }
+     linked={first:{element:first.element,prefix:first.prefix},
+      second:other?{element:other.element,prefix:other.prefix}:{placement:construction},status:joint.status};
+     break;
+    }
+   }
+   if(linkUnknown)break;
+  }
+
+  const placementConflict=placementChoices.some(choice=>choice.status==='unsolved');
+  const constructionUnknown=placementChoices.some(choice=>choice.status==='inconclusive');
+  if(level.family==='budget'&&(!placementConflict||!placementChoices.some(choice=>choice.status==='solved')))
+   return reject('No verified credible bridge tradeoff',{clean:'solved',alternatives,placementChoices});
+  if(level.family==='checkpoint'&&!failed.some(probe=>probe.element==='nature'))
+   return reject('No verified competing Plant approach',{clean:'solved',alternatives,placementChoices});
+  if(!failed.length&&!placementConflict)return reject('No verified consequential local choice',{clean:'solved',alternatives,placementChoices});
+  const complete=!inconclusive&&!constructionUnknown;
+  const linkStatus=linked?'verified':linkUnknown?'inconclusive':'no conflict among tested commitments';
+  const lateFailure=failed.some(probe=>probe.firstBlockedAt>=3)||
+   placementChoices.some(choice=>choice.status==='unsolved'&&!choice.stranded.length);
+  const multiPlanBridge=placementChoices.filter(choice=>choice.status==='solved').length>=2;
+  const twoCurrentComparison=failed.some(probe=>probe.firstBlockedAt>=3)||multiPlanBridge;
+  const tier=model.pairs.length===2?(twoCurrentComparison?'Medium':'Easy'):
+   complete&&linked&&!linkUnknown&&lateFailure?'Expert':complete&&lateFailure?'Hard':'Medium';
+  const strategy={
+   conflicts:[...new Set(failed.map(probe=>[probe.element,probe.blocks.join('+')||'joint',
+    probe.firstBlockedAt>=3?'after-approach':'near-source'].join(':')))].sort(),
+   family:level.family,
+   tools:Object.values(clean.placements).sort(),
+   blocked:[...new Set(failed.map(probe=>probe.element))].sort(),
+   bridges:[...new Set(placementChoices.map(choice=>choice.status+':'+choice.usableBy.slice().sort().join(',')+
+    '/'+choice.stranded.slice().sort().join(',')))].sort(),
+   linked:linked?[linked.first.element,linked.second.element||'bridge'].sort().join(':'):null
+  };
+  return {accepted:true,reason:'Verified whole-board routing consequence',clean:'solved',difficulty:tier,nodes:work,
+   alternatives,placementChoices,linked,linkStatus,complete,strategy,solution:clean};
+ }
+
+ function reference(family){
+  const spec=referenceBoards[family];
+  if(!spec)throw Error('Unknown reference family');
+  const stage=fromRows(spec.rows,family);
+  stage.map.name=names[family];
+  stage.map.description=spec.description;
+  return stage;
+ }
+
+ const referenceBoards={
+  budget:{
+   rows:['...~e..','.*.~#.#','...~...','..P~W..','...~.*.','.w.pE..','...~...'],
+   description:'One bridge is available. Deliver all three currents across the floodplain.'
+  },
+  passage:{
+   rows:['P.....','.#...#','..*#..','#....F','.f.W..','.#p..w','......'],
+   description:'Three currents share a clearing. You may build one intersection.'
+  },
+  checkpoint:{
+   rows:['#......','..####.','.......','PW...w.','.E.@...','.#..p.#','..e.*..'],
+   description:'Plant must visit its checkpoint while all three currents reach the Engine.'
+  },
+  combined:{
+   rows:['#.~p..','.#~...','##~E.W','..~.@.','......','eP~...','..~.w.'],
+   description:'Plant has a checkpoint. Your budget buys a bridge or an intersection.'
+  }
+ };
+
+ function variant(family,pick){
+  const spec=referenceBoards[family];
+  const board=spec.rows.map(row=>[...row]);
+  const sites=board.flatMap((row,y)=>row.map((tile,x)=>({x,y,tile})));
+  const symbols=sites.filter(({tile})=>/[wpef@]/i.test(tile));
+  const {x,y,tile}=symbols[pick(symbols.length)];
+  const options=sites.filter(site=>site.tile==='.'&&Math.abs(site.x-x)+Math.abs(site.y-y)<=2);
+  if(options.length){
+   const target=options[pick(options.length)];
+   board[target.y][target.x]=tile;
+   board[y][x]='.';
+  }
+  const edits=sites.filter(site=>site.tile==='#'||board[site.y][site.x]==='.');
+  const edit=edits[pick(edits.length)];
+  board[edit.y][edit.x]=edit.tile==='#'?'.':'#';
+  return fromRows(board.map(row=>row.join('')),family);
+ }
+
+ function generate({seed='forge',family='mixed',difficulty='mixed',count=6,attempts=count*12,limit=defaultLimit,includeReferences=false}={}){
+  if(!Number.isInteger(count)||count<1||count>20||!Number.isInteger(attempts)||attempts<0||attempts>400||
+     !Number.isInteger(limit)||limit<0||!['mixed',...families].includes(family)||
+     !['mixed',...difficulties].includes(difficulty))throw Error('Invalid generator options.');
+  const pick=random(revision+':'+seed);
+  const stages=[],evidence=[],rejections=[],layouts=new Set(),decisions=new Set();
+  let fallback=0;
+  function add(level,origin){
+   if(!level)return;
+   const key=layoutKey(level.map);
+   if(layouts.has(key)){rejections.push({family:level.family,reason:'Repeated layout or decision'});return;}
+   const check=verify(level,{limit});
+   if(!check.accepted){rejections.push({family:level.family,reason:check.reason,nodes:check.nodes});return;}
+   const decision=JSON.stringify(check.strategy);
+   if(decisions.has(decision)){rejections.push({family:level.family,reason:'Repeated layout or decision'});return;}
+   if(difficulty!=='mixed'&&difficulty!==check.difficulty){
+    rejections.push({family:level.family,reason:'Verified '+check.difficulty+' rather than requested '+difficulty});return;
+   }
+   layouts.add(key);decisions.add(decision);
+   Object.assign(level,{difficulty:check.difficulty,special:level.family==='combined'&&!!check.linked});
+   level.map.description||='Route each current to its matching inlet.';
+   stages.push(level);evidence.push({origin,decision,...check});
+   if(origin==='fallback')fallback++;
+  }
+  if(includeReferences)for(const f of families.filter(f=>referenceBoards[f]&&(family==='mixed'||family===f))){
+   if(stages.length<count)add(reference(f),'reference');
+  }
+  for(let i=0;i<attempts&&stages.length<count;i++){
+   const f=family==='mixed'?families[i%4]:family;
+   const intro=difficulty==='Easy'||(f==='budget'&&difficulty==='Medium'&&i%2===0)||(difficulty==='mixed'&&!stages.some(stage=>stage.difficulty==='Easy'));
+   add(!intro&&i%3!==0?variant(f,pick):recipe(f,pick,{intro}),'generated');
+  }
+  for(const f of families.filter(f=>referenceBoards[f]&&(family==='mixed'||family===f))){
+   if(stages.length<count)add(reference(f),'fallback');
+  }
+  if(difficulty==='mixed'){
+   const order=stages.map((stage,i)=>i).sort((a,b)=>
+    difficulties.indexOf(stages[a].difficulty)-difficulties.indexOf(stages[b].difficulty));
+   const orderedStages=order.map(i=>stages[i]);
+   const orderedEvidence=order.map(i=>evidence[i]);
+   stages.splice(0,stages.length,...orderedStages);
+   evidence.splice(0,evidence.length,...orderedEvidence);
+  }
+  stages.forEach((stage,index)=>{
+   const suffix=evidence[index].origin==='generated'?' '+(index+1):'';
+   stage.map.name=stage.difficulty+' · '+names[stage.family]+suffix;
+  });
+  const shortfall=count-stages.length;
+  return {pack:{format:'element-forge-challenges',version:1,revision,seed:String(seed),stages},
+   report:{revision,seed:String(seed),family,difficulty,limit,attempts,includeReferences,requested:count,accepted:stages.length,shortfall,fallback,rejections,evidence}};
+ }
+
+ const api={families,difficulties,revision,reference,verify,replay,generate,readPack,layoutKey,recipe,random,fromRows};
  root.EFChallenges=api;
  if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

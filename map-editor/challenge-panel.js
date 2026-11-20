@@ -7,9 +7,9 @@
   for(const value of ['mixed',...values])field(type).add(new Option(value,value));
  }
  let batch;
- const controls=['open','export','report','stage'];
+ const controls=['open','export','export-stage','report','stage'];
  function details(){
-  if(!batch)return;
+  if(!batch||!field('evidence').open)return;
   const selected=batch.report.evidence[Number(field('stage').value)];
   field('details').textContent=JSON.stringify({selected,rejections:batch.report.rejections},null,2);
  }
@@ -22,7 +22,7 @@
  field('generate').onclick=()=>{
   field('generate').disabled=true;
   controls.forEach(id=>{field(id).disabled=true;});
-  field('status').textContent='Verifying layouts and tool placements…';
+  field('status').textContent='Checking routes, construction and competing plans…';
   field('evidence').open=false;
   field('details').textContent='';
   field('stage').replaceChildren();
@@ -31,7 +31,7 @@
     batch=G.generate({seed:field('seed').value,family:field('family').value,
      difficulty:field('difficulty').value,count:Number(field('count').value)});
     batch.pack.stages.forEach((stage,index)=>field('stage').add(new Option(stage.map.name,index)));
-    field('status').textContent=`${batch.report.accepted}/${batch.report.requested} verified · ${batch.report.fallback} fallback · ${batch.report.rejections.length} rejected · seed ${batch.pack.seed}`;
+    field('status').textContent=`${batch.report.accepted}/${batch.report.requested} verified · ${batch.report.fallback} fallback · ${batch.report.rejections.length} rejected · seed ${batch.pack.seed}${batch.report.shortfall ? ` · ${batch.report.shortfall} unfilled` : ''}`;
     controls.forEach(id=>{field(id).disabled=id!=='report'&&!batch.pack.stages.length;});
     details();
    }catch(error){batch=undefined;field('status').textContent=error.message;}
@@ -39,6 +39,7 @@
   },0);
  };
  field('stage').onchange=details;
+ field('evidence').ontoggle=details;
  field('open').onclick=()=>{
   if(window.EFPlay.isActive()){field('status').textContent='Exit Playtest before opening a stage.';return;}
   if(dirty&&!confirm('Replace the current unsaved map?'))return;
@@ -48,5 +49,6 @@
   field('status').textContent='Selected stage loaded. Enter Playtest to try it.';
  };
  field('export').onclick=()=>download('Element_Forge_Challenge_Pack.json',batch.pack);
+ field('export-stage').onclick=()=>download('Element_Forge_Verified_Stage.json',batch.pack.stages[Number(field('stage').value)]);
  field('report').onclick=()=>download('Element_Forge_Generator_Report.json',batch.report);
 })();

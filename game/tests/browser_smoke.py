@@ -325,9 +325,10 @@ def test_challenge_pack_offline(browser, offline):
     page.goto(offline.as_uri())
     page.locator("#challenge-library summary").tap()
     page.locator("#curated-pack").tap()
-    expect(page.locator("#puzzle")).to_contain_text("Scarce Crossing")
     pack = page.evaluate("EFCurated")
-    plans = page.evaluate("""EFCurated.stages.map(level => EFEngine.solveConstruction(EFMap.readLevel(level)))""")
+    expect(page.locator("#puzzle")).to_contain_text(pack["stages"][0]["map"]["name"])
+    plans = page.evaluate("EFCurated.stages.map(level => EFChallenges.verify(level).solution)")
+    assert all(plan and plan["status"] == "solved" for plan in plans)
     for i, plan in enumerate(plans):
         page.locator("#start").scroll_into_view_if_needed()
         for index, tool in plan["placements"].items():
@@ -349,7 +350,7 @@ def test_challenge_pack_offline(browser, offline):
     page.locator("#challenge-library summary").tap()
     page.locator("#pack-file").set_input_files({"name": "pack.json", "mimeType": "application/json",
                                                "buffer": json.dumps(pack).encode()})
-    expect(page.locator("#puzzle")).to_contain_text("Scarce Crossing")
+    expect(page.locator("#puzzle")).to_contain_text(pack["stages"][0]["map"]["name"])
     page.close()
 
 
