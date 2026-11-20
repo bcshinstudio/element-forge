@@ -19,7 +19,6 @@ def tile(page, index):
 
 
 def route(page, path, drag=False):
-    page.get_by_role("button", name="Draw track").click()
     if not drag:
         for index in path:
             tile(page, index).click()
@@ -43,14 +42,16 @@ def test_main_loop(browser, url):
     expect(page.get_by_role("heading", name="Ember Meadow")).to_be_visible()
     expect(page.locator(".tile")).to_have_count(144)
     page.get_by_role("button", name="Start building").click()
-    route(page, [40, 52, 64, 76, 88, 89, 90, 102, 103, 104, 92], drag=True)
+    route(page, [40, 52, 64], drag=True)
+    expect(tile(page, 64).locator(".track")).to_have_count(1)
+    route(page, [64, 76, 88, 89, 90, 102, 103, 104, 92], drag=True)
     page.get_by_role("button", name="Test delivery").click()
     expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
     expect(page.locator(".orb")).to_have_count(1)
     page.get_by_role("button", name="Next puzzle").click()
     expect(page.get_by_role("heading", name="Brook Bridge")).to_be_visible()
 
-    page.locator("#level").select_option(label="The River Crossing")
+    page.locator("#level").select_option("3")
     expect(page.get_by_role("heading", name="Plan your route")).to_be_visible()
     expect(tile(page, 113)).to_be_visible()
     expect(page.get_by_role("button", name="Draw track")).to_be_hidden()
@@ -59,9 +60,9 @@ def test_main_loop(browser, url):
     expect(page.get_by_role("button", name="Start building")).to_be_disabled()
     expect(page.locator("#budget")).to_have_text("2 points over budget")
     # Visiting a fixed-inventory puzzle clears the over-budget button state.
-    page.locator("#level").select_option(label="Brook Bridge")
+    page.locator("#level").select_option("1")
     expect(page.get_by_role("button", name="Start building")).to_be_enabled()
-    page.locator("#level").select_option(label="The River Crossing")
+    page.locator("#level").select_option("3")
     bridge_count.fill("1")
     page.get_by_role("button", name="Start building").click()
 
@@ -131,7 +132,72 @@ def test_offline_touch_and_import(browser, offline):
     page.get_by_role("button", name="Test delivery").tap()
     expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
     expect(page.locator(".orb")).to_have_count(0)
+    expect(page.locator("#campaign-progress")).to_have_text("0 / 15 complete")
     assert not errors, errors
+    page.close()
+
+
+def test_campaign_and_progress(browser, url):
+    page = browser.new_page(viewport={"width": 1280, "height": 1000}, reduced_motion="reduce")
+    errors = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    page.goto(url + BASE)
+    plans = page.evaluate("""EFLevels.catalog.map(level => {
+        const map = EFMap.readLevel(level);
+        const solution = EFEngine.solveConstruction(map);
+        return {name: map.name, budget: !!map.construction, ...solution};
+    })""")
+    assert len(plans) == 15
+    for i, plan in enumerate(plans):
+        expect(page.get_by_role("heading", name=plan["name"], exact=True)).to_be_visible()
+        assert plan["status"] == "solved", plan
+        if plan["budget"]:
+            counts = {}
+            for placement in plan["placements"].values():
+                kind = placement if isinstance(placement, str) else placement["kind"]
+                counts[kind] = counts.get(kind, 0) + 1
+            for kind, count in counts.items():
+                page.locator(f'input[name="{kind}"]').fill(str(count))
+        page.get_by_role("button", name="Start building").click()
+        for index, placement in plan["placements"].items():
+            kind = placement if isinstance(placement, str) else placement["kind"]
+            page.locator(f'[data-tool="{kind}"]').click()
+            if isinstance(placement, dict):
+                page.locator("#link-id").fill(placement["pairId"])
+            tile(page, index).click()
+            expect(page.locator("#instructions")).to_contain_text("Tap or drag")
+        for path in plan["routes"]:
+            route(page, path["path"])
+        page.get_by_role("button", name="Test delivery").click()
+        expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
+        expect(page.locator("#campaign-progress")).to_have_text(f"{i+1} / 15 complete")
+        if i < 14:
+            page.get_by_role("button", name="Next puzzle").click()
+    expect(page.get_by_role("button", name="Next puzzle")).to_be_disabled()
+    page.reload()
+    expect(page.get_by_role("heading", name="The Threefold Divide")).to_be_visible()
+    expect(page.locator("#campaign-progress")).to_have_text("15 / 15 complete")
+    page.locator("#level").select_option("0")
+    expect(page.locator("#level option").first).to_have_text("1. Ember Meadow ✓")
+    expect(page.locator("#campaign-progress")).to_have_text("15 / 15 complete")
+    assert not errors, errors
+    page.close()
+
+
+def test_keyboard(browser, url):
+    page = browser.new_page(reduced_motion="reduce")
+    page.goto(url + BASE)
+    page.locator("#start").focus()
+    page.keyboard.press("Enter")
+    expect(tile(page, 40)).to_be_focused()
+    page.keyboard.press("Enter")
+    for key in ["ArrowDown", "ArrowDown", "ArrowDown", "ArrowDown", "ArrowRight",
+                "ArrowRight", "ArrowDown", "ArrowRight", "ArrowRight", "ArrowUp"]:
+        page.keyboard.press(key)
+        page.keyboard.press("Enter")
+    page.locator("#check").focus()
+    page.keyboard.press("Enter")
+    expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
     page.close()
 
 
@@ -151,9 +217,13 @@ if __name__ == "__main__":
                 with sync_playwright() as playwright:
                     browser = playwright.chromium.launch(executable_path=os.getenv("CHROMIUM_EXECUTABLE"))
                     test_main_loop(browser, url)
-                    print("PASS G1 desktop: drag routing, overspend, invalid placement, wrong bridge, restart, replan, undo, animation, next and replay")
+                    print("PASS desktop: start and resume drag routing, overspend, invalid placement, wrong bridge, restart, replan, undo, animation, next and replay")
                     test_offline_touch_and_import(browser, offline)
-                    print("PASS G1 standalone mobile emulation: responsive board, legacy import, touch routing and reduced motion")
+                    print("PASS standalone mobile emulation: responsive board, legacy import, touch routing and reduced motion")
+                    test_keyboard(browser, url)
+                    print("PASS keyboard: start, navigate, draw and deliver without a pointer")
+                    test_campaign_and_progress(browser, url)
+                    print("PASS campaign: all 15 levels playable, next and replay navigation, completed progress survives reload")
                     browser.close()
             finally:
                 server.shutdown()

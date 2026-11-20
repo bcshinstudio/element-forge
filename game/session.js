@@ -55,8 +55,18 @@
    if(!onboard(index)||!E.canPlace(map,state.placements,index,kind))return fail('This tool cannot be placed here.');
    if((E.placementCounts(state.placements)[kind]||0)>=(state.loadout[kind]||0))return fail('No '+kind+' remaining.');
    if(['portal','tunnel'].includes(kind)&&!/^[\w-]{1,12}$/.test(pairId))return fail('Use a link ID of 1–12 letters, digits, underscores, or hyphens.');
+   const linked=['portal','tunnel'].includes(kind);
+   const value=linked?{kind,pairId}:kind;
+   if(linked){
+    const matching=map.cells.map((_,i)=>i).filter(i=>E.effective(map,state.placements,i)===kind&&
+     E.pairIdAt(map,state.placements,i)===pairId);
+    if(matching.length>=2)return fail('This link ID already has two ends. Choose a new ID.');
+    if(kind==='tunnel'&&matching.length===1&&E.linkPartner(map,index,{...state.placements,[index]:value})<0){
+     return fail('Align the tunnel ends in one row or column with blocked terrain between them.');
+    }
+   }
    remember();
-   state.placements[index]=['portal','tunnel'].includes(kind)?{kind,pairId}:kind;
+   state.placements[index]=value;
    return ok();
   }
 

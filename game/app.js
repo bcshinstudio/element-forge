@@ -2,6 +2,10 @@
 (()=>{
  const E=window.EFEngine,F=window.EFMap;
  const levels=[...window.EFLevels.catalog];
+ const campaignSize=levels.length;
+ let storage;
+ try{storage=window.localStorage;}catch{}
+ const progress=window.EFProgress.createProgress(storage,levels.map(level=>level.id));
  const $=id=>document.getElementById(id);
  const board=$('board');
  const colors={fire:'#ff9875',water:'#79d7ff',nature:'#bdec81',electricity:'#ffdd72',arcane:'#d9b5ff'};
@@ -19,6 +23,7 @@
   session=window.EFSession.createSession(levels[index]);
   const {map}=session;
   levelIndex=index;
+  if(index<campaignSize){progress.select(levels[index].id);updateLevelLabels();}
   $('level').value=index;
   $('puzzle-options').open=false;
   $('custom-level').open=false;
@@ -26,9 +31,11 @@
   $('puzzle').textContent=map.name;
   $('description').textContent=map.description;
   board.style.setProperty('--cols',map.width);
+  const firstSource=E.pairs(map)[0].source;
   tiles=map.cells.map((cell,i)=>{
    const tile=document.createElement('button');
    tile.type='button';
+   tile.tabIndex=i===firstSource?0:-1;
    tile.dataset.index=i;
    tile.className='tile '+cell.terrain;
    return tile;
@@ -92,8 +99,8 @@
   const {state}=session;
   const counts=E.placementCounts(state.placements);
   const remaining=Object.fromEntries(toolEntries().map(([kind])=>[kind,(state.loadout[kind]||0)-(counts[kind]||0)]));
-  const choices=[['route','Draw track'],...Object.entries(remaining).filter(([,count])=>count>0)
-   .map(([kind,count])=>[kind,`${toolNames[kind]} (${count})`])];
+  const choices=Object.entries(remaining).filter(([,count])=>count>0)
+   .map(([kind,count])=>[kind,`${toolNames[kind]} (${count})`]);
   if(tool==='remove'&&!Object.keys(state.placements).length||Object.hasOwn(remaining,tool)&&remaining[tool]<=0)tool='route';
   const buttons=choices.map(([kind,label])=>{
    const button=document.createElement('button');
@@ -104,12 +111,13 @@
    return button;
   });
   $('tools').replaceChildren(...buttons);
+  $('tools').hidden=!buttons.length;
   $('remove').hidden=!Object.keys(state.placements).length;
   $('remove').setAttribute('aria-pressed',String(tool==='remove'));
   $('replan').hidden=!session.map.construction;
   $('link-field').hidden=!['portal','tunnel'].includes(tool);
   $('instructions').textContent=tool==='remove'?'Choose a tool on the map to remove it.':
-   tool==='route'?'Start at a source. Tap or drag through adjacent tiles.':
+   tool==='route'?'Tap or drag from a source. Resume an unfinished route from its end.':
    'Choose a tile for your '+toolNames[tool].toLowerCase()+'.';
  }
 
@@ -163,25 +171,43 @@
     mark.textContent=symbols[cell.node.element];
    }else if(kind){
     mark.classList.add('structure');
-    mark.textContent=(componentSymbols[kind]||'')+(link||arrows[cell.props?.direction]||'');
+    const element=kind==='checkpoint'?cell.props?.element:null;
+   mark.textContent=(componentSymbols[kind]||'')+(symbols[element]||link||arrows[cell.props?.direction]||'');
+   if(colors[element])mark.style.color=colors[element];
    }else mark.textContent=cell.terrain==='oneway'?arrows[cell.props?.direction||'E']:terrainSymbols[cell.terrain]||'';
    fragments[i].append(mark);
    tile.replaceChildren(fragments[i]);
+   const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
    const label=`Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, `+
-    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?toolNames[kind]+(link?' '+link:''):cell.terrain);
+    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):cell.terrain);
    tile.title=label;
    tile.setAttribute('aria-label',label);
   }
  }
 
+ function explainMove(result,index){
+  const {map,state}=session;
+  const element=state.active?.element;
+  if(result.message==='Element terrain restriction violated'){
+   return F.ELEMENTS[element].name+' cannot cross '+map.cells[index].terrain+' on this level.';
+  }
+  if(result.message==='Element component restriction violated'){
+   return F.ELEMENTS[element].name+' cannot use '+toolNames[E.effective(map,state.placements,index)].toLowerCase()+' on this level.';
+  }
+  if(/^Blocked terrain/.test(result.message)&&map.cells[index].terrain==='water'){
+   return 'This water tile needs a bridge.';
+  }
+  return result.message;
+ }
+
  function act(index){
   if(session.state.phase!=='build')return;
   const result=tool==='route'?session.route(index):tool==='remove'?session.remove(index):session.place(index,tool,$('link-id').value.trim());
-  if(!result.ok){message(result.message);return;}
+  if(!result.ok){message(explainMove(result,index));return false;}
   message('');
   drawBoard();
-  // Leave the selected toolbar button in place while a route is drawn.
-  if(tool!=='route')drawToolBar();
+  if(tool!=='route'){tool='route';drawToolBar();}
+  return true;
  }
 
  function stopAnimation(){
@@ -219,13 +245,13 @@
   tool='route';
   update();
   message('');
-  $('tools').querySelector('button').focus();
+  focusSource();
  });
  $('tools').addEventListener('click',event=>{
   const kind=event.target.dataset.tool;
   if(!kind)return;
-  if(session.state.active&&kind!=='route'){message('Finish or undo your current route first.');return;}
-  tool=kind;
+  if(session.state.active){message('Finish or undo your current route first.');return;}
+  tool=tool===kind?'route':kind;
   drawToolBar();
   $('tools').querySelector(`[data-tool="${kind}"]`).focus();
   message('');
@@ -235,7 +261,7 @@
   tool='remove';
   $('puzzle-options').open=false;
   drawToolBar();
-  $('tools').querySelector('button').focus();
+  focusSource();
   message('');
  };
  function reset(replan){
@@ -246,7 +272,7 @@
   drawPlan();
   update();
   message(replan?'Choose a new loadout.':'The board has been reset.');
-  (replan?$('start'):$('tools').querySelector('button')).focus();
+  if(replan)$('start').focus();else focusSource();
  }
  $('restart').onclick=()=>reset(false);
  $('replan').onclick=()=>reset(true);
@@ -255,6 +281,7 @@
  $('check').onclick=()=>{
   const result=session.verify();
   if(!result.ok){message(result.message);return;}
+  if(levelIndex<campaignSize){progress.complete(levels[levelIndex].id);updateLevelLabels();}
   $('score').textContent=`Track length ${result.track}`+(result.spend===null?'':` · Construction spend ${result.spend} pt`);
   update();
   message('');
@@ -287,9 +314,11 @@
  });
  board.addEventListener('pointerdown',event=>{
   const tile=event.target.closest('.tile');
-  if(!tile||event.button!==0||session.state.phase!=='build')return;
+  if(!tile||!event.isPrimary||event.button!==0||session.state.phase!=='build')return;
   const index=Number(tile.dataset.index);
-  if(tool==='route'){
+  const active=session.state.active;
+  const routeStart=active?active.path.at(-1)===index:session.map.cells[index].node?.role==='source';
+  if(tool==='route'&&routeStart&&!drag){
    drag={pointer:event.pointerId,index};
    board.setPointerCapture(event.pointerId);
   }
@@ -302,7 +331,15 @@
   const index=Number(tile.dataset.index);
   if(index===drag.index)return;
   drag.index=index;
-  act(index);
+  const tip=session.state.active.path.at(-1);
+  const map=session.map;
+  const stride=Math.floor(tip/map.width)===Math.floor(index/map.width)?1:tip%map.width===index%map.width?map.width:0;
+  if(stride&&index!==tip&&E.linkPartner(map,tip,session.state.placements)!==index){
+   const delta=Math.sign(index-tip)*stride;
+   for(let next=tip+delta;session.state.active;next+=delta){
+    if(!act(next)||next===index)break;
+   }
+  }else act(index);
  });
  board.addEventListener('keydown',event=>{
   const tile=event.target.closest('.tile');
@@ -310,12 +347,33 @@
   const direction={ArrowUp:'N',ArrowRight:'E',ArrowDown:'S',ArrowLeft:'W'}[event.key];
   const index=Number(tile.dataset.index);
   const next=E.neighbors(index,session.map.width,session.map.height).find(([,dir])=>dir===direction);
-  if(next){event.preventDefault();tiles[next[0]].focus();}
+  if(next){event.preventDefault();focusTile(next[0]);}
  });
  for(const type of ['pointerup','pointercancel','lostpointercapture']){
   board.addEventListener(type,event=>{if(drag?.pointer===event.pointerId)drag=null;});
  }
 
+ function focusTile(index){
+  const previous=board.querySelector('[tabindex="0"]');
+  if(previous)previous.tabIndex=-1;
+  tiles[index].tabIndex=0;
+  tiles[index].focus();
+ }
+ function focusSource(){focusTile(E.pairs(session.map)[0].source);}
+ board.addEventListener('focusin',event=>{
+  const tile=event.target.closest('.tile');
+  const previous=board.querySelector('[tabindex="0"]');
+  if(previous&&previous!==tile)previous.tabIndex=-1;
+  if(tile)tile.tabIndex=0;
+ });
+
+ function updateLevelLabels(){
+  for(let i=0;i<campaignSize;i++){
+   const {id,map}=levels[i];
+   $('level').options[i].textContent=`${i+1}. ${map.name}${progress.hasCompleted(id)?' ✓':''}`;
+  }
+  $('campaign-progress').textContent=`${progress.completedCount()} / ${campaignSize} complete`;
+ }
  for(const [index,level] of levels.entries())$('level').add(new Option(level.map.name,index));
- openLevel(0);
+ openLevel(Math.max(0,levels.findIndex(level=>level.id===progress.selected())));
 })();

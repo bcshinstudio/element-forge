@@ -22,7 +22,7 @@ for(const level of catalog){
   const session=createSession(level);
   assert.equal(session.start({...E.placementCounts(solved.placements)}).ok,true);
   for(const [index,kind] of Object.entries(solved.placements)){
-   assert.equal(session.place(Number(index),E.placementKind(kind)).ok,true);
+   assert.equal(session.place(Number(index),E.placementKind(kind),kind.pairId).ok,true);
   }
   for(const route of solved.routes)draw(session,route.path);
   assert.equal(session.verify().ok,true);
@@ -117,4 +117,56 @@ test('Partial crossing may enter an intersection but must leave it straight',()=
  assert.equal(session.route(90).ok,false);
  draw(session,[79,80,81,82]);
  assert.equal(session.verify().ok,true);
+});
+
+test('Routing can resume at the existing tip without losing the track',()=>{
+ const session=createSession(catalog[0]);
+ session.start();
+ draw(session,[40,52,64,64,76]);
+ assert.deepEqual(session.state.active.path,[40,52,64,76]);
+ assert.equal(session.route(92).ok,false);
+ assert.deepEqual(session.state.active.path,[40,52,64,76]);
+ draw(session,[88,89,90,102,103,104,92]);
+ assert.equal(session.verify().ok,true);
+});
+
+test('Tunnel placement rejects a bad second end and accounts for both ends',()=>{
+ const session=createSession(catalog[8]);
+ assert.equal(session.start({tunnel:2,bridge:1}).ok,false);
+ assert.equal(session.start({tunnel:2}).ok,true);
+ assert.equal(session.place(38,'tunnel').ok,true);
+ assert.match(session.place(57,'tunnel').message,/Align/);
+ assert.equal(session.place(45,'tunnel').ok,true);
+ assert.equal(E.constructionCost(session.map,E.placementCounts(session.state.placements)),2);
+});
+
+test('Required station cannot be bypassed even with a connected track',()=>{
+ const session=createSession(catalog[10]);
+ session.start();
+ draw(session,[38,39,40,41,42,43]);
+ assert.match(session.verify().message,/required checkpoint not visited/);
+});
+
+test('Campaign progress survives reload, ignores unknown levels and tolerates unusable storage',()=>{
+ const {createProgress}=require('../progress.js');
+ const ids=catalog.map(level=>level.id);
+ assert.equal(ids.length,15);
+ assert.equal(new Set(ids).size,15);
+ let snapshot;
+ const storage={getItem:()=>snapshot,setItem:(_,value)=>{snapshot=value;}};
+ const initial=createProgress(storage,ids);
+ initial.select(ids[4]);
+ initial.complete(ids[0]);
+ initial.complete(ids[0]);
+ initial.complete('imported-map');
+ const reopened=createProgress(storage,ids);
+ assert.equal(reopened.selected(),ids[4]);
+ assert.equal(reopened.completedCount(),1);
+ assert.equal(reopened.hasCompleted(ids[0]),true);
+ snapshot='broken JSON';
+ assert.equal(createProgress(storage,ids).completedCount(),0);
+ const blocked={getItem(){throw Error('blocked');},setItem(){throw Error('blocked');}};
+ const temporary=createProgress(blocked,ids);
+ temporary.complete(ids[1]);
+ assert.equal(temporary.hasCompleted(ids[1]),true);
 });
