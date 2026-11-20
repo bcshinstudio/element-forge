@@ -1,0 +1,2481 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <meta name="theme-color" content="#102019">
+ <title>Element Forge</title>
+ <style>
+:root {
+ color-scheme: dark;
+ font-family: "Trebuchet MS", system-ui, sans-serif;
+ color: #f8f3e5;
+ background: #102019;
+ --muted: #b6c7b5;
+ --border: #465a4c;
+ --accent: #f1c777;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; min-height: 100vh; }
+.masthead {
+ max-width: 1260px; margin: auto; padding: 22px clamp(16px,4vw,52px);
+ display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;
+ border-bottom: 1px solid var(--border);
+}
+.brand { color: var(--accent); font: 700 clamp(24px,4vw,36px) Georgia,serif; text-decoration: none; }
+.masthead label { display: flex; align-items: center; gap: 8px; }
+.layout {
+ max-width: 1260px; margin: auto; padding: 24px clamp(16px,4vw,52px);
+ display: grid; grid-template-columns: minmax(0, 720px) minmax(255px, 1fr); gap: clamp(16px,3vw,40px); align-items: start;
+}
+h1,h2 { font-family: Georgia,serif; margin: 0 0 10px; }
+h1 { font-size: clamp(29px,5vw,46px); }
+p { line-height: 1.5; }
+#description,#instructions,.legend,.import { color: var(--muted); }
+#board {
+ display: grid; grid-template-columns: repeat(var(--cols,12), minmax(0,1fr)); width: 100%;
+ padding: 4px; border: 1px solid var(--border); border-radius: 12px;
+ background: #1a2c22; touch-action: pan-y pinch-zoom; user-select: none;
+}
+.tile {
+ position: relative; display: grid; place-items: center; aspect-ratio: 1; min-width: 0;
+ padding: 0; border: 1px solid #18281d36; border-radius: 0; isolation: isolate;
+ background: #a5a370; color: #101f1a; font-size: clamp(12px,2.7vw,22px); line-height: 1;
+}
+.tile.forest { background: #59774f; }
+.tile.mountain,.tile.wall,.tile.void { background: #48524b; color: #eaf0e0; }
+.tile.water { background: #276983; color: #e2f6ff; }
+.tile.ice { background: #b6e0e4; }
+.tile.lava { background: #a8412c; color: #ffead2; }
+.tile:focus-visible { outline: 3px solid #fff; z-index: 3; }
+.track { position: absolute; inset: 0; pointer-events: none; }
+.track i { position: absolute; background: var(--line); box-shadow: inset 0 0 1px #000; }
+.track .dot { inset: 38%; border-radius: 50%; }
+.track .north { inset: 0 39% 48%; }
+.track .south { inset: 48% 39% 0; }
+.track .west { inset: 39% 48% 39% 0; }
+.track .east { inset: 39% 0 39% 48%; }
+.mark {
+ position: relative; z-index: 1; pointer-events: none; display: grid; place-items: center;
+ font-weight: 800;
+}
+.mark.endpoint {
+ width: 75%; height: 75%; max-width: 34px; max-height: 34px; border-radius: 50%;
+ background: var(--element); color: #121b16; border: 2px solid #fff8;
+}
+.mark.destination { border-style: double; border-width: 4px; }
+.mark.structure { border-radius: 4px; padding: 1px 3px; background: #19271edb; color: #fff4cc; }
+.orb { z-index: 2; position: absolute; inset: 24%; border-radius: 50%; background: var(--line); border: 2px solid white; box-shadow: 0 0 10px var(--line); pointer-events: none; }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; padding-top: 12px; }
+.legend b { color: var(--element); }
+.controls { border: 1px solid var(--border); border-radius: 14px; background: #1c3025; padding: 20px; }
+.tools,.actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+button,select,input { font: inherit; }
+button,select,input[type=number],input[type=text],#link-id {
+ background: #263b2c; color: #fff5df; border: 1px solid #728775; border-radius: 7px; padding: 8px 10px;
+}
+button { cursor: pointer; }
+button:disabled { opacity: .62; cursor: default; }
+button[aria-pressed=true] { box-shadow: inset 0 0 0 2px var(--accent); }
+.primary { background: var(--accent); color: #17251a; border-color: var(--accent); font-weight: 700; }
+.loadout-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.loadout-row input { width: 68px; }
+#import { display: block; max-width: 100%; margin-top: 6px; }
+#status { min-height: 1.5em; color: #ffda92; margin-bottom: 12px; }
+footer { padding: 0 16px 20px; text-align: center; color: var(--muted); font-size: .9rem; }
+@media (max-width: 790px) {
+ .layout { grid-template-columns: minmax(0, 1fr); max-width: 690px; }
+ .controls { padding: 14px; }
+}
+.sidebar { min-width: 0; }
+.controls #instructions { margin: 0 0 16px; }
+.tools { gap: 6px; margin: 0 0 14px; }
+.tools button { background: transparent; }
+.tools button[aria-pressed=true] {
+ background: #3a4b36; border-color: var(--accent); box-shadow: none; color: #fff1cf;
+}
+.build-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 14px; }
+.build-actions button { min-height: 42px; }
+#undo { background: transparent; }
+.disclosure { color: var(--muted); font-size: .9rem; margin-top: 14px; }
+.disclosure summary { width: fit-content; cursor: pointer; padding: 6px 0; }
+.disclosure summary:hover { color: #fff5df; }
+.option-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.custom-level { padding: 0 4px; }
+.custom-level .import { display: block; margin-top: 6px; }
+#status,#import-error { min-height: 0; margin: 0; color: #ffda92; }
+#status:not(:empty),#import-error:not(:empty) { margin-top: 12px; }
+
+.campaign-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-width: 0; }
+.campaign-picker label { min-width: 0; }
+.campaign-picker select { min-width: 0; max-width: min(65vw, 285px); }
+#campaign-progress { color: var(--muted); font-size: .88rem; }
+
+.inventory-count { color: var(--accent); font-weight: 700; }
+#bridge-hint { color: var(--muted); margin: 4px 0 10px; font-size: .9rem; }
+.mark.destination { border-radius: 22%; }
+.endpoint-role {
+ position: absolute; right: -3px; bottom: -3px; min-width: 1.1em; text-align: center;
+ padding: 1px; border-radius: 3px; background: #142219; color: #fff;
+ font: 700 clamp(8px, 1vw, 12px)/1.1 system-ui,sans-serif;
+}
+
+.tile.tunnel-preview { outline: 3px dashed #fff3b0; outline-offset: -4px; z-index: 2; }
+.tile.tunnel-preview .mark { font-weight: 900; }
+
+.tile.route-handle { touch-action: none; }
+#puzzle-hint { margin: 0 0 12px; }
+#hint-text { margin: 4px 0 10px; }
+@media (max-width: 600px) {
+ .layout { padding-inline: 8px; gap: 12px; }
+ .field h1, #description { margin-inline: 6px; }
+ #board { padding: 2px; }
+ .sidebar button, .sidebar summary, .campaign-picker select { min-height: 44px; }
+ .sidebar summary { display: list-item; padding-block: 12px; }
+ .endpoint-role { right: -2px; bottom: -2px; font-size: 9px; }
+}
+
+.world-intro { max-width: 48rem; margin: 1rem auto; padding: 1rem; background: #263b2c; border-radius: 12px; }
+.world-intro button { min-height: 44px; margin: 4px 4px 0 0; }
+.tile.void { background: radial-gradient(ellipse, #050907 32%, #35493c 74%); color: #94aa9a; }
+.tile.wind-landing { outline: 2px dashed #a8f0dd; outline-offset: -4px; z-index: 2; }
+.restoration { display: flex; align-items: center; gap: 12px; color: #ffda92; }
+.engine-wheel { display: inline-block; font-size: 2rem; }
+@media (prefers-reduced-motion: no-preference) {
+ .engine-wheel { animation: engine-turn 2s ease-out both; }
+}
+@keyframes engine-turn { to { transform: rotate(720deg); } }
+
+[hidden] { display: none !important; }
+button.brand { background: transparent; border: 0; text-align: left; }
+#challenge-menu { margin-top: 1rem; }
+.tile.river { background: #235b79; }
+.tile.bank { background: #9c8b5d; }
+.tile.shallow { background: #4b8c99; }
+.tile.scree { background: #675f53; }
+.tile.heated, .tile.lava { background: #943f38; }
+.tile.abrasive { background: #6d5d71; }
+.tile.exposed { background: #a28b51; }
+.tile.covered { background: #514c73; }
+#check.ready { outline: 2px solid #caff9c; outline-offset: 3px; }
+.harmony-pulse { animation: harmony 750ms ease-out; }
+@keyframes harmony {
+  35% { box-shadow: 0 0 32px #caff9caa; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .harmony-pulse { animation: none; }
+}
+</style>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+</head>
+<body>
+ <header class="masthead">
+  <button id="home-button" class="brand" type="button">Element Forge</button>
+  <div class="campaign-picker">
+  <label for="level">Puzzle
+   <select id="level"></select>
+  </label>
+  <span id="campaign-progress"></span>
+ </div>
+ </header>
+ <section id="home" class="world-intro" aria-labelledby="home-title">
+  <h1 id="home-title">Element Forge</h1>
+  <p id="home-total"></p>
+  <button id="continue" class="primary" type="button"></button>
+  <button id="stage-select" type="button">Stage Select</button>
+  <button id="choose-challenge" type="button">Challenges</button>
+  <button id="new-campaign" type="button">Start New Campaign</button>
+  <div id="challenge-menu" hidden>
+   <label>Difficulty <select id="challenge-tier"><option>Easy</option><option>Medium</option><option>Hard</option><option>Expert</option></select></label>
+   <button id="generate-challenge" type="button">Find puzzle</button>
+   <button id="resume-challenge" type="button">Resume challenge</button>
+   <button id="home-curated" type="button">Play curated pack</button>
+   <p id="challenge-status" role="status"></p>
+  </div>
+ </section>
+ <section hidden id="world-intro" class="world-intro" aria-labelledby="world-intro-title">
+  <h2 id="world-intro-title">The Last Conduit Weaver</h2>
+  <p>Primeval Well-Springs once fed the World-Engines that guided the winds, tides, and seasons. An ancient civilization fractured the network. Now the Engines are slowing, and you are the last Conduit Weaver.</p>
+  <p>Carry each current from its Well-Spring (S) to its matching Engine inlet (D). The currents are volatile on the way, but the Engine can combine them safely.</p>
+  <button id="intro-begin" class="primary" type="button">Begin weaving</button>
+  <button id="intro-skip" type="button">Skip introduction</button>
+ </section>
+ <main id="play-view" class="layout" hidden>
+  <section class="field" aria-labelledby="puzzle">
+   <h1 id="puzzle"></h1>
+   <p id="description"></p>
+   <div id="board" role="group" aria-label="Puzzle board"></div>
+   <div id="elements" class="legend"></div>
+  </section>
+  <div class="sidebar">
+  <section class="controls" aria-labelledby="phase">
+   <h2 id="phase">Plan your route</h2>
+   <p id="instructions"></p>
+   <details id="puzzle-hint" class="disclosure" hidden>
+    <summary>Puzzle hint</summary>
+    <p id="hint-text"></p>
+   </details>
+   <form id="plan">
+    <div id="loadout"></div>
+    <p id="budget"></p>
+    <button class="primary" id="start">Start building</button>
+   </form>
+   <div id="build" hidden>
+    <div id="bridge-count" class="inventory-count" role="status" hidden></div>
+    <p id="bridge-hint" hidden>Tap an empty water tile to place a bridge, even mid-route.</p>
+    <div id="tools" class="tools" role="group" aria-label="Build tools"></div>
+    <button id="remove" hidden>Remove tool</button>
+    <label id="link-field" hidden>Link ID <input id="link-id" value="A" maxlength="12"></label>
+    <p id="projected" role="status" hidden></p>
+    <div class="build-actions">
+     <button id="check" class="primary">Restore Harmony</button>
+     <button id="undo">Undo</button>
+    </div>
+    <details id="puzzle-options" class="disclosure">
+     <summary>Puzzle options</summary>
+     <div class="option-actions">
+      <button id="restart">Restart</button>
+      <button id="replan">Replan tools</button>
+     </div>
+    </details>
+   </div>
+   <div id="finish" hidden>
+    <div id="engine-restoration" class="restoration" hidden>
+     <p><strong>Harmony restored.</strong><br>Life energy flows through the valley again.</p>
+    </div>
+    <p id="score"></p>
+    <p id="totals"></p>
+    <details id="score-details" class="disclosure">
+     <summary>Score details</summary>
+     <ul><li id="score-base"></li><li id="score-route"></li><li id="score-bonus"></li>
+      <li id="score-floor" hidden>Scores stop at zero.</li></ul>
+    </details>
+    <button id="skip-animation" type="button" hidden>Skip animation</button>
+    <div class="actions"><button id="replay">Replay puzzle</button><button id="next" class="primary">Next puzzle</button></div>
+   </div>
+   <p id="status" role="status" aria-live="polite"></p>
+  </section>
+  <details id="challenge-library" class="disclosure custom-level">
+   <summary>Challenge stages</summary>
+   <button id="curated-pack" type="button">Play curated pack</button>
+   <label class="import">Import challenge pack <input type="file" id="pack-file" accept=".json,application/json"></label>
+  </details>
+  <details id="custom-level" class="disclosure custom-level">
+   <summary>Open a custom level</summary>
+   <label class="import">Choose an editor-exported level <input type="file" id="import" accept=".json,application/json"></label>
+   <p id="import-error" role="status"></p>
+  </details>
+  </div>
+ </main>
+ <footer>BC Shin Studio</footer>
+<script>
+'use strict';
+/* Shared rules: browser global and Node test export. Prototype scope deliberately explicit. */
+(function(root){
+const ELEMENTS=['fire','water','nature','electricity','arcane','wind','earth','ice','metal','light','shadow'];
+const neighbors=(i,w,h)=>[[i-w,'N'],[i+1,'E'],[i+w,'S'],[i-1,'W']].filter(([j,d])=>j>=0&&j<w*h&&(d!=='E'||Math.floor(j/w)===Math.floor(i/w))&&(d!=='W'||Math.floor(j/w)===Math.floor(i/w)));
+const axis=(a,b,w)=>Math.floor(a/w)===Math.floor(b/w)?'h':'v';
+const pairs=m=>ELEMENTS.map(element=>({element,source:m.cells.findIndex(c=>c.node?.element===element&&c.node.role==='source'),destination:m.cells.findIndex(c=>c.node?.element===element&&c.node.role==='destination')})).filter(p=>p.source>=0||p.destination>=0);
+const placementKind=v=>typeof v==='string'?v:v?.kind||null;
+const effective=(m,placements,i)=>placementKind(placements?.[i])||m.cells[i].component||null;
+const pairIdAt=(m,placements,i)=>placements?.[i]?.pairId||m.cells[i]?.props?.pairId||null;
+const linkPartner=(m,i,placements={})=>{
+ const kind=effective(m,placements,i),id=pairIdAt(m,placements,i);
+ if(!['portal','tunnel'].includes(kind)||!id)return -1;
+ const matches=[];for(let j=0;j<m.cells.length;j++)if(effective(m,placements,j)===kind&&pairIdAt(m,placements,j)===id)matches.push(j);
+ if(matches.length!==2)return -1;
+ const other=matches[0]===i?matches[1]:matches[0];
+ if(kind==='tunnel'){
+  const row=Math.floor(i/m.width)===Math.floor(other/m.width),col=i%m.width===other%m.width;
+  if(!row&&!col)return -1;
+  const step=row?(other>i?1:-1):(other>i?m.width:-m.width);
+  let blocked=false;for(let k=i+step;k!==other;k+=step)if(!['land','forest','ice'].includes(m.cells[k].terrain))blocked=true;
+  if(!blocked)return -1;
+ }
+ return other;
+};
+function windLandings(m,i,placements={}){
+ const ground=cell=>['land','forest','ice','bank','exposed','covered'].includes(cell?.terrain)&&
+  (!(m.rulesVersion>=3)||cell.terrain!=='forest');
+ const legal=index=>ground(m.cells[index])&&(m.rulesVersion!==4||((!m.cells[index].node||m.cells[index].node.element==='wind')&&effective(m,placements,index)!=='tunnel'));
+ if(!legal(i))return [];
+ return neighbors(i,m.width,m.height).flatMap(([hole,heading])=>{
+  if(m.cells[hole].terrain!=='void')return [];
+  const landing=neighbors(hole,m.width,m.height).find(([,dir])=>dir===heading)?.[0];
+  return legal(landing)?[landing]:[];
+ });
+}
+function routeNeighbors(m,i,placements={},element){
+ const result=neighbors(i,m.width,m.height).map(([j])=>j);
+ const partner=linkPartner(m,i,placements);
+ if(partner>=0&&(element!=='wind'||effective(m,placements,i)!=='tunnel'))result.push(partner);
+ if(element==='wind')result.push(...windLandings(m,i,placements));
+ return result;
+}
+const spanKinds=['bridge','metalSpan'];
+const ordinaryGround=['land','forest','ice','oneway'];
+const newTerrain=['river','bank','shallow','scree','heated','abrasive','exposed','covered'];
+function terrainError(m,element,index,component){
+ const {terrain}=m.cells[index];
+ const blocked=`Blocked terrain at cell ${index+1}`;
+ if(!(m.rulesVersion>=3))return ordinaryGround.includes(terrain)||(terrain==='water'&&component==='bridge')?null:blocked;
+ if(terrain==='forest'&&element!=='nature')return 'Only Plant can move through woods.';
+ if(element==='nature'&&component==='portal')return 'Plant cannot use portals.';
+ if(['earth','metal'].includes(element)&&component==='bridge')return 'This current cannot use lightweight bridges.';
+ if(element==='ice'&&terrain==='heated')return 'Ice cannot enter heated ground.';
+ if(terrain==='exposed'&&element==='shadow')return 'Shadow needs covered channels.';
+ if(terrain==='covered'&&element==='light')return 'Light needs exposed channels.';
+ if([...ordinaryGround,'bank','exposed','covered'].includes(terrain))return null;
+ if(terrain==='lava')return element==='fire'?null:'Only Fire can enter lava.';
+ if(terrain==='scree')return element==='earth'?null:'Only Earth can cross scree.';
+ if(['heated','abrasive'].includes(terrain))return element==='metal'?null:'Only Metal can cross this ground.';
+ if(!['water','river','shallow'].includes(terrain))return blocked;
+ if(element==='fire'&&m.rulesVersion>=4)return 'Fire cannot cross water, even on a bridge.';
+ if(element==='electricity'&&m.rulesVersion>=4)return 'Electricity needs dry ground. Bridges do not carry it over water.';
+ if(element==='fire'&&terrain!=='shallow')return 'Deep water blocks Fire even on a span.';
+ if(element==='electricity')return component==='metalSpan'?null:'Electricity needs a metal span over water.';
+ if(element==='water'&&terrain==='river')return null;
+ if(element==='ice'&&terrain==='shallow')return null;
+ return spanKinds.includes(component)?null:blocked;
+}
+function bankError(m,element,from,to){
+ if(m.rulesVersion!==3||element!=='water')return null;
+ const a=m.cells[from].terrain,b=m.cells[to].terrain;
+ if((a==='river')===(b==='river'))return null;
+ return a==='bank'||b==='bank'?null:'Water can enter or leave the river only at a marked bank.';
+}
+const direction=(a,b,w)=>b===a-w?'N':b===a+w?'S':b===a+1&&Math.floor(a/w)===Math.floor(b/w)?'E':b===a-1&&Math.floor(a/w)===Math.floor(b/w)?'W':null;
+function allowedTransition(m,element,from,to,placements={}){
+ const c=m.cells[from],next=m.cells[to],step=direction(from,to,m.width);
+ if(bankError(m,element,from,to)||(!step&&m.rulesVersion>=3&&element==='water'&&(c.terrain==='river'||next.terrain==='river')))return false;
+ if(!step)return (element==='wind'&&windLandings(m,from,placements).includes(to))||
+  (linkPartner(m,from,placements)===to&&(element!=='wind'||effective(m,placements,from)!=='tunnel'));
+ if(c.terrain==='oneway'&&step!==(c.props?.direction||'E'))return false;
+ if(c.component==='gate'&&step!==(c.props?.direction||'E'))return false;
+ if(next.component==='gate'&&step!==(next.props?.direction||'E'))return false;
+ if(next.terrain==='oneway'&&step!==(next.props?.direction||'E'))return false;
+ return true;
+}
+function constraintError(m,element,path,placements={},partial=false){
+ const rules=m.constraints?.[element]||{};
+ if(rules.forbidTerrain?.some(t=>path.some(i=>m.cells[i].terrain===t)))return 'Element terrain restriction violated';
+ if(rules.forbidComponents?.some(t=>path.some(i=>effective(m,placements,i)===t)))return 'Element component restriction violated';
+ if(!partial&&rules.requireComponents?.some(t=>!path.some(i=>effective(m,placements,i)===t)))return 'Required component not used';
+ return null;
+}
+function canPlace(m,placements,i,kind){const c=m.cells[i];return !!c&&!c.node&&!c.component&&!placements[i]&&(spanKinds.includes(kind)?(c.terrain==='water'||m.rulesVersion>=3&&['river','shallow'].includes(c.terrain)):['intersection','portal','tunnel'].includes(kind)?['land','forest','ice','bank','exposed','covered'].includes(c.terrain):false)}
+function validatePath(m,element,path,other=[],placements={},partial=false){
+ const p=pairs(m).find(x=>x.element===element);if(!p||p.source<0||p.destination<0)return 'Missing endpoints';
+ if(!Array.isArray(path)||path.length<(partial?1:2)||path[0]!==p.source||(!partial&&path.at(-1)!==p.destination))return 'Route must connect its source to destination';
+ const seen=new Set();for(let k=0;k<path.length;k++){const i=path[k],c=m.cells[i];if(!Number.isInteger(i)||!c||seen.has(i))return 'Route leaves board or loops';seen.add(i);
+ const comp=effective(m,placements,i);if(element==='wind'&&comp==='tunnel')return 'Wind cannot use tunnels';
+ const terrain=terrainError(m,element,i,comp);if(terrain)return terrain;
+ if(comp&&!['bridge','metalSpan','intersection','checkpoint','portal','tunnel','gate'].includes(comp))return `Unsupported component: ${comp}`;
+ if(c.node&&(c.node.element!==element||(k!==0&&(k!==path.length-1||i!==p.destination))))return 'Another endpoint blocks route';
+ if(c.component==='checkpoint'&&c.props?.element&&!['any',element].includes(c.props.element))return 'Checkpoint belongs to another element';
+ if(k&& !routeNeighbors(m,path[k-1],placements,element).includes(i))return 'Routes must use adjacent cells or valid paired links';
+ if(k&&!allowedTransition(m,element,path[k-1],i,placements))return bankError(m,element,path[k-1],i)||'One-way direction violated';
+ }
+ const restriction=constraintError(m,element,path,placements,partial);if(restriction)return restriction;
+ for(const r of other){if(r.element===element)continue;for(const i of path){if(!r.path.includes(i))continue;if(effective(m,placements,i)!=='intersection')return 'Different elements cannot share a cell';const a=path.indexOf(i),b=r.path.indexOf(i);if(partial&&a===path.length-1&&a>0&&b>0&&b<r.path.length-1)continue;if(a===0||a===path.length-1||b===0||b===r.path.length-1)return 'Crossing cannot be at an endpoint';const a1=axis(path[a-1],i,m.width),a2=axis(i,path[a+1],m.width),b1=axis(r.path[b-1],i,m.width),b2=axis(i,r.path[b+1],m.width);if(!direction(path[a-1],i,m.width)||!direction(i,path[a+1],m.width)||!direction(r.path[b-1],i,m.width)||!direction(i,r.path[b+1],m.width)||a1!==a2||b1!==b2||a1===b1)return 'Intersection needs straight perpendicular routes';}}
+ return null;
+}
+function constructionCost(m,counts){
+ return Object.entries(counts).reduce((sum,[kind,count])=>sum+(m.construction?.prices[kind]??0)*count,0);
+}
+function placementCounts(placements){
+ const counts=Object.create(null);
+ for(const value of Object.values(placements)){
+  const kind=placementKind(value);
+  counts[kind]=(counts[kind]||0)+1;
+ }
+ return counts;
+}
+function checkAll(m,routes,placements={}){const errors=[];const counts=placementCounts(placements);for(const [i,v] of Object.entries(placements)){const k=placementKind(v);if(!canPlace(m,Object.fromEntries(Object.entries(placements).filter(([j])=>j!==i)),+i,k))errors.push(`Invalid ${k} placement at ${+i+1}`);}for(const [k,n] of Object.entries(counts))if(n>(m.inventory?.[k]||0))errors.push(`Inventory exceeded: ${k}`);
+ if(m.construction&&constructionCost(m,counts)>m.construction.budget)errors.push('Construction budget exceeded');
+ for(let i=0;i<m.cells.length;i++)if(['portal','tunnel'].includes(effective(m,placements,i))&&linkPartner(m,i,placements)<0)errors.push(`Invalid or unpaired ${effective(m,placements,i)} at cell ${i+1}`);
+ const boardPairs=pairs(m);
+ if(!boardPairs.length)errors.push('Add at least one source/destination pair');
+ const routeElements=new Set();
+ for(const route of routes){
+  if(routeElements.has(route.element))errors.push(`${route.element}: duplicate route`);
+  if(!boardPairs.some(p=>p.element===route.element))errors.push(`${route.element}: unexpected route`);
+  routeElements.add(route.element);
+ }
+ for(const p of boardPairs){if(p.source<0||p.destination<0){errors.push(`${p.element}: unmatched endpoints`);continue;}const r=routes.find(r=>r.element===p.element);if(!r){errors.push(`${p.element}: missing route`);continue;}const err=validatePath(m,p.element,r.path,routes.filter(x=>x!==r),placements);if(err)errors.push(`${p.element}: ${err}`);for(let i=0;i<m.cells.length;i++){const c=m.cells[i];if(c.component==='checkpoint'&&['any',p.element].includes(c.props?.element)&&!r.path.includes(i))errors.push(`${p.element}: required checkpoint not visited`);}}
+ return errors;}
+function score(m,routes,placements={}){const track=routes.reduce((s,r)=>s+r.path.length-1,0),components=Object.values(placements).length,cost=track+components*5;return {track,components,cost};}
+/* Bounded search: route first; when water encountered, may consume bridge; when another route is present, may consume intersection.
+   Search limits are NOT evidence of unsolvability. */
+function solve(m,{limit=120000,maxPairs=3,allowPlacement=true,initialPlacements={}}={}){
+ const ps=pairs(m);if(!ps.length||ps.some(p=>p.source<0||p.destination<0))return {status:'invalid',message:'Missing or unmatched endpoints'};
+ if(ps.length>maxPairs)return {status:'unsupported',message:`Maximum ${maxPairs} pairs for prototype solver`};
+ if(m.cells.some(c=>c.component&&!['bridge','metalSpan','intersection','checkpoint','portal','tunnel','gate'].includes(c.component)))return {status:'unsupported',message:'Map contains advanced components not supported by solver'};
+ if(m.cells.some(c=>!['land','forest','ice','water','mountain','wall','void','lava','oneway',...newTerrain].includes(c.terrain)))return {status:'unsupported',message:'Unknown terrain'};
+
+
+ for(let i=0;i<m.cells.length;i++){const c=m.cells[i];if(['portal','tunnel'].includes(c.component)&&linkPartner(m,i)<0)return {status:'invalid',message:`Invalid ${c.component} connection at cell ${i+1}; tunnel ends must align and cross blocked terrain`};}
+ let nodes=0,exhausted=false;const budget={bridge:allowPlacement?(m.inventory?.bridge||0):0,intersection:allowPlacement?(m.inventory?.intersection||0):0,metalSpan:allowPlacement?(m.inventory?.metalSpan||0):0};
+ const distance=(i,d)=>Math.abs(i%m.width-d%m.width)+Math.abs(Math.floor(i/m.width)-Math.floor(d/m.width));
+ const ordered=[...ps].sort((a,b)=>distance(a.source,a.destination)-distance(b.source,b.destination));
+ function visitPair(pi,routes,placements){if(pi===ordered.length){const errors=checkAll(m,routes,placements);return errors.length?null:{routes,placements};}
+ const p=ordered[pi],stack=[{path:[p.source],seen:new Set([p.source]),placements}];
+ while(stack.length){if(++nodes>limit){exhausted=true;return null;}const state=stack.pop(),cur=state.path.at(-1);
+ if(cur===p.destination){if(validatePath(m,p.element,state.path,routes,state.placements))continue;const needed=m.cells.map((c,i)=>c.component==='checkpoint'&&['any',p.element].includes(c.props?.element)?i:-1).filter(i=>i>=0);if(needed.some(i=>!state.seen.has(i)))continue;const found=visitPair(pi+1,[...routes,{element:p.element,path:state.path}],state.placements);if(found)return found;if(exhausted)return null;continue;}
+ const ns=routeNeighbors(m,cur,state.placements,p.element).filter(i=>!state.seen.has(i));ns.sort((a,b)=>distance(b,p.destination)-distance(a,p.destination));
+ for(const i of ns){if(!allowedTransition(m,p.element,cur,i,state.placements))continue;const c=m.cells[i];if(c.node&&!(c.node.element===p.element&&c.node.role==='destination'))continue;let pl=state.placements,comp=effective(m,pl,i);const overlaps=routes.filter(r=>r.path.includes(i));let wanted=null;
+ if(terrainError(m,p.element,i,comp)){if(!comp)wanted=spanKinds.find(kind=>budget[kind]&&canPlace(m,pl,i,kind)&&!terrainError(m,p.element,i,kind));if(!wanted)continue;}
+ if(comp&&!['bridge','metalSpan','intersection','checkpoint','portal','tunnel','gate'].includes(comp))continue;
+ if(overlaps.length){if(overlaps.length>1)continue;if(spanKinds.includes(comp))continue;if(comp!=='intersection')wanted='intersection';}
+ if(wanted){if(!allowPlacement||!canPlace(m,pl,i,wanted))continue;const used=Object.values(pl).filter(x=>placementKind(x)===wanted).length;if(used>=budget[wanted])continue;pl={...pl,[i]:wanted};if(m.construction&&constructionCost(m,placementCounts(pl))>m.construction.budget)continue;}
+ const path=[...state.path,i];if(overlaps.length){const r=overlaps[0],j=r.path.indexOf(i);if(j===0||j===r.path.length-1||path.length<3)continue;const b1=axis(r.path[j-1],i,m.width),b2=axis(i,r.path[j+1],m.width);if(b1!==b2)continue;const a1=axis(path[path.length-2],i,m.width);if(a1===b1)continue; /* require straight exit on next step */}
+ if(path.length>m.width*m.height)continue;
+ stack.push({path,seen:new Set([...state.seen,i]),placements:pl});
+ }
+ }
+ return null;}
+ const result=visitPair(0,[],initialPlacements);return result?{status:'solved',...result,nodes,score:score(m,result.routes,result.placements)}:{status:exhausted?'inconclusive':'unsolved',nodes,message:exhausted?'Search budget reached; result unknown':'No solution under supported rules'};
+}
+/* Bounded construction search. First try ordinary routes, then try candidate portal/tunnel pairs.
+   This is a heuristic, not an exhaustive proof of unsolvability or optimality. */
+function solveConstruction(m,{limit=120000,maxPairs=3,maxCandidates=180}={}){
+ const direct=solve(m,{limit,maxPairs});
+ if(direct.status==='solved'||direct.status==='invalid'||direct.status==='unsupported')return {...direct,constructionAttempts:0};
+ const ps=pairs(m);if(!ps.length)return direct;
+ const dist=(a,b)=>Math.abs(a%m.width-b%m.width)+Math.abs(Math.floor(a/m.width)-Math.floor(b/m.width));
+ const validCells=m.cells.map((_,i)=>i).filter(i=>canPlace(m,{},i,'portal'));
+ const kinds=['tunnel','portal'].filter(k=>(m.inventory?.[k]||0)>=2);
+ let attempts=0,hitLimit=false;
+ for(const kind of kinds){
+  for(const pair of ps){
+   const starts=[...validCells].sort((a,b)=>dist(a,pair.source)-dist(b,pair.source)||a-b).slice(0,14);
+   const ends=[...validCells].sort((a,b)=>dist(a,pair.destination)-dist(b,pair.destination)||a-b).slice(0,14);
+   const candidates=[];
+   for(const a of starts)for(const b of ends){if(a===b)continue;
+    const pl={[a]:{kind,pairId:'AUTO'},[b]:{kind,pairId:'AUTO'}};
+    if(linkPartner(m,a,pl)!==b)continue;
+    candidates.push({a,b,pl,cost:dist(a,pair.source)+dist(b,pair.destination)});
+   }
+   candidates.sort((a,b)=>a.cost-b.cost||a.a-b.a||a.b-b.b);
+   for(const candidate of candidates){
+    if(attempts>=maxCandidates)return {status:'inconclusive',message:'Construction candidate budget reached; solvability unknown',constructionAttempts:attempts};
+    attempts++;
+    const result=solve(m,{limit:Math.max(10000,Math.floor(limit/4)),maxPairs,initialPlacements:candidate.pl});
+    if(result.status==='solved')return {...result,constructionAttempts:attempts,constructionKind:kind};
+    if(result.status==='inconclusive')hitLimit=true;
+   }
+  }
+ }
+ return {status:hitLimit||direct.status==='inconclusive'?'inconclusive':'unsolved',message:hitLimit?'Some construction searches exceeded their limits':'No solution found within supported construction candidates',constructionAttempts:attempts};
+}
+const api={terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
+})(typeof window!=='undefined'?window:globalThis);
+</script>
+<script>
+'use strict';
+(function(root){
+const E=typeof module==='undefined'?root.EFEngine:require('./engine.js');
+const TERRAIN=[['land','Land','·'],['mountain','Mountain','▲'],['water','Water','≈'],['wall','Wall','▦'],['forest','Forest','♣'],['lava','Lava','♨'],['ice','Ice','❄'],['void','Void','◼'],['oneway','One-way','➜'],['river','Deep river','∿'],['bank','River bank','⇆'],['shallow','Shallow water','≋'],['scree','Scree','⋰'],['heated','Heated ground','▥'],['abrasive','Abrasive ground','▒'],['exposed','Exposed channel','☀'],['covered','Covered channel','☾']];
+const COMPONENTS=[['bridge','Light bridge','═'],['metalSpan','Metal span','▤'],['intersection','Intersection','╋'],['tunnel','Tunnel end','◉'],['portal','Portal','◎'],['junction','Junction','⑂'],['sorter','Sorter','◇'],['converter','Converter','⬡'],['gate','Gate','⊣'],['checkpoint','Checkpoint','⚑'],['remover','Remover','✕'],['booster','Booster','»']];
+const ELEMENTS={fire:{name:'Fire',color:'#d55b4e'},water:{name:'Water',color:'#377fd1'},nature:{name:'Plant',icon:'🌿',symbol:'P',color:'#419d66'},electricity:{name:'Electricity',color:'#d5ac29'},arcane:{name:'Arcane',color:'#9368c5'},wind:{name:'Wind',color:'#7dc8bc'},earth:{name:'Earth',color:'#d8a37d',symbol:'R'},ice:{name:'Ice',color:'#b8eaff',symbol:'I'},metal:{name:'Metal',color:'#c3c9db',symbol:'M'},light:{name:'Light',color:'#fff197',symbol:'L'},shadow:{name:'Shadow',color:'#ba9bf6',symbol:'H'}};
+const TIDS=new Set(TERRAIN.map(x=>x[0])),CIDS=new Set(COMPONENTS.map(x=>x[0])),DIRECTIONS=['N','E','S','W'];
+const fresh=(w=12,h=12)=>({format:'element-forge-map',schemaVersion:2,name:'Untitled Map',description:'',width:w,height:h,cells:Array.from({length:w*h},()=>({terrain:'land'})),constraints:{},inventory:Object.fromEntries(COMPONENTS.map(([id])=>[id,['bridge','intersection'].includes(id)?1:0]))});
+const RULES=['forbidTerrain','forbidComponents','requireComponents'];
+const LINKS=['portal','tunnel'];
+const PLAYABLE=['bridge','metalSpan','intersection','portal','tunnel','gate','checkpoint'];
+const PLACEABLE=['bridge','metalSpan','intersection','portal','tunnel'];
+const record=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+function parseConstraints(value){
+ const result={};if(value===undefined)return result;
+ if(!value||typeof value!=='object'||Array.isArray(value))throw Error('Invalid constraints.');
+ for(const [element,rule] of Object.entries(value)){
+  if(!Object.hasOwn(ELEMENTS,element)||!rule||typeof rule!=='object'||Array.isArray(rule))throw Error('Invalid element constraints.');
+  result[element]={};
+  for(const key of Object.keys(rule))if(!RULES.includes(key))throw Error('Unknown constraint: '+key);
+  for(const key of RULES){
+   if(rule[key]===undefined)continue;
+   if(!Array.isArray(rule[key])||rule[key].length>20||rule[key].some(id=>typeof id!=='string'||!(key==='forbidTerrain'?TIDS:CIDS).has(id)))throw Error('Invalid '+key+' constraint.');
+   result[element][key]=[...new Set(rule[key])];
+  }
+ }return result;
+}
+function parseCell(cell,index,version){
+ const fail=message=>{throw Error(`Cell ${index+1}: ${message}`);};
+ if(!record(cell)||!TIDS.has(cell.terrain))fail('invalid terrain.');
+ const {terrain,component,node,props}=cell;
+ const next={terrain};
+ if(component!=null){
+  if(!CIDS.has(component))fail('unknown component.');
+  next.component=component;
+ }
+ if(node!=null){
+  if(!record(node)||!Object.hasOwn(ELEMENTS,node.element)||!['source','destination'].includes(node.role))fail('invalid node.');
+  if(component)fail('node and component overlap.');
+  next.node={element:node.element,role:node.role};
+ }
+ if(props!=null){
+  if(!record(props))fail('invalid properties.');
+  next.props={};
+  if(props.direction!==undefined){
+   if(!DIRECTIONS.includes(props.direction))fail('invalid direction.');
+   if(!['bridge','tunnel','portal','intersection'].includes(component))next.props.direction=props.direction;
+  }
+  if(props.pairId!==undefined){
+   if(typeof props.pairId!=='string'||!/^[a-zA-Z0-9_-]{1,12}$/.test(props.pairId))fail('invalid connection ID.');
+   next.props.pairId=props.pairId;
+  }
+  if(props.element!==undefined){
+   if(props.element!=='any'&&!Object.hasOwn(ELEMENTS,props.element))fail('invalid checkpoint element.');
+   next.props.element=props.element;
+  }
+ }
+ if(version===1&&LINKS.includes(component)&&!next.props?.pairId)next.props={...next.props,pairId:'A'};
+ return next;
+}
+
+function parseConstruction(source,inventory){
+ if(!record(source)||!Number.isSafeInteger(source.budget)||source.budget<0||
+    !record(source.prices))throw Error('Invalid construction budget.');
+ const prices={};
+ for(const [kind,price] of Object.entries(source.prices)){
+  if(!['bridge','metalSpan','intersection','tunnel','portal'].includes(kind)||!Number.isInteger(price)||price<1||price>999){
+   throw Error('Invalid construction tool price.');
+  }
+  prices[kind]=price;
+ }
+ for(const [kind,count] of Object.entries(inventory)){
+  if(count&&!Object.hasOwn(prices,kind))throw Error(`Missing construction price for ${kind}.`);
+ }
+ return {budget:source.budget,prices};
+}
+
+function parseMap(source){
+ if(!record(source)||source.format!=='element-forge-map'||![1,2].includes(source.schemaVersion)){
+  throw Error('Unsupported map format/schema version.');
+ }
+ const {width,height}=source;
+ if(![width,height].every(n=>Number.isInteger(n)&&n>=4&&n<=24)||
+    !Array.isArray(source.cells)||source.cells.length!==width*height)throw Error('Invalid dimensions or cell count.');
+ if(source.inventory!=null&&!record(source.inventory))throw Error('Invalid inventory.');
+ const result=fresh(width,height);
+ if([3,4].includes(source.rulesVersion))result.rulesVersion=source.rulesVersion;
+ result.name=String(source.name||'Untitled Map').slice(0,80);
+ result.description=String(source.description||'').slice(0,500);
+ result.cells=Array.from(source.cells,(cell,index)=>parseCell(cell,index,source.schemaVersion));
+ result.constraints=parseConstraints(source.constraints);
+ for(const kind of CIDS){
+  const count=source.inventory?.[kind]??0;
+  if(!Number.isInteger(count)||count<0||count>99)throw Error(`Invalid ${kind} inventory.`);
+  result.inventory[kind]=count;
+ }
+ if(source.construction!==undefined)result.construction=parseConstruction(source.construction,result.inventory);
+ return result;
+}
+
+function structuralErrors(map){
+ const issues=[];
+ const endpoints=new Map();
+ const links=new Map();
+ for(const [i,cell] of map.cells.entries()){
+  const {node,component,terrain,props}=cell;
+  const label=`Cell ${i+1}`;
+  if(node){
+   if(!endpoints.has(node.element))endpoints.set(node.element,{source:0,destination:0});
+   endpoints.get(node.element)[node.role]++;
+   if(terrain!=='land')issues.push(`${label}: endpoint must be on land.`);
+   if(component)issues.push(`${label}: component and node overlap.`);
+  }
+  if(component==='bridge'&&terrain==='void')issues.push(`${label}: bridge cannot be placed on void.`);
+  if(!LINKS.includes(component))continue;
+  if(!props?.pairId){issues.push(`${label}: ${component} needs a connection ID.`);continue;}
+  const key=`${component} ${props.pairId}`;
+  if(!links.has(key))links.set(key,[]);
+  links.get(key).push(i);
+ }
+ let matched=0;
+ for(const [element,{source,destination}] of endpoints){
+  if(source!==destination)issues.push(`${ELEMENTS[element].name}: ${source} source(s) vs ${destination} destination(s).`);
+  if(source>1||destination>1)issues.push(`${ELEMENTS[element].name}: only one source/destination pair is supported.`);
+  if(source===1&&destination===1)matched++;
+ }
+ if(!matched)issues.push('Add at least one source/destination pair.');
+ for(const [key,indices] of links){
+  if(indices.length!==2)issues.push(`${key}: expected 2 endpoints, found ${indices.length}.`);
+  else if(E.linkPartner(map,indices[0])<0)issues.push(`${key}: tunnel ends must align and cross blocked terrain.`);
+ }
+ return {issues,matched};
+}
+
+function assertPlayable(map){
+ const {issues,matched}=structuralErrors(map);
+ if(issues.length)throw Error(issues.join(' '));
+ if(matched>3)throw Error('Game levels currently support up to three element pairs.');
+ for(const [kind,count] of Object.entries(map.inventory)){
+  if(count&&!PLACEABLE.includes(kind))throw Error(`Unsupported player inventory: ${kind}.`);
+ }
+ for(const [i,{component,terrain}] of map.cells.entries()){
+  if(!component)continue;
+  if(!PLAYABLE.includes(component))throw Error(`Cell ${i+1}: unsupported game component ${component}.`);
+  const ground=['land','forest','ice','oneway','bank','exposed','covered'];
+  const allowed=E.spanKinds.includes(component)?['water','river','shallow',...ground]:ground;
+  if(!allowed.includes(terrain))throw Error(`Cell ${i+1}: ${component} cannot be used on ${terrain}.`);
+ }
+}
+
+function createLevel(source){
+ const map=parseMap(source);
+ assertPlayable(map);
+ const result=E.solveConstruction(map);
+ if(result.status!=='solved')throw Error(`Could not verify a solution (${result.status}): ${result.message||'unknown result'}`);
+ const errors=E.checkAll(map,result.routes,result.placements);
+ if(errors.length)throw Error(errors.join(' '));
+ return {format:'element-forge-level',schemaVersion:1,rulesVersion:map.rulesVersion??(map.construction?2:1),map};
+}
+
+function readLevel(source){
+ if(!record(source)||source.format!=='element-forge-level'||source.schemaVersion!==1||
+    ![1,2,3,4].includes(source.rulesVersion)||source.map?.schemaVersion!==2||
+    (source.rulesVersion<3&&(source.rulesVersion===2)!==(source.map.construction!==undefined)))throw Error('Unsupported game level or rules version.');
+ const map=parseMap({...source.map,rulesVersion:source.rulesVersion});
+ assertPlayable(map);
+ return map;
+}
+
+const api={TERRAIN,COMPONENTS,ELEMENTS,DIRECTIONS,fresh,parseConstraints,parseMap,structuralErrors,createLevel,readLevel};
+root.EFMap=api;
+if(typeof module!=='undefined')module.exports=api;
+})(typeof window==='undefined'?globalThis:window);
+</script>
+<script>
+'use strict';
+(function(root){
+ const F=typeof module==='undefined'?root.EFMap:require('../map-editor/map-format.js');
+
+ // Scenic sketches are row-major. Uppercase endpoints are sources.
+ function level(name,description,rows,inventory={},construction,constraints={}){
+  const map=F.fresh();
+  const terrain={'.':'land','#':'mountain','~':'water','*':'forest','o':'void','=':'river',':':'bank','!':'lava','_':'shallow','%':'scree','^':'heated','&':'abrasive','+':'exposed','-':'covered'};
+  const elements={f:'fire',w:'water',n:'nature',e:'electricity',v:'wind',r:'earth',i:'ice',m:'metal',l:'light',h:'shadow'};
+  const checkpoints={'1':'fire','2':'water','3':'nature'};
+  if(rows.length!==12||rows.some(row=>row.length!==12))throw Error('Expected a 12 × 12 level.');
+  map.name=name;
+  map.description=description;
+  map.inventory=inventory;
+  map.cells=rows.join('').split('').map(mark=>{
+   if(checkpoints[mark])return {terrain:'land',component:'checkpoint',props:{element:checkpoints[mark]}};
+   if(terrain[mark])return {terrain:terrain[mark]};
+   const element=elements[mark.toLowerCase()];
+   if(!element)throw Error('Unknown level symbol: '+mark);
+   return {terrain:'land',node:{element,role:mark===mark.toUpperCase()?'source':'destination'}};
+  });
+  map.constraints=constraints;
+  if(rows.some(row=>row.includes('*'))){
+   for(const element of ['fire','water','electricity','arcane','wind']){
+    const rule=constraints[element]??{};
+    constraints[element]={...rule,forbidTerrain:[...new Set([...(rule.forbidTerrain??[]),'forest'])]};
+   }
+  }
+  if(construction)map.construction=construction;
+  return {id:name.toLowerCase().replaceAll(' ','-'),format:'element-forge-level',schemaVersion:1,rulesVersion:construction?2:1,map};
+ }
+
+ const harmonyCatalog=[
+  level('Ember Meadow','Draw a route from the Fire spring to its matching forge. Tap the source (S), then tap adjacent tiles or drag toward its destination (D). Trees block Fire.',[
+   '************','***......***','**........**','*...F.#....*','*.....##...*','*.....##...*',
+   '*.....##...*','*......#f..*','**........**','***......***','************','************'
+  ]),
+  level('Brook Bridge','Tap an empty water tile to build a bridge to carry Water across the brook.',[
+   '#####~######','##...~...###','#....~....##','#....~.w..##','#..W.~....##','#....~....##',
+   '##...~...###','###..~..####','####.~.#####','#####~######','#####~######','#####~######'
+  ],{bridge:1}),
+  level('Stone Pass','Fire and Plant meet in a narrow pass. Place an intersection where the two routes cross, then pass straight through it.',[
+   '############','######N#####','######.#####','######.#####','######.#####','######.#####',
+   '#F........f#','######.#####','######.#####','######n#####','############','############'
+  ],{intersection:1}),
+  level('The River Crossing','You can afford one bridge. Study the river bend and both pairs of endpoints before choosing where to build.',[
+   '############','####....####','###......###','##...~....##','##F..~..f.##','###..~...###',
+   '#######.####','###..~...###','##.W.~....##','##...~.w..##','###..~...###','#####~######'
+  ],{bridge:2,intersection:1},{budget:2,prices:{bridge:2,intersection:1}}),
+  level('Firebreak Fen','Fire cannot enter water, even on a bridge. Route it around the head of the fen.',[
+   '############','###....#####','###.##..####','##..#~...###','#F...~..f..#','##..#~.#..##',
+   '###..~.#.###','####.~..####','#####~..####','#####~.#####','#####~######','############'
+  ],{bridge:1},undefined,{fire:{forbidTerrain:['water']}}),
+  level('Reedwater Ford','Plant avoids water. Water can cross with a bridge. Leave room for both routes on the east bank.',[
+   '############','####....####','###......###','##....~...##','##N...~..n##','####..~..###',
+   '#######..###','###...~..###','##w...~...##','##....~..W##','###...~..###','############'
+  ],{bridge:1},undefined,{nature:{forbidTerrain:['water']}}),
+  level('Briar Hollow','P is Plant. Plant can route through woods. Fire must stay in the clearing.',[
+   '############','##***N***###','#**....****#','#*.F......*#','#*.....f..*#','#***###...*#',
+   '#**********#','##*******n*#','##*********#','###******###','############','############'
+  ],{},undefined,{fire:{forbidTerrain:['forest']}}),
+  level('Granite Gate','Tap Tunnel, then tap two open tiles in the same row or column with blocked terrain between them. Either opening works in both directions.',[
+   '############','############','###..##...##','##...##...##','##F..##...##','##...##.f.##',
+   '###..##...##','############','############','############','############','############'
+  ],{tunnel:2}),
+  level('Under the Escarpment','One tunnel connects two openings and costs two points. Budget for the whole tunnel before building.',[
+   '############','###..#####.#','##...###.f.#','##...###...#','##...###...#','##...###...#',
+   '##F..###...#','##...###...#','###..###..##','############','############','############'
+  ],{tunnel:2,bridge:1},{budget:2,prices:{tunnel:1,bridge:1}}),
+  level('Twin Ravines','One route must cross a brook and another must go under a ridge. Buy enough equipment for both.',[
+   '############','##...~...###','##W..~...###','##...~..w###','##...~...###','############',
+   '###..###..##','##...###...#','##n..###...#','##...###.N.#','###..###..##','############'
+  ],{bridge:2,tunnel:2,intersection:1},{budget:4,prices:{bridge:2,tunnel:1,intersection:1}}),
+  level('Lantern Station','Fire must visit the marked checkpoint before reaching its forge. The direct route skips it.',[
+   '############','###......###','##.......###','##F....f..##','##..##....##','###..#...###',
+   '####..1.####','#####...####','############','############','############','############'
+  ]),
+  level('Two Waystations','Visit the checkpoint marked for each element. Fire and Water cannot use each other’s station.',[
+   '############','###.1....###','##.......###','##F....f..##','###......###','############',
+   '###.....2###','##........##','##w.#..W..##','###.......##','####.....###','############'
+  ]),
+  level('Signal at the Pass','Plant stops at its checkpoint. The two routes must still cross straight at the intersection.',[
+   '############','#####N######','#####.######','#####3######','#####.######','#####.######',
+   '#F........f#','#####.######','#####.######','#####n######','############','############'
+  ],{intersection:1}),
+  level('Coldwater Relay','Water must cross the brook and visit its station. Fire must find a dry route to its own station.',[
+   '############','##...~...###','##W..~...###','##...~.2w###','###..~..####','############',
+   '####....####','###.1....###','##...~.f..##','##F..~....##','###..~...###','#####~######'
+  ],{bridge:2,intersection:1},{budget:2,prices:{bridge:2,intersection:1}},{fire:{forbidTerrain:['water']}}),
+  level('The Threefold Divide','Plan two intersections, a bridge, and Plant’s checkpoint. Tap a different source to switch routes. You can build with routes unfinished.',[
+   '############','###.N###w.##','###.3###..##','####.###.###','####.###.###','####.###.###',
+   '#F........f#','####.###.###','####n###~###','####.###.###','#######.W.##','############'
+  ],{intersection:2,bridge:2,tunnel:2},{budget:4,prices:{intersection:1,bridge:2,tunnel:1}},
+  {fire:{forbidTerrain:['water']}})
+
+ ];
+
+ const hints=[
+  'Look for open ground around a ridge tip. Fire stays out of the woods.',
+  'A bridge makes one water tile usable. Check that both banks have reachable land.',
+  'An intersection lets two routes cross at right angles. Both must go straight through.',
+  'Check whether either element can go around the water before spending the only bridge.',
+  'Fire cannot enter a water tile, even with a bridge. Trace the edge of the fen.',
+  'Plant needs dry land. Leave some space between the bridge and each destination.',
+  'P stands for Plant. Only Plant can cross the trees in this campaign.',
+  'Both tunnel openings go on open tiles across a barrier. Either opening can be entered first.',
+  'The tunnel price shown buys both openings. Compare the tool costs with the available budget.',
+  'A bridge spans water and a tunnel connects open tiles across a barrier. Account for both jobs.',
+  'A connected route still has to visit its matching checkpoint before delivery.',
+  'Check the letter on each station to see which element must visit it.',
+  'Plan the checkpoint visit and approach each intersection in a straight line.',
+  'Check each element’s terrain rule and station before using the bridge budget.',
+  'Tap another source to start its route. Tap an unfinished tip to return to it, and place tools whenever needed.'
+ ];
+ for(const [index,entry] of harmonyCatalog.entries())entry.hint=hints[index];
+
+ const prototype=level('Wind over the Rift','Tap a highlighted landing tile to carry Wind straight over one hole. Wind cannot use tunnels.',[
+  '############','############','#####..#####','####..######','####...##..#','##V..o...v.#',
+  '####.oo##..#','####...#####','############','############','############','############'
+ ]);
+ prototype.hint='Land directly across one hole. Two holes in a row and diagonal jumps cannot be crossed.';
+ // Preserve IDs and the original layouts for regression and legacy imports.
+ const legacyCatalog=harmonyCatalog.map(entry=>JSON.parse(JSON.stringify(entry)));
+ function modern(entry){
+  entry.rulesVersion=3;
+  entry.map.rulesVersion=3;
+  return entry;
+ }
+ function replace(index,description,rows,inventory={},construction){
+  const old=harmonyCatalog[index];
+  harmonyCatalog[index]=level(old.map.name,description,rows,inventory,construction);
+ }
+ replace(1,'Water can travel in the river. Follow the bank markers to enter and leave.',[
+  '############','############','##...=...###','##...=.w.###','##W..=...###','##..:=...###',
+  '##...=:..###','##...=...###','############','############','############','############'
+ ]);
+ harmonyCatalog[1].hint='A marked bank touches the river on each shore.';
+ replace(3,'Water uses marked banks. Electricity needs one metal span across open water.',[
+  '############','##...~...###','##E..~.e.###','##...~...###','############','##...=...###',
+  '##W.:=...###','##...=:w.###','##...=...###','############','############','############'
+ ],{metalSpan:2},{budget:2,prices:{metalSpan:2}});
+ harmonyCatalog[3].hint='Water follows the river unaided. Put the metal span where Electricity can reach both shores.';
+ replace(4,'Fire can cross lava unaided. Deep water blocks even bridged Fire.',[
+  '############','############','##..~....###','##F.~..f.###','##..~....###','##..!....###',
+  '##..!....###','############','############','############','############','############'
+ ],{bridge:1});
+ const briar=harmonyCatalog[6];
+ briar.map.description+=' Plant cannot take the portal shortcut.';
+ for(const i of [2*12+5,5*12+9])briar.map.cells[i]={terrain:'land',component:'portal',props:{pairId:'A'}};
+ harmonyCatalog[4].hint='Try crossing the lava at the bottom of the inlet.';
+ const lessons=[
+  level('Wind over the Rift','Jump one hole in a straight line. Wind cannot use tunnels.',[
+   '############','############','####...#####','####...#####','####...#####','##V..o...v##',
+   '####.oo#####','############','############','############','############','############'
+  ],{tunnel:2}),
+  level('Shifting Ridge','Earth crosses scree. Lightweight bridges cannot carry it.',[
+   '############','############','##...~...###','##R..~..r###','##...~...###','##...%...###',
+   '##...%...###','############','############','############','############','############'
+  ],{bridge:1}),
+  level('The Winter Ford','Ice freezes shallow water as it travels. Heated ground blocks it.',[
+   '############','############','##...^...###','##I..^..i###','##..._...###','##..._...###',
+   '############','############','############','############','############','############'
+  ]),
+  level('Foundry Run','Metal crosses heated and abrasive ground. It cannot use lightweight bridges.',[
+   '############','############','##..^.&..###','##M.^.&.m###','##..^.&..###','##..~.&..###',
+   '############','############','############','############','############','############'
+  ],{bridge:1}),
+  level('Sun and Shade','Light uses exposed channels. Shadow uses covered channels.',[
+   '############','############','##...+...###','##L..+..l###','##...+...###','##...#...###',
+   '##...-...###','##h..-..H###','##...-...###','############','############','############'
+  ]),
+  level('The Living Basin','Route Earth through scree and Metal through the heated channel. Ice needs the shallow ford.',[
+   '############','##..%....###','##R.%..r.###','##..%....###','############','##..^....###',
+   '##M.^..m.###','##..^....###','############','##.._....###','##I._..i.###','############'
+  ])
+ ];
+ lessons[0].id='wind-campaign-lesson';
+ harmonyCatalog.push(...lessons);
+ harmonyCatalog.forEach(modern);
+ modern(prototype);
+ // A compact sketch is positioned inside the 12 × 12 board. Every active
+ // cell, including the alternative routes, is specified by the sketch.
+ function lesson(name,description,sketch,{tools={},budget,prices,components=[],requires=[]}={}){
+  const rows=Array(12).fill('############');
+  const y=Math.floor((12-sketch.length)/2),x=Math.floor((12-sketch[0].length)/2);
+  sketch.forEach((row,i)=>{
+   if(row.length!==sketch[0].length)throw Error('Uneven tutorial sketch: '+name);
+   rows[y+i]='#'.repeat(x)+row+'#'.repeat(12-x-row.length);
+  });
+  const entry=level(name,description,rows,tools,budget===undefined?undefined:{budget,prices});
+  entry.id='rules4-'+entry.id;
+  entry.rulesVersion=entry.map.rulesVersion=4;
+  for(const [col,row,component,props] of components){
+   Object.assign(entry.map.cells[(row+y)*12+col+x],{component,...(props&&{props})});
+  }
+  entry.requires=requires;
+  return entry;
+ }
+
+ const catalog=[
+  lesson('First Spark','Draw Fire from its spring to its forge. Tap the source, then tap adjacent tiles or drag.',[
+   'F...###','###.###','###...f'
+  ]),
+  lesson('Free Current','Take Water straight into the river from shore. Follow the river and leave on the other side. Lava blocks Water.',[
+   'W..!..w','...=...','###=###'
+  ],{requires:['river']}),
+  lesson('Lava Channel','Fire crosses lava. The shorter water route is blocked, even by a bridge.',[
+   'F.._..f','...~...','...!...'
+  ],{requires:['lava'],components:[[3,0,'bridge']]}),
+  lesson('Forest Shortcut','Plant travels through woods. The paired portals are closed to Plant.',[
+   'N.*.*.n','..#.#..','..###..'
+  ],{requires:['forest'],components:[[1,2,'portal',{pairId:'P'}],[5,2,'portal',{pairId:'P'}]]}),
+  lesson('Dry Circuit','Electricity stays dry. Go around the water and the bridge.',[
+   'E..~..e','...~...','.......'
+  ],{components:[[3,0,'bridge']]}),
+  lesson('Scree Shelf','Earth crosses scree. A lightweight bridge cannot carry it.',[
+   'R..~..r','...%...','###%###'
+  ],{requires:['scree'],components:[[3,0,'bridge']]}),
+  lesson('One Clear Jump','Wind jumps across one gap in a straight line. Two gaps are too wide and Wind cannot use tunnels.',[
+   'V..o..v','..oo...','...o...'
+  ],{requires:['jump'],components:[[2,2,'tunnel',{pairId:'T'}],[4,2,'tunnel',{pairId:'T'}]]}),
+  lesson('Shallow Freeze','Ice can freeze shallow water to cross. Heated ground blocks Ice.',[
+   'I..^..i','..._...','###_###'
+  ],{requires:['shallow']}),
+  lesson('Foundry Floor','Metal crosses heated and abrasive terrain. Scree and lightweight bridges won’t carry it.',[
+   'M.~.%.m','..^.&..','##^#&##'
+  ],{requires:['heated','abrasive'],components:[[2,0,'bridge']]}),
+  lesson('Open Sky','Light uses exposed channels. Covered passages block it.',[
+   'L..-..l','...+...','###.###'
+  ],{requires:['exposed']}),
+  lesson('Under Cover','Shadow uses covered channels. Exposed passages block it.',[
+   'H..+..h','...-...','###.###'
+  ],{requires:['covered']}),
+  lesson('Build a Bridge','Give Plant a light bridge across the pool. Tap an empty water tile to place it.',[
+   'N..~..n','...~...','###~###'
+  ],{tools:{bridge:1},requires:['bridge']}),
+  lesson('Cross at Right Angles','Use an intersection so two currents can cross. Both must go straight through.',[
+   '###E###','###.###','F.....f','###.###','###e###'
+  ],{tools:{intersection:1},requires:['intersection']}),
+  lesson('Choose Your Tunnel','Budget for a tunnel, then place both ends on open tiles across rock.',[
+   'F..#..f','...#...','...#...'
+  ],{tools:{tunnel:2,bridge:1},budget:2,prices:{tunnel:1,bridge:1},requires:['tunnel']}),
+  lesson('Portal Relay','Fire can use a paired portal. Visit the checkpoint before reaching the forge.',[
+   'F..#...','...#..f','...#.1.'
+  ],{components:[[2,0,'portal',{pairId:'A'}],[4,0,'portal',{pairId:'A'}]],requires:['portal','checkpoint']}),
+  lesson('Shared Causeway','Water can leave the river early, but Plant needs the upper clearing to reach the woods. Try another exit.',[
+   '##N#####','##*#####','##.#####','W=......','#=n####.','#=#####.','#======w'
+  ],{requires:['river','forest']}),
+  lesson('Two Currents, One Crossing','Find the dry line for Electricity while Water chooses where to join the river. Budget for one intersection.',[
+   '###E###','###.###','W...==w','###.###','###e###'
+  ],{tools:{intersection:2},budget:1,prices:{intersection:1},requires:['intersection','river']})
+ ];
+ const api={catalog,prototype,legacyCatalog,harmonyCatalog,level,modern,lesson};
+ root.EFLevels=api;
+ if(typeof module!=='undefined')module.exports=api;
+})(typeof window==='undefined'?globalThis:window);
+</script>
+<script>
+'use strict';
+(function(root){
+ const KEY='element-forge.campaign.v2';
+ const LEGACY='element-forge.campaign.v1';
+ function createProgress(storage,levelIds,campaignRules=3){
+  const key=campaignRules>=4?'element-forge.tutorial-campaign.v4':KEY;
+  const ids=new Set(levelIds);
+  function read(key){
+   try{return JSON.parse(storage?.getItem(key)??'null');}catch{return null;}
+  }
+  const current=read(key);
+  const saved=current?.version===2?current:key===KEY?read(LEGACY):{challenge:read(KEY)?.challenge};
+  const completed=new Set(Array.isArray(saved?.completed)?saved.completed.filter(id=>ids.has(id)):[]);
+  const best=Object.fromEntries(levelIds.filter(id=>Number.isSafeInteger(saved?.best?.[id])&&saved.best[id]>=0&&completed.has(id))
+   .map(id=>[id,saved.best[id]]));
+  let selected=ids.has(saved?.selected)?saved.selected:null;
+  let campaign=saved?.version===2?saved.campaign:null;
+  let challenge=saved?.challenge??null;
+  function save(){
+   try{storage?.setItem(key,JSON.stringify({version:2,selected,completed:[...completed],best,campaign,challenge}));}catch{}
+  }
+  return {
+   unlockedIndex:()=>{
+    const firstIncomplete=levelIds.findIndex(id=>!completed.has(id));
+    return firstIncomplete<0?levelIds.length-1:firstIncomplete;
+   },
+   selected:()=>selected,
+   completedCount:()=>completed.size,
+   hasCompleted:id=>completed.has(id),
+   best:id=>best[id]??null,
+   total:()=>Object.values(best).reduce((sum,score)=>sum+score,0),
+   select(id){if(ids.has(id)){selected=id;save();}},
+   complete(id,score,board){
+    if(!ids.has(id))return;
+    completed.add(id);
+    if(Number.isSafeInteger(score)&&score>=0)best[id]=Math.max(best[id]??0,score);
+    if(board)campaign=board;
+    save();
+   },
+   campaign:()=>campaign,
+   challenge:()=>challenge,
+   saveCampaign(board){campaign=board;save();},
+   saveChallenge(board){challenge=board;save();},
+   reset(){completed.clear();for(const id of Object.keys(best))delete best[id];selected=null;campaign=null;save();}
+  };
+ }
+ const api={createProgress};
+ root.EFProgress=api;
+ if(typeof module!=='undefined')module.exports=api;
+})(typeof window==='undefined'?globalThis:window);
+</script>
+<script>
+'use strict';
+(function(root){
+ const E=typeof module==='undefined'?root.EFEngine:require('../map-editor/engine.js');
+ const F=typeof module==='undefined'?root.EFMap:require('../map-editor/map-format.js');
+ const copy=value=>JSON.parse(JSON.stringify(value));
+ const ok=()=>({ok:true});
+ const fail=message=>({ok:false,message});
+
+ function score(map,routes,placements){
+  const tiles=new Set(routes.flatMap(route=>route.path)).size;
+  const available=map.width*map.height;
+  const spend=map.construction?E.constructionCost(map,E.placementCounts(placements)):null;
+  const unspent=spend===null?0:map.construction.budget-spend;
+  return {tiles,available,spend,unspent,points:Math.max(0,available-2*tiles+10*unspent)};
+ }
+
+ function createSession(level){
+  const map=F.readLevel(level);
+  const state={phase:'inspect',loadout:{},placements:{},routes:[],drafts:{},active:null};
+  let history=[];
+  const onboard=index=>Number.isInteger(index)&&index>=0&&index<map.cells.length;
+  const remember=()=>{history.push(copy({placements:state.placements,routes:state.routes,drafts:state.drafts,active:state.active?.element}));};
+  const activeMap=()=>({...map,inventory:state.loadout});
+
+  function start(selection){
+   if(state.phase!=='inspect')return fail('Return to planning before changing tools.');
+   const selected=map.construction?selection??{}:map.inventory;
+   if(typeof selected!=='object'||Array.isArray(selected))return fail('Choose valid tool counts.');
+   for(const [kind,count] of Object.entries(selected)){
+    if(!Object.hasOwn(map.inventory,kind)||!Number.isInteger(count)||count<0||count>map.inventory[kind]){
+     return fail('Tool count exceeds availability.');
+    }
+   }
+   if(map.construction&&E.constructionCost(map,selected)>map.construction.budget)return fail('Your loadout exceeds the budget.');
+   state.loadout={...selected};
+   state.phase='build';
+   return ok();
+  }
+
+  function restart(replan=false){
+   state.placements={};
+   state.routes=[];
+   state.active=null;
+   history=[];
+   state.drafts={};
+   if(replan)state.phase='inspect';
+   else if(state.phase!=='inspect')state.phase='build';
+  }
+
+  function undo(){
+   if(state.phase!=='build')return false;
+   if(state.active){
+    delete state.drafts[state.active.element];
+    state.active=null;
+    return true;
+   }
+   const previous=history.pop();
+   if(!previous)return false;
+   state.placements=previous.placements;
+   state.routes=previous.routes;
+   state.drafts=previous.drafts;
+   state.active=state.drafts[previous.active]??null;
+   return true;
+  }
+
+  function place(index,kind,pairId='A'){
+   if(state.phase!=='build')return fail('Start building first.');
+   if(!onboard(index)||!E.canPlace(map,state.placements,index,kind))return fail('This tool cannot be placed here.');
+   if((E.placementCounts(state.placements)[kind]||0)>=(state.loadout[kind]||0))return fail('No '+kind+' remaining.');
+   if(['portal','tunnel'].includes(kind)&&!/^[\w-]{1,12}$/.test(pairId))return fail('Use a link ID of 1–12 letters, digits, underscores, or hyphens.');
+   const linked=['portal','tunnel'].includes(kind);
+   const value=linked?{kind,pairId}:kind;
+   if(linked){
+    const matching=map.cells.map((_,i)=>i).filter(i=>E.effective(map,state.placements,i)===kind&&
+     E.pairIdAt(map,state.placements,i)===pairId);
+    if(matching.length>=2)return fail('This link ID already has two ends. Choose a new ID.');
+    if(kind==='tunnel'&&matching.length===1&&E.linkPartner(map,index,{...state.placements,[index]:value})<0){
+     return fail('Align the tunnel ends in one row or column with blocked terrain between them.');
+    }
+   }
+   remember();
+   state.placements[index]=value;
+   return ok();
+  }
+
+  function remove(index){
+   if(state.phase!=='build')return fail('Start building first.');
+   if(!onboard(index)||!Object.hasOwn(state.placements,index))return fail('Choose a tool you placed.');
+   remember();
+   const linked=E.linkPartner(map,index,state.placements);
+   const tiles=linked<0?[index]:[index,linked];
+   for(const i of tiles)delete state.placements[i];
+   const affected=route=>route.path.some(i=>tiles.includes(i));
+   state.routes=state.routes.filter(route=>!affected(route));
+   for(const [element,draft] of Object.entries(state.drafts)){
+    if(affected(draft))delete state.drafts[element];
+   }
+   if(state.active&&!state.drafts[state.active.element])state.active=null;
+   return ok();
+  }
+
+  function placeTunnel(first,second){
+   if(state.phase!=='build')return fail('Start building first.');
+   if(!onboard(first)||!onboard(second)||first===second||
+      !E.canPlace(map,state.placements,first,'tunnel')||!E.canPlace(map,state.placements,second,'tunnel')){
+    return fail('Choose two different open tiles for the tunnel openings.');
+   }
+   if((E.placementCounts(state.placements).tunnel||0)+2>(state.loadout.tunnel||0))return fail('No tunnel pair remaining.');
+   const used=new Set(map.cells.map((_,i)=>E.pairIdAt(map,state.placements,i)).filter(Boolean));
+   let number=1;
+   while(used.has('T'+number))number++;
+   const opening={kind:'tunnel',pairId:'T'+number};
+   const placements={...state.placements,[first]:opening,[second]:opening};
+   if(E.linkPartner(map,first,placements)!==second){
+    return fail('Align the openings in one row or column with blocked terrain between them.');
+   }
+   remember();
+   state.placements=placements;
+   return ok();
+  }
+
+  function route(index){
+   if(state.phase!=='build'||!onboard(index))return fail('Choose an available board tile.');
+   const cell=map.cells[index];
+   if(state.active?.path.at(-2)===index){state.active.path.pop();return ok();}
+   const existing=Object.values(state.drafts).find(draft=>draft.path.at(-1)===index);
+   if(existing){state.active=existing;return ok();}
+   if(cell.node?.role==='source'){
+    const element=cell.node.element;
+    state.active=state.drafts[element]??{element,path:[index]};
+    state.drafts[element]=state.active;
+    return ok();
+   }
+   if(!state.active)return fail('Start at an element source.');
+   const {element,path}=state.active;
+   const next=[...path,index];
+   const complete=cell.node?.role==='destination'&&cell.node.element===element;
+   const reserved=state.routes.filter(route=>route.element!==element);
+   const error=E.validatePath(map,element,next,reserved,state.placements,!complete);
+   if(error)return fail(error);
+   if(complete){
+    delete state.drafts[element];
+    state.active=null;
+    remember();
+    state.routes=state.routes.filter(route=>route.element!==element);
+    state.routes.push({element,path:next});
+   }else state.active.path=next;
+   return ok();
+  }
+
+  function evaluate(){
+   if(state.phase==='inspect'||Object.keys(state.drafts).length)return fail('Finish or undo your current route before testing.');
+   const errors=E.checkAll(activeMap(),state.routes,state.placements);
+   if(errors.length)return fail(errors.join('. '));
+   return {ok:true,track:E.score(map,state.routes,state.placements).track,...score(map,state.routes,state.placements)};
+  }
+
+  function verify(){
+   if(state.phase!=='build')return fail('Start building first.');
+   const result=evaluate();
+   if(result.ok)state.phase='complete';
+   return result;
+  }
+
+  function snapshot(){
+   return copy({version:1,phase:state.phase,loadout:state.loadout,placements:state.placements,
+    routes:state.routes,drafts:state.drafts,active:state.active?.element});
+  }
+
+  function restore(saved){
+   if(saved?.version!==1||!['inspect','build','complete'].includes(saved.phase))return false;
+   if(saved.phase==='inspect'){
+    restart(true);
+    state.loadout={};
+    if(!start(saved.loadout).ok)return false;
+    restart(true);
+    return true;
+   }
+   const previous=snapshot();
+   restart(true);
+   try{
+    if(!start(saved.loadout).ok)throw Error('Invalid loadout');
+    const counts=E.placementCounts(saved.placements);
+    if(Object.entries(counts).some(([kind,count])=>count>(state.loadout[kind]||0)))throw Error('Invalid inventory');
+    for(const [index,value] of Object.entries(saved.placements)){
+     const kind=E.placementKind(value),i=Number(index);
+     if(!E.canPlace(map,{},i,kind))throw Error('Invalid placement');
+     if(['tunnel','portal'].includes(kind)){
+      if(!/^[\w-]{1,12}$/.test(value.pairId||''))throw Error('Invalid link');
+      const partner=E.linkPartner(map,i,saved.placements);
+      const ends=Object.values(saved.placements).filter(other=>other.kind===kind&&other.pairId===value.pairId);
+      if(partner<0&&!(kind==='portal'&&ends.length===1))throw Error('Invalid paired tool');
+     }
+    }
+    const used=new Set();
+    for(const route of saved.routes){
+     if(used.has(route.element)||E.validatePath(map,route.element,route.path,saved.routes,saved.placements))
+      throw Error('Invalid route');
+     used.add(route.element);
+    }
+    for(const [element,draft] of Object.entries(saved.drafts)){
+     if(element!==draft.element||E.validatePath(map,element,draft.path,saved.routes,saved.placements,true))
+      throw Error('Invalid draft');
+    }
+    const restored=copy(saved);
+    Object.assign(state,{loadout:restored.loadout,placements:restored.placements,routes:restored.routes,
+     drafts:restored.drafts,active:restored.drafts[restored.active]||null});
+    if(saved.phase==='complete'&&!verify().ok)throw Error('Invalid clear');
+    return true;
+   }catch{
+    restart(true);
+    if(previous.phase!=='inspect')restore(previous);
+    return false;
+   }
+  }
+
+  return {map,state,start,restart,undo,place,placeTunnel,remove,route,evaluate,verify,snapshot,restore};
+ }
+
+ const api={createSession,score};
+ root.EFSession=api;
+ if(typeof module!=='undefined')module.exports=api;
+})(typeof window==='undefined'?globalThis:window);
+</script>
+<script>
+'use strict';
+(function(root){
+ const E=typeof module==='undefined'?root.EFEngine:require('../map-editor/engine');
+ const ground=['land','forest','ice'];
+ const componentKinds=['bridge','metalSpan','intersection','checkpoint'];
+ const edgeKey=(previous,cell,next)=>previous+':'+cell+':'+next;
+
+ // Each low-level search respects the current's bans and optional player prefix.
+ // The fast search finds a shortest walk. If a required waypoint caused a loop,
+ // retry with the visited set in the state so the result remains a simple path.
+ function shortest(model,pair,placements,bans,prefix){
+  const {map,adjacency,tick}=model;
+  const rules=map.constraints[pair.element]||{};
+  const checkpoints=map.cells.flatMap((cell,i)=>cell.component==='checkpoint'&&
+   ['any',pair.element].includes(cell.props?.element)?[i]:[]);
+  const required=[...new Set(rules.requireComponents||[])];
+  const full=(1<<(checkpoints.length+required.length))-1;
+  const passable=map.cells.map((cell,i)=>{
+   const kind=E.effective(map,placements,i);
+   return !bans.has(i)&&(!cell.node||cell.node.element===pair.element)&&
+    !E.terrainError(map,pair.element,i,kind)&&
+    !rules.forbidTerrain?.includes(cell.terrain)&&!rules.forbidComponents?.includes(kind)&&
+    (kind!=='checkpoint'||!cell.props?.element||['any',pair.element].includes(cell.props.element));
+  });
+  function flags(cell){
+   const checkpoint=checkpoints.indexOf(cell);
+   const component=required.indexOf(E.effective(map,placements,cell));
+   return (checkpoint<0?0:1<<checkpoint)|(component<0?0:1<<(checkpoints.length+component));
+  }
+  let mask=0;
+  const start=prefix||[pair.source];
+  if(start[0]!==pair.source||new Set(start).size!==start.length)return null;
+  for(let i=0;i<start.length;i++){
+   const cell=start[i];
+   if(!passable[cell]||(i>0&&(!adjacency[start[i-1]].includes(cell)||!E.allowedTransition(map,pair.element,start[i-1],cell,placements)))||
+     (i>1&&bans.has(edgeKey(start[i-2],start[i-1],cell)))||
+     (cell===pair.destination&&i!==start.length-1))return null;
+   mask|=flags(cell);
+  }
+  function search(simple){
+   const queue=[{path:start,mask}];
+   const seen=new Set();
+   for(let head=0;head<queue.length;head++){
+    tick();
+    const state=queue[head], cell=state.path.at(-1), previous=state.path.at(-2);
+    if(cell===pair.destination){
+     if(state.mask===full)return state.path;
+     continue;
+    }
+    for(const next of adjacency[cell]){
+     if(next===pair.source||!E.allowedTransition(map,pair.element,cell,next,placements)||!passable[next]||bans.has(edgeKey(previous,cell,next))||
+       (simple?state.path.includes(next):start.includes(next)))continue;
+     const nextMask=state.mask|flags(next);
+     const path=[...state.path,next];
+     const key=(bans.size?cell+':':'')+next+':'+nextMask+(simple?':'+[...path].sort((a,b)=>a-b).join(','):'');
+     if(seen.has(key))continue;
+     seen.add(key);
+     queue.push({path,mask:nextMask});
+    }
+   }
+   return null;
+  }
+  const walk=search(false);
+  return walk&&new Set(walk).size!==walk.length?search(true):walk;
+ }
+
+ function conflict(map,placements,paths){
+  const occupied=new Map();
+  const axis=(previous,cell,next)=>previous===undefined||next===undefined?null:
+   Math.abs(previous-next)===2&&Math.floor(previous/map.width)===Math.floor(next/map.width)?'row':
+   Math.abs(previous-next)===2*map.width?'column':null;
+  for(let pair=0;pair<paths.length;pair++){
+   const path=paths[pair];
+   for(let i=0;i<path.length;i++){
+    const cell=path[i], previous=path[i-1], next=path[i+1];
+    const crossing=E.effective(map,placements,cell)==='intersection';
+    const use={pair,ban:crossing?edgeKey(previous,cell,next):cell,axis:axis(previous,cell,next)};
+    for(const other of occupied.get(cell)||[]){
+     if(!crossing||!use.axis||!other.axis||use.axis===other.axis)return [other,use];
+    }
+    occupied.set(cell,[...(occupied.get(cell)||[]),use]);
+   }
+  }
+  return null;
+ }
+
+ function prepare(map){
+  const adjacency=map.cells.map((_,i)=>E.neighbors(i,map.width,map.height).map(([next])=>next));
+  const pairs=E.pairs(map);
+  const supported=pairs.length>0&&pairs.every(pair=>pair.source>=0&&pair.destination>=0)&&
+   map.cells.every(cell=>[...ground,'water','mountain','wall','river','bank','shallow','scree','heated','abrasive','exposed','covered','lava'].includes(cell.terrain)&&
+    (!cell.component||componentKinds.includes(cell.component)))&&
+   Object.keys(map.inventory).every(kind=>['bridge','metalSpan','intersection'].includes(kind)||!map.inventory[kind])&&
+   map.cells.filter(cell=>cell.component==='checkpoint').length<20&&
+   Object.values(map.constraints).every(rule=>(rule.requireComponents?.length||0)<10);
+  const requiredIntersection=Object.values(map.constraints).some(rule=>rule.requireComponents?.includes('intersection'));
+  const canCross=i=>map.rulesVersion>=3||adjacency[i].length===4&&adjacency[i].every(j=>
+   ground.includes(map.cells[j].terrain)||
+   (map.cells[j].terrain==='water'&&(map.cells[j].component==='bridge'||map.inventory.bridge)));
+  const sites=map.cells.flatMap((_,i)=>['bridge','metalSpan','intersection'].flatMap(kind=>
+   map.inventory[kind]&&E.canPlace(map,{},i,kind)&&
+   (kind!=='intersection'||requiredIntersection||canCross(i))?[{i,kind}]:[]));
+  return {map,adjacency,pairs,supported,sites};
+ }
+
+ function solve(model,{limit=20000,placements,required={},prefixes={},avoid={},solo,only}={}){
+  if(!model.supported)return {status:'unsupported',nodes:0};
+  const {map,sites}=model;
+  const pairs=model.pairs.filter(pair=>solo?pair.element===solo:only?only.includes(pair.element):true);
+  const stop=Symbol('search limit');
+  let nodes=0;
+  const tick=()=>{if(nodes>=limit)throw stop;nodes++;};
+  const work={...model,tick};
+  function valid(plan){
+   const counts=E.placementCounts(plan);
+   return Object.entries(plan).every(([i,kind])=>E.canPlace(map,{},Number(i),kind))&&
+    Object.entries(counts).every(([kind,count])=>count<=(map.inventory[kind]||0))&&
+    (!map.construction||E.constructionCost(map,counts)<=map.construction.budget);
+  }
+  function* plans(plan,first){
+   tick();
+   if(!valid(plan))return;
+   yield plan;
+   for(let index=first;index<sites.length;index++){
+    const {i,kind}=sites[index];
+    if(!Object.hasOwn(plan,i))yield* plans({...plan,[i]:kind},index+1);
+   }
+  }
+  function fixed(plan){
+   const bans=pairs.map(pair=>new Set(avoid[pair.element]||[]));
+   const paths=pairs.map((pair,i)=>shortest(work,pair,plan,bans[i],prefixes[pair.element]));
+   if(paths.some(path=>!path))return null;
+   const pending=[{bans,paths}];
+   const seen=new Set();
+   while(pending.length){
+    tick();
+    const state=pending.pop();
+    const clash=conflict(map,plan,state.paths);
+    if(!clash)return state.paths.map((path,i)=>({element:pairs[i].element,path}));
+    const nextStates=[];
+    for(const {pair,ban} of clash){
+     const updated=[...state.bans];
+     updated[pair]=new Set([...updated[pair],ban]);
+     const key=JSON.stringify(updated.map(set=>[...set].sort()));
+     if(seen.has(key))continue;
+     seen.add(key);
+     const path=shortest(work,pairs[pair],plan,updated[pair],prefixes[pairs[pair].element]);
+     if(!path)continue;
+     const paths=[...state.paths];
+     paths[pair]=path;
+     nextStates.push({bans:updated,paths});
+    }
+    nextStates.sort((a,b)=>b.paths.reduce((sum,path)=>sum+path.length,0)-a.paths.reduce((sum,path)=>sum+path.length,0));
+    pending.push(...nextStates);
+   }
+   return null;
+  }
+  try{
+   for(const plan of placements===undefined?plans(required,0):valid(placements)?[placements]:[]){
+    const routes=fixed(plan);
+    if(!routes)continue;
+    const errors=solo||only?routes.map(route=>E.validatePath(map,route.element,route.path,routes,plan)).filter(Boolean):
+     E.checkAll(map,routes,plan);
+    if(errors.length)return {status:'invalid',nodes,errors};
+    return {status:'solved',nodes,routes,placements:plan,score:E.score(map,routes,plan)};
+   }
+   return {status:'unsolved',nodes};
+  }catch(error){
+   if(error!==stop)throw error;
+   return {status:'inconclusive',nodes};
+  }
+ }
+
+ const api={prepare,solve};
+ root.EFRoutingSearch=api;
+ if(typeof module!=='undefined')module.exports=api;
+})(typeof window==='undefined'?globalThis:window);
+</script>
+<script>
+'use strict';
+(function(root){
+ const E=typeof module==='undefined'?root.EFEngine:require('../map-editor/engine.js');
+ const F=typeof module==='undefined'?root.EFMap:require('../map-editor/map-format.js');
+ const R=typeof module==='undefined'?root.EFRoutingSearch:require('./routing-search');
+ const S=typeof module==='undefined'?root.EFSession:require('./session.js');
+ function random(seed){
+  let state=2166136261;
+  for(const letter of String(seed))state=Math.imul(state^letter.charCodeAt(0),16777619);
+  return n=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return Math.floor(state/4294967296*n);};
+ }
+
+ function layoutKey(map){
+  const base=map.cells.map(cell=>[cell.terrain,cell.node?.element,cell.node?.role,cell.component,cell.props?.element].join(':'));
+  const forms=[];
+  for(const swap of [false,true])for(const rx of [false,true])for(const ry of [false,true]){
+   const w=swap?map.height:map.width,h=swap?map.width:map.height;
+   const cells=Array.from({length:w*h},(_,i)=>{
+    let x=i%w,y=Math.floor(i/w);
+    if(rx)x=w-1-x;
+    if(ry)y=h-1-y;
+    return base[(swap?x:y)*map.width+(swap?y:x)];
+   });
+   forms.push(w+'x'+h+':'+cells.join('|'));
+  }
+  return forms.sort()[0]+JSON.stringify(map.inventory)+JSON.stringify(map.construction)+JSON.stringify(map.constraints);
+ }
+
+ function replay(level,result){
+  const session=S.createSession(level);
+  const counts=E.placementCounts(result.placements);
+  if(!session.start(counts).ok)return false;
+  for(const [index,value] of Object.entries(result.placements)){
+   if(!session.place(Number(index),E.placementKind(value),value.pairId).ok)return false;
+  }
+  for(const route of result.routes)for(const index of route.path){
+   if(!session.route(index).ok)return false;
+  }
+  return session.verify().ok;
+ }
+
+ function readPack(value){
+  if(value?.format!=='element-forge-challenges'||value.version!==1||!Array.isArray(value.stages)||
+     value.stages.length<1||value.stages.length>20)throw Error('Invalid challenge pack.');
+  return value.stages.map(stage=>{
+   const map=F.readLevel(stage);
+   return {format:stage.format,schemaVersion:stage.schemaVersion,rulesVersion:stage.rulesVersion,map,
+    hint:typeof stage.hint==='string'?stage.hint.slice(0,200):''};
+  });
+ }
+ const revision='tutorial-v4';
+ const families=['budget','passage','checkpoint','combined'];
+ const difficulties=['Easy','Medium','Hard','Expert'];
+ const names={budget:'Scarce Crossing',passage:'Contested Pass',checkpoint:'Grove Crossing',combined:'Valley Relay'};
+ const hints={
+  budget:'Compare what each current can still reach after you spend the bridge.',
+  passage:'A route can reach its inlet and still take space another current needs.',
+  checkpoint:'Check what space Plant leaves for other currents on either side of its checkpoint.',
+  combined:'Compare approaches to the checkpoint before committing construction.'
+ };
+
+ function fromRows(rows,family){
+  const map=F.fresh(rows[0].length,rows.length);
+  const elements={w:'water',p:'nature',f:'fire',e:'electricity'};
+  map.cells=rows.join('').split('').map(char=>{
+   const element=elements[char.toLowerCase()];
+   if(element)return {terrain:'land',node:{element,role:char===char.toLowerCase()?'source':'destination'}};
+   if(char==='@')return {terrain:'forest',component:'checkpoint',props:{element:'nature'}};
+   if(char==='+')return {terrain:'land',component:'intersection'};
+   return {terrain:({'#':'mountain','~':'water','*':'forest'})[char]||'land'};
+  });
+  map.inventory={bridge:Number(family==='budget'||family==='combined'),intersection:Number(family==='passage'||family==='combined')};
+  map.construction={budget:1,prices:Object.fromEntries(Object.keys(map.inventory).filter(kind=>map.inventory[kind]).map(kind=>[kind,1]))};
+  return {format:'element-forge-level',schemaVersion:1,rulesVersion:2,map,hint:hints[family],family};
+ }
+
+ function recipe(family,pick,{intro=false,wide=false}={}){
+  const width=wide?8+pick(2):6+pick(2),height=wide?8+pick(2):6+pick(2);
+  const river=['budget','combined'].includes(family)?2+pick(width-4):-1;
+  const gap=pick(height);
+  const board=Array.from({length:height},(_,y)=>Array.from({length:width},(_,x)=>
+   x===river&&y!==gap?'~':pick(100)<14?'#':'.'));
+  if(river>=0)board[gap][river]='.';
+  const open=[];
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++)if(board[y][x]==='.')open.push([x,y]);
+  const use=(choices,char)=>{
+   const [x,y]=choices[pick(choices.length)];
+   board[y][x]=char;
+   open.splice(open.findIndex(([a,b])=>a===x&&b===y),1);
+   return [x,y];
+  };
+  const checkpoint=['checkpoint','combined'].includes(family);
+  if(checkpoint){
+   const interior=open.filter(([x,y])=>x>0&&y>0&&x<width-1&&y<height-1);
+   if(!interior.length)return null;
+   use(interior,'@');
+  }
+  const elements=intro?(checkpoint?'pw':'we'):(checkpoint?'pwe':'wep');
+  for(const element of elements){
+   if(open.length<2)return null;
+   const [x,y]=use(open,element);
+   const targets=open.filter(([a,b])=>Math.abs(x-a)+Math.abs(y-b)>=3);
+   if(!targets.length)return null;
+   use(targets,element.toUpperCase());
+  }
+  return fromRows(board.map(row=>row.join('')),family);
+ }
+
+ const defaultLimit=32000;
+ function verify(level,{limit=defaultLimit}={}){
+  const map=F.readLevel(level);
+  const model=R.prepare(map);
+  let work=0;
+  const solve=options=>{
+   const result=R.solve(model,{limit:Math.max(0,limit-work),...options});
+   work+=result.nodes;
+   return result;
+  };
+  const reject=(reason,details={})=>({accepted:false,reason,nodes:work,...details});
+  const dry=solve({placements:{}});
+  if(!['solved','unsolved'].includes(dry.status))return reject('Starting board '+dry.status,{clean:dry.status});
+  const clean=dry.status==='solved'?dry:solve({});
+  if(clean.status!=='solved')return reject('Construction search '+clean.status,{clean:clean.status});
+  if(!replay(level,clean))return reject('Game replay failed',{clean:'invalid'});
+  if(['budget','combined'].includes(level.family)&&dry.status==='solved')return reject('Tool-free bypass',{clean:'solved'});
+  const area=map.rulesVersion>=3?map.cells.filter(cell=>cell.terrain!=='mountain').length:map.cells.length;
+  const open=map.cells.filter(cell=>['land','forest'].includes(cell.terrain)).length;
+  const shared=model.adjacency.filter((neighbors,i)=>
+   ['land','forest'].includes(map.cells[i].terrain)&&
+   neighbors.filter(next=>['land','forest'].includes(map.cells[next].terrain)).length>=3).length;
+  if(open<area/2||shared<5)return reject('Visible corridors or independent lanes',{clean:'solved'});
+
+  const solo=[];
+  const plans=[{},...model.sites.filter(site=>E.spanKinds.includes(site.kind)).map(({i,kind})=>({[i]:kind}))];
+  for(const pair of model.pairs){
+   const candidates=[];
+   for(const placement of plans){
+    const path=solve({solo:pair.element,placements:placement});
+    if(path.status==='inconclusive')return reject('Solo comparison inconclusive',{clean:'solved'});
+    if(path.status==='solved')candidates.push(path);
+   }
+   candidates.sort((a,b)=>a.score.track-b.score.track||a.score.components-b.score.components);
+   solo.push(candidates);
+  }
+  const obvious=solo.map(paths=>paths[0]?.routes[0]).filter(Boolean);
+  const obviousPlacement=Object.assign({},...solo.map(paths=>paths[0]?.placements));
+  if(!E.checkAll(map,obvious,obviousPlacement).length)return reject('Independent shortest routes win',{clean:'solved'});
+
+  const alternatives=[];
+  const prefixes=[];
+  for(const candidates of solo){
+   if(!candidates.length)continue;
+   const best=candidates[0], {element,path}=best.routes[0];
+   const waypoint=path.findIndex(index=>map.cells[index].component==='checkpoint');
+   const handoff=waypoint>1?waypoint-1:Math.max(1,Math.floor((path.length-1)/2));
+   const avoid=[...new Set([path[handoff],path[1]])];
+   const detours=avoid.map(index=>solve({solo:element,placements:best.placements,avoid:{[element]:[index]}}));
+   if(detours.some(route=>route.status==='inconclusive'))return reject('Solo comparison inconclusive',{clean:'solved'});
+   const local=new Set();
+   for(const candidate of [best,...detours.filter(route=>route.status==='solved'),...candidates.slice(1)]){
+    const route=candidate.routes[0].path;
+    if(route.length>path.length+3||route.length<4)continue;
+    const checkpoint=route.findIndex(index=>map.cells[index].component==='checkpoint');
+    const prefix=route.slice(0,Math.max(3,Math.ceil(route.length*.65),checkpoint+1));
+    const used=Object.keys(candidate.placements).every(index=>route.includes(Number(index)));
+    const key=prefix.join(',');
+    if(!used||local.has(key))continue;
+    local.add(key);
+    prefixes.push({element,prefix,placement:candidate.placements,soloPath:route});
+    if(local.size===3)break;
+   }
+  }
+  for(const probe of prefixes){
+   const {element,prefix,placement}=probe;
+   const result=solve({prefixes:{[element]:prefix},required:placement});
+   if(result.status==='solved'&&!replay(level,result))return reject('Alternative replay failed',{clean:'solved'});
+   alternatives.push({...probe,status:result.status,witness:result.status==='solved'?result:undefined});
+  }
+  const failed=alternatives.filter(probe=>probe.status==='unsolved');
+  let inconclusive=alternatives.some(probe=>probe.status==='inconclusive');
+  for(const probe of failed){
+   let left=1,right=probe.prefix.length;
+   while(left<right){
+    const mid=Math.floor((left+right)/2);
+    const test=solve({prefixes:{[probe.element]:probe.prefix.slice(0,mid)},required:probe.placement});
+    if(test.status==='inconclusive'){inconclusive=true;break;}
+    if(test.status==='solved')left=mid+1;
+    else if(test.status==='unsolved')right=mid;
+    else return reject('Prefix verification failed',{clean:'solved'});
+   }
+   if(left===right)probe.firstBlockedAt=left;
+   probe.blocks=[];
+   for(const pair of model.pairs.filter(pair=>pair.element!==probe.element)){
+    const test=solve({only:[probe.element,pair.element],prefixes:{[probe.element]:probe.prefix},required:probe.placement});
+    if(test.status==='unsolved')probe.blocks.push(pair.element);
+    if(test.status==='inconclusive')inconclusive=true;
+   }
+  }
+  const placementChoices=[];
+  const usefulBridgeSites=[...new Set(solo.flatMap(paths=>paths.flatMap(path=>
+   Object.entries(path.placements).filter(([index,kind])=>E.spanKinds.includes(kind)&&path.routes[0].path.includes(Number(index))).map(([index,kind])=>index+':'+kind))))];
+  for(const site of usefulBridgeSites){
+   const [cell,kind]=site.split(':');
+   const index=Number(cell);
+   const placement={[index]:kind};
+   const result=solve({placements:placement});
+   if(result.status==='solved'&&!replay(level,result))return reject('Construction alternative replay failed',{clean:'solved'});
+   const soloStates=solo.map(paths=>({
+    element:paths[0]?.routes[0].element,
+    reachable:paths.some(path=>!Object.keys(path.placements).length||path.placements[index]),
+    usesBridge:paths.some(path=>path.placements[index]&&path.routes[0].path.includes(index))
+   }));
+   placementChoices.push({index,kind,usableBy:soloStates.filter(state=>state.usesBridge).map(state=>state.element),
+    stranded:soloStates.filter(state=>!state.reachable).map(state=>state.element),
+    status:result.status,witness:result.status==='solved'?result:undefined});
+  }
+
+  // Either commitment can extend to a win independently. Together they must
+  // leave each committed route individually viable but prevent a whole-board win.
+  let linked;
+  let linkUnknown=false;
+  const winners=alternatives.filter(item=>item.status==='solved');
+  if(model.pairs.length>=3)for(const first of winners){
+   if(linked)break;
+   const trials=[
+    ...placementChoices.filter(choice=>choice.status==='solved').map(choice=>({placement:{[choice.index]:'bridge'}})),
+    ...winners.filter(other=>other.element!==first.element).map(other=>({other}))
+   ];
+   for(const {placement,other} of trials){
+    const construction=other?.placement||placement;
+    if(Object.keys(first.placement).some(i=>!Object.hasOwn(construction,i)))continue;
+    if(other?.prefix.some(cell=>first.prefix.includes(cell)))continue;
+    if(!other&&Object.keys(first.placement).length)continue;
+    const options={required:construction,prefixes:{[first.element]:first.prefix}};
+    if(other)options.prefixes[other.element]=other.prefix;
+    const local=solve({...options,solo:first.element});
+    if(local.status==='inconclusive'){linkUnknown=true;break;}
+    if(local.status!=='solved')continue;
+    const joint=solve(options);
+    if(joint.status==='inconclusive'){linkUnknown=true;break;}
+    if(joint.status==='unsolved'){
+     if(other){
+      const secondLocal=solve({...options,solo:other.element});
+      if(secondLocal.status==='inconclusive'){linkUnknown=true;break;}
+      if(secondLocal.status!=='solved')continue;
+     }
+     linked={first:{element:first.element,prefix:first.prefix},
+      second:other?{element:other.element,prefix:other.prefix}:{placement:construction},status:joint.status};
+     break;
+    }
+   }
+   if(linkUnknown)break;
+  }
+
+  const placementConflict=placementChoices.some(choice=>choice.status==='unsolved');
+  const constructionUnknown=placementChoices.some(choice=>choice.status==='inconclusive');
+  if(level.family==='budget'&&(!placementConflict||!placementChoices.some(choice=>choice.status==='solved')))
+   return reject('No verified credible bridge tradeoff',{clean:'solved',alternatives,placementChoices});
+  if(level.family==='checkpoint'&&!failed.some(probe=>probe.element==='nature'))
+   return reject('No verified competing Plant approach',{clean:'solved',alternatives,placementChoices});
+  if(!failed.length&&!placementConflict)return reject('No verified consequential local choice',{clean:'solved',alternatives,placementChoices});
+  const complete=!inconclusive&&!constructionUnknown;
+  const linkStatus=linked?'verified':linkUnknown?'inconclusive':'no conflict among tested commitments';
+  const lateFailure=failed.some(probe=>probe.firstBlockedAt>=3)||
+   placementChoices.some(choice=>choice.status==='unsolved'&&!choice.stranded.length);
+  const multiPlanBridge=placementChoices.filter(choice=>choice.status==='solved').length>=2;
+  const twoCurrentComparison=failed.some(probe=>probe.firstBlockedAt>=3)||multiPlanBridge;
+  const tier=model.pairs.length===2?(twoCurrentComparison?'Medium':'Easy'):
+   complete&&linked&&!linkUnknown&&lateFailure?'Expert':complete&&lateFailure?'Hard':'Medium';
+  const strategy={
+   conflicts:[...new Set(failed.map(probe=>[probe.element,probe.blocks.join('+')||'joint',
+    probe.firstBlockedAt>=3?'after-approach':'near-source'].join(':')))].sort(),
+   family:level.family,
+   tools:Object.values(clean.placements).sort(),
+   blocked:[...new Set(failed.map(probe=>probe.element))].sort(),
+   bridges:[...new Set(placementChoices.map(choice=>choice.status+':'+choice.usableBy.slice().sort().join(',')+
+    '/'+choice.stranded.slice().sort().join(',')))].sort(),
+   linked:linked?[linked.first.element,linked.second.element||'bridge'].sort().join(':'):null
+  };
+  return {accepted:true,reason:'Verified whole-board routing consequence',clean:'solved',difficulty:tier,nodes:work,
+   alternatives,placementChoices,linked,linkStatus,complete,strategy,solution:clean};
+ }
+
+ function reference(family){
+  const spec=referenceBoards[family];
+  if(!spec)throw Error('Unknown reference family');
+  const stage=fromRows(spec.rows,family);
+  stage.map.name=names[family];
+  stage.map.description=spec.description;
+  return stage;
+ }
+
+ const referenceBoards={
+  budget:{
+   rows:['...~e..','.*.~#.#','...~...','..P~W..','...~.*.','.w.pE..','...~...'],
+   description:'One bridge is available. Deliver all three currents across the floodplain.'
+  },
+  passage:{
+   rows:['P.....','.#...#','..*#..','#....F','.f.W..','.#p..w','......'],
+   description:'Three currents share a clearing. You may build one intersection.'
+  },
+  checkpoint:{
+   rows:['#......','..####.','.......','PW...w.','.E.@...','.#..p.#','..e.*..'],
+   description:'Plant must visit its checkpoint while all three currents reach the Engine.'
+  },
+  combined:{
+   rows:['#.~p..','.#~...','##~E.W','..~.@.','......','eP~...','..~.w.'],
+   description:'Plant has a checkpoint. Your budget buys a bridge or an intersection.'
+  }
+ };
+
+ function variant(family,pick){
+  const spec=referenceBoards[family];
+  const board=spec.rows.map(row=>[...row]);
+  const sites=board.flatMap((row,y)=>row.map((tile,x)=>({x,y,tile})));
+  const symbols=sites.filter(({tile})=>/[wpef@]/i.test(tile));
+  const {x,y,tile}=symbols[pick(symbols.length)];
+  const options=sites.filter(site=>site.tile==='.'&&Math.abs(site.x-x)+Math.abs(site.y-y)<=2);
+  if(options.length){
+   const target=options[pick(options.length)];
+   board[target.y][target.x]=tile;
+   board[y][x]='.';
+  }
+  const edits=sites.filter(site=>site.tile==='#'||board[site.y][site.x]==='.');
+  const edit=edits[pick(edits.length)];
+  board[edit.y][edit.x]=edit.tile==='#'?'.':'#';
+  return fromRows(board.map(row=>row.join('')),family);
+ }
+
+ function expand(level,pick){
+  const map=level.map;
+  const x=pick(13-map.width),y=pick(13-map.height);
+  const cells=Array.from({length:144},()=>({terrain:'mountain'}));
+  for(const [i,cell] of map.cells.entries())cells[(y+Math.floor(i/map.width))*12+x+i%map.width]=cell;
+  if(map.inventory.bridge){
+   // A bridge budget is meaningful for bridge-capable currents.
+   for(const cell of cells){
+    if(cell.node?.element==='electricity')cell.node={...cell.node,element:'light'};
+    if(cell.node?.element==='fire')cell.node={...cell.node,element:'shadow'};
+   }
+  }
+  return {...level,rulesVersion:4,map:{...map,rulesVersion:4,width:12,height:12,cells}};
+ }
+
+ function scarceCrossing(){
+  const board=Array.from({length:12},()=>Array(12).fill('#'));
+  const put=(x,y,tile)=>{board[y][x]=tile;};
+  for(let y=2;y<=9;y++)put(4,y,'=');
+  for(const y of [3,5,8])for(let x=5;x<=11;x++)put(x,y,x===5?':':'.');
+  for(let y=3;y<=8;y++)put(11,y,'.');
+  put(8,5,'.');put(9,6,'.');put(9,7,'E');put(5,6,'e');
+  put(5,1,'p');put(5,2,'*');put(5,4,'P');
+  put(1,7,'w');put(2,7,'.');put(3,7,'.');put(11,7,'W');
+  const rows=board.map(row=>row.join(''));
+  const level=fromRows(rows,'budget');
+  for(const [i,tile] of rows.join('').split('').entries()){
+   if(tile==='='||tile===':')level.map.cells[i].terrain=tile==='='?'river':'bank';
+  }
+  level.rulesVersion=level.map.rulesVersion=4;
+  level.map.name='Scarce Crossing';
+  level.map.description='Choose where Water leaves the river while Plant reaches the woods and Electricity follows the dry corridor.';
+  level.map.inventory={};
+  delete level.map.construction;
+  level.hint='Trace the three landings from the river before committing.';
+  return level;
+ }
+
+ function verifyScarce(){
+  const level=scarceCrossing();
+  const model=R.prepare(F.readLevel(level));
+  const solve=options=>R.solve(model,{limit:64000,...options});
+  const solution=solve({});
+  if(solution.status!=='solved'||!replay(level,solution))throw Error('Scarce Crossing failed replay');
+  const alternatives=[3,5,8].map(exit=>{
+   const placements={};
+   const vertical=Array.from({length:Math.abs(exit-7)+1},(_,i)=>(7+i*Math.sign(exit-7))*12+4);
+   const prefix=[7*12+1,7*12+2,7*12+3,...vertical,exit*12+5];
+   const options={placements,prefixes:{water:prefix}};
+   return {exit,solo:solve({...options,solo:'water'}).status,status:solve(options).status,
+    plant:solve({...options,only:['water','nature']}).status,electricity:solve({...options,only:['water','electricity']}).status};
+  });
+  if(alternatives.some(entry=>entry.solo!=='solved')||alternatives[0].plant!=='unsolved'||alternatives[1].electricity!=='unsolved'||
+   alternatives[0].status!=='unsolved'||alternatives[1].status!=='unsolved'||alternatives[2].status!=='solved')
+   throw Error('Scarce Crossing alternatives changed: '+JSON.stringify(alternatives));
+  return {level,solution,alternatives};
+ }
+
+ function generate({seed='forge',family='mixed',difficulty='mixed',count=6,attempts=count*12,limit=defaultLimit,includeReferences=false,legacy=false}={}){
+  if(!Number.isInteger(count)||count<1||count>20||!Number.isInteger(attempts)||attempts<0||attempts>400||
+     !Number.isInteger(limit)||limit<0||!['mixed',...families].includes(family)||
+     !['mixed',...difficulties].includes(difficulty))throw Error('Invalid generator options.');
+  const activeRevision=legacy?'routing-v2':revision;
+  const pick=random(activeRevision+':'+seed);
+  const stages=[],evidence=[],rejections=[],layouts=new Set(),decisions=new Set();
+  let fallback=0;
+  function add(level,origin){
+   if(!level)return;
+   if(!legacy)level=expand(level,random(activeRevision+':'+seed+':'+origin+':'+(stages.length+rejections.length)));
+   const key=layoutKey(level.map);
+   if(layouts.has(key)){rejections.push({family:level.family,reason:'Repeated layout or decision'});return;}
+   const check=verify(level,{limit});
+   if(!check.accepted){rejections.push({family:level.family,reason:check.reason,nodes:check.nodes});return;}
+   const decision=JSON.stringify(legacy?check.strategy:{
+    ...check.strategy,
+    conflicts:[...new Set(check.strategy.conflicts.map(conflict=>conflict.replace(/:(after-approach|near-source)$/,'')))].sort()
+   });
+   if(decisions.has(decision)){rejections.push({family:level.family,reason:'Repeated layout or decision'});return;}
+   if(difficulty!=='mixed'&&difficulty!==check.difficulty){
+    rejections.push({family:level.family,reason:'Verified '+check.difficulty+' rather than requested '+difficulty});return;
+   }
+   layouts.add(key);decisions.add(decision);
+   Object.assign(level,{difficulty:check.difficulty,special:level.family==='combined'&&!!check.linked});
+   level.map.description||='Route each current to its matching inlet.';
+   stages.push(level);evidence.push({origin,decision,...check});
+   if(origin==='fallback')fallback++;
+  }
+  if(includeReferences)for(const f of families.filter(f=>referenceBoards[f]&&(family==='mixed'||family===f))){
+   if(stages.length<count)add(reference(f),'reference');
+  }
+  for(let i=0;i<attempts&&stages.length<count;i++){
+   const f=family==='mixed'?families[i%4]:family;
+   const intro=difficulty==='Easy'||(f==='budget'&&difficulty==='Medium'&&i%2===0)||(difficulty==='mixed'&&!stages.some(stage=>stage.difficulty==='Easy'));
+   add(!intro&&i%3!==0?variant(f,pick):recipe(f,pick,{intro,wide:!legacy&&i%6===3}),'generated');
+  }
+  for(const f of families.filter(f=>referenceBoards[f]&&(family==='mixed'||family===f))){
+   if(stages.length<count)add(reference(f),'fallback');
+  }
+  if(difficulty==='mixed'){
+   const order=stages.map((stage,i)=>i).sort((a,b)=>
+    difficulties.indexOf(stages[a].difficulty)-difficulties.indexOf(stages[b].difficulty));
+   const orderedStages=order.map(i=>stages[i]);
+   const orderedEvidence=order.map(i=>evidence[i]);
+   stages.splice(0,stages.length,...orderedStages);
+   evidence.splice(0,evidence.length,...orderedEvidence);
+  }
+  stages.forEach((stage,index)=>{
+   const suffix=evidence[index].origin==='generated'?' '+(index+1):'';
+   stage.map.name=stage.difficulty+' · '+names[stage.family]+suffix;
+  });
+  const shortfall=count-stages.length;
+  return {pack:{format:'element-forge-challenges',version:1,revision:activeRevision,seed:String(seed),stages},
+   report:{revision:activeRevision,seed:String(seed),family,difficulty,limit,attempts,includeReferences,requested:count,accepted:stages.length,shortfall,fallback,rejections,evidence}};
+ }
+
+ const api={families,difficulties,revision,reference,verify,replay,generate,readPack,layoutKey,recipe,random,fromRows,scarceCrossing,verifyScarce};
+ root.EFChallenges=api;
+ if(typeof module!=='undefined')module.exports=api;
+})(typeof window==='undefined'?globalThis:window);
+</script>
+<script>
+'use strict';
+window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"authored-playtest-v1","stages":[{"id":"rules4-cinder-ford","format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"map":{"format":"element-forge-map","schemaVersion":2,"name":"Cinder Ford","description":"Fire needs the lava ford. Water follows the river and detours around the lava.","width":12,"height":12,"cells":[{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"water","role":"source"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"river"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"river"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"fire","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"lava"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"fire","role":"destination"}},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"river"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"river"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"water","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"}],"constraints":{},"inventory":{"intersection":1},"rulesVersion":4},"difficulty":"Easy","hint":"Check each current’s legal approaches before committing tools."},{"id":"rules4-dry-junction","format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"map":{"format":"element-forge-map","schemaVersion":2,"name":"Dry Junction","description":"Keep Electricity on dry ground as Plant crosses from the grove.","width":12,"height":12,"cells":[{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"electricity","role":"source"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"nature","role":"source"}},{"terrain":"forest"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"nature","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"forest"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"electricity","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"}],"constraints":{"fire":{"forbidTerrain":["forest"]},"water":{"forbidTerrain":["forest"]},"electricity":{"forbidTerrain":["forest"]},"arcane":{"forbidTerrain":["forest"]},"wind":{"forbidTerrain":["forest"]}},"inventory":{"intersection":1},"rulesVersion":4},"difficulty":"Easy","hint":"Check each current’s legal approaches before committing tools."},{"id":"rules4-glasswater","format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"map":{"format":"element-forge-map","schemaVersion":2,"name":"Glasswater","description":"Ice can cross the shallows. Electricity needs the dry ridge.","width":12,"height":12,"cells":[{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"electricity","role":"source"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"ice","role":"source"}},{"terrain":"land"},{"terrain":"shallow"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"ice","role":"destination"}},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"heated"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"electricity","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"}],"constraints":{},"inventory":{"intersection":1},"rulesVersion":4},"difficulty":"Medium","hint":"Check each current’s legal approaches before committing tools."},{"id":"rules4-sheltered-pass","format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"map":{"format":"element-forge-map","schemaVersion":2,"name":"Sheltered Pass","description":"Light and Shadow have separate approaches to the shared landing.","width":12,"height":12,"cells":[{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"shadow","role":"source"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"covered"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"covered"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"light","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"light","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"covered"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"covered"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"shadow","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"}],"constraints":{},"inventory":{"intersection":1},"rulesVersion":4},"difficulty":"Medium","hint":"Check each current’s legal approaches before committing tools."},{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"map":{"format":"element-forge-map","schemaVersion":2,"name":"Scarce Crossing","description":"Choose where Water leaves the river while Plant reaches the woods and Electricity follows the dry corridor.","width":12,"height":12,"cells":[{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"nature","role":"source"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"river"},{"terrain":"forest"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"river"},{"terrain":"bank"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"river"},{"terrain":"land","node":{"element":"nature","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"river"},{"terrain":"bank"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"river"},{"terrain":"land","node":{"element":"electricity","role":"source"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"water","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"river"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"electricity","role":"destination"}},{"terrain":"mountain"},{"terrain":"land","node":{"element":"water","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"river"},{"terrain":"bank"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"river"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"}],"constraints":{},"inventory":{},"rulesVersion":4},"hint":"Trace the three landings from the river before committing.","family":"budget","difficulty":"Medium"},{"id":"rules4-scree-and-timber","format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"map":{"format":"element-forge-map","schemaVersion":2,"name":"Scree and Timber","description":"Give the crossing to the current that can reach it without the bridge.","width":12,"height":12,"cells":[{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"earth","role":"source"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"scree"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"nature","role":"source"}},{"terrain":"land"},{"terrain":"forest"},{"terrain":"land"},{"terrain":"land"},{"terrain":"water"},{"terrain":"land"},{"terrain":"forest"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"nature","role":"destination"}},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"scree"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"earth","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"}],"constraints":{"fire":{"forbidTerrain":["forest"]},"water":{"forbidTerrain":["forest"]},"electricity":{"forbidTerrain":["forest"]},"arcane":{"forbidTerrain":["forest"]},"wind":{"forbidTerrain":["forest"]}},"inventory":{"bridge":1,"intersection":1},"rulesVersion":4},"difficulty":"Hard","hint":"Check each current’s legal approaches before committing tools."},{"id":"rules4-kiln-junction","format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"map":{"format":"element-forge-map","schemaVersion":2,"name":"Kiln Junction","description":"Metal can use the heated passage. Fire needs the lava approach.","width":12,"height":12,"cells":[{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"metal","role":"source"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"heated"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"abrasive"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"fire","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"lava"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"lava"},{"terrain":"land"},{"terrain":"land","node":{"element":"fire","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"heated"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"abrasive"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"metal","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"}],"constraints":{},"inventory":{"intersection":1},"rulesVersion":4},"difficulty":"Hard","hint":"Check each current’s legal approaches before committing tools."},{"id":"rules4-grove-overlook","format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"map":{"format":"element-forge-map","schemaVersion":2,"name":"Grove Overlook","description":"Plan both crossings before spending the intersection budget.","width":12,"height":12,"cells":[{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"electricity","role":"source"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"earth","role":"source"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"scree"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"nature","role":"source"}},{"terrain":"land"},{"terrain":"forest"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"nature","role":"destination"}},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"scree"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"electricity","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"earth","role":"destination"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"}],"constraints":{"fire":{"forbidTerrain":["forest"]},"water":{"forbidTerrain":["forest"]},"electricity":{"forbidTerrain":["forest"]},"arcane":{"forbidTerrain":["forest"]},"wind":{"forbidTerrain":["forest"]}},"inventory":{"intersection":3},"construction":{"budget":2,"prices":{"intersection":1}},"rulesVersion":4},"difficulty":"Expert","hint":"Check each current’s legal approaches before committing tools."}]};
+</script>
+<script>
+'use strict';
+(()=>{
+ const E=window.EFEngine,F=window.EFMap;
+ const levels=[...window.EFLevels.catalog];
+ const campaignSize=levels.length;
+ levels.push(window.EFLevels.prototype);
+ let storage;
+ try{storage=window.localStorage;}catch{}
+ const progress=window.EFProgress.createProgress(storage,levels.slice(0,campaignSize).map(level=>level.id),levels[0].rulesVersion);
+ const challengeStart=campaignSize+2;
+ let challengeEnd=challengeStart,activePack=null,challengeBest={};
+ const $=id=>document.getElementById(id);
+ const board=$('board');
+ const colors={fire:'#ff9875',water:'#79d7ff',nature:'#bdec81',electricity:'#ffdd72',arcane:'#d9b5ff',wind:'#a8f0dd'};
+ const symbols={fire:'F',water:'W',nature:'P',electricity:'E',arcane:'A',wind:'V'};
+ for(const [id,element] of Object.entries(F.ELEMENTS)){
+  colors[id]??=element.color;
+  symbols[id]??=element.symbol;
+ }
+ const toolNames=Object.fromEntries(F.COMPONENTS.map(([id,name])=>[id,name]));
+ const componentSymbols=Object.fromEntries(F.COMPONENTS.map(([id,,icon])=>[id,icon]));
+ const terrainSymbols={forest:'♣',mountain:'▲',water:'≈',wall:'▦',void:'◌',ice:'✧',lava:'♨',land:''};
+ for(const [id,,glyph] of F.TERRAIN)terrainSymbols[id]??=glyph;
+ const terrainNames=Object.fromEntries(F.TERRAIN.map(([id,name])=>[id,name]));
+ const arrows={N:'↑',E:'→',S:'↓',W:'←'};
+ toolNames.tunnel='Tunnel';
+ let session,tiles,tool,tunnelStart=null,levelIndex,timer=null,drag=null,importTicket=0;
+ const message=value=>{$('status').textContent=value;};
+
+ function canOpen(index){
+  return index>=campaignSize||index<=progress.unlockedIndex();
+ }
+ function openLevel(index,saved=null){
+  if(!levels[index])return;
+  $('home').hidden=true;
+  $('play-view').hidden=false;
+  document.querySelector('.campaign-picker').hidden=false;
+  intro.hidden=index!==0||introSeen;
+  tool='route';
+  if(!canOpen(index)){ $('level').value=levelIndex;return; }
+  stopAnimation();
+  drag=null;
+  tunnelStart=null;
+  session=window.EFSession.createSession(levels[index]);
+  const {map}=session;
+  levelIndex=index;
+  const restored=session.restore(saved);
+  if(restored&&session.state.phase==='complete')drawResult(session.evaluate());
+  if(index<campaignSize){progress.select(levels[index].id);updateLevelLabels();}
+  $('level').value=index;
+  $('puzzle-options').open=false;
+  $('custom-level').open=false;
+  $('import-error').textContent='';
+  $('puzzle').textContent=map.name;
+  $('description').textContent=map.description;
+  $('puzzle-hint').open=false;
+  $('puzzle-hint').hidden=!levels[index].hint;
+  $('hint-text').textContent=levels[index].hint??'';
+  board.style.setProperty('--cols',map.width);
+  const firstSource=E.pairs(map)[0].source;
+  tiles=map.cells.map((cell,i)=>{
+   const tile=document.createElement('button');
+   tile.type='button';
+   tile.tabIndex=i===firstSource?0:-1;
+   tile.dataset.index=i;
+   tile.className='tile '+cell.terrain;
+   return tile;
+  });
+  board.replaceChildren(...tiles);
+  const legend=E.pairs(map).map(({element})=>{
+   const item=document.createElement('b');
+   item.style.setProperty('--element',colors[element]);
+   item.textContent=symbols[element]+' · '+F.ELEMENTS[element].name+(F.ELEMENTS[element].icon?' '+F.ELEMENTS[element].icon:'');
+   return item;
+  });
+  $('elements').replaceChildren(...legend,document.createTextNode('S = source · D = destination'));
+  $('link-id').value='A';
+  drawPlan();
+  update();
+  persist();
+  message(saved&&!restored?'This board changed. Your unlocked stages and scores were kept.':'');
+ }
+
+ function campaignSnapshot(){
+  return {id:levels[levelIndex].id,rules:levels[levelIndex].rulesVersion,board:session.snapshot()};
+ }
+
+ function persist(){
+  if(levelIndex<campaignSize)progress.saveCampaign(campaignSnapshot());
+  else if(levelIndex>=challengeStart&&activePack)progress.saveChallenge({
+   pack:activePack,index:levelIndex-challengeStart,best:challengeBest,board:session.snapshot()
+  });
+ }
+
+ function drawResult(result){
+  const {points,available,tiles,unspent}=result;
+  $('score').textContent=`${points} points`;
+  $('score-details').open=false;
+  $('score-base').textContent=`Board points ${available}`;
+  $('score-route').textContent=`Route tiles −${2*tiles}`;
+  $('score-bonus').hidden=!unspent;
+  $('score-bonus').textContent=`Unused construction +${10*unspent}`;
+  $('score-floor').hidden=available-2*tiles+10*unspent>=0;
+  const best=levelIndex<campaignSize?progress.best(levels[levelIndex].id):challengeBest[levelIndex-challengeStart];
+  $('totals').textContent=best==null?'':`Stage best ${best}`+(levelIndex<campaignSize?` · Campaign total ${progress.total()}`:'');
+ }
+
+ function ready(){
+  const result=session.evaluate();
+  $('projected').hidden=!result.ok;
+  $('check').classList.toggle('ready',result.ok);
+  $('projected').textContent=result.ok?`Projected score ${result.points} points`:'';
+ }
+
+ function toolEntries(){return Object.entries(session.map.inventory).filter(([,count])=>count>0);}
+
+ function drawPlan(){
+  const {map,state}=session;
+  const rows=toolEntries().map(([kind,count])=>{
+   const label=document.createElement('label');
+   label.className='loadout-row';
+   const unit=kind==='tunnel'?2:1;
+   const quantity=Math.floor(count/unit);
+   label.textContent=toolNames[kind]+(map.construction?' · '+map.construction.prices[kind]*unit+' pt each':'');
+   if(map.construction){
+    const field=document.createElement('input');
+    field.type='number';
+    field.name=kind;
+    field.min=0;
+    field.max=quantity;
+    field.required=true;
+    field.value=Math.floor((state.loadout[kind]??0)/unit);
+    field.addEventListener('input',()=>{
+     updateBudget();
+     if(!$('start').disabled&&field.validity.valid){
+      state.loadout=selection();
+      persist();
+     }
+    });
+    label.append(field);
+   }else label.append(document.createTextNode(' × '+quantity));
+   return label;
+  });
+  $('loadout').replaceChildren(...rows);
+  updateBudget();
+ }
+
+ function selection(){
+  return Object.fromEntries([...$('loadout').querySelectorAll('input')].map(field=>[field.name,Number(field.value)*(field.name==='tunnel'?2:1)]));
+ }
+
+ function updateBudget(){
+  const construction=session.map.construction;
+  if(!construction){
+   $('start').disabled=false;
+   $('budget').textContent=toolEntries().length?'This puzzle supplies a fixed set of tools.':'This puzzle uses track only.';
+   return;
+  }
+  const remaining=construction.budget-E.constructionCost(session.map,selection());
+  $('budget').textContent=remaining<0?`${-remaining} points over budget`:`${remaining} of ${construction.budget} points available`;
+  $('start').disabled=remaining<0;
+ }
+
+ function drawToolBar(){
+  const {state}=session;
+  const counts=E.placementCounts(state.placements);
+  const remaining=Object.fromEntries(toolEntries().map(([kind])=>[kind,(state.loadout[kind]||0)-(counts[kind]||0)]));
+  remaining.tunnel=Math.floor((remaining.tunnel||0)/2);
+  const choices=Object.entries(remaining).filter(([kind,count])=>kind!=='bridge'&&count>0)
+   .map(([kind,count])=>[kind,`${toolNames[kind]} (${count})`]);
+  if(tool==='remove'&&!Object.keys(state.placements).length||Object.hasOwn(remaining,tool)&&remaining[tool]<=0)tool='route';
+  const buttons=choices.map(([kind,label])=>{
+   const button=document.createElement('button');
+   button.type='button';
+   button.dataset.tool=kind;
+   button.setAttribute('aria-pressed',String(kind===tool));
+   button.textContent=label;
+   return button;
+  });
+  $('tools').replaceChildren(...buttons);
+  $('tools').hidden=!buttons.length;
+  $('bridge-count').hidden=!state.loadout.bridge;
+  $('bridge-count').textContent=`Bridges left: ${remaining.bridge??0}`;
+  $('bridge-hint').hidden=!remaining.bridge;
+  $('remove').hidden=!Object.keys(state.placements).length;
+  $('remove').setAttribute('aria-pressed',String(tool==='remove'));
+  $('replan').hidden=!session.map.construction;
+  $('link-field').hidden=tool!=='portal';
+  syncDragHandles();
+  ready();
+  $('instructions').textContent=tool==='remove'?'Choose a tool on the map to remove it.':
+   tool==='route'?'Tap a source or unfinished tip to draw. Swipe elsewhere on the board to scroll.':
+   tool==='tunnel'?(tunnelStart===null?'Choose the first open tile for your tunnel.':
+    'Choose the other opening in the same row or column, across blocked terrain. Tap the first opening again or tap outside the board to cancel.'):
+   'Choose a tile for your '+toolNames[tool].toLowerCase()+'.';
+ }
+
+ function update(){
+  const phase=session.state.phase;
+  $('phase').textContent={inspect:'Plan your route',build:'Build the network',complete:'Delivery complete'}[phase];
+  $('instructions').textContent={
+   inspect:'Inspect the board before choosing tools.',
+   build:'',
+   complete:'Every element reached its destination.'
+  }[phase];
+  $('plan').hidden=phase!=='inspect';
+  $('build').hidden=phase!=='build';
+  $('finish').hidden=phase!=='complete';
+  $('engine-restoration').hidden=phase!=='complete';
+  if(phase==='build')drawToolBar();
+  $('next').disabled=levelIndex<campaignSize?levelIndex===campaignSize-1:
+   levelIndex<challengeStart||levelIndex+1>=challengeEnd;
+  $('next').textContent=levelIndex===campaignSize-1?'Campaign summary':'Next Stage';
+  if(levelIndex===campaignSize-1)$('next').disabled=false;
+  drawBoard();
+ }
+
+ function syncDragHandles(){
+  const {state,map}=session;
+  const tips=new Set(Object.values(state.drafts).map(route=>route.path.at(-1)));
+  for(const [i,tile] of tiles.entries()){
+   tile.classList.toggle('route-handle',state.phase==='build'&&tool==='route'&&
+    (tips.has(i)||map.cells[i].node?.role==='source'));
+  }
+ }
+
+ function drawBoard(){
+  syncDragHandles();
+  const {map,state}=session;
+  const fragments=tiles.map(()=>document.createDocumentFragment());
+  for(const {element,path} of [...state.routes.filter(route=>!state.drafts[route.element]),...Object.values(state.drafts)]){
+   for(const [j,i] of path.entries()){
+    const line=document.createElement('span');
+    line.className='track';
+    line.style.setProperty('--line',colors[element]);
+    const dot=document.createElement('i');
+    dot.className='dot';
+    line.append(dot);
+    const adjacent=E.neighbors(i,map.width,map.height);
+    for(const next of [path[j-1],path[j+1]]){
+     const neighbor=adjacent.find(([index])=>index===next);
+     if(!neighbor)continue;
+     const arm=document.createElement('i');
+     arm.className={N:'north',S:'south',W:'west',E:'east'}[neighbor[1]];
+     line.append(arm);
+    }
+    fragments[i].append(line);
+   }
+  }
+  const landings=state.active?.element==='wind'?new Set(E.windLandings(map,state.active.path.at(-1),state.placements)):new Set();
+  for(const [i,cell] of map.cells.entries()){
+   const tile=tiles[i];
+   const mark=document.createElement('span');
+   const kind=E.effective(map,state.placements,i);
+   const link=E.pairIdAt(map,state.placements,i);
+   mark.className='mark';
+   if(cell.node){
+    mark.classList.add('endpoint',cell.node.role);
+    mark.style.setProperty('--element',colors[cell.node.element]);
+    mark.textContent=symbols[cell.node.element];
+    const role=document.createElement('small');
+    role.className='endpoint-role';
+    role.textContent=cell.node.role==='source'?'S':'D';
+    role.setAttribute('aria-hidden','true');
+    mark.append(role);
+   }else if(kind){
+    mark.classList.add('structure');
+    const element=kind==='checkpoint'?cell.props?.element:null;
+   mark.textContent=(componentSymbols[kind]||'')+(symbols[element]||link||arrows[cell.props?.direction]||'');
+   if(colors[element])mark.style.color=colors[element];
+   }else mark.textContent=cell.terrain==='oneway'?arrows[cell.props?.direction||'E']:terrainSymbols[cell.terrain]||'';
+   fragments[i].append(mark);
+   tile.classList.toggle('wind-landing',landings.has(i));
+   tile.classList.toggle('tunnel-preview',i===tunnelStart);
+   tile.replaceChildren(fragments[i]);
+   const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
+   const label=`Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, `+
+    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[cell.terrain]||cell.terrain));
+   tile.title=label;
+   tile.setAttribute('aria-label',label);
+  }
+ }
+
+ function explainMove(result,index){
+  const {map,state}=session;
+  const element=state.active?.element;
+  if(result.message==='Start at an element source.'&&map.cells[index].node?.role==='destination'){
+   return 'This is a destination (D). Start at the matching source (S).';
+  }
+  if(element==='wind'&&map.cells[index].terrain==='void')return 'Tap the landing across one hole. Wind cannot stop in the Void.';
+  if(result.message==='Element terrain restriction violated'){
+   return F.ELEMENTS[element].name+' cannot cross '+map.cells[index].terrain+' on this level.';
+  }
+  if(result.message==='Element component restriction violated'){
+   return F.ELEMENTS[element].name+' cannot use '+toolNames[E.effective(map,state.placements,index)].toLowerCase()+' on this level.';
+  }
+  if(/^Blocked terrain/.test(result.message)&&E.canPlace(map,state.placements,index,'bridge')&&state.loadout.bridge){
+   return 'This water tile needs a bridge. Click or tap it to build one.';
+  }
+  return result.message;
+ }
+
+ function cancelTool(){
+  tool='route';
+  tunnelStart=null;
+  drawToolBar();
+  drawBoard();
+  message('');
+ }
+
+ function act(index,direct=false){
+  if(session.state.phase!=='build')return;
+  const {map,state}=session;
+  const element=state.active?.element;
+  const bridgeTile=direct&&tool==='route'&&state.loadout.bridge>(E.placementCounts(state.placements).bridge||0)&&
+   E.canPlace(map,state.placements,index,'bridge')&&(!element||
+    Boolean(E.terrainError(map,element,index,null))&&!E.terrainError(map,element,index,'bridge'));
+  if(tool==='tunnel'&&tunnelStart===index){cancelTool();return true;}
+  if(tool==='tunnel'&&tunnelStart===null){
+   if(!E.canPlace(map,state.placements,index,'tunnel')){message('Choose an open tile for the tunnel opening.');return false;}
+   tunnelStart=index;
+   drawBoard();
+   drawToolBar();
+   message('');
+   return true;
+  }
+  const result=bridgeTile?session.place(index,'bridge'):tool==='tunnel'?session.placeTunnel(tunnelStart,index):
+   tool==='route'?session.route(index):tool==='remove'?session.remove(index):session.place(index,tool,$('link-id').value.trim());
+  if(!result.ok){message(explainMove(result,index));return false;}
+  message('');
+  tunnelStart=null;
+  drawBoard();
+  if(bridgeTile||tool!=='route'){tool='route';drawToolBar();}
+  else ready();
+  persist();
+  return true;
+ }
+
+ function stopAnimation(){
+  clearInterval(timer);
+  timer=null;
+  board.querySelectorAll('.orb').forEach(orb=>orb.remove());
+  $('replay').disabled=false;
+  $('skip-animation').hidden=true;
+  board.classList.remove('harmony-pulse');
+ }
+
+ function animate(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  let step=0;
+  const {routes}=session.state;
+  const count=Math.max(...routes.map(route=>route.path.length));
+  $('replay').disabled=true;
+  $('skip-animation').hidden=false;
+  const advance=()=>{
+   board.querySelectorAll('.orb').forEach(orb=>orb.remove());
+   if(step>=count){stopAnimation();board.classList.add('harmony-pulse');return;}
+   for(const {element,path} of routes){
+    const orb=document.createElement('span');
+    orb.className='orb';
+    orb.style.setProperty('--line',colors[element]);
+    tiles[path[Math.min(step,path.length-1)]].append(orb);
+   }
+   step++;
+  };
+  timer=setInterval(advance,Math.min(115,Math.ceil(2400/count)));
+  advance();
+ }
+
+ $('plan').addEventListener('submit',event=>{
+  event.preventDefault();
+  const result=session.start(selection());
+  if(!result.ok){message(result.message);return;}
+  if(!intro.hidden)dismissIntro();
+  tool='route';
+  update();
+  message('');
+  focusSource();
+  persist();
+ });
+ $('tools').addEventListener('click',event=>{
+  const kind=event.target.dataset.tool;
+  if(!kind)return;
+  tool=tool===kind?'route':kind;
+  tunnelStart=null;
+  drawBoard();
+  drawToolBar();
+  $('tools').querySelector(`[data-tool="${kind}"]`).focus();
+  message('');
+ });
+ $('remove').onclick=()=>{
+  tool='remove';
+  tunnelStart=null;
+  $('puzzle-options').open=false;
+  drawToolBar();
+  focusSource();
+  message('');
+ };
+ function reset(replan){
+  stopAnimation();
+  session.restart(replan);
+  tunnelStart=null;
+  $('puzzle-options').open=false;
+  tool='route';
+  drawPlan();
+  update();
+  message(replan?'Choose a new loadout.':'The board has been reset.');
+  if(replan)$('start').focus();else focusSource();
+  persist();
+ }
+ $('restart').onclick=()=>reset(false);
+ $('replan').onclick=()=>reset(true);
+ $('replay').onclick=()=>reset(true);
+ $('undo').onclick=()=>{if(tool!=='route'){cancelTool();return;}if(session.undo()){drawBoard();drawToolBar();message('Last change undone.');persist();}};
+ $('check').onclick=()=>{
+  const result=session.verify();
+  if(!result.ok){message(result.message);return;}
+  if(levelIndex<campaignSize){
+   progress.complete(levels[levelIndex].id,result.points,campaignSnapshot());
+   updateLevelLabels();
+  }else if(levelIndex>=challengeStart){
+   const index=levelIndex-challengeStart;
+   challengeBest={...challengeBest,[index]:Math.max(challengeBest[index]??0,result.points)};
+   persist();
+  }
+  drawResult(result);
+  update();
+  message('');
+  animate();
+ };
+ $('skip-animation').onclick=stopAnimation;
+ $('next').onclick=()=>{if(session.state.phase==='complete'){
+  if(levelIndex===campaignSize-1)showHome();
+  else openLevel(levelIndex+1);
+ }};
+ $('level').onchange=()=>{importTicket++;openLevel(Number($('level').value));};
+ $('import').onchange=async event=>{
+  const input=event.target,file=input.files[0],ticket=++importTicket;
+  input.value='';
+  if(!file)return;
+  $('import-error').textContent='';
+  try{
+   if(file.size>1024*1024)throw Error('Choose a level file smaller than 1 MiB.');
+   const level=JSON.parse((await file.text()).replace(/^\uFEFF/,''));
+   if(ticket!==importTicket)return;
+   const map=F.readLevel(level);
+   const index=campaignSize+1;
+   levels[index]=level;
+   $('level').querySelector('[data-import]')?.remove();
+   const option=new Option(map.name+' (imported)',index);
+   option.dataset.import='true';
+   $('level').add(option);
+   openLevel(index);
+  }catch(error){if(ticket===importTicket)$('import-error').textContent='Import failed. '+error.message;}
+ };
+ function loadPack(pack,saved){
+  const stages=window.EFChallenges.readPack(pack);
+  activePack=pack;
+  challengeBest=saved?.best||{};
+  $('level').querySelector('[data-challenge-pack]')?.remove();
+  const group=document.createElement('optgroup');
+  group.label='Challenge pack';
+  group.dataset.challengePack='';
+  levels.length=challengeStart;
+  levels.push(...stages);
+  challengeEnd=challengeStart+stages.length;
+  stages.forEach((stage,index)=>group.append(new Option(stage.map.name,challengeStart+index)));
+  $('level').append(group);
+  const index=Number.isInteger(saved?.index)&&saved.index>=0&&saved.index<stages.length?saved.index:0;
+  openLevel(challengeStart+index,saved?.board);
+ }
+
+ $('curated-pack').onclick=()=>{loadPack(window.EFCurated);$('challenge-library').open=false;};
+ $('pack-file').onchange=async event=>{
+  const file=event.target.files[0];
+  event.target.value='';
+  if(!file)return;
+  const ticket=++importTicket;
+  try{
+   if(file.size>1024*1024)throw Error('Choose a pack smaller than 1 MiB.');
+   const pack=JSON.parse((await file.text()).replace(/^\uFEFF/,''));
+   if(ticket!==importTicket)return;
+   loadPack(pack);
+   $('challenge-library').open=false;
+  }catch(error){if(ticket===importTicket)message('Pack import failed. '+error.message);}
+ };
+ board.addEventListener('click',event=>{
+  const tile=event.target.closest('.tile');
+  if(tile)act(Number(tile.dataset.index),true);
+ });
+ board.addEventListener('pointerdown',event=>{
+  const tile=event.target.closest('.tile');
+  if(!tile||!event.isPrimary||event.button!==0||session.state.phase!=='build')return;
+  const index=Number(tile.dataset.index);
+  const routeStart=Object.values(session.state.drafts).some(route=>route.path.at(-1)===index)||
+   session.map.cells[index].node?.role==='source';
+  if(tool==='route'&&routeStart&&!drag){
+   drag={pointer:event.pointerId,index};
+   board.setPointerCapture(event.pointerId);
+   act(index,true);
+  }
+ });
+ board.addEventListener('pointermove',event=>{
+  if(drag?.pointer!==event.pointerId||!session.state.active)return;
+  const tile=document.elementFromPoint(event.clientX,event.clientY)?.closest('.tile');
+  if(!tile||!board.contains(tile))return;
+  const index=Number(tile.dataset.index);
+  if(index===drag.index)return;
+  drag.index=index;
+  const tip=session.state.active.path.at(-1);
+  const map=session.map;
+  const stride=Math.floor(tip/map.width)===Math.floor(index/map.width)?1:tip%map.width===index%map.width?map.width:0;
+  if(stride&&index!==tip&&E.linkPartner(map,tip,session.state.placements)!==index&&
+     !(session.state.active.element==='wind'&&E.windLandings(map,tip,session.state.placements).includes(index))){
+   const delta=Math.sign(index-tip)*stride;
+   for(let next=tip+delta;session.state.active;next+=delta){
+    if(!act(next)||next===index)break;
+   }
+  }else act(index);
+ });
+ board.addEventListener('contextmenu',event=>{
+  const tile=event.target.closest('.tile');
+  if(!tile||session.state.phase!=='build')return;
+  const index=Number(tile.dataset.index);
+  if(!Object.hasOwn(session.state.placements,index))return;
+  event.preventDefault();
+  const result=session.remove(index);
+  if(!result.ok){message(result.message);return;}
+  tool='route';
+  tunnelStart=null;
+  drawBoard();
+  drawToolBar();
+  message('Tool removed. Any track using it was cleared.');
+  persist();
+ });
+ document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&session?.state.phase==='build'&&tool!=='route'){event.preventDefault();cancelTool();}
+ });
+ document.addEventListener('pointerdown',event=>{
+  if(session?.state.phase==='build'&&tool==='tunnel'&&!board.contains(event.target)&&
+     !$('tools').contains(event.target))cancelTool();
+ });
+ board.addEventListener('keydown',event=>{
+  const tile=event.target.closest('.tile');
+  if(!tile||!event.key.startsWith('Arrow'))return;
+  const direction={ArrowUp:'N',ArrowRight:'E',ArrowDown:'S',ArrowLeft:'W'}[event.key];
+  const index=Number(tile.dataset.index);
+  const next=E.neighbors(index,session.map.width,session.map.height).find(([,dir])=>dir===direction);
+  if(next){event.preventDefault();focusTile(next[0]);}
+ });
+ for(const type of ['pointerup','pointercancel','lostpointercapture']){
+  board.addEventListener(type,event=>{if(drag?.pointer===event.pointerId)drag=null;});
+ }
+
+ function focusTile(index){
+  const previous=board.querySelector('[tabindex="0"]');
+  if(previous)previous.tabIndex=-1;
+  tiles[index].tabIndex=0;
+  tiles[index].focus();
+ }
+ function focusSource(){focusTile(E.pairs(session.map)[0].source);}
+ board.addEventListener('focusin',event=>{
+  const tile=event.target.closest('.tile');
+  const previous=board.querySelector('[tabindex="0"]');
+  if(previous&&previous!==tile)previous.tabIndex=-1;
+  if(tile)tile.tabIndex=0;
+ });
+
+ function updateLevelLabels(){
+  for(let i=0;i<campaignSize;i++){
+   const {id,map}=levels[i];
+   $('level').options[i].disabled=!canOpen(i);
+   $('level').options[i].textContent=`${i+1}. ${map.name}${progress.hasCompleted(id)?' ✓':canOpen(i)?'':' · Locked'}`;
+  }
+  $('campaign-progress').textContent=`${progress.completedCount()} / ${campaignSize} complete`;
+ }
+ const introKey='element-forge.world-engine-intro.v1';
+ const intro=$('world-intro');
+ let introSeen=false;
+ try{introSeen=storage?.getItem(introKey)==='seen';}catch{}
+ function dismissIntro(){
+  intro.hidden=true;
+  introSeen=true;
+  try{storage?.setItem(introKey,'seen');}catch{}
+ }
+ function continueCampaign(){
+  const saved=progress.campaign();
+  const index=levels.findIndex(level=>level?.id===saved?.id);
+  if(index>=0&&index<campaignSize&&canOpen(index)&&saved.board?.phase!=='complete'){
+   openLevel(index,saved.rules===levels[index].rulesVersion?saved.board:{});
+  }else openLevel(progress.unlockedIndex());
+ }
+ function showHome(){
+  stopAnimation();
+  $('home').hidden=false;
+  $('play-view').hidden=true;
+  document.querySelector('.campaign-picker').hidden=true;
+  intro.hidden=true;
+  const saved=progress.campaign();
+  const started=saved||progress.selected()||progress.completedCount()>0;
+  const target=saved?.board?.phase!=='complete'?levels.findIndex(level=>level?.id===saved?.id):-1;
+  const done=progress.completedCount()===campaignSize;
+  $('continue').textContent=done&&target<0?'Campaign complete · Replay final stage':started?
+   `Continue · Stage ${(target>=0&&target<campaignSize&&canOpen(target)?target:progress.unlockedIndex())+1}`:'Start Campaign';
+  $('home-total').textContent=started?`Campaign total ${progress.total()} · ${progress.completedCount()} of ${campaignSize} stages cleared`:'';
+  $('stage-select').hidden=!started;
+  $('new-campaign').hidden=!started;
+  $('resume-challenge').hidden=!progress.challenge()?.pack;
+  $('continue').focus();
+ }
+ $('intro-begin').onclick=dismissIntro;
+ $('intro-skip').onclick=dismissIntro;
+ $('home-button').onclick=showHome;
+ $('continue').onclick=continueCampaign;
+ $('stage-select').onclick=()=>{
+  continueCampaign();
+  $('level').focus();
+  if(typeof $('level').showPicker==='function')try{$('level').showPicker();}catch{}
+ };
+ $('new-campaign').onclick=()=>{
+  if(!confirm('Start a new campaign and reset campaign progress and scores?'))return;
+  progress.reset();updateLevelLabels();openLevel(0);
+ };
+ $('choose-challenge').onclick=()=>{$('challenge-menu').hidden=!$('challenge-menu').hidden;};
+ $('home-curated').onclick=()=>loadPack(window.EFCurated);
+ $('resume-challenge').onclick=()=>{
+  const saved=progress.challenge();
+  try{loadPack(saved.pack,saved);}catch{progress.saveChallenge(null);$('resume-challenge').hidden=true;
+   $('challenge-status').textContent='This saved challenge could not be opened.';}
+ };
+ $('generate-challenge').onclick=()=>{
+  const button=$('generate-challenge'),status=$('challenge-status');
+  const difficulty=$('challenge-tier').value;
+  button.disabled=true;
+  status.textContent='Verifying a puzzle…';
+  setTimeout(()=>{
+   try{
+    const {pack}=window.EFChallenges.generate({difficulty,count:1,attempts:48,seed:String(Date.now())});
+    if(pack.stages.length)loadPack(pack);
+    else{
+     const reference=window.EFCurated.stages.find(stage=>stage.difficulty===difficulty);
+     if(reference)loadPack({...window.EFCurated,stages:[reference]});
+     else status.textContent='No verified puzzle found at this difficulty. Try again or open the curated pack.';
+    }
+   }catch(error){status.textContent=error.message;}
+   finally{button.disabled=false;}
+  },0);
+ };
+ for(const [index,level] of levels.entries())$('level').add(new Option(level.map.name+(index===campaignSize?' · Optional':''),index));
+ updateLevelLabels();
+ showHome();
+})();
+</script>
+</body>
+</html>

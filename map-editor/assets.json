@@ -1,7 +1,0 @@
-{
-  "format": "element-forge-assets",
-  "version": 1,
-  "note": "Optional image paths. Empty strings use built-in vector-style glyphs. Relative paths resolve from the editor directory.",
-  "terrain": {"land":"","mountain":"","water":"","wall":"","forest":"","lava":"","ice":"","void":"","oneway":""},
-  "components": {"bridge":"","intersection":"","tunnel":"","portal":"","junction":"","sorter":"","converter":"","gate":"","checkpoint":"","remover":"","booster":""}
-}
