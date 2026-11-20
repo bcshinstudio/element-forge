@@ -23,7 +23,7 @@ test('Terrain and tool restrictions agree with the level parser and route valida
   ['electricity','forest',null,/Only Plant/],['nature','land','portal',/Plant cannot use/],
   ['electricity','water',null,/metal span/],['electricity','water','bridge',/metal span/],
   ['electricity','water','metalSpan',null],['earth','scree',null,null],
-  ['earth','water','bridge',/lightweight/],['metal','water','bridge',/lightweight/],
+  ['earth','water','bridge',/ordinary bridge/],['metal','water','bridge',/ordinary bridge/],
   ['ice','shallow',null,null],['ice','heated',null,/heated/],['metal','heated',null,null],
   ['metal','abrasive',null,null],['metal','scree',null,/Earth/],
   ['light','exposed',null,null],['shadow','covered',null,null],

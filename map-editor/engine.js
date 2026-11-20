@@ -50,7 +50,7 @@ function terrainError(m,element,index,component){
  if(!(m.rulesVersion>=3))return ordinaryGround.includes(terrain)||(terrain==='water'&&component==='bridge')?null:blocked;
  if(terrain==='forest'&&element!=='nature')return 'Only Plant can move through woods.';
  if(element==='nature'&&component==='portal')return 'Plant cannot use portals.';
- if(['earth','metal'].includes(element)&&component==='bridge')return 'This current cannot use lightweight bridges.';
+ if(['earth','metal'].includes(element)&&component==='bridge')return 'This current cannot use ordinary bridges.';
  if(element==='ice'&&terrain==='heated')return 'Ice cannot enter heated ground.';
  if(terrain==='exposed'&&element==='shadow')return 'Shadow needs covered channels.';
  if(terrain==='covered'&&element==='light')return 'Light needs exposed channels.';

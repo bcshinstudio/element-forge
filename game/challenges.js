@@ -39,6 +39,15 @@
   return session.verify().ok;
  }
 
+ // Repair the mislabeled river channels in older generated Rules 4 packs.
+ // Authored and custom maps can still contain open water.
+ function repairGeneratedRivers(pack){
+  if(pack?.revision!=='tutorial-v4'||!Array.isArray(pack.stages))return pack;
+  return {...pack,revision:'tutorial-v4-river-fix',stages:pack.stages.map(stage=>{
+   if(stage?.rulesVersion!==4||!['budget','combined'].includes(stage.family)||!Array.isArray(stage.map?.cells))return stage;
+   return {...stage,map:{...stage.map,cells:stage.map.cells.map(cell=>cell?.terrain==='water'?{...cell,terrain:'river'}:cell)}};
+  })};
+ }
  function readPack(value){
   if(value?.format!=='element-forge-challenges'||value.version!==1||!Array.isArray(value.stages)||
      value.stages.length<1||value.stages.length>20)throw Error('Invalid challenge pack.');
@@ -48,7 +57,7 @@
     hint:typeof stage.hint==='string'?stage.hint.slice(0,200):''};
   });
  }
- const revision='tutorial-v4';
+ const revision='mobile-v4';
  const families=['budget','passage','checkpoint','combined'];
  const difficulties=['Easy','Medium','Hard','Expert'];
  const names={budget:'Scarce Crossing',passage:'Contested Pass',checkpoint:'Grove Crossing',combined:'Valley Relay'};
@@ -333,6 +342,7 @@
   const cells=Array.from({length:144},()=>({terrain:'mountain'}));
   for(const [i,cell] of map.cells.entries())cells[(y+Math.floor(i/map.width))*12+x+i%map.width]=cell;
   if(map.inventory.bridge){
+   for(const cell of cells)if(cell.terrain==='water')cell.terrain='river';
    // A bridge budget is meaningful for bridge-capable currents.
    for(const cell of cells){
     if(cell.node?.element==='electricity')cell.node={...cell.node,element:'light'};
@@ -442,7 +452,7 @@
    report:{revision:activeRevision,seed:String(seed),family,difficulty,limit,attempts,includeReferences,requested:count,accepted:stages.length,shortfall,fallback,rejections,evidence}};
  }
 
- const api={families,difficulties,revision,reference,verify,replay,generate,readPack,layoutKey,recipe,random,fromRows,scarceCrossing,verifyScarce};
+ const api={families,difficulties,revision,reference,verify,replay,generate,readPack,repairGeneratedRivers,layoutKey,recipe,random,fromRows,scarceCrossing,verifyScarce};
  root.EFChallenges=api;
  if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

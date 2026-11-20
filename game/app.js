@@ -25,6 +25,33 @@
  const arrows={N:'↑',E:'→',S:'↓',W:'←'};
  toolNames.tunnel='Tunnel';
  let session,tiles,tool,tunnelStart=null,levelIndex,timer=null,drag=null,importTicket=0;
+ const phone=matchMedia('(max-width: 600px)');
+ const menu=$('game-menu');
+ const menuItems=[document.querySelector('.campaign-picker'),$('description'),$('elements'),$('instructions'),
+  $('puzzle-hint'),$('puzzle-options'),$('challenge-library'),$('custom-level'),$('world-intro')];
+ const menuHomes=menuItems.map(item=>{
+  const marker=document.createComment('desktop location');
+  item.before(marker);
+  return marker;
+ });
+ function adjustPhone(){
+  for(const [i,item] of menuItems.entries()){
+   if(phone.matches)$('menu-content').append(item);
+   else menuHomes[i].after(item);
+  }
+  if(!phone.matches&&menu.open)menu.close();
+  $('mobile-menu').hidden=!phone.matches||$('play-view').hidden;
+ }
+ function fitBoard(){
+  if(!phone.matches||$('play-view').hidden)return;
+  const height=['.masthead','#puzzle','.controls'].reduce((total,selector)=>
+   total+document.querySelector(selector).getBoundingClientRect().height,24);
+  board.style.setProperty('--mobile-chrome',height+'px');
+ }
+ phone.addEventListener('change',()=>{adjustPhone();if(session)drawPlan();fitBoard();});
+ const fitObserver=new ResizeObserver(fitBoard);
+ for(const selector of ['.masthead','#puzzle','.controls'])fitObserver.observe(document.querySelector(selector));
+ $('mobile-menu').onclick=()=>menu.showModal();
  const message=value=>{$('status').textContent=value;};
 
  function canOpen(index){
@@ -34,6 +61,8 @@
   if(!levels[index])return;
   $('home').hidden=true;
   $('play-view').hidden=false;
+  adjustPhone();
+  if(menu.open)menu.close();
   document.querySelector('.campaign-picker').hidden=false;
   intro.hidden=index!==0||introSeen;
   tool='route';
@@ -57,6 +86,7 @@
   $('puzzle-hint').hidden=!levels[index].hint;
   $('hint-text').textContent=levels[index].hint??'';
   board.style.setProperty('--cols',map.width);
+  board.style.setProperty('--board-ratio',map.width/map.height);
   const firstSource=E.pairs(map)[0].source;
   tiles=map.cells.map((cell,i)=>{
    const tile=document.createElement('button');
@@ -75,6 +105,7 @@
   });
   $('elements').replaceChildren(...legend,document.createTextNode('S = source · D = destination'));
   $('link-id').value='A';
+  $('phone-link-id').value='auto';
   drawPlan();
   update();
   persist();
@@ -137,7 +168,24 @@
       persist();
      }
     });
-    label.append(field);
+    const stepper=document.createElement('span');
+    stepper.className='stepper';
+    const step=(sign,caption)=>{
+     const button=document.createElement('button');
+     button.type='button';
+     button.textContent=caption;
+     button.setAttribute('aria-label',(sign>0?'Add ':'Subtract ')+toolNames[kind]);
+     button.onclick=()=>{
+      field.value=Number(field.value)+sign;
+      field.dispatchEvent(new Event('input'));
+     };
+     return button;
+    };
+    field.setAttribute('aria-label',toolNames[kind]+' quantity');
+    field.readOnly=phone.matches;
+    field.inputMode=phone.matches?'none':'numeric';
+    stepper.append(step(-1,'−'),field,step(1,'+'));
+    label.append(stepper);
    }else label.append(document.createTextNode(' × '+quantity));
    return label;
   });
@@ -159,6 +207,12 @@
   const remaining=construction.budget-E.constructionCost(session.map,selection());
   $('budget').textContent=remaining<0?`${-remaining} points over budget`:`${remaining} of ${construction.budget} points available`;
   $('start').disabled=remaining<0;
+  for(const field of $('loadout').querySelectorAll('input')){
+   const [less,,more]=field.parentElement.children;
+   const unit=field.name==='tunnel'?2:1;
+   less.disabled=Number(field.value)<=0;
+   more.disabled=Number(field.value)>=Number(field.max)||remaining<construction.prices[field.name]*unit;
+  }
  }
 
  function drawToolBar(){
@@ -186,10 +240,20 @@
   $('remove').setAttribute('aria-pressed',String(tool==='remove'));
   $('replan').hidden=!session.map.construction;
   $('link-field').hidden=tool!=='portal';
+  if(tool==='portal'){
+   const counts=new Map();
+   for(const value of Object.values(state.placements))if(E.placementKind(value)==='portal')
+    counts.set(value.pairId,(counts.get(value.pairId)||0)+1);
+   const picker=$('phone-link-id');
+   const previous=picker.value;
+   picker.replaceChildren(new Option('Automatic pair','auto'),
+    ...[...counts].filter(([,count])=>count===1).map(([id])=>new Option('Pair '+id,id)));
+   if([...picker.options].some(option=>option.value===previous))picker.value=previous;
+  }
   syncDragHandles();
   ready();
   $('instructions').textContent=tool==='remove'?'Choose a tool on the map to remove it.':
-   tool==='route'?'Tap a source or unfinished tip to draw. Swipe elsewhere on the board to scroll.':
+   tool==='route'?'Tap a source or unfinished tip to draw. Tap a placed tool to remove it when no route is active.':
    tool==='tunnel'?(tunnelStart===null?'Choose the first open tile for your tunnel.':
     'Choose the other opening in the same row or column, across blocked terrain. Tap the first opening again or tap outside the board to cancel.'):
    'Choose a tile for your '+toolNames[tool].toLowerCase()+'.';
@@ -204,6 +268,7 @@
    complete:'Every element reached its destination.'
   }[phase];
   $('plan').hidden=phase!=='inspect';
+  $('puzzle-options').hidden=phase!=='build';
   $('build').hidden=phase!=='build';
   $('finish').hidden=phase!=='complete';
   $('engine-restoration').hidden=phase!=='complete';
@@ -308,10 +373,22 @@
   message('');
  }
 
+ function portalPair(){
+  if(!phone.matches)return $('link-id').value.trim();
+  const picker=$('phone-link-id');
+  if(picker.value!=='auto')return picker.value;
+  if(picker.options.length>1)return picker.options[1].value;
+  const {map,state}=session;
+  let number=1;
+  const ids=new Set(map.cells.map((_,i)=>E.pairIdAt(map,state.placements,i)).filter(Boolean));
+  while(ids.has('P'+number))number++;
+  return 'P'+number;
+ }
  function act(index,direct=false){
   if(session.state.phase!=='build')return;
   const {map,state}=session;
   const element=state.active?.element;
+  const removePlaced=direct&&tool==='route'&&!element&&Object.hasOwn(state.placements,index);
   const bridgeTile=direct&&tool==='route'&&state.loadout.bridge>(E.placementCounts(state.placements).bridge||0)&&
    E.canPlace(map,state.placements,index,'bridge')&&(!element||
     Boolean(E.terrainError(map,element,index,null))&&!E.terrainError(map,element,index,'bridge'));
@@ -324,13 +401,13 @@
    message('');
    return true;
   }
-  const result=bridgeTile?session.place(index,'bridge'):tool==='tunnel'?session.placeTunnel(tunnelStart,index):
-   tool==='route'?session.route(index):tool==='remove'?session.remove(index):session.place(index,tool,$('link-id').value.trim());
+  const result=removePlaced?session.remove(index):bridgeTile?session.place(index,'bridge'):tool==='tunnel'?session.placeTunnel(tunnelStart,index):
+   tool==='route'?session.route(index):tool==='remove'?session.remove(index):session.place(index,tool,tool==='portal'?portalPair():undefined);
   if(!result.ok){message(explainMove(result,index));return false;}
-  message('');
+  message(removePlaced?'Tool removed.':'');
   tunnelStart=null;
   drawBoard();
-  if(bridgeTile||tool!=='route'){tool='route';drawToolBar();}
+  if(removePlaced||bridgeTile||tool!=='route'){tool='route';drawToolBar();}
   else ready();
   persist();
   return true;
@@ -397,6 +474,7 @@
   message('');
  };
  function reset(replan){
+  if(menu.open)menu.close();
   stopAnimation();
   session.restart(replan);
   tunnelStart=null;
@@ -454,6 +532,7 @@
   }catch(error){if(ticket===importTicket)$('import-error').textContent='Import failed. '+error.message;}
  };
  function loadPack(pack,saved){
+  pack=window.EFChallenges.repairGeneratedRivers(pack);
   const stages=window.EFChallenges.readPack(pack);
   activePack=pack;
   challengeBest=saved?.best||{};
@@ -594,6 +673,8 @@
   stopAnimation();
   $('home').hidden=false;
   $('play-view').hidden=true;
+  adjustPhone();
+  if(menu.open)menu.close();
   document.querySelector('.campaign-picker').hidden=true;
   intro.hidden=true;
   const saved=progress.campaign();
@@ -614,6 +695,7 @@
  $('continue').onclick=continueCampaign;
  $('stage-select').onclick=()=>{
   continueCampaign();
+  if(phone.matches&&!menu.open)menu.showModal();
   $('level').focus();
   if(typeof $('level').showPicker==='function')try{$('level').showPicker();}catch{}
  };

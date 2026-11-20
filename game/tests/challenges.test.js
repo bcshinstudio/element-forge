@@ -145,3 +145,19 @@ test('routing search matches independent simple-path enumeration on tiny boards'
   assert.equal(result.status,plans.some(plan=>oracle(plan,0,[]))?'solved':'unsolved',rows.join('/'));
  }
 });
+
+test('Hard Scarce Crossing uses river tiles for unaided Water travel',()=>{
+ const {pack,report}=G.generate({difficulty:'Hard',family:'budget',count:1,seed:'mobile-0',attempts:40});
+ const stage=pack.stages[0],result=report.evidence[0].solution;
+ const water=result.routes.find(route=>route.element==='water');
+ assert.ok(stage.map.name.includes('Hard · Scarce Crossing'));
+ assert.ok(water.path.some(i=>stage.map.cells[i].terrain==='river'&&!result.placements[i]));
+ assert.ok(G.replay(stage,result));
+ const previous={...pack,revision:'tutorial-v4',stages:[{...stage,map:{
+  ...stage.map,cells:stage.map.cells.map(cell=>cell.terrain==='river'?{...cell,terrain:'water'}:cell)
+ }}]};
+ const updated=G.repairGeneratedRivers(previous);
+ assert.deepEqual(updated.stages,pack.stages);
+ assert.ok(G.replay(updated.stages[0],result));
+ assert.strictEqual(G.repairGeneratedRivers(pack),pack);
+});

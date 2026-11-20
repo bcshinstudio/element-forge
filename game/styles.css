@@ -158,3 +158,37 @@ button.brand { background: transparent; border: 0; text-align: left; }
 @media (prefers-reduced-motion: reduce) {
   .harmony-pulse { animation: none; }
 }
+
+.stepper { display: inline-flex; align-items: center; gap: 4px; }
+.stepper button { min-width: 42px; font-weight: 800; }
+.stepper input { text-align: center; }
+#phone-link-id { display: none; }
+#game-menu { width: min(94vw, 420px); max-height: 88svh; overflow: auto; padding: 14px; border: 1px solid var(--border); border-radius: 14px; background: #1c3025; color: #f8f3e5; }
+#game-menu::backdrop { background: #0b1715aa; }
+#game-menu .campaign-picker { margin-block: 12px; }
+#game-menu button, #game-menu select, #game-menu summary { min-height: 44px; }
+@media (max-width: 600px) {
+ .masthead { padding: 4px 10px; gap: 4px; }
+ .masthead .brand { font-size: clamp(21px, 6vw, 28px); padding-inline: 3px; }
+ #mobile-menu { min-height: 40px; }
+ .layout { padding: 4px 6px; gap: 5px; }
+ .field h1 { font-size: clamp(17px, 5vw, 24px); line-height: 1.12; margin: 3px 0 5px; }
+ #board { width: min(100%, max(130px, calc((100svh - var(--mobile-chrome, 240px)) * var(--board-ratio, 1)))); margin-inline: auto; touch-action: pinch-zoom; }
+ .controls { padding: 6px 8px; }
+ .controls h2 { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+ .controls #bridge-hint, .controls #remove { display: none; }
+ #status:not(:empty) { margin-top: 3px; font-size: .8rem; }
+ .loadout-row { margin: 0; gap: 2px; font-size: .85rem; }
+ .stepper input { width: 32px; padding: 0; border: 0; background: transparent; appearance: textfield; }
+ .stepper input::-webkit-inner-spin-button { appearance: none; }
+ #budget, #projected { margin: 3px 0; font-size: .82rem; }
+ #start { width: 100%; }
+ .tools, .actions { margin: 2px 0; gap: 3px; }
+ .tools button, #start, .build-actions button { min-height: 44px; }
+ .build-actions { margin-top: 4px; gap: 4px; }
+ #bridge-count { font-size: .85rem; }
+ #link-id, footer { display: none; }
+ #phone-link-id { display: inline-block; min-height: 44px; }
+ .controls .restoration p, #score, #totals { margin: 3px 0; }
+ #score-details { margin-top: 3px; }
+}
