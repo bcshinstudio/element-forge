@@ -2,13 +2,13 @@
 (()=>{
  const $=id=>document.getElementById(id),E=window.EFEngine;
  let play=false,routes=[],active=null,placements={},undo=[],mode='route',animation=null;
- const colors={fire:'#d55b4e',water:'#377fd1',nature:'#419d66',electricity:'#d5ac29',arcane:'#9368c5',wind:'#7dc8bc'};
+ const colors=Object.fromEntries(Object.entries(window.EFMap.ELEMENTS).map(([id,element])=>[id,element.color]));
  const message=(s,ok=false)=>{const b=$('playMessages');b.className='messages '+(ok?'ok':'');b.textContent=s;};
  function stopAnimation(){if(animation){clearInterval(animation);animation=null;}document.querySelectorAll('.moving-element').forEach(x=>x.remove());}
  function draw(){stopAnimation();document.querySelectorAll('#board .cell .route-segment,#board .cell .placement-glyph').forEach(x=>x.remove());for(const [i,kind] of Object.entries(placements)){const c=$('board').children[+i];if(c){const g=document.createElement('span');g.className='placement-glyph';const type=E.placementKind(kind);g.textContent=({bridge:'═',intersection:'╋',portal:'◎',tunnel:'◉'})[type]||'?';if(kind?.pairId)g.title='Link '+kind.pairId;c.appendChild(g);}}
  for(const r of [...routes,...(active?[active]:[])])for(let k=0;k<r.path.length;k++){const i=r.path[k],c=$('board').children[i];if(!c)continue;const s=document.createElement('span');s.className='route-segment';s.style.background=colors[r.element];if(r.path.some((_,j)=>j!==k&&r.path[j]===i))continue;const prev=r.path[k-1],next=r.path[k+1],w=map.width;const dirs=[prev,next].filter(x=>x!==undefined&&E.neighbors(i,map.width,map.height).some(([j])=>j===x)).map(x=>x===i-w?'N':x===i+w?'S':x===i-1?'W':'E');for(const d of ['N','S','E','W'])s.style.setProperty('--'+d.toLowerCase(),dirs.includes(d)?'1':'0');if(E.effective(map,placements,i)==='intersection'&&routes.filter(x=>x.path.includes(i)).length>1)s.classList.add('crossing');c.appendChild(s);}
  updateInventory();}
- function updateInventory(){for(const kind of ['bridge','intersection','portal','tunnel']){const left=(map.inventory?.[kind]||0)-Object.values(placements).filter(v=>E.placementKind(v)===kind).length;const el=$('left-'+kind);if(el)el.textContent=left;}}
+ function updateInventory(){for(const kind of ['bridge','metalSpan','intersection','portal','tunnel']){const left=(map.inventory?.[kind]||0)-Object.values(placements).filter(v=>E.placementKind(v)===kind).length;const el=$('left-'+kind);if(el)el.textContent=left;}}
  function snapshot(){undo.push(JSON.stringify({routes,placements}));if(undo.length>100)undo.shift();}
  function clear(){stopAnimation();routes=[];active=null;placements={};undo=[];draw();message('Routes and player placements cleared.');}
  const editorControls='#newMap,#load,#resize,#width,#height,#clear,#mapName,#description,#inventory input,#constraints,#applyConstraints,#generate';

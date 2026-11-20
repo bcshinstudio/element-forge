@@ -48,7 +48,7 @@
     hint:typeof stage.hint==='string'?stage.hint.slice(0,200):''};
   });
  }
- const revision='routing-v2';
+ const revision='harmony-v3';
  const families=['budget','passage','checkpoint','combined'];
  const difficulties=['Easy','Medium','Hard','Expert'];
  const names={budget:'Scarce Crossing',passage:'Contested Pass',checkpoint:'Grove Crossing',combined:'Valley Relay'};
@@ -74,8 +74,8 @@
   return {format:'element-forge-level',schemaVersion:1,rulesVersion:2,map,hint:hints[family],family};
  }
 
- function recipe(family,pick,{intro=false}={}){
-  const width=6+pick(2),height=6+pick(2);
+ function recipe(family,pick,{intro=false,wide=false}={}){
+  const width=wide?8+pick(2):6+pick(2),height=wide?8+pick(2):6+pick(2);
   const river=['budget','combined'].includes(family)?2+pick(width-4):-1;
   const gap=pick(height);
   const board=Array.from({length:height},(_,y)=>Array.from({length:width},(_,x)=>
@@ -123,14 +123,15 @@
   if(clean.status!=='solved')return reject('Construction search '+clean.status,{clean:clean.status});
   if(!replay(level,clean))return reject('Game replay failed',{clean:'invalid'});
   if(['budget','combined'].includes(level.family)&&dry.status==='solved')return reject('Tool-free bypass',{clean:'solved'});
+  const area=map.rulesVersion===3?map.cells.filter(cell=>cell.terrain!=='mountain').length:map.cells.length;
   const open=map.cells.filter(cell=>['land','forest'].includes(cell.terrain)).length;
   const shared=model.adjacency.filter((neighbors,i)=>
    ['land','forest'].includes(map.cells[i].terrain)&&
    neighbors.filter(next=>['land','forest'].includes(map.cells[next].terrain)).length>=3).length;
-  if(open<map.cells.length/2||shared<5)return reject('Visible corridors or independent lanes',{clean:'solved'});
+  if(open<area/2||shared<5)return reject('Visible corridors or independent lanes',{clean:'solved'});
 
   const solo=[];
-  const plans=[{},...model.sites.filter(site=>site.kind==='bridge').map(({i,kind})=>({[i]:kind}))];
+  const plans=[{},...model.sites.filter(site=>E.spanKinds.includes(site.kind)).map(({i,kind})=>({[i]:kind}))];
   for(const pair of model.pairs){
    const candidates=[];
    for(const placement of plans){
@@ -197,9 +198,11 @@
   }
   const placementChoices=[];
   const usefulBridgeSites=[...new Set(solo.flatMap(paths=>paths.flatMap(path=>
-   Object.entries(path.placements).filter(([index,kind])=>kind==='bridge'&&path.routes[0].path.includes(Number(index))).map(([index])=>Number(index)))))];
-  for(const index of usefulBridgeSites){
-   const placement={[index]:'bridge'};
+   Object.entries(path.placements).filter(([index,kind])=>E.spanKinds.includes(kind)&&path.routes[0].path.includes(Number(index))).map(([index,kind])=>index+':'+kind))))];
+  for(const site of usefulBridgeSites){
+   const [cell,kind]=site.split(':');
+   const index=Number(cell);
+   const placement={[index]:kind};
    const result=solve({placements:placement});
    if(result.status==='solved'&&!replay(level,result))return reject('Construction alternative replay failed',{clean:'solved'});
    const soloStates=solo.map(paths=>({
@@ -207,7 +210,7 @@
     reachable:paths.some(path=>!Object.keys(path.placements).length||path.placements[index]),
     usesBridge:paths.some(path=>path.placements[index]&&path.routes[0].path.includes(index))
    }));
-   placementChoices.push({index,usableBy:soloStates.filter(state=>state.usesBridge).map(state=>state.element),
+   placementChoices.push({index,kind,usableBy:soloStates.filter(state=>state.usesBridge).map(state=>state.element),
     stranded:soloStates.filter(state=>!state.reachable).map(state=>state.element),
     status:result.status,witness:result.status==='solved'?result:undefined});
   }
@@ -324,20 +327,84 @@
   return fromRows(board.map(row=>row.join('')),family);
  }
 
- function generate({seed='forge',family='mixed',difficulty='mixed',count=6,attempts=count*12,limit=defaultLimit,includeReferences=false}={}){
+ function expand(level,pick){
+  const map=level.map;
+  const x=pick(13-map.width),y=pick(13-map.height);
+  const cells=Array.from({length:144},()=>({terrain:'mountain'}));
+  for(const [i,cell] of map.cells.entries())cells[(y+Math.floor(i/map.width))*12+x+i%map.width]=cell;
+  if(map.inventory.bridge){
+   // Wet layouts use a conductive span so Electricity can cross as well.
+   map.inventory.metalSpan=map.inventory.bridge;
+   map.inventory.bridge=0;
+   map.construction.prices.metalSpan=map.construction.prices.bridge;
+   delete map.construction.prices.bridge;
+   level.hint='Compare what each current can still reach after you spend the span.';
+  }
+  return {...level,rulesVersion:3,map:{...map,rulesVersion:3,width:12,height:12,cells}};
+ }
+
+ function scarceCrossing(){
+  const board=Array.from({length:12},()=>Array(12).fill('#'));
+  const put=(x,y,tile)=>{board[y][x]=tile;};
+  for(let y=2;y<=9;y++)put(4,y,'=');
+  for(const y of [3,5,8])for(let x=5;x<=10;x++)put(x,y,x===5?':':'.');
+  for(let y=3;y<=8;y++)put(10,y,'.');
+  put(8,5,'~');put(9,6,'E');put(5,6,'e');
+  put(5,1,'p');put(5,2,'*');put(5,4,'P');
+  put(2,7,'w');put(3,7,':');put(10,7,'W');
+  const rows=board.map(row=>row.join(''));
+  const level=fromRows(rows,'budget');
+  for(const [i,tile] of rows.join('').split('').entries()){
+   if(tile==='='||tile===':')level.map.cells[i].terrain=tile==='='?'river':'bank';
+  }
+  level.rulesVersion=level.map.rulesVersion=3;
+  level.map.name='Scarce Crossing';
+  level.map.description='Choose where Water leaves the river while Plant reaches the woods and Electricity reaches its span.';
+  level.map.inventory={metalSpan:1};
+  level.map.construction={budget:1,prices:{metalSpan:1}};
+  level.hint='Trace the three landings from the river before committing.';
+  return level;
+ }
+
+ function verifyScarce(){
+  const level=scarceCrossing();
+  const model=R.prepare(F.readLevel(level));
+  const solve=options=>R.solve(model,{limit:64000,...options});
+  const solution=solve({});
+  if(solution.status!=='solved'||!replay(level,solution))throw Error('Scarce Crossing failed replay');
+  const alternatives=[3,5,8].map(exit=>{
+   const placements={[5*12+8]:'metalSpan'};
+   const vertical=Array.from({length:Math.abs(exit-7)+1},(_,i)=>(7+i*Math.sign(exit-7))*12+4);
+   const prefix=[7*12+2,7*12+3,...vertical,exit*12+5];
+   const options={placements,prefixes:{water:prefix}};
+   return {exit,solo:solve({...options,solo:'water'}).status,status:solve(options).status,
+    plant:solve({...options,only:['water','nature']}).status,electricity:solve({...options,only:['water','electricity']}).status};
+  });
+  if(alternatives.some(entry=>entry.solo!=='solved')||alternatives[0].plant!=='unsolved'||alternatives[1].electricity!=='unsolved'||
+   alternatives[0].status!=='unsolved'||alternatives[1].status!=='unsolved'||alternatives[2].status!=='solved')
+   throw Error('Scarce Crossing alternatives changed: '+JSON.stringify(alternatives));
+  return {level,solution,alternatives};
+ }
+
+ function generate({seed='forge',family='mixed',difficulty='mixed',count=6,attempts=count*12,limit=defaultLimit,includeReferences=false,legacy=false}={}){
   if(!Number.isInteger(count)||count<1||count>20||!Number.isInteger(attempts)||attempts<0||attempts>400||
      !Number.isInteger(limit)||limit<0||!['mixed',...families].includes(family)||
      !['mixed',...difficulties].includes(difficulty))throw Error('Invalid generator options.');
-  const pick=random(revision+':'+seed);
+  const activeRevision=legacy?'routing-v2':revision;
+  const pick=random(activeRevision+':'+seed);
   const stages=[],evidence=[],rejections=[],layouts=new Set(),decisions=new Set();
   let fallback=0;
   function add(level,origin){
    if(!level)return;
+   if(!legacy)level=expand(level,random(activeRevision+':'+seed+':'+origin+':'+(stages.length+rejections.length)));
    const key=layoutKey(level.map);
    if(layouts.has(key)){rejections.push({family:level.family,reason:'Repeated layout or decision'});return;}
    const check=verify(level,{limit});
    if(!check.accepted){rejections.push({family:level.family,reason:check.reason,nodes:check.nodes});return;}
-   const decision=JSON.stringify(check.strategy);
+   const decision=JSON.stringify(legacy?check.strategy:{
+    ...check.strategy,
+    conflicts:[...new Set(check.strategy.conflicts.map(conflict=>conflict.replace(/:(after-approach|near-source)$/,'')))].sort()
+   });
    if(decisions.has(decision)){rejections.push({family:level.family,reason:'Repeated layout or decision'});return;}
    if(difficulty!=='mixed'&&difficulty!==check.difficulty){
     rejections.push({family:level.family,reason:'Verified '+check.difficulty+' rather than requested '+difficulty});return;
@@ -354,7 +421,7 @@
   for(let i=0;i<attempts&&stages.length<count;i++){
    const f=family==='mixed'?families[i%4]:family;
    const intro=difficulty==='Easy'||(f==='budget'&&difficulty==='Medium'&&i%2===0)||(difficulty==='mixed'&&!stages.some(stage=>stage.difficulty==='Easy'));
-   add(!intro&&i%3!==0?variant(f,pick):recipe(f,pick,{intro}),'generated');
+   add(!intro&&i%3!==0?variant(f,pick):recipe(f,pick,{intro,wide:!legacy&&i%6===3}),'generated');
   }
   for(const f of families.filter(f=>referenceBoards[f]&&(family==='mixed'||family===f))){
    if(stages.length<count)add(reference(f),'fallback');
@@ -372,11 +439,11 @@
    stage.map.name=stage.difficulty+' · '+names[stage.family]+suffix;
   });
   const shortfall=count-stages.length;
-  return {pack:{format:'element-forge-challenges',version:1,revision,seed:String(seed),stages},
-   report:{revision,seed:String(seed),family,difficulty,limit,attempts,includeReferences,requested:count,accepted:stages.length,shortfall,fallback,rejections,evidence}};
+  return {pack:{format:'element-forge-challenges',version:1,revision:activeRevision,seed:String(seed),stages},
+   report:{revision:activeRevision,seed:String(seed),family,difficulty,limit,attempts,includeReferences,requested:count,accepted:stages.length,shortfall,fallback,rejections,evidence}};
  }
 
- const api={families,difficulties,revision,reference,verify,replay,generate,readPack,layoutKey,recipe,random,fromRows};
+ const api={families,difficulties,revision,reference,verify,replay,generate,readPack,layoutKey,recipe,random,fromRows,scarceCrossing,verifyScarce};
  root.EFChallenges=api;
  if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

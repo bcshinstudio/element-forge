@@ -5,8 +5,8 @@
  // Scenic sketches are row-major. Uppercase endpoints are sources.
  function level(name,description,rows,inventory={},construction,constraints={}){
   const map=F.fresh();
-  const terrain={'.':'land','#':'mountain','~':'water','*':'forest','o':'void'};
-  const elements={f:'fire',w:'water',n:'nature',e:'electricity',v:'wind'};
+  const terrain={'.':'land','#':'mountain','~':'water','*':'forest','o':'void','=':'river',':':'bank','!':'lava','_':'shallow','%':'scree','^':'heated','&':'abrasive','+':'exposed','-':'covered'};
+  const elements={f:'fire',w:'water',n:'nature',e:'electricity',v:'wind',r:'earth',i:'ice',m:'metal',l:'light',h:'shadow'};
   const checkpoints={'1':'fire','2':'water','3':'nature'};
   if(rows.length!==12||rows.some(row=>row.length!==12))throw Error('Expected a 12 × 12 level.');
   map.name=name;
@@ -119,7 +119,66 @@
   '####.oo##..#','####...#####','############','############','############','############'
  ]);
  prototype.hint='Land directly across one hole. Two holes in a row and diagonal jumps cannot be crossed.';
- const api={catalog,prototype};
+ // Preserve IDs and the original layouts for regression and legacy imports.
+ const legacyCatalog=catalog.map(entry=>JSON.parse(JSON.stringify(entry)));
+ function modern(entry){
+  entry.rulesVersion=3;
+  entry.map.rulesVersion=3;
+  return entry;
+ }
+ function replace(index,description,rows,inventory={},construction){
+  const old=catalog[index];
+  catalog[index]=level(old.map.name,description,rows,inventory,construction);
+ }
+ replace(1,'Water can travel in the river. Follow the bank markers to enter and leave.',[
+  '############','############','##...=...###','##...=.w.###','##W..=...###','##..:=...###',
+  '##...=:..###','##...=...###','############','############','############','############'
+ ]);
+ catalog[1].hint='A marked bank touches the river on each shore.';
+ replace(3,'Water uses marked banks. Electricity needs one metal span across open water.',[
+  '############','##...~...###','##E..~.e.###','##...~...###','############','##...=...###',
+  '##W.:=...###','##...=:w.###','##...=...###','############','############','############'
+ ],{metalSpan:2},{budget:2,prices:{metalSpan:2}});
+ catalog[3].hint='Water follows the river unaided. Put the metal span where Electricity can reach both shores.';
+ replace(4,'Fire can cross lava unaided. Deep water blocks even bridged Fire.',[
+  '############','############','##..~....###','##F.~..f.###','##..~....###','##..!....###',
+  '##..!....###','############','############','############','############','############'
+ ],{bridge:1});
+ const briar=catalog[6];
+ briar.map.description+=' Plant cannot take the portal shortcut.';
+ for(const i of [2*12+5,5*12+9])briar.map.cells[i]={terrain:'land',component:'portal',props:{pairId:'A'}};
+ catalog[4].hint='Try crossing the lava at the bottom of the inlet.';
+ const lessons=[
+  level('Wind over the Rift','Jump one hole in a straight line. Wind cannot use tunnels.',[
+   '############','############','####...#####','####...#####','####...#####','##V..o...v##',
+   '####.oo#####','############','############','############','############','############'
+  ],{tunnel:2}),
+  level('Shifting Ridge','Earth crosses scree. Lightweight bridges cannot carry it.',[
+   '############','############','##...~...###','##R..~..r###','##...~...###','##...%...###',
+   '##...%...###','############','############','############','############','############'
+  ],{bridge:1}),
+  level('The Winter Ford','Ice freezes shallow water as it travels. Heated ground blocks it.',[
+   '############','############','##...^...###','##I..^..i###','##..._...###','##..._...###',
+   '############','############','############','############','############','############'
+  ]),
+  level('Foundry Run','Metal crosses heated and abrasive ground. It cannot use lightweight bridges.',[
+   '############','############','##..^.&..###','##M.^.&.m###','##..^.&..###','##..~.&..###',
+   '############','############','############','############','############','############'
+  ],{bridge:1}),
+  level('Sun and Shade','Light uses exposed channels. Shadow uses covered channels.',[
+   '############','############','##...+...###','##L..+..l###','##...+...###','##...#...###',
+   '##...-...###','##h..-..H###','##...-...###','############','############','############'
+  ]),
+  level('The Living Basin','Route Earth through scree and Metal through the heated channel. Ice needs the shallow ford.',[
+   '############','##..%....###','##R.%..r.###','##..%....###','############','##..^....###',
+   '##M.^..m.###','##..^....###','############','##.._....###','##I._..i.###','############'
+  ])
+ ];
+ lessons[0].id='wind-campaign-lesson';
+ catalog.push(...lessons);
+ catalog.forEach(modern);
+ modern(prototype);
+ const api={catalog,prototype,legacyCatalog,level,modern};
  root.EFLevels=api;
  if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

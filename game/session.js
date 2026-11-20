@@ -6,6 +6,14 @@
  const ok=()=>({ok:true});
  const fail=message=>({ok:false,message});
 
+ function score(map,routes,placements){
+  const tiles=new Set(routes.flatMap(route=>route.path)).size;
+  const available=map.width*map.height;
+  const spend=map.construction?E.constructionCost(map,E.placementCounts(placements)):null;
+  const unspent=spend===null?0:map.construction.budget-spend;
+  return {tiles,available,spend,unspent,points:Math.max(0,available-2*tiles+10*unspent)};
+ }
+
  function createSession(level){
   const map=F.readLevel(level);
   const state={phase:'inspect',loadout:{},placements:{},routes:[],drafts:{},active:null};
@@ -140,19 +148,76 @@
    return ok();
   }
 
-  function verify(){
-   if(state.phase!=='build'||Object.keys(state.drafts).length)return fail('Finish or undo your current route before testing.');
+  function evaluate(){
+   if(state.phase==='inspect'||Object.keys(state.drafts).length)return fail('Finish or undo your current route before testing.');
    const errors=E.checkAll(activeMap(),state.routes,state.placements);
    if(errors.length)return fail(errors.join('. '));
-   state.phase='complete';
-   return {ok:true,track:E.score(map,state.routes,state.placements).track,
-    spend:map.construction?E.constructionCost(map,E.placementCounts(state.placements)):null};
+   return {ok:true,track:E.score(map,state.routes,state.placements).track,...score(map,state.routes,state.placements)};
   }
 
-  return {map,state,start,restart,undo,place,placeTunnel,remove,route,verify};
+  function verify(){
+   if(state.phase!=='build')return fail('Start building first.');
+   const result=evaluate();
+   if(result.ok)state.phase='complete';
+   return result;
+  }
+
+  function snapshot(){
+   return copy({version:1,phase:state.phase,loadout:state.loadout,placements:state.placements,
+    routes:state.routes,drafts:state.drafts,active:state.active?.element});
+  }
+
+  function restore(saved){
+   if(saved?.version!==1||!['inspect','build','complete'].includes(saved.phase))return false;
+   if(saved.phase==='inspect'){
+    restart(true);
+    state.loadout={};
+    if(!start(saved.loadout).ok)return false;
+    restart(true);
+    return true;
+   }
+   const previous=snapshot();
+   restart(true);
+   try{
+    if(!start(saved.loadout).ok)throw Error('Invalid loadout');
+    const counts=E.placementCounts(saved.placements);
+    if(Object.entries(counts).some(([kind,count])=>count>(state.loadout[kind]||0)))throw Error('Invalid inventory');
+    for(const [index,value] of Object.entries(saved.placements)){
+     const kind=E.placementKind(value),i=Number(index);
+     if(!E.canPlace(map,{},i,kind))throw Error('Invalid placement');
+     if(['tunnel','portal'].includes(kind)){
+      if(!/^[\w-]{1,12}$/.test(value.pairId||''))throw Error('Invalid link');
+      const partner=E.linkPartner(map,i,saved.placements);
+      const ends=Object.values(saved.placements).filter(other=>other.kind===kind&&other.pairId===value.pairId);
+      if(partner<0&&!(kind==='portal'&&ends.length===1))throw Error('Invalid paired tool');
+     }
+    }
+    const used=new Set();
+    for(const route of saved.routes){
+     if(used.has(route.element)||E.validatePath(map,route.element,route.path,saved.routes,saved.placements))
+      throw Error('Invalid route');
+     used.add(route.element);
+    }
+    for(const [element,draft] of Object.entries(saved.drafts)){
+     if(element!==draft.element||E.validatePath(map,element,draft.path,saved.routes,saved.placements,true))
+      throw Error('Invalid draft');
+    }
+    const restored=copy(saved);
+    Object.assign(state,{loadout:restored.loadout,placements:restored.placements,routes:restored.routes,
+     drafts:restored.drafts,active:restored.drafts[restored.active]||null});
+    if(saved.phase==='complete'&&!verify().ok)throw Error('Invalid clear');
+    return true;
+   }catch{
+    restart(true);
+    if(previous.phase!=='inspect')restore(previous);
+    return false;
+   }
+  }
+
+  return {map,state,start,restart,undo,place,placeTunnel,remove,route,evaluate,verify,snapshot,restore};
  }
 
- const api={createSession};
+ const api={createSession,score};
  root.EFSession=api;
  if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

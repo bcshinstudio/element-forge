@@ -40,7 +40,9 @@ def unlock_through(page, count):
         const completed = EFLevels.catalog.slice(0, count).map(level => level.id);
         localStorage.setItem('element-forge.campaign.v1', JSON.stringify({completed}));
     }""", count)
+    page.evaluate("localStorage.removeItem('element-forge.campaign.v2')")
     page.reload()
+    page.locator("#continue").click()
 
 
 def test_main_loop(browser, url):
@@ -48,20 +50,25 @@ def test_main_loop(browser, url):
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.goto(url + BASE)
+    page.locator("#continue").click()
     expect(page.get_by_role("heading", name="Ember Meadow")).to_be_visible()
     expect(page.locator(".tile")).to_have_count(144)
     page.get_by_role("button", name="Start building").click()
     route(page, [40, 52, 64], drag=True)
     expect(tile(page, 64).locator(".track")).to_have_count(1)
     route(page, [64, 76, 88, 89, 90, 102, 103, 104, 92], drag=True)
-    page.get_by_role("button", name="Test delivery").click()
+    page.get_by_role("button", name="Restore Harmony").click()
     expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
     expect(page.locator(".orb")).to_have_count(1)
-    page.get_by_role("button", name="Next puzzle").click()
+    page.get_by_role("button", name="Next Stage").click()
     expect(page.get_by_role("heading", name="Brook Bridge")).to_be_visible()
 
-    unlock_through(page, 3)
-    page.locator("#level").select_option("3")
+    legacy = page.evaluate("EFLevels.legacyCatalog[3]")
+    page.locator("#import").set_input_files({"name": "old.level.json", "mimeType": "application/json",
+                                             "buffer": json.dumps(legacy).encode()})
+    expect(page.locator("#puzzle")).to_have_text("The River Crossing")
+    imported = page.locator("#level").input_value()
+
     expect(page.get_by_role("heading", name="Plan your route")).to_be_visible()
     expect(tile(page, 113)).to_be_visible()
     expect(page.get_by_role("button", name="Draw track")).to_be_hidden()
@@ -72,7 +79,7 @@ def test_main_loop(browser, url):
     # Visiting a fixed-inventory puzzle clears the over-budget button state.
     page.locator("#level").select_option("1")
     expect(page.get_by_role("button", name="Start building")).to_be_enabled()
-    page.locator("#level").select_option("3")
+    page.locator("#level").select_option(imported)
     bridge_count.fill("1")
     page.get_by_role("button", name="Start building").click()
 
@@ -83,7 +90,7 @@ def test_main_loop(browser, url):
     expect(page.locator("#bridge-count")).to_have_text("Bridges left: 1")
     tile(page, 53).click()
     route(page, FIRE_SHORTCUT)
-    page.get_by_role("button", name="Test delivery").click()
+    page.get_by_role("button", name="Restore Harmony").click()
     expect(page.locator("#status")).to_contain_text("water: missing route")
     expect(page.get_by_role("button", name="Restart", exact=True)).to_be_hidden()
     expect(page.locator("#import")).to_be_hidden()
@@ -92,7 +99,7 @@ def test_main_loop(browser, url):
     expect(page.get_by_role("button", name="Remove tool")).to_be_visible()
     page.get_by_role("button", name="Restart", exact=True).click()
     expect(page.locator("#bridge-count")).to_have_text("Bridges left: 1")
-    expect(tile(page, 53)).to_have_attribute("aria-label", "Row 5, column 6, water")
+    expect(tile(page, 53)).to_have_attribute("aria-label", "Row 5, column 6, Water")
     page.get_by_text("Puzzle options", exact=True).click()
     page.get_by_role("button", name="Replan tools").click()
     expect(page.get_by_role("heading", name="Plan your route")).to_be_visible()
@@ -105,9 +112,9 @@ def test_main_loop(browser, url):
     route(page, FIRE_DETOUR[2:])
     page.get_by_role("button", name="Undo").click()
     route(page, FIRE_DETOUR)
-    page.get_by_role("button", name="Test delivery").click()
+    page.get_by_role("button", name="Restore Harmony").click()
     expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
-    expect(page.locator("#score")).to_have_text("Track length 17 · Construction spend 2 pt")
+    expect(page.locator("#score")).to_contain_text("106 points")
     expect(page.locator(".orb")).to_have_count(2)
     expect(page.get_by_role("button", name="Replay puzzle")).to_be_enabled(timeout=8000)
     page.get_by_role("button", name="Replay puzzle").click()
@@ -119,6 +126,7 @@ def test_main_loop(browser, url):
 def test_reedwater_endpoints_and_lock(browser, url):
     page = browser.new_page(viewport={"width": 1280, "height": 1000})
     page.goto(url + BASE)
+    page.locator("#continue").click()
     unlock_through(page, 5)
     page.locator("#level").select_option("5")
     page.locator("#start").click()
@@ -137,7 +145,7 @@ def test_reedwater_endpoints_and_lock(browser, url):
     expect(page.get_by_role("heading", name="Reedwater Ford")).to_be_visible()
     expect(page.locator("#level")).to_have_value("5")
     expect(page.get_by_role("button", name="Skip to next puzzle")).to_have_count(0)
-    expect(page.locator("#campaign-progress")).to_have_text("5 / 15 complete")
+    expect(page.locator("#campaign-progress")).to_have_text("5 / 21 complete")
     page.close()
 
 
@@ -148,6 +156,7 @@ def test_offline_touch_and_import(browser, offline):
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.context.set_offline(True)
     page.goto(offline.as_uri())
+    page.locator("#continue").tap()
     expect(page.locator(".tile")).to_have_count(144)
     assert page.evaluate("document.documentElement.scrollWidth === window.innerWidth")
     page.locator("#start").tap()
@@ -155,8 +164,11 @@ def test_offline_touch_and_import(browser, offline):
     page.locator("#check").tap()
     page.locator("#next").tap()
     page.locator("#start").tap()
-    tile(page, 53).tap()
-    expect(page.locator("#bridge-count")).to_have_text("Bridges left: 0")
+    plan = page.evaluate("EFEngine.solveConstruction(EFMap.readLevel(EFLevels.catalog[1]))")
+    for index in plan["routes"][0]["path"]:
+        tile(page, index).tap()
+    expect(page.locator("#projected")).to_contain_text("points")
+
     cells = [{"terrain": "land"} for _ in range(16)]
     for index, role in ((0, "source"), (3, "destination")):
         cells[index]["node"] = {"role": role, "element": "fire"}
@@ -174,10 +186,10 @@ def test_offline_touch_and_import(browser, offline):
     page.get_by_role("button", name="Start building").tap()
     for index in range(4):
         tile(page, index).tap()
-    page.get_by_role("button", name="Test delivery").tap()
+    page.get_by_role("button", name="Restore Harmony").tap()
     expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
     expect(page.locator(".orb")).to_have_count(0)
-    expect(page.locator("#campaign-progress")).to_have_text("1 / 15 complete")
+    expect(page.locator("#campaign-progress")).to_have_text("1 / 21 complete")
     assert not errors, errors
     page.close()
 
@@ -187,12 +199,13 @@ def test_campaign_and_progress(browser, url):
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.goto(url + BASE)
+    page.locator("#continue").click()
     plans = page.evaluate("""EFLevels.catalog.map(level => {
         const map = EFMap.readLevel(level);
         const solution = EFEngine.solveConstruction(map);
         return {name: map.name, budget: !!map.construction, ...solution};
     })""")
-    assert len(plans) == 15
+    assert len(plans) == 21
     for i, plan in enumerate(plans):
         expect(page.get_by_role("heading", name=plan["name"], exact=True)).to_be_visible()
         assert plan["status"] == "solved", plan
@@ -228,18 +241,20 @@ def test_campaign_and_progress(browser, url):
             expect(page.locator("#instructions")).to_contain_text("Tap a source")
         for path in plan["routes"]:
             route(page, path["path"])
-        page.get_by_role("button", name="Test delivery").click()
+        page.get_by_role("button", name="Restore Harmony").click()
         expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
-        expect(page.locator("#campaign-progress")).to_have_text(f"{i+1} / 15 complete")
-        if i < 14:
-            page.get_by_role("button", name="Next puzzle").click()
-    expect(page.get_by_role("button", name="Next puzzle")).to_be_disabled()
+        expect(page.locator("#campaign-progress")).to_have_text(f"{i+1} / 21 complete")
+        if i < len(plans) - 1:
+            page.get_by_role("button", name="Next Stage").click()
+    expect(page.get_by_role("button", name="Campaign summary")).to_be_visible()
     page.reload()
-    expect(page.get_by_role("heading", name="The Threefold Divide")).to_be_visible()
-    expect(page.locator("#campaign-progress")).to_have_text("15 / 15 complete")
+    expect(page.locator("#continue")).to_contain_text("Campaign complete")
+    page.locator("#continue").click()
+    expect(page.get_by_role("heading", name="The Living Basin")).to_be_visible()
+    expect(page.locator("#campaign-progress")).to_have_text("21 / 21 complete")
     page.locator("#level").select_option("0")
     expect(page.locator("#level option").first).to_have_text("1. Ember Meadow ✓")
-    expect(page.locator("#campaign-progress")).to_have_text("15 / 15 complete")
+    expect(page.locator("#campaign-progress")).to_have_text("21 / 21 complete")
     assert not errors, errors
     page.close()
 
@@ -248,6 +263,7 @@ def test_portrait_tunnels(browser, url):
     page = browser.new_page(viewport={"width": 360, "height": 640},
                             is_mobile=True, has_touch=True, reduced_motion="reduce")
     page.goto(url + BASE)
+    page.locator("#continue").click()
     unlock_through(page, 7)
     page.locator("#level").select_option("7")
     assert page.evaluate("document.documentElement.scrollWidth === innerWidth")
@@ -285,7 +301,7 @@ def test_portrait_tunnels(browser, url):
     page.get_by_role("button", name="Remove tool").tap()
     tile(page, 56).tap()
     for index in (51, 56):
-        expect(tile(page, index)).to_have_attribute("aria-label", re.compile("land$"))
+        expect(tile(page, index)).to_have_attribute("aria-label", re.compile("Land$"))
     expect(tunnel).to_be_visible()
     page.close()
 
@@ -295,10 +311,11 @@ def test_world_engine_offline(browser, offline):
                             is_mobile=True, has_touch=True, reduced_motion="reduce")
     page.context.set_offline(True)
     page.goto(offline.as_uri())
+    page.locator("#continue").tap()
     expect(page.locator("#world-intro")).to_be_visible()
     page.locator("#intro-skip").tap()
     expect(page.locator("#world-intro")).to_be_hidden()
-    page.locator("#level").select_option("15")
+    page.locator("#level").select_option(str(page.evaluate("EFLevels.catalog.length")))
     page.locator("#start").tap()
     for index in (62, 63, 64):
         tile(page, index).tap()
@@ -308,9 +325,10 @@ def test_world_engine_offline(browser, offline):
     for index in (66, 67, 68, 69):
         tile(page, index).tap()
     page.locator("#check").tap()
-    expect(page.locator("#engine-restoration")).to_contain_text("World-Engine online")
-    assert page.locator(".engine-wheel").evaluate("wheel => getComputedStyle(wheel).animationName") == "none"
-    expect(page.locator("#campaign-progress")).to_have_text("0 / 15 complete")
+    expect(page.locator("#engine-restoration")).to_contain_text("Harmony restored.")
+    expect(page.locator(".orb")).to_have_count(0)
+    expect(page.locator("#skip-animation")).to_be_hidden()
+    expect(page.locator("#campaign-progress")).to_have_text("0 / 21 complete")
     page.locator("#replay").tap()
     expect(page.locator("#world-intro")).to_be_hidden()
     page.reload()
@@ -323,11 +341,11 @@ def test_challenge_pack_offline(browser, offline):
                             is_mobile=True, has_touch=True, reduced_motion="reduce")
     page.context.set_offline(True)
     page.goto(offline.as_uri())
-    page.locator("#challenge-library summary").tap()
-    page.locator("#curated-pack").tap()
+    page.locator("#choose-challenge").tap()
+    page.locator("#home-curated").tap()
     pack = page.evaluate("EFCurated")
     expect(page.locator("#puzzle")).to_contain_text(pack["stages"][0]["map"]["name"])
-    plans = page.evaluate("EFCurated.stages.map(level => EFChallenges.verify(level).solution)")
+    plans = page.evaluate("EFCurated.stages.map(level => level.map.name === 'Scarce Crossing' ? EFChallenges.verifyScarce().solution : EFChallenges.verify(level).solution)")
     assert all(plan and plan["status"] == "solved" for plan in plans)
     for i, plan in enumerate(plans):
         page.locator("#start").scroll_into_view_if_needed()
@@ -338,15 +356,20 @@ def test_challenge_pack_offline(browser, offline):
             if tool != "bridge":
                 page.locator(f'[data-tool="{tool}"]').tap()
             tile(page, index).tap()
-        for current in plan["routes"]:
-            for index in current["path"]:
+        for route_index, current in enumerate(plan["routes"]):
+            for step, index in enumerate(current["path"]):
                 tile(page, index).tap()
+                if i == 0 and route_index == 0 and step == 1:
+                    page.reload()
+                    page.locator("#choose-challenge").tap()
+                    page.locator("#resume-challenge").tap()
+                    expect(tile(page, index).locator(".track")).to_have_count(1)
         page.locator("#check").tap()
         expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
         if i < len(plans)-1:
             page.get_by_role("button", name="Next Stage").tap()
     expect(page.locator("#next")).to_be_disabled()
-    expect(page.locator("#campaign-progress")).to_have_text("0 / 15 complete")
+    expect(page.locator("#campaign-progress")).to_have_text("0 / 21 complete")
     page.locator("#challenge-library summary").tap()
     page.locator("#pack-file").set_input_files({"name": "pack.json", "mimeType": "application/json",
                                                "buffer": json.dumps(pack).encode()})
@@ -354,9 +377,40 @@ def test_challenge_pack_offline(browser, offline):
     page.close()
 
 
+def test_autosave_and_scoring(browser, url):
+    page = browser.new_page(viewport={"width": 1280, "height": 1000})
+    page.goto(url + BASE)
+    expect(page.locator("#continue")).to_have_text("Start Campaign")
+    page.locator("#continue").click()
+    page.locator("#start").click()
+    path = [40, 52, 64, 76, 88, 89, 90, 102, 103, 104, 92]
+    route(page, path[:3])
+    page.reload()
+    expect(page.locator("#continue")).to_have_text("Continue · Stage 1")
+    page.locator("#continue").click()
+    expect(tile(page, 64).locator(".track")).to_have_count(1)
+    route(page, path[3:])
+    expect(page.locator("#projected")).to_have_text("Projected score 122 points")
+    page.locator("#check").click()
+    expect(page.locator("#skip-animation")).to_be_visible()
+    expect(page.locator("#totals")).to_have_text("Stage best 122 · Campaign total 122")
+    page.reload()
+    expect(page.locator("#continue")).to_have_text("Continue · Stage 2")
+    page.locator("#continue").click()
+    page.locator("#level").select_option("0")
+    page.locator("#start").click()
+    route(page, path)
+    page.locator("#check").click()
+    expect(page.locator("#totals")).to_have_text("Stage best 122 · Campaign total 122")
+    page.locator("#skip-animation").click()
+    expect(page.locator("#skip-animation")).to_be_hidden()
+    page.close()
+
+
 def test_keyboard(browser, url):
     page = browser.new_page(reduced_motion="reduce")
     page.goto(url + BASE)
+    page.locator("#continue").click()
     page.locator("#start").focus()
     page.keyboard.press("Enter")
     expect(tile(page, 40)).to_be_focused()
@@ -397,11 +451,13 @@ if __name__ == "__main__":
                     test_world_engine_offline(browser, offline)
                     print("PASS offline World-Engine intro, Wind jump, reduced motion and replay")
                     test_challenge_pack_offline(browser, offline)
-                    print("PASS offline touch challenge pack: all eight stages, next and import")
+                    print("PASS offline touch challenge pack: all eight stages, exact resume, next and import")
+                    test_autosave_and_scoring(browser, url)
+                    print("PASS autosave: exact unfinished route, interrupted completion, projected score, replay best and animation skip")
                     test_keyboard(browser, url)
                     print("PASS keyboard: start, navigate, draw and deliver without a pointer")
                     test_campaign_and_progress(browser, url)
-                    print("PASS campaign: all 15 levels playable, next and replay navigation, completed progress survives reload")
+                    print("PASS campaign: all 21 levels playable, next and replay navigation, completed progress survives reload")
                     browser.close()
             finally:
                 server.shutdown()

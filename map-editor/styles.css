@@ -8,3 +8,12 @@
 [data-play-tool].active{background:#396a79;border-color:#70b7b8;color:#fff}.placement-glyph{position:absolute;inset:2px;display:grid;place-items:center;color:#f5e2a4;font-size:clamp(13px,2vw,24px);font-weight:900;pointer-events:none;z-index:2;text-shadow:0 1px 3px #000}.route-segment{z-index:3;opacity:.85}.moving-element{position:absolute;z-index:6;width:48%;height:48%;left:26%;top:26%;border:2px solid #fff;border-radius:50%;box-shadow:0 0 11px #fff8;pointer-events:none}.generator-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.generator-controls label{font-size:12px}.generator-controls input,.generator-controls select{width:100%;margin-top:5px;padding:9px;border-radius:7px;background:#121c2b;border:1px solid #45546d;color:#fff}
 
 .pair-label{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#b6cbe2}.pair-label input{width:60px;padding:8px;background:#111b2e;color:white;border:1px solid #53627b;border-radius:5px}
+
+.cell.river { background: #235b79; }
+.cell.bank { background: #9c8b5d; }
+.cell.shallow { background: #4b8c99; }
+.cell.scree { background: #675f53; }
+.cell.heated { background: #943f38; }
+.cell.abrasive { background: #6d5d71; }
+.cell.exposed { background: #a28b51; }
+.cell.covered { background: #514c73; }

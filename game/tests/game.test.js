@@ -3,7 +3,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const E=require('../../map-editor/engine.js');
 const F=require('../../map-editor/map-format.js');
-const {catalog}=require('../levels.js');
+const {legacyCatalog:catalog}=require('../levels.js');
 const {createSession}=require('../session.js');
 
 const fireLand=[50,51,52,40,39,27,28,29,30,42,54,55,56];
@@ -80,7 +80,7 @@ test('River Crossing fails with the wrong bridge and remains playable after repl
  assert.equal(session.place(113,'bridge').ok,true);
  draw(session,fireLand);
  draw(session,water);
- assert.deepEqual(session.verify(),{ok:true,track:17,spend:2});
+ assert.deepEqual(session.verify(),{ok:true,track:17,spend:2,tiles:19,available:144,unspent:0,points:106});
  session.restart();
  assert.deepEqual(session.state.loadout,{bridge:1});
  assert.equal(session.state.phase,'build');
