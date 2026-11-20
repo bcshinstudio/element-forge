@@ -361,12 +361,14 @@ def test_challenge_pack_offline(browser, offline):
     page.locator("#home-curated").tap()
     pack = page.evaluate("EFCurated")
     expect(page.locator("#puzzle")).to_contain_text(pack["stages"][0]["map"]["name"])
-    plans = page.evaluate("EFCurated.stages.map(level => level.map.name === 'Scarce Crossing' ? EFChallenges.verifyScarce().solution : EFChallenges.verify(level).solution)")
+    plans = page.evaluate("EFCurated.stages.map(level => level.map.name === 'Scarce Crossing' ? EFChallenges.verifyScarce().solution : EFEngine.solveConstruction(EFMap.readLevel(level)))")
     assert all(plan and plan["status"] == "solved" for plan in plans)
     for i, plan in enumerate(plans):
         page.locator("#start").scroll_into_view_if_needed()
         for index, tool in plan["placements"].items():
-            page.locator(f'#loadout input[name="{tool}"]').fill("1")
+            field = page.locator(f'#loadout input[name="{tool}"]')
+            if field.count():
+                field.fill(str(list(plan["placements"].values()).count(tool)))
         page.locator("#start").tap()
         for index, tool in plan["placements"].items():
             if tool != "bridge":

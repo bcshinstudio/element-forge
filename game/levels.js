@@ -250,7 +250,7 @@
    '###E###','###.###','W...==w','###.###','###e###'
   ],{tools:{intersection:2},budget:1,prices:{intersection:1},requires:['intersection','river']})
  ];
- const api={catalog,prototype,legacyCatalog,harmonyCatalog,level,modern};
+ const api={catalog,prototype,legacyCatalog,harmonyCatalog,level,modern,lesson};
  root.EFLevels=api;
  if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

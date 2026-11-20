@@ -3,29 +3,44 @@ const {mkdirSync,writeFileSync}=require('node:fs');
 const {join}=require('node:path');
 const G=require('./challenges');
 
-const options={seed:'river-valley-26',count:6,includeReferences:true};
+const E=require('../map-editor/engine');
+const F=require('../map-editor/map-format');
+const {stages}=require('./challenge-boards');
+
+function verifyAuthored(stage){
+ const map=F.readLevel(stage);
+ const solution=E.solveConstruction(map);
+ if(solution.status!=='solved'||!G.replay(stage,solution))throw Error('Cannot replay '+map.name);
+ const checks=stage.requires.map(feature=>{
+  const trial=structuredClone(map);
+  if(trial.inventory[feature])trial.inventory[feature]=0;
+  else for(const cell of trial.cells)if(cell.terrain===feature)cell.terrain='wall';
+  const status=E.solveConstruction(trial).status;
+  if(status!=='unsolved')throw Error(map.name+' requirement '+feature+' is '+status+' when removed');
+  return {feature,status};
+ });
+ return {origin:'authored',solution,checks,difficulty:stage.difficulty};
+}
+
 function release(){
- const {pack,report}=G.generate(options);
- if(report.shortfall)throw Error('The curated seed no longer produces enough verified stages.');
+ const boards=stages();
+ const evidence=boards.map(verifyAuthored);
  const {level,solution,alternatives}=G.verifyScarce();
  level.difficulty='Medium';
- pack.stages.splice(2,0,level);
- report.evidence.splice(2,0,{origin:'authored',solution,alternatives,difficulty:'Medium'});
- const expert=G.generate({seed:'clear-expert-5',count:1,attempts:72,difficulty:'Expert'});
- if(expert.report.shortfall)throw Error('The Expert reference seed no longer verifies.');
- if(report.evidence.some(entry=>entry.decision===expert.report.evidence[0].decision))throw Error('The curated Expert stage repeats a decision.');
- pack.stages.push(expert.pack.stages[0]);
- report.evidence.push({...expert.report.evidence[0],seed:'clear-expert-5'});
- report.requested+=2;
- report.accepted+=2;
- return {pack,report};
+ boards.splice(4,0,level);
+ evidence.splice(4,0,{origin:'authored',solution,alternatives,difficulty:'Medium'});
+ const stagesForPlay=boards.map(({requires,...stage})=>stage);
+ return {
+  pack:{format:'element-forge-challenges',version:1,revision:'authored-playtest-v1',stages:stagesForPlay},
+  report:{requested:boards.length,accepted:boards.length,shortfall:0,evidence}
+ };
 }
 if(require.main===module){
  const destination=process.argv[2]||'.';
  const {pack,report}=release();
  mkdirSync(destination,{recursive:true});
  writeFileSync(join(destination,'curated.js'),"'use strict';\nwindow.EFCurated="+JSON.stringify(pack)+';\n');
- writeFileSync(join(destination,'Element_Forge_Tutorial_Pack.json'),JSON.stringify(pack,null,2)+'\n');
- writeFileSync(join(destination,'curated-evidence.json'),JSON.stringify({options,...report},null,2)+'\n');
+ writeFileSync(join(destination,'Element_Forge_Challenge_Playtest.json'),JSON.stringify(pack,null,2)+'\n');
+ writeFileSync(join(destination,'curated-evidence.json'),JSON.stringify(report,null,2)+'\n');
 }
 module.exports={release};
