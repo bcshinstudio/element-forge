@@ -23,6 +23,13 @@
   <span id="campaign-progress"></span>
  </div>
  </header>
+ <section id="world-intro" class="world-intro" aria-labelledby="world-intro-title">
+  <h2 id="world-intro-title">The Last Conduit Weaver</h2>
+  <p>Primeval Well-Springs once fed the World-Engines that guided the winds, tides, and seasons. An ancient civilization fractured the network. Now the Engines are slowing, and you are the last Conduit Weaver.</p>
+  <p>Carry each current from its Well-Spring (S) to its matching Engine inlet (D). The currents are volatile on the way, but the Engine can combine them safely.</p>
+  <button id="intro-begin" class="primary" type="button">Begin weaving</button>
+  <button id="intro-skip" type="button">Skip introduction</button>
+ </section>
  <main class="layout">
   <section class="field" aria-labelledby="puzzle">
    <h1 id="puzzle"></h1>
@@ -62,6 +69,10 @@
     </details>
    </div>
    <div id="finish" hidden>
+    <div id="engine-restoration" class="restoration" hidden>
+     <span class="engine-wheel" aria-hidden="true">✣</span>
+     <p><strong>World-Engine online</strong><br>The valley’s windmill turns again.</p>
+    </div>
     <p id="score"></p>
     <div class="actions"><button id="replay">Replay puzzle</button><button id="next" class="primary">Next puzzle</button></div>
    </div>

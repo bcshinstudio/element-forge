@@ -2,7 +2,7 @@
 (()=>{
  const $=id=>document.getElementById(id),E=window.EFEngine;
  let play=false,routes=[],active=null,placements={},undo=[],mode='route',animation=null;
- const colors={fire:'#d55b4e',water:'#377fd1',nature:'#419d66',electricity:'#d5ac29',arcane:'#9368c5'};
+ const colors={fire:'#d55b4e',water:'#377fd1',nature:'#419d66',electricity:'#d5ac29',arcane:'#9368c5',wind:'#7dc8bc'};
  const message=(s,ok=false)=>{const b=$('playMessages');b.className='messages '+(ok?'ok':'');b.textContent=s;};
  function stopAnimation(){if(animation){clearInterval(animation);animation=null;}document.querySelectorAll('.moving-element').forEach(x=>x.remove());}
  function draw(){stopAnimation();document.querySelectorAll('#board .cell .route-segment,#board .cell .placement-glyph').forEach(x=>x.remove());for(const [i,kind] of Object.entries(placements)){const c=$('board').children[+i];if(c){const g=document.createElement('span');g.className='placement-glyph';const type=E.placementKind(kind);g.textContent=({bridge:'═',intersection:'╋',portal:'◎',tunnel:'◉'})[type]||'?';if(kind?.pairId)g.title='Link '+kind.pairId;c.appendChild(g);}}
@@ -14,8 +14,9 @@
  const editorControls='#newMap,#load,#resize,#width,#height,#clear,#mapName,#description,#inventory input,#constraints,#applyConstraints,#generate';
  function toggle(on){play=on;clear();document.querySelectorAll(editorControls).forEach(el=>{el.disabled=on;});window.EFEditor.updateHistory();$('playMode').textContent=on?'Exit playtest':'Enter playtest';$('playPanel').hidden=!on;$('palette').closest('aside').classList.toggle('play-locked',on);$('board').classList.toggle('play-mode',on);message('Select Route, then start at an S source. Or select Bridge / Intersection to construct.');}
  function begin(i){const n=map.cells[i]?.node;if(n?.role!=='source'){message('Start at a source (S).');return;}snapshot();routes=routes.filter(r=>r.element!==n.element);active={element:n.element,path:[i]};draw();message(`Drawing ${n.element}. Click or drag through adjacent cells.`);}
- function extend(i){if(!active)return;const path=active.path,prev=path.at(-1);if(i===prev)return;if(path.length>1&&i===path.at(-2)){path.pop();draw();return;}if(!E.routeNeighbors(map,prev,placements).includes(i)||path.includes(i))return;if(!E.allowedTransition(map,active.element,prev,i,placements)){message('One-way direction violated.');return;}const c=map.cells[i],comp=E.effective(map,placements,i);
+ function extend(i){if(!active)return;const path=active.path,prev=path.at(-1);if(i===prev)return;if(path.length>1&&i===path.at(-2)){path.pop();draw();return;}if(!E.routeNeighbors(map,prev,placements,active.element).includes(i)||path.includes(i))return;if(!E.allowedTransition(map,active.element,prev,i,placements)){message('One-way direction violated.');return;}const c=map.cells[i],comp=E.effective(map,placements,i);
  if(c.node&&!(c.node.element===active.element&&c.node.role==='destination')){message('Another endpoint blocks the route.');return;}
+ if(active.element==='wind'&&comp==='tunnel'){message('Wind cannot use tunnels.');return;}
  if(!(['land','forest','ice','oneway'].includes(c.terrain)||(c.terrain==='water'&&comp==='bridge'))){message('Blocked terrain. Water needs a bridge.');return;}
  if(comp&&!['bridge','intersection','checkpoint','portal','tunnel','gate'].includes(comp)){message('This component is not yet playable.');return;}
  if(routes.some(r=>r.path.includes(i))&&comp!=='intersection'){message('Routes cannot share a cell without an intersection.');return;}

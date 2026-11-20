@@ -81,3 +81,21 @@ is sufficient for this campaign.
 The automated suite solves and plays every campaign level, including through
 the browser. G3 covers advanced puzzles such as portal budgets, ordered
 stations and efficiency scoring. G4 covers curated procedural generation.
+
+## World-Engine playtest
+
+Plant uses the existing `nature` map identifier. The optional Wind over the
+Rift puzzle is separate from campaign completion. Wind can jump one Void tile
+in a straight line between ground tiles and cannot use tunnels. The game
+highlights candidate landings.
+
+Ideas for later playtests include Fire crossing lava but avoiding deep water,
+Water following designated river channels but avoiding lava, Plant using
+woodland while avoiding portals, and Electricity using conductive spans while
+avoiding open water. Earth, Ice, Metal, Light, Shadow and Arcane still need
+distinct tradeoffs. These are design ideas. The campaign keeps its bridge rules.
+
+Build the standalone page with `python game/build.py Element_Forge_G2.html`.
+For a hosted playtest, upload only that generated HTML as `index.html` to an
+approved static web host. An access-controlled site can keep the build private;
+a public site requires approval. The source repository can remain private.

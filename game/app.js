@@ -3,16 +3,17 @@
  const E=window.EFEngine,F=window.EFMap;
  const levels=[...window.EFLevels.catalog];
  const campaignSize=levels.length;
+ levels.push(window.EFLevels.prototype);
  let storage;
  try{storage=window.localStorage;}catch{}
- const progress=window.EFProgress.createProgress(storage,levels.map(level=>level.id));
+ const progress=window.EFProgress.createProgress(storage,levels.slice(0,campaignSize).map(level=>level.id));
  const $=id=>document.getElementById(id);
  const board=$('board');
- const colors={fire:'#ff9875',water:'#79d7ff',nature:'#bdec81',electricity:'#ffdd72',arcane:'#d9b5ff'};
- const symbols={fire:'F',water:'W',nature:'N',electricity:'E',arcane:'A'};
+ const colors={fire:'#ff9875',water:'#79d7ff',nature:'#bdec81',electricity:'#ffdd72',arcane:'#d9b5ff',wind:'#a8f0dd'};
+ const symbols={fire:'F',water:'W',nature:'P',electricity:'E',arcane:'A',wind:'V'};
  const toolNames=Object.fromEntries(F.COMPONENTS.map(([id,name])=>[id,name]));
  const componentSymbols=Object.fromEntries(F.COMPONENTS.map(([id,,icon])=>[id,icon]));
- const terrainSymbols={forest:'♣',mountain:'▲',water:'≈',wall:'▦',void:'■',ice:'✧',lava:'≋',land:''};
+ const terrainSymbols={forest:'♣',mountain:'▲',water:'≈',wall:'▦',void:'◌',ice:'✧',lava:'≋',land:''};
  const arrows={N:'↑',E:'→',S:'↓',W:'←'};
  toolNames.tunnel='Tunnel';
  let session,tiles,tool,tunnelStart=null,levelIndex,timer=null,drag=null,importTicket=0;
@@ -53,7 +54,7 @@
   const legend=E.pairs(map).map(({element})=>{
    const item=document.createElement('b');
    item.style.setProperty('--element',colors[element]);
-   item.textContent=symbols[element]+' · '+F.ELEMENTS[element].name;
+   item.textContent=symbols[element]+' · '+F.ELEMENTS[element].name+(F.ELEMENTS[element].icon?' '+F.ELEMENTS[element].icon:'');
    return item;
   });
   $('elements').replaceChildren(...legend,document.createTextNode('S = source · D = destination'));
@@ -150,6 +151,7 @@
   $('plan').hidden=phase!=='inspect';
   $('build').hidden=phase!=='build';
   $('finish').hidden=phase!=='complete';
+  $('engine-restoration').hidden=phase!=='complete';
   if(phase==='build')drawToolBar();
   $('next').disabled=levelIndex>=campaignSize-1;
   drawBoard();
@@ -187,6 +189,7 @@
     fragments[i].append(line);
    }
   }
+  const landings=state.active?.element==='wind'?new Set(E.windLandings(map,state.active.path.at(-1))):new Set();
   for(const [i,cell] of map.cells.entries()){
    const tile=tiles[i];
    const mark=document.createElement('span');
@@ -209,6 +212,7 @@
    if(colors[element])mark.style.color=colors[element];
    }else mark.textContent=cell.terrain==='oneway'?arrows[cell.props?.direction||'E']:terrainSymbols[cell.terrain]||'';
    fragments[i].append(mark);
+   tile.classList.toggle('wind-landing',landings.has(i));
    tile.classList.toggle('tunnel-preview',i===tunnelStart);
    tile.replaceChildren(fragments[i]);
    const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
@@ -225,6 +229,7 @@
   if(result.message==='Start at an element source.'&&map.cells[index].node?.role==='destination'){
    return 'This is a destination (D). Start at the matching source (S).';
   }
+  if(element==='wind'&&map.cells[index].terrain==='void')return 'Tap the landing across one hole. Wind cannot stop in the Void.';
   if(result.message==='Element terrain restriction violated'){
    return F.ELEMENTS[element].name+' cannot cross '+map.cells[index].terrain+' on this level.';
   }
@@ -301,6 +306,7 @@
   event.preventDefault();
   const result=session.start(selection());
   if(!result.ok){message(result.message);return;}
+  if(!intro.hidden)dismissIntro();
   tool='route';
   update();
   message('');
@@ -360,7 +366,7 @@
    const level=JSON.parse((await file.text()).replace(/^\uFEFF/,''));
    if(ticket!==importTicket)return;
    const map=F.readLevel(level);
-   const index=window.EFLevels.catalog.length;
+   const index=campaignSize+1;
    levels[index]=level;
    $('level').querySelector('[data-import]')?.remove();
    const option=new Option(map.name+' (imported)',index);
@@ -395,7 +401,8 @@
   const tip=session.state.active.path.at(-1);
   const map=session.map;
   const stride=Math.floor(tip/map.width)===Math.floor(index/map.width)?1:tip%map.width===index%map.width?map.width:0;
-  if(stride&&index!==tip&&E.linkPartner(map,tip,session.state.placements)!==index){
+  if(stride&&index!==tip&&E.linkPartner(map,tip,session.state.placements)!==index&&
+     !(session.state.active.element==='wind'&&E.windLandings(map,tip).includes(index))){
    const delta=Math.sign(index-tip)*stride;
    for(let next=tip+delta;session.state.active;next+=delta){
     if(!act(next)||next===index)break;
@@ -457,6 +464,15 @@
   }
   $('campaign-progress').textContent=`${progress.completedCount()} / ${campaignSize} complete`;
  }
- for(const [index,level] of levels.entries())$('level').add(new Option(level.map.name,index));
+ const introKey='element-forge.world-engine-intro.v1';
+ const intro=$('world-intro');
+ try{intro.hidden=storage?.getItem(introKey)==='seen';}catch{}
+ function dismissIntro(){
+  intro.hidden=true;
+  try{storage?.setItem(introKey,'seen');}catch{}
+ }
+ $('intro-begin').onclick=dismissIntro;
+ $('intro-skip').onclick=dismissIntro;
+ for(const [index,level] of levels.entries())$('level').add(new Option(level.map.name+(index===campaignSize?' · Optional':''),index));
  openLevel(Math.min(progress.unlockedIndex(),Math.max(0,levels.findIndex(level=>level.id===progress.selected()))));
 })();

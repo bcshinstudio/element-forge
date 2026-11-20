@@ -290,6 +290,34 @@ def test_portrait_tunnels(browser, url):
     page.close()
 
 
+def test_world_engine_offline(browser, offline):
+    page = browser.new_page(viewport={"width": 390, "height": 844},
+                            is_mobile=True, has_touch=True, reduced_motion="reduce")
+    page.context.set_offline(True)
+    page.goto(offline.as_uri())
+    expect(page.locator("#world-intro")).to_be_visible()
+    page.locator("#intro-skip").tap()
+    expect(page.locator("#world-intro")).to_be_hidden()
+    page.locator("#level").select_option("15")
+    page.locator("#start").tap()
+    for index in (62, 63, 64):
+        tile(page, index).tap()
+    expect(tile(page, 66)).to_have_class(re.compile("wind-landing"))
+    tile(page, 65).tap()
+    expect(page.locator("#status")).to_contain_text("cannot stop")
+    for index in (66, 67, 68, 69):
+        tile(page, index).tap()
+    page.locator("#check").tap()
+    expect(page.locator("#engine-restoration")).to_contain_text("World-Engine online")
+    assert page.locator(".engine-wheel").evaluate("wheel => getComputedStyle(wheel).animationName") == "none"
+    expect(page.locator("#campaign-progress")).to_have_text("0 / 15 complete")
+    page.locator("#replay").tap()
+    expect(page.locator("#world-intro")).to_be_hidden()
+    page.reload()
+    expect(page.locator("#world-intro")).to_be_hidden()
+    page.close()
+
+
 def test_keyboard(browser, url):
     page = browser.new_page(reduced_motion="reduce")
     page.goto(url + BASE)
@@ -330,6 +358,8 @@ if __name__ == "__main__":
                     print("PASS standalone mobile emulation: responsive board, legacy import, touch routing and reduced motion")
                     test_portrait_tunnels(browser, url)
                     print("PASS portrait touch: scroll, hints, cancel either way, paired placement and removal")
+                    test_world_engine_offline(browser, offline)
+                    print("PASS offline World-Engine intro, Wind jump, reduced motion and replay")
                     test_keyboard(browser, url)
                     print("PASS keyboard: start, navigate, draw and deliver without a pointer")
                     test_campaign_and_progress(browser, url)
