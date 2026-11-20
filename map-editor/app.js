@@ -2,7 +2,7 @@
 // Editor data is renderer-independent. Future generator/solver should use this schema.
 const {TERRAIN,COMPONENTS,ELEMENTS,DIRECTIONS,fresh,parseConstraints,parseMap,structuralErrors}=window.EFMap;
 const $=id=>document.getElementById(id),clone=o=>JSON.parse(JSON.stringify(o));
-const newBoard=()=>({...fresh(),rulesVersion:3});
+const newBoard=()=>({...fresh(),rulesVersion:4});
 let map=newBoard(),tool='terrain:mountain',element='fire',direction='E',pairId='A',checkpointElement='any',history=[],future=[],drawing=false,changedStroke=false,lastIndex=-1,dirty=false,assets={terrain:{},components:{}};
 function snapshot(){history.push(clone(map));if(history.length>100)history.shift();future=[];updateHistory()}
 function updateHistory(){

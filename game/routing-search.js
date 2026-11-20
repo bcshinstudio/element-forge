@@ -94,7 +94,7 @@
    map.cells.filter(cell=>cell.component==='checkpoint').length<20&&
    Object.values(map.constraints).every(rule=>(rule.requireComponents?.length||0)<10);
   const requiredIntersection=Object.values(map.constraints).some(rule=>rule.requireComponents?.includes('intersection'));
-  const canCross=i=>map.rulesVersion===3||adjacency[i].length===4&&adjacency[i].every(j=>
+  const canCross=i=>map.rulesVersion>=3||adjacency[i].length===4&&adjacency[i].every(j=>
    ground.includes(map.cells[j].terrain)||
    (map.cells[j].terrain==='water'&&(map.cells[j].component==='bridge'||map.inventory.bridge)));
   const sites=map.cells.flatMap((_,i)=>['bridge','metalSpan','intersection'].flatMap(kind=>

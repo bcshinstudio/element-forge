@@ -48,7 +48,7 @@
     hint:typeof stage.hint==='string'?stage.hint.slice(0,200):''};
   });
  }
- const revision='harmony-v3';
+ const revision='tutorial-v4';
  const families=['budget','passage','checkpoint','combined'];
  const difficulties=['Easy','Medium','Hard','Expert'];
  const names={budget:'Scarce Crossing',passage:'Contested Pass',checkpoint:'Grove Crossing',combined:'Valley Relay'};
@@ -123,7 +123,7 @@
   if(clean.status!=='solved')return reject('Construction search '+clean.status,{clean:clean.status});
   if(!replay(level,clean))return reject('Game replay failed',{clean:'invalid'});
   if(['budget','combined'].includes(level.family)&&dry.status==='solved')return reject('Tool-free bypass',{clean:'solved'});
-  const area=map.rulesVersion===3?map.cells.filter(cell=>cell.terrain!=='mountain').length:map.cells.length;
+  const area=map.rulesVersion>=3?map.cells.filter(cell=>cell.terrain!=='mountain').length:map.cells.length;
   const open=map.cells.filter(cell=>['land','forest'].includes(cell.terrain)).length;
   const shared=model.adjacency.filter((neighbors,i)=>
    ['land','forest'].includes(map.cells[i].terrain)&&
@@ -333,14 +333,13 @@
   const cells=Array.from({length:144},()=>({terrain:'mountain'}));
   for(const [i,cell] of map.cells.entries())cells[(y+Math.floor(i/map.width))*12+x+i%map.width]=cell;
   if(map.inventory.bridge){
-   // Wet layouts use a conductive span so Electricity can cross as well.
-   map.inventory.metalSpan=map.inventory.bridge;
-   map.inventory.bridge=0;
-   map.construction.prices.metalSpan=map.construction.prices.bridge;
-   delete map.construction.prices.bridge;
-   level.hint='Compare what each current can still reach after you spend the span.';
+   // A bridge budget is meaningful for bridge-capable currents.
+   for(const cell of cells){
+    if(cell.node?.element==='electricity')cell.node={...cell.node,element:'light'};
+    if(cell.node?.element==='fire')cell.node={...cell.node,element:'shadow'};
+   }
   }
-  return {...level,rulesVersion:3,map:{...map,rulesVersion:3,width:12,height:12,cells}};
+  return {...level,rulesVersion:4,map:{...map,rulesVersion:4,width:12,height:12,cells}};
  }
 
  function scarceCrossing(){
@@ -349,7 +348,7 @@
   for(let y=2;y<=9;y++)put(4,y,'=');
   for(const y of [3,5,8])for(let x=5;x<=10;x++)put(x,y,x===5?':':'.');
   for(let y=3;y<=8;y++)put(10,y,'.');
-  put(8,5,'~');put(9,6,'E');put(5,6,'e');
+  put(8,5,'.');put(9,6,'E');put(5,6,'e');
   put(5,1,'p');put(5,2,'*');put(5,4,'P');
   put(2,7,'w');put(3,7,':');put(10,7,'W');
   const rows=board.map(row=>row.join(''));
@@ -357,11 +356,11 @@
   for(const [i,tile] of rows.join('').split('').entries()){
    if(tile==='='||tile===':')level.map.cells[i].terrain=tile==='='?'river':'bank';
   }
-  level.rulesVersion=level.map.rulesVersion=3;
+  level.rulesVersion=level.map.rulesVersion=4;
   level.map.name='Scarce Crossing';
-  level.map.description='Choose where Water leaves the river while Plant reaches the woods and Electricity reaches its span.';
-  level.map.inventory={metalSpan:1};
-  level.map.construction={budget:1,prices:{metalSpan:1}};
+  level.map.description='Choose where Water leaves the river while Plant reaches the woods and Electricity follows the dry corridor.';
+  level.map.inventory={};
+  delete level.map.construction;
   level.hint='Trace the three landings from the river before committing.';
   return level;
  }
@@ -373,7 +372,7 @@
   const solution=solve({});
   if(solution.status!=='solved'||!replay(level,solution))throw Error('Scarce Crossing failed replay');
   const alternatives=[3,5,8].map(exit=>{
-   const placements={[5*12+8]:'metalSpan'};
+   const placements={};
    const vertical=Array.from({length:Math.abs(exit-7)+1},(_,i)=>(7+i*Math.sign(exit-7))*12+4);
    const prefix=[7*12+2,7*12+3,...vertical,exit*12+5];
    const options={placements,prefixes:{water:prefix}};

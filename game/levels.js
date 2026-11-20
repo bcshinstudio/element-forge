@@ -30,7 +30,7 @@
   return {id:name.toLowerCase().replaceAll(' ','-'),format:'element-forge-level',schemaVersion:1,rulesVersion:construction?2:1,map};
  }
 
- const catalog=[
+ const harmonyCatalog=[
   level('Ember Meadow','Draw a route from the Fire spring to its matching forge. Tap the source (S), then tap adjacent tiles or drag toward its destination (D). Trees block Fire.',[
    '************','***......***','**........**','*...F.#....*','*.....##...*','*.....##...*',
    '*.....##...*','*......#f..*','**........**','***......***','************','************'
@@ -112,7 +112,7 @@
   'Check each element’s terrain rule and station before using the bridge budget.',
   'Tap another source to start its route. Tap an unfinished tip to return to it, and place tools whenever needed.'
  ];
- for(const [index,entry] of catalog.entries())entry.hint=hints[index];
+ for(const [index,entry] of harmonyCatalog.entries())entry.hint=hints[index];
 
  const prototype=level('Wind over the Rift','Tap a highlighted landing tile to carry Wind straight over one hole. Wind cannot use tunnels.',[
   '############','############','#####..#####','####..######','####...##..#','##V..o...v.#',
@@ -120,34 +120,34 @@
  ]);
  prototype.hint='Land directly across one hole. Two holes in a row and diagonal jumps cannot be crossed.';
  // Preserve IDs and the original layouts for regression and legacy imports.
- const legacyCatalog=catalog.map(entry=>JSON.parse(JSON.stringify(entry)));
+ const legacyCatalog=harmonyCatalog.map(entry=>JSON.parse(JSON.stringify(entry)));
  function modern(entry){
   entry.rulesVersion=3;
   entry.map.rulesVersion=3;
   return entry;
  }
  function replace(index,description,rows,inventory={},construction){
-  const old=catalog[index];
-  catalog[index]=level(old.map.name,description,rows,inventory,construction);
+  const old=harmonyCatalog[index];
+  harmonyCatalog[index]=level(old.map.name,description,rows,inventory,construction);
  }
  replace(1,'Water can travel in the river. Follow the bank markers to enter and leave.',[
   '############','############','##...=...###','##...=.w.###','##W..=...###','##..:=...###',
   '##...=:..###','##...=...###','############','############','############','############'
  ]);
- catalog[1].hint='A marked bank touches the river on each shore.';
+ harmonyCatalog[1].hint='A marked bank touches the river on each shore.';
  replace(3,'Water uses marked banks. Electricity needs one metal span across open water.',[
   '############','##...~...###','##E..~.e.###','##...~...###','############','##...=...###',
   '##W.:=...###','##...=:w.###','##...=...###','############','############','############'
  ],{metalSpan:2},{budget:2,prices:{metalSpan:2}});
- catalog[3].hint='Water follows the river unaided. Put the metal span where Electricity can reach both shores.';
+ harmonyCatalog[3].hint='Water follows the river unaided. Put the metal span where Electricity can reach both shores.';
  replace(4,'Fire can cross lava unaided. Deep water blocks even bridged Fire.',[
   '############','############','##..~....###','##F.~..f.###','##..~....###','##..!....###',
   '##..!....###','############','############','############','############','############'
  ],{bridge:1});
- const briar=catalog[6];
+ const briar=harmonyCatalog[6];
  briar.map.description+=' Plant cannot take the portal shortcut.';
  for(const i of [2*12+5,5*12+9])briar.map.cells[i]={terrain:'land',component:'portal',props:{pairId:'A'}};
- catalog[4].hint='Try crossing the lava at the bottom of the inlet.';
+ harmonyCatalog[4].hint='Try crossing the lava at the bottom of the inlet.';
  const lessons=[
   level('Wind over the Rift','Jump one hole in a straight line. Wind cannot use tunnels.',[
    '############','############','####...#####','####...#####','####...#####','##V..o...v##',
@@ -175,10 +175,82 @@
   ])
  ];
  lessons[0].id='wind-campaign-lesson';
- catalog.push(...lessons);
- catalog.forEach(modern);
+ harmonyCatalog.push(...lessons);
+ harmonyCatalog.forEach(modern);
  modern(prototype);
- const api={catalog,prototype,legacyCatalog,level,modern};
+ // A compact sketch is positioned inside the 12 × 12 board. Every active
+ // cell, including the alternative routes, is specified by the sketch.
+ function lesson(name,description,sketch,{tools={},budget,prices,components=[],requires=[]}={}){
+  const rows=Array(12).fill('############');
+  const y=Math.floor((12-sketch.length)/2),x=Math.floor((12-sketch[0].length)/2);
+  sketch.forEach((row,i)=>{
+   if(row.length!==sketch[0].length)throw Error('Uneven tutorial sketch: '+name);
+   rows[y+i]='#'.repeat(x)+row+'#'.repeat(12-x-row.length);
+  });
+  const entry=level(name,description,rows,tools,budget===undefined?undefined:{budget,prices});
+  entry.id='rules4-'+entry.id;
+  entry.rulesVersion=entry.map.rulesVersion=4;
+  for(const [col,row,component,props] of components){
+   Object.assign(entry.map.cells[(row+y)*12+col+x],{component,...(props&&{props})});
+  }
+  entry.requires=requires;
+  return entry;
+ }
+
+ const catalog=[
+  lesson('First Spark','Draw Fire from its spring to its forge. Tap the source, then tap adjacent tiles or drag.',[
+   'F...###','###.###','###...f'
+  ]),
+  lesson('Free Current','Take Water straight into the river from shore. Follow the river and leave on the other side. Lava blocks Water.',[
+   'W..!..w','...=...','###=###'
+  ],{requires:['river']}),
+  lesson('Lava Channel','Fire crosses lava. The shorter water route is blocked, even by a bridge.',[
+   'F.._..f','...~...','...!...'
+  ],{requires:['lava'],components:[[3,0,'bridge']]}),
+  lesson('Forest Shortcut','Plant travels through woods. The paired portals are closed to Plant.',[
+   'N.*.*.n','..#.#..','..###..'
+  ],{requires:['forest'],components:[[1,2,'portal',{pairId:'P'}],[5,2,'portal',{pairId:'P'}]]}),
+  lesson('Dry Circuit','Electricity stays dry. Go around the water and the bridge.',[
+   'E..~..e','...~...','.......'
+  ],{components:[[3,0,'bridge']]}),
+  lesson('Scree Shelf','Earth crosses scree. A lightweight bridge cannot carry it.',[
+   'R..~..r','...%...','###%###'
+  ],{requires:['scree'],components:[[3,0,'bridge']]}),
+  lesson('One Clear Jump','Wind jumps across one gap in a straight line. Two gaps are too wide and Wind cannot use tunnels.',[
+   'V..o..v','..oo...','...o...'
+  ],{requires:['jump'],components:[[2,2,'tunnel',{pairId:'T'}],[4,2,'tunnel',{pairId:'T'}]]}),
+  lesson('Shallow Freeze','Ice can freeze shallow water to cross. Heated ground blocks Ice.',[
+   'I..^..i','..._...','###_###'
+  ],{requires:['shallow']}),
+  lesson('Foundry Floor','Metal crosses heated and abrasive terrain. Scree and lightweight bridges won’t carry it.',[
+   'M.~.%.m','..^.&..','##^#&##'
+  ],{requires:['heated','abrasive'],components:[[2,0,'bridge']]}),
+  lesson('Open Sky','Light uses exposed channels. Covered passages block it.',[
+   'L..-..l','...+...','###.###'
+  ],{requires:['exposed']}),
+  lesson('Under Cover','Shadow uses covered channels. Exposed passages block it.',[
+   'H..+..h','...-...','###.###'
+  ],{requires:['covered']}),
+  lesson('Build a Bridge','Give Plant a light bridge across the pool. Tap an empty water tile to place it.',[
+   'N..~..n','...~...','###~###'
+  ],{tools:{bridge:1},requires:['bridge']}),
+  lesson('Cross at Right Angles','Use an intersection so two currents can cross. Both must go straight through.',[
+   '###E###','###.###','F.....f','###.###','###e###'
+  ],{tools:{intersection:1},requires:['intersection']}),
+  lesson('Choose Your Tunnel','Budget for a tunnel, then place both ends on open tiles across rock.',[
+   'F..#..f','...#...','...#...'
+  ],{tools:{tunnel:2,bridge:1},budget:2,prices:{tunnel:1,bridge:1},requires:['tunnel']}),
+  lesson('Portal Relay','Fire can use a paired portal. Visit the checkpoint before reaching the forge.',[
+   'F..#...','...#..f','...#.1.'
+  ],{components:[[2,0,'portal',{pairId:'A'}],[4,0,'portal',{pairId:'A'}]],requires:['portal','checkpoint']}),
+  lesson('Shared Causeway','Water can leave the river early, but Plant needs the upper clearing to reach the woods. Try another exit.',[
+   '##N#####','##*#####','##.#####','W=......','#=n####.','#=#####.','#======w'
+  ],{requires:['river','forest']}),
+  lesson('Two Currents, One Crossing','Find the dry line for Electricity while Water chooses where to join the river. Budget for one intersection.',[
+   '###E###','###.###','W...==w','###.###','###e###'
+  ],{tools:{intersection:2},budget:1,prices:{intersection:1},requires:['intersection','river']})
+ ];
+ const api={catalog,prototype,legacyCatalog,harmonyCatalog,level,modern};
  root.EFLevels=api;
  if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);
