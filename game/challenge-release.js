@@ -11,10 +11,11 @@ function release(){
  level.difficulty='Medium';
  pack.stages.splice(2,0,level);
  report.evidence.splice(2,0,{origin:'authored',solution,alternatives,difficulty:'Medium'});
- const expert=G.generate({seed:'clear-expert-0',count:1,attempts:72,difficulty:'Expert'});
+ const expert=G.generate({seed:'clear-expert-5',count:1,attempts:72,difficulty:'Expert'});
  if(expert.report.shortfall)throw Error('The Expert reference seed no longer verifies.');
+ if(report.evidence.some(entry=>entry.decision===expert.report.evidence[0].decision))throw Error('The curated Expert stage repeats a decision.');
  pack.stages.push(expert.pack.stages[0]);
- report.evidence.push({...expert.report.evidence[0],seed:'clear-expert-0'});
+ report.evidence.push({...expert.report.evidence[0],seed:'clear-expert-5'});
  report.requested+=2;
  report.accepted+=2;
  return {pack,report};
