@@ -13,7 +13,7 @@
  <script defer src="session.js"></script>
  <script defer src="routing-search.js"></script>
  <script defer src="challenges.js"></script>
- <script defer src="curated.js"></script>
+ <script defer src="revised-boards.js"></script>
  <link rel="stylesheet" href="../art/board.css">
  <script defer src="../art/board.js"></script>
  <script defer src="chapter.js"></script>
@@ -23,7 +23,7 @@
 <body>
  <header class="masthead">
   <button id="home-button" class="brand" type="button">Element Forge</button>
-  <button id="mobile-menu" type="button" hidden>Menu</button>
+  <div id="puzzle-nav" hidden><button id="mobile-menu" type="button" hidden>Menu</button> <button id="puzzle-home" type="button">Home</button></div>
   <div class="campaign-picker">
   <label for="level">Puzzle
    <select id="level"></select>
@@ -152,7 +152,9 @@
   <button type="button" id="back-to-game" autofocus>Back to Game</button>
   <button type="button" id="menu-tip" hidden>Mechanic tip</button>
   <button type="button" id="menu-home">Main menu</button>
+  <button type="button" id="menu-information">Information / Tutorials</button>
   <div id="menu-content"></div>
+  <div id="menu-lessons" hidden></div>
  </dialog>
  <footer>BC Shin Studio</footer>
 </body>

@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -77,12 +78,11 @@ def test_campaign(browser, url):
             page.locator("#try-lesson").click()
             expect(page.locator("#puzzle")).to_have_text("Forest Shortcut")
             page.locator("#return-lesson").click()
-            expect(page.locator("#puzzle")).to_have_text("Dry Junction")
+            expect(page.locator("#puzzle")).to_have_text("Crosswind Commons")
             expect(page.locator("#mechanic-tip")).to_be_hidden()
         if index == 4:
             expect(page.locator("#mechanic-tip")).to_be_hidden()
             expect(page.locator(".tile.bank")).to_have_count(0)
-            expect(tile(page, 41)).to_have_attribute("aria-label", "Row 4, column 6, Land")
         if index == 5:
             page.locator("#skip-tutorial-popups").check()
             page.locator("#continue-stage").click()
@@ -91,6 +91,7 @@ def test_campaign(browser, url):
             page.locator("#replan").click()
             expect(page.locator("#loadout")).to_be_visible()
         if index == 6:
+            expect(page.locator("#board .scree").first).to_have_css("background-image", re.compile("scree.webp"))
             expect(page.locator("#mechanic-tip")).to_be_hidden()
             page.locator("#mobile-menu").click()
             page.locator("#menu-tip").click()
@@ -101,7 +102,7 @@ def test_campaign(browser, url):
         if index == 2:
             page.reload()
             page.locator("#continue").click()
-            expect(page.locator("#puzzle")).to_have_text("Dry Junction")
+            expect(page.locator("#puzzle")).to_have_text("Crosswind Commons")
         else:
             page.locator("#next").click()
     expect(page.locator("#home-total")).to_contain_text("Chapter One complete")
@@ -197,6 +198,83 @@ def test_keyboard_and_import(browser, url):
     page.close()
 
 
+def test_import_navigation(browser, offline, width, height, touch):
+    page = browser.new_page(viewport={"width": width, "height": height}, is_mobile=touch,
+                            has_touch=touch, reduced_motion="reduce")
+    press = lambda locator: locator.tap() if touch else locator.click()
+    page.context.set_offline(True)
+    page.goto(offline.as_uri())
+    press(page.locator("#new-campaign"))
+    if not touch:
+        press(page.locator("#intro-skip"))
+    if touch:
+        press(page.locator("#mobile-menu"))
+    press(page.locator("#challenge-library summary"))
+    original = ROOT / "game/tests/fixtures/original-harder-pack.json"
+    page.locator("#pack-file").set_input_files(original)
+    expect(page.locator("#puzzle")).to_have_text("Hard · Grove Crossing 1")
+    page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+    for control in ["#mobile-menu", "#puzzle-home"]:
+        assert page.locator(control).evaluate("e => e.getBoundingClientRect().top >= 0 && e.getBoundingClientRect().bottom <= innerHeight")
+    press(page.locator("#mobile-menu"))
+    press(page.locator("#menu-information"))
+    expect(page.locator("#menu-lessons #tutorial-list button")).to_have_count(18)
+    press(page.locator("#back-to-game"))
+    expect(page.locator("#puzzle")).to_have_text("Hard · Grove Crossing 1")
+    expect(page.locator("#start")).to_be_visible()
+    press(page.locator("#puzzle-home"))
+    press(page.locator("#choose-challenge"))
+    expect(page.locator("#challenge-puzzles button")).to_have_count(6)
+    page.reload()
+    press(page.locator("#choose-challenge"))
+    press(page.locator("#challenge-puzzles button").first)
+    expect(page.locator("#puzzle")).to_have_text("Hard · Grove Crossing 1")
+    press(page.locator("#puzzle-home"))
+    press(page.locator("#choose-challenge"))
+    page.locator("#home-pack-file").set_input_files(ROOT / "game/tests/fixtures/revised-harder-pack.json")
+    expect(page.locator("#challenge-puzzles button")).to_have_count(6)
+    press(page.locator("#challenge-puzzles button").last)
+    expect(page.locator("#puzzle")).to_have_text("Wide Relay")
+    page.close()
+
+
+def test_challenge_fallback(browser, url):
+    page = browser.new_page()
+    page.goto(url + BASE)
+    page.evaluate("EFChallenges.generate = () => ({pack:{stages:[]}})")
+    page.locator("#choose-challenge").click()
+    page.locator("#challenge-tier").select_option("Easy")
+    page.locator("#generate-challenge").click()
+    expect(page.locator("#challenge-status")).to_contain_text("No verified puzzle")
+    page.locator("#challenge-tier").select_option("Hard")
+    page.locator("#generate-challenge").click()
+    expected = page.evaluate("EFRevisedBoards.pack.stages.find(s => s.difficulty === 'Hard').map.name")
+    expect(page.locator("#puzzle")).to_have_text(expected)
+    page.close()
+
+
+def test_layout_migration(browser, url):
+    page = browser.new_page()
+    page.goto(url + BASE)
+    page.evaluate("""() => {
+      const ids=EFChapter.chapter.map(l=>l.id);
+      localStorage.setItem('element-forge.chapter-one.v1', JSON.stringify({
+        version:2, completed:ids.slice(0,4), best:{[ids[3]]:99},
+        campaign:{id:ids[3],rules:4,board:{phase:'build'}}
+      }));
+      localStorage.setItem('element-forge.skip-tutorial-popups.v1','yes');
+    }""")
+    page.reload()
+    page.locator("#continue").click()
+    expect(page.locator("#puzzle")).to_have_text("Crosswind Commons")
+    expect(page.locator("#status")).to_contain_text("new layout")
+    expect(page.locator("#start")).to_be_visible()
+    expect(page.locator("#campaign-progress")).to_have_text("4 / 12 complete")
+    assert page.evaluate("""() => JSON.parse(localStorage.getItem('element-forge.chapter-one.v1'))
+      .archivedBest['chapter-one-dry-junction']['1'] === 99""")
+    page.close()
+
+
 def test_challenge_pack_offline(browser, offline):
     page = browser.new_page(viewport={"width": 390, "height": 844},
                             is_mobile=True, has_touch=True, reduced_motion="reduce")
@@ -204,9 +282,9 @@ def test_challenge_pack_offline(browser, offline):
     page.goto(offline.as_uri())
     page.locator("#choose-challenge").tap()
     page.locator("#home-curated").tap()
-    pack = page.evaluate("EFCurated")
+    pack = page.evaluate("EFRevisedBoards.pack")
     expect(page.locator("#puzzle")).to_contain_text(pack["stages"][0]["map"]["name"])
-    plans = page.evaluate("EFCurated.stages.map(level => level.map.name === 'Scarce Crossing' ? EFChallenges.verifyScarce().solution : EFEngine.solveConstruction(EFMap.readLevel(level)))")
+    plans = page.evaluate("EFRevisedBoards.pack.stages.map(level => EFEngine.solveConstruction(EFMap.readLevel(level)))")
     assert all(plan and plan["status"] == "solved" for plan in plans)
     for i, plan in enumerate(plans):
         assert page.locator("#start").evaluate("e => e.getBoundingClientRect().bottom <= innerHeight")
@@ -278,6 +356,13 @@ if __name__ == "__main__":
                     print("PASS offline portrait and landscape touch, menu dismissal, resume and audio settings")
                     test_keyboard_and_import(browser, url)
                     print("PASS keyboard routing and editor import")
+                    test_challenge_fallback(browser, url)
+                    print("PASS challenge fallback uses only the requested tier")
+                    test_layout_migration(browser, url)
+                    print("PASS saved layout migration and score archive")
+                    for width, height, touch in [(1280, 650, False), (390, 844, True), (844, 390, True)]:
+                        test_import_navigation(browser, offline, width, height, touch)
+                    print("PASS exact six-pack navigation on desktop and portrait/landscape touch")
                     test_challenge_pack_offline(browser, offline)
                     print("PASS offline challenge pack, resume, next and pack import")
                     browser.close()

@@ -11,6 +11,7 @@
 [hidden] { display: none !important; }
 body { margin: 0; min-height: 100vh; }
 .masthead {
+ position: sticky; top: 0; z-index: 5; background: #14241c;
  max-width: 1260px; margin: auto; padding: 22px clamp(16px,4vw,52px);
  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;
  border-bottom: 1px solid var(--border);
@@ -230,3 +231,6 @@ body {
  #link-id { display:none; }
  #phone-link-id { display:inline-block; min-height:44px; }
 }
+
+#puzzle-nav { display:flex; gap:4px; }
+#puzzle-nav button { min-height: 40px; }

@@ -8,7 +8,11 @@ const {catalog,prototype}=require('../levels');
 const {createSession}=require('../session');
 const {createProgress}=require('../progress');
 const {createAudio}=require('../audio');
-const {verifyScarce}=require('../challenges');
+const G=require('../challenges');
+const R=require('../routing-search');
+const decisions=require('./fixtures/rebuild-decisions.json');
+const {pack}=require('../revised-boards');
+const playtest=require('./fixtures/revised-harder-pack.json');
 
 const chapterKey='element-forge.chapter-one.v1';
 const tutorialKey='element-forge.tutorial-campaign.v4';
@@ -52,32 +56,51 @@ for(const [index,level] of chapter.entries())test(`Chapter stage ${index+1}: ${l
  assert.equal(createSession(level).restore(session.snapshot()),true);
 });
 
-test('chapter choices test alternative placements and movement rather than only the winning lines',()=>{
- const fixed=[
-  [1,{53:'intersection'},'solved'],
-  [2,{61:'intersection'},'unsolved'],
-  [3,{64:'intersection'},'unsolved'],
-  [5,{76:'bridge',67:'intersection'},'unsolved'],
-  [6,{63:'intersection',65:'bridge'},'solved'],
-  [7,{64:{kind:'tunnel',pairId:'T'},68:{kind:'tunnel',pairId:'T'}},'unsolved'],
-  [8,{64:'intersection'},'unsolved'],
-  [9,{67:'intersection'},'unsolved'],
-  [10,{64:'intersection'},'solved'],
-  [11,{62:'intersection',63:'intersection'},'unsolved']
- ];
- for(const [stage,initialPlacements,status] of fixed){
-  const map=F.readLevel(chapter[stage]);
-  for(const [index,value] of Object.entries(initialPlacements)){
-   assert.equal(E.canPlace(map,{},Number(index),E.placementKind(value)),true);
-  }
-  const search=stage===7?E.solve:E.solveFixed;
-  assert.equal(search(map,{initialPlacements}).status,status,chapter[stage].map.name);
- }
+test('opening lessons teach backtracking and alternate intersection placement',()=>{
  const opening=createSession(chapter[0]);
  assert.equal(opening.start().ok,true);
  assert.equal(opening.route(50).ok,true);
  assert.equal(opening.route(62).ok,false);
- assert.deepEqual(verifyScarce().alternatives.map(a=>a.status),['unsolved','unsolved','solved']);
+ assert.equal(E.solveFixed(F.readLevel(chapter[1]),{initialPlacements:{53:'intersection'}}).status,'solved');
+});
+
+for(const [group,stages] of Object.entries({chapter:chapter.slice(3),pack:pack.stages,playtest:playtest.stages})){
+ test(`${group} replacement layouts have verified route or construction traps`,()=>{
+  assert.equal(stages.length,decisions[group].length);
+  assert.equal(new Set(stages.map(s=>G.layoutKey(F.readLevel(s)))).size,stages.length);
+  for(const [i,stage] of stages.entries()){
+   const map=F.readLevel(stage), model=R.prepare(map), wrong=decisions[group][i];
+   assert.ok(G.replay(stage,E.solveConstruction(map)),stage.map.name);
+   if(wrong.path){
+    assert.equal(E.validatePath(map,wrong.element,wrong.path,[],wrong.required),null,stage.map.name);
+    const options={prefixes:{[wrong.element]:wrong.path},required:wrong.required,limit:120000};
+    assert.equal(R.solve(model,options).status,'unsolved',stage.map.name);
+    for(const other of wrong.blocks)
+     assert.equal(R.solve(model,{...options,only:[wrong.element,other]}).status,'unsolved',stage.map.name);
+   }else{
+    for(const [index,kind] of Object.entries(wrong.placement))assert.ok(E.canPlace(map,{},Number(index),kind));
+    assert.equal(R.solve(model,{placements:wrong.placement,limit:120000}).status,'unsolved',stage.map.name);
+   }
+  }
+ });
+}
+
+test('layout migration archives prior scores and preserves progress and saved challenge',()=>{
+ const storage=memory(), id=ids[3];
+ const old=createProgress(storage,ids,4,chapterKey);
+ old.complete(id,85);
+ old.saveCampaign({id,rules:4,board:{phase:'build'}});
+ old.saveChallenge({pack:{stages:['legacy']},index:0});
+ const current=createProgress(storage,ids,4,chapterKey,{[id]:2});
+ assert.equal(current.best(id),null);
+ assert.equal(current.historicalBest(id,1),85);
+ assert.equal(current.reachedIndex(),4);
+ assert.equal(current.campaign().id,id);
+ assert.deepEqual(current.challenge().pack.stages,['legacy']);
+ current.complete(id,50);
+ const reload=createProgress(storage,ids,4,chapterKey,{[id]:2});
+ assert.equal(reload.best(id),50);
+ assert.equal(reload.historicalBest(id,1),85);
 });
 
 test('exact First Spark draft migrates while an incompatible tutorial draft remains archived',()=>{

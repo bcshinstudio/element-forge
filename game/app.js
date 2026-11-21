@@ -8,7 +8,7 @@
  const importIndex=levels.length;
  let storage;
  try{storage=window.localStorage;}catch{}
- const progress=window.EFProgress.createProgress(storage,levels.slice(0,campaignSize).map(level=>level.id),levels[0].rulesVersion,'element-forge.chapter-one.v1');
+ const progress=window.EFProgress.createProgress(storage,levels.slice(0,campaignSize).map(level=>level.id),levels[0].rulesVersion,'element-forge.chapter-one.v1',Object.fromEntries(levels.slice(0,campaignSize).map(level=>[level.id,level.layout??1])));
  const tutorialProgress=window.EFProgress.createProgress(storage,tutorials.map(level=>level.id),4);
  const audio=window.EFAudio.createAudio({storage,document,AudioContext:window.AudioContext||window.webkitAudioContext});
  document.addEventListener('click',()=>audio.unlock(),true);
@@ -46,6 +46,7 @@
    if(phone.matches)$('menu-content').append(item);
    else menuHomes[i].after(item);
   }
+  $('puzzle-nav').hidden=$('play-view').hidden;
   $('mobile-menu').hidden=$('play-view').hidden;
  }
  function fitBoard(){
@@ -63,7 +64,18 @@
   if(!menu.open){menu.scrollTop=0;menu.showModal();menu.scrollTop=0;}
  };
  $('back-to-game').onclick=()=>menu.close();
- $('menu-home').onclick=()=>showHome();
+ $('menu-home').onclick=$('puzzle-home').onclick=()=>showHome();
+ const informationHome=$('information-panel').parentNode;
+ function showMenuInformation(show){
+  $('menu-lessons').hidden=!show;
+  $('menu-content').hidden=show;
+  $('menu-information').setAttribute('aria-expanded',String(show));
+  if(show)$('menu-lessons').append($('information-panel'));
+  else informationHome.insertBefore($('information-panel'),$('audio-settings'));
+  $('information-panel').hidden=!show;
+ }
+ $('menu-information').onclick=()=>{const show=$('menu-lessons').hidden;showMenuInformation(show);if(show)renderChoices();};
+ menu.addEventListener('close',()=>{if(!$('menu-lessons').hidden)showMenuInformation(false);});
  menu.addEventListener('close',()=>{if(!$('mobile-menu').hidden)$('mobile-menu').focus({preventScroll:true});});
  menu.addEventListener('click',event=>{
   if(event.target!==menu)return;
@@ -144,7 +156,7 @@
  }
 
  function campaignSnapshot(){
-  return {id:levels[levelIndex].id,rules:levels[levelIndex].rulesVersion,board:session.snapshot()};
+  return {id:levels[levelIndex].id,rules:levels[levelIndex].rulesVersion,layout:levels[levelIndex].layout??1,board:session.snapshot()};
  }
 
  function persist(){
@@ -613,7 +625,7 @@
   message(`Imported ${challengeEnd-challengeStart} puzzles. Find them under Challenges on the home screen.`);
  }
 
- $('curated-pack').onclick=()=>{loadPack(window.EFCurated);$('challenge-library').open=false;};
+ $('curated-pack').onclick=()=>{loadPack(window.EFRevisedBoards.pack);$('challenge-library').open=false;};
  async function importPack(event){
   const input=event.currentTarget;
   const file=input.files[0];
@@ -744,11 +756,15 @@
    if(index===campaignSize-1)return {complete:true};
    return {index:index+1};
   }
-  return {index,board:saved.rules===levels[index].rulesVersion?saved.board:null};
+  const changed=(saved.layout??1)!==(levels[index].layout??1);
+  return {index,changed,board:!changed&&saved.rules===levels[index].rulesVersion?saved.board:null};
  }
  function continueCampaign(){
   const target=runTarget();
-  if(target&&!target.complete)openLevel(target.index,target.board);
+  if(!target||target.complete)return;
+  openLevel(target.index,target.board);
+  if(target.changed)message('This stage has a new layout. The board restarted; your unlocks and old layout score were kept.');
+
  }
  const panels=['stage-list','information-panel','audio-settings','challenge-menu'];
  function showPanel(id){
@@ -788,7 +804,7 @@
    $('tutorial-list').append(heading);
    tutorials.slice(start,end).forEach((level,index)=>makeChoice($('tutorial-list'),
     level.map.name+(tutorialProgress.hasCompleted(level.id)?' ✓':''),
-    ()=>{tutorialReturn=null;openLevel(campaignSize+start+index,null,'tutorial');}));
+    ()=>{tutorialReturn=menu.open?{index:levelIndex,board:session.snapshot(),mode}:null;openLevel(campaignSize+start+index,null,'tutorial');}));
   }
  }
  let seenTips=new Set();
@@ -849,6 +865,7 @@
   $('play-view').hidden=true;
   adjustPhone();
   if(menu.open)menu.close();
+  if(!$('menu-lessons').hidden)showMenuInformation(false);
   if(tip.open)tip.close();
   document.querySelector('.campaign-picker').hidden=true;
   intro.hidden=true;
@@ -880,7 +897,7 @@
   input.checked=audio.preferences[key];
   input.onchange=()=>audio.set(key,input.checked);
  }
- $('home-curated').onclick=()=>loadPack(window.EFCurated);
+ $('home-curated').onclick=()=>loadPack(window.EFRevisedBoards.pack);
  $('resume-challenge').onclick=()=>{
   const saved=progress.challenge();
   try{loadPack(saved.pack,saved);}catch{progress.saveChallenge(null);$('resume-challenge').hidden=true;
@@ -896,8 +913,8 @@
     const {pack}=window.EFChallenges.generate({difficulty,count:1,attempts:48,seed:String(Date.now())});
     if(pack.stages.length)loadPack(pack);
     else{
-     const reference=window.EFCurated.stages.find(stage=>stage.difficulty===difficulty);
-     if(reference)loadPack({...window.EFCurated,stages:[reference]});
+     const reference=window.EFRevisedBoards.pack.stages.find(stage=>stage.difficulty===difficulty);
+     if(reference)loadPack({...window.EFRevisedBoards.pack,stages:[reference]});
      else status.textContent='No verified puzzle found at this difficulty. Try again or open the curated pack.';
     }
    }catch(error){status.textContent=error.message;}
