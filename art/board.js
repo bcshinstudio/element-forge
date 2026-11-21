@@ -1,7 +1,7 @@
 'use strict';
 (() => {
  const structures = new Set(['bridge', 'intersection', 'tunnel', 'portal']);
- const terrains = new Set(['land', 'forest', 'mountain', 'void', 'water', 'river', 'shallow', 'heated', 'lava']);
+ const terrains = new Set(['land', 'forest', 'mountain', 'void', 'water', 'river', 'shallow', 'heated', 'lava', 'scree']);
 
  function decorate(cell, kind, { link, custom = false } = {}) {
   cell.querySelectorAll('.structure-art, .art-structure-label').forEach(node => node.remove());

@@ -60,6 +60,8 @@
    <button id="generate-challenge" type="button">Find puzzle</button>
    <button id="resume-challenge" type="button">Resume challenge</button>
    <button id="home-curated" type="button">Play curated pack</button>
+   <label class="import">Import challenge pack <input id="home-pack-file" type="file" accept=".json,application/json"></label>
+   <div id="challenge-puzzles" class="stage-list" hidden></div>
    <p id="challenge-status" role="status"></p>
   </div>
  </section>
@@ -109,11 +111,11 @@
      <button id="check" class="primary">Restore Harmony</button>
      <button id="undo">Undo</button>
     </div>
-    <button id="replan" type="button">Change construction</button>
+    <button id="replan" class="restart-stage" type="button">Restart stage</button>
     <details id="puzzle-options" class="disclosure">
      <summary>Puzzle options</summary>
      <div class="option-actions">
-      <button id="restart">Restart</button>
+      <button id="restart">Restart with same tools</button>
      </div>
     </details>
    </div>
@@ -137,10 +139,11 @@
    <summary>Challenge stages</summary>
    <button id="curated-pack" type="button">Play curated pack</button>
    <label class="import">Import challenge pack <input type="file" id="pack-file" accept=".json,application/json"></label>
+   <p id="pack-import-error" role="alert"></p>
   </details>
   <details id="custom-level" class="disclosure custom-level">
    <summary>Open a custom level</summary>
-   <label class="import">Choose an editor-exported level <input type="file" id="import" accept=".json,application/json"></label>
+   <label class="import">Choose a level or challenge pack <input type="file" id="import" accept=".json,application/json"></label>
    <p id="import-error" role="status"></p>
   </details>
   </div>

@@ -2,6 +2,7 @@
 #board :is(.tile, .cell).land { background-image: url(tiles/land.webp); }
 #board :is(.tile, .cell).forest { background-image: url(tiles/forest.webp); }
 #board :is(.tile, .cell).mountain { background-image: url(tiles/mountain.webp); }
+#board :is(.tile, .cell).scree { background-image: url(tiles/scree.webp); }
 #board :is(.tile, .cell).void { background-image: url(tiles/void.webp); }
 #board :is(.tile, .cell).water { background-image: url(tiles/water.webp); }
 #board :is(.tile, .cell).river { background-image: url(tiles/river.webp); }

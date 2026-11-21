@@ -531,7 +531,7 @@
  $('replan').onclick=()=>{
   const {placements,routes,drafts}=session.state;
   const hasWork=Object.keys(placements).length||routes.length||Object.keys(drafts).length;
-  if(hasWork&&!confirm('Change construction? This clears routes and placed tools on this stage.'))return;
+  if(hasWork&&!confirm('Restart this stage and choose tools again? This clears routes and placed tools.'))return;
   reset(true);
  };
  $('replay').onclick=()=>reset(true);
@@ -578,6 +578,7 @@
    if(file.size>1024*1024)throw Error('Choose a level file smaller than 1 MiB.');
    const level=JSON.parse((await file.text()).replace(/^\uFEFF/,''));
    if(ticket!==importTicket)return;
+   if(level?.format==='element-forge-challenges'){startImportedPack(level);return;}
    const map=F.readLevel(level);
    const index=importIndex;
    levels[index]=level;
@@ -606,20 +607,36 @@
   openLevel(challengeStart+index,saved?.board);
  }
 
+ function startImportedPack(pack){
+  loadPack(pack);
+  $('challenge-library').open=false;
+  message(`Imported ${challengeEnd-challengeStart} puzzles. Find them under Challenges on the home screen.`);
+ }
+
  $('curated-pack').onclick=()=>{loadPack(window.EFCurated);$('challenge-library').open=false;};
- $('pack-file').onchange=async event=>{
-  const file=event.target.files[0];
-  event.target.value='';
+ async function importPack(event){
+  const input=event.currentTarget;
+  const file=input.files[0];
+  input.value='';
   if(!file)return;
+  const fromHome=input.id==='home-pack-file';
+  const status=$(fromHome?'challenge-status':'pack-import-error');
+  status.textContent='';
   const ticket=++importTicket;
   try{
    if(file.size>1024*1024)throw Error('Choose a pack smaller than 1 MiB.');
-   const pack=JSON.parse((await file.text()).replace(/^\uFEFF/,''));
-   if(ticket!==importTicket)return;
-   loadPack(pack);
-   $('challenge-library').open=false;
-  }catch(error){if(ticket===importTicket)message('Pack import failed. '+error.message);}
- };
+   const pack=window.EFChallenges.repairGeneratedRivers(JSON.parse((await file.text()).replace(/^\uFEFF/,'')));
+   if(ticket!==importTicket||fromHome===$('home').hidden)return;
+   if(fromHome){
+    const puzzles=window.EFChallenges.readPack(pack);
+    progress.saveChallenge({pack,index:0,best:{},board:null});
+    renderChallengeChoices();
+    status.textContent=`Imported ${puzzles.length} puzzle${puzzles.length===1?'':'s'}. Choose one below.`;
+   }else startImportedPack(pack);
+  }catch(error){if(ticket===importTicket)status.textContent='Pack import failed. '+error.message;}
+ }
+ $('pack-file').onchange=importPack;
+ $('home-pack-file').onchange=importPack;
  board.addEventListener('click',event=>{
   const tile=event.target.closest('.tile');
   if(tile)act(Number(tile.dataset.index),true);
@@ -745,6 +762,19 @@
   button.onclick=callback;
   parent.append(button);
  }
+ function renderChallengeChoices(){
+  const saved=progress.challenge();
+  const list=$('challenge-puzzles');
+  list.replaceChildren();
+  list.hidden=true;
+  $('resume-challenge').hidden=!saved?.pack||!saved.board;
+  if(!saved?.pack)return;
+  try{
+   window.EFChallenges.readPack(saved.pack).forEach(({map},index)=>makeChoice(list,
+    `${index+1}. ${map.name}`,()=>loadPack(saved.pack,{...saved,index,board:index===saved.index?saved.board:null})));
+   list.hidden=false;
+  }catch{}
+ }
  function renderChoices(){
   $('stage-list').replaceChildren();
   levels.slice(0,campaignSize).forEach((level,index)=>makeChoice($('stage-list'),
@@ -827,7 +857,7 @@
   $('continue').disabled=!target||Boolean(target.complete);
   $('home-total').textContent=target?.complete?'Chapter One complete · The valley is restored':
    target?`Stage ${target.index+1} of ${campaignSize} · Campaign best total ${progress.total()}`:'Chapter One · The Sleeping Valley';
-  $('resume-challenge').hidden=!progress.challenge()?.pack;
+  renderChallengeChoices();
   showPanel(null);
   renderChoices();
   (target&&!target.complete?$('continue'):$('new-campaign')).focus();

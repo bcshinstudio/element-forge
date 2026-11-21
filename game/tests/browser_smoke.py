@@ -241,6 +241,18 @@ def test_challenge_pack_offline(browser, offline):
     page.locator("#pack-file").set_input_files({"name": "pack.json", "mimeType": "application/json",
                                                "buffer": json.dumps(pack).encode()})
     expect(page.locator("#puzzle")).to_contain_text(pack["stages"][0]["map"]["name"])
+    file = {"name": "pack.json", "mimeType": "application/json", "buffer": json.dumps(pack).encode()}
+    page.locator("#mobile-menu").tap()
+    page.locator("#custom-level summary").tap()
+    page.locator("#import").set_input_files(file)
+    expect(page.locator("#status")).to_contain_text("Imported")
+    page.reload()
+    page.locator("#choose-challenge").tap()
+    expect(page.locator("#challenge-puzzles button")).to_have_count(len(pack["stages"]))
+    page.locator("#home-pack-file").set_input_files(file)
+    expect(page.locator("#challenge-status")).to_contain_text("Choose one below")
+    page.locator("#challenge-puzzles button").nth(1).tap()
+    expect(page.locator("#puzzle")).to_have_text(pack["stages"][1]["map"]["name"])
     page.close()
 
 
