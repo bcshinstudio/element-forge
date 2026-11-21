@@ -3,7 +3,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const E=require('../../map-editor/engine');
 const F=require('../../map-editor/map-format');
-const {chapter}=require('../chapter');
+const {chapter,chapterTwo}=require('../chapter');
 const {catalog,prototype}=require('../levels');
 const {createSession}=require('../session');
 const {createProgress}=require('../progress');
@@ -176,4 +176,22 @@ test('audio settings persist, cue groups are gated, and scene switches stop exis
  listeners.visibilitychange();
  const restored=createAudio({storage,document:page,AudioContext:Context});
  assert.deepEqual(restored.preferences,{music:false,effects:false});
+});
+
+test('Chapter Two opens after Chapter One and all five stages replay in the game session',()=>{
+ const storage=memory();
+ const old=createProgress(storage,ids,4,chapterKey);
+ ids.forEach(id=>old.complete(id,40));
+ old.saveCampaign({id:ids.at(-1),rules:4,layout:2,board:{phase:'complete'}});
+ const all=[...ids,...chapterTwo.map(level=>level.id)];
+ const migrated=createProgress(storage,all,4,chapterKey);
+ assert.equal(migrated.reachedIndex(),12);
+ assert.equal(migrated.completedCount(),12);
+ assert.equal(migrated.campaign().id,ids.at(-1));
+ assert.equal(new Set(all).size,17);
+ for(const level of chapterTwo){
+  const solution=E.solveConstruction(F.readLevel(level));
+  assert.equal(solution.status,'solved',level.map.name);
+  play(level,solution);
+ }
 });

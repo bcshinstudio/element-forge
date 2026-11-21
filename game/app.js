@@ -1,7 +1,8 @@
 'use strict';
 (()=>{
  const E=window.EFEngine,F=window.EFMap;
- const levels=[...window.EFChapter.chapter];
+ const chapterOneSize=window.EFChapter.chapter.length;
+ const levels=[...window.EFChapter.chapter,...window.EFChapter.chapterTwo];
  const campaignSize=levels.length;
  const tutorials=[...window.EFLevels.catalog,window.EFLevels.prototype];
  levels.push(...tutorials);
@@ -319,7 +320,7 @@
   if(phase==='build')drawToolBar();
   $('next').disabled=mode==='independent'&&(levelIndex<challengeStart||levelIndex+1>=challengeEnd);
   $('next').textContent=mode==='tutorial'?(tutorialReturn?'Return to Stage':'Tutorials'):
-   mode==='replay'?'Stage Select':levelIndex===campaignSize-1?'Chapter summary':'Next Stage';
+   mode==='replay'?'Stage Select':levelIndex===campaignSize-1?'Campaign summary':levelIndex===chapterOneSize-1?'Start Chapter Two':'Next Stage';
   $('return-lesson').hidden=mode!=='tutorial';
   drawBoard();
  }
@@ -737,7 +738,9 @@
    $('level').options[i].disabled=!canOpen(i);
    $('level').options[i].textContent=`${i+1}. ${map.name}${progress.hasCompleted(id)?' ✓':canOpen(i)?'':' · Locked'}`;
   }
-  $('campaign-progress').textContent=`${progress.completedCount()} / ${campaignSize} complete`;
+  const second=levelIndex>=chapterOneSize&&levelIndex<campaignSize;
+  const stages=second?levels.slice(chapterOneSize,campaignSize):levels.slice(0,chapterOneSize);
+  $('campaign-progress').textContent=`${stages.filter(level=>progress.hasCompleted(level.id)).length} / ${stages.length} complete`;
  }
  const introKey='element-forge.world-engine-intro.v1';
  const intro=$('world-intro');
@@ -793,9 +796,15 @@
  }
  function renderChoices(){
   $('stage-list').replaceChildren();
-  levels.slice(0,campaignSize).forEach((level,index)=>makeChoice($('stage-list'),
-   `${index+1}. ${level.map.name}${progress.hasCompleted(level.id)?' ✓':''}`,
-   ()=>openLevel(index,null,'replay'),!canOpen(index)));
+  levels.slice(0,campaignSize).forEach((level,index)=>{
+   if(index===0||index===chapterOneSize){
+    const heading=document.createElement('h3');
+    heading.textContent=index===0?'Chapter One · The Sleeping Valley':'Chapter Two · The Gatekeepers';
+    $('stage-list').append(heading);
+   }
+   makeChoice($('stage-list'),`${index+1}. ${level.map.name}${progress.hasCompleted(level.id)?' ✓':''}`,
+    ()=>openLevel(index,null,'replay'),!canOpen(index));
+  });
   $('tutorial-list').replaceChildren();
   const groups=[['Route basics and elements',0,11],['Construction and combined routing',11,17],['Wind practice',17,18]];
   for(const [title,start,end] of groups){
@@ -872,8 +881,8 @@
   const target=runTarget();
   document.body.classList.toggle('chapter-restored',Boolean(target?.complete));
   $('continue').disabled=!target||Boolean(target.complete);
-  $('home-total').textContent=target?.complete?'Chapter One complete · The valley is restored':
-   target?`Stage ${target.index+1} of ${campaignSize} · Campaign best total ${progress.total()}`:'Chapter One · The Sleeping Valley';
+  $('home-total').textContent=target?.complete?'Campaign complete · The Gatekeepers restored':
+   target?`${target.index<chapterOneSize?'Chapter One':'Chapter Two'} · Stage ${target.index+1} of ${campaignSize} · Campaign best total ${progress.total()}`:'Chapter One · The Sleeping Valley';
   renderChallengeChoices();
   showPanel(null);
   renderChoices();

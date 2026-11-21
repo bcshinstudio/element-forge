@@ -15,7 +15,7 @@ def tile(page, index):
 
 
 def current_plan(page, index):
-    return page.evaluate("index => EFEngine.solveConstruction(EFMap.readLevel(EFChapter.chapter[index]))", index)
+    return page.evaluate("index => EFEngine.solveConstruction(EFMap.readLevel([...EFChapter.chapter,...EFChapter.chapterTwo][index]))", index)
 
 
 def prepare(page, plan, tap=False):
@@ -70,7 +70,7 @@ def test_campaign(browser, url):
     page.locator("#new-campaign").click()
     if page.locator("#intro-skip").is_visible():
         page.locator("#intro-skip").click()
-    for index in range(12):
+    for index in range(17):
         plan = current_plan(page, index)
         assert plan["status"] == "solved"
         if index == 3:
@@ -99,13 +99,15 @@ def test_campaign(browser, url):
             page.locator("#continue-stage").click()
         prepare(page, plan)
         finish(page, plan)
+        if index == 11:
+            expect(page.locator("#next")).to_have_text("Start Chapter Two")
         if index == 2:
             page.reload()
             page.locator("#continue").click()
             expect(page.locator("#puzzle")).to_have_text("Crosswind Commons")
         else:
             page.locator("#next").click()
-    expect(page.locator("#home-total")).to_contain_text("Chapter One complete")
+    expect(page.locator("#home-total")).to_contain_text("Campaign complete")
     page.reload()
     page.locator("#settings").click()
     expect(page.locator("#settings-skip-tutorial-popups")).to_be_checked()
@@ -115,7 +117,7 @@ def test_campaign(browser, url):
     page.locator("#stage-select").click()
     expect(page.locator("#stage-list button").last).to_be_enabled()
     page.locator("#stage-list button").last.click()
-    expect(page.locator("#puzzle")).to_have_text("Grove Overlook")
+    expect(page.locator("#puzzle")).to_have_text("The Two Inlets")
     page.locator("#home-button").click()
     page.locator("#continue").click()
     expect(page.locator("#puzzle")).to_have_text("First Spark")
