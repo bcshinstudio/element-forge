@@ -15,10 +15,19 @@ with sync_playwright() as pw:
     page.on('pageerror',lambda e: errors.append(str(e)))
     page.goto(f'http://127.0.0.1:{server.server_port}/map-editor/index.html')
     assert page.locator('#board .cell').count()==144
+
+    def square_tiles():
+        sizes=page.locator('#board .cell').evaluate_all(
+            'cells => cells.map(cell => {const r=cell.getBoundingClientRect(); return [r.width,r.height]})')
+        assert all(abs(width-height)<0.1 for width,height in sizes), sizes[:12]
+        return sizes
+
+    initial_sizes=square_tiles()
     page.locator('[data-tool="node:source"]').click()
     page.locator('#board .cell').nth(37).click()
     page.locator('[data-tool="node:destination"]').click()
     page.locator('#board .cell').nth(42).click()
+    assert square_tiles()==initial_sizes
     page.locator('#inv-portal').fill('2')
     page.locator('#inv-portal').dispatch_event('change')
     page.locator('#playMode').click()
@@ -26,9 +35,11 @@ with sync_playwright() as pw:
     page.locator('#board .cell').nth(39).click()
     page.locator('#board .cell').nth(40).click()
     assert page.locator('#left-portal').inner_text()=='0'
+    assert square_tiles()==initial_sizes
     page.locator('[data-play-tool="erase"]').click()
     page.locator('#board .cell').nth(39).click()
     assert page.locator('#left-portal').inner_text()=='1'
+    assert square_tiles()==initial_sizes
     assert not errors, errors
     print('PASS browser smoke: board render, endpoint editing, player portal placement, inventory restoration, no JS exceptions')
     expect(page.locator('#resize')).to_be_disabled()
