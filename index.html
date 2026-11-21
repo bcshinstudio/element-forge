@@ -73,7 +73,7 @@ p { line-height: 1.5; }
 .controls { border: 1px solid var(--border); border-radius: 14px; background: #1c3025; padding: 20px; }
 .tools,.actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
 button,select,input { font: inherit; }
-button,select,input[type=number],input[type=text],#link-id {
+button,select,input[type=number],input[type=text] {
  background: #263b2c; color: #fff5df; border: 1px solid #728775; border-radius: 7px; padding: 8px 10px;
 }
 button { cursor: pointer; }
@@ -172,7 +172,6 @@ button.brand { background: transparent; border: 0; text-align: left; }
 .stepper { display: inline-flex; align-items: center; gap: 4px; }
 .stepper button { min-width: 42px; font-weight: 800; }
 .stepper input { text-align: center; }
-#phone-link-id { display: none; }
 #game-menu { width: min(94vw, 420px); max-height: 88svh; overflow: auto; padding: 14px; border: 1px solid var(--border); border-radius: 14px; background: #1c3025; color: #f8f3e5; }
 #game-menu::backdrop { background: #0b1715aa; }
 #game-menu .campaign-picker { margin-block: 12px; }
@@ -197,8 +196,7 @@ button.brand { background: transparent; border: 0; text-align: left; }
  .tools button, #start, .build-actions button { min-height: 44px; }
  .build-actions { margin-top: 4px; gap: 4px; }
  #bridge-count { font-size: .85rem; }
- #link-id, footer { display: none; }
- #phone-link-id { display: inline-block; min-height: 44px; }
+ footer { display: none; }
  .controls .restoration p, #score, #totals { margin: 3px 0; }
  #score-details { margin-top: 3px; }
 }
@@ -236,12 +234,23 @@ body {
  .masthead { padding-block:4px; }
  .layout { grid-template-columns:minmax(0,1fr) minmax(13rem,40%); gap:8px; padding:6px 10px; }
  #board { width:min(100%, max(200px, calc(100svh - 100px))); margin-inline:auto; }
- #link-id { display:none; }
- #phone-link-id { display:inline-block; min-height:44px; }
 }
 
 #puzzle-nav { display:flex; gap:4px; }
 #puzzle-nav button { min-height: 40px; }
+
+#board [data-structure="bridge"]:has(.bent-bridge) .structure-art { visibility: hidden; }
+.bent-bridge { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.bent-bridge i {
+ position: absolute;
+ background: repeating-linear-gradient(45deg, #956a3e 0 4px, #674726 4px 5px);
+ box-shadow: inset 0 0 0 1px #452e19;
+}
+.bent-bridge .dot { inset: 27%; border-radius: 18%; }
+.bent-bridge .north { inset: 0 27% 50%; }
+.bent-bridge .south { inset: 50% 27% 0; }
+.bent-bridge .west { inset: 27% 50% 27% 0; }
+.bent-bridge .east { inset: 27% 0 27% 50%; }
 </style>
  
  
@@ -406,7 +415,6 @@ body {
     <p id="bridge-hint" hidden>Tap an empty water tile to place a bridge, even mid-route.</p>
     <div id="tools" class="tools" role="group" aria-label="Build tools"></div>
     <button id="remove" hidden>Remove tool</button>
-    <label id="link-field" hidden>Portal pair <input id="link-id" value="A" maxlength="12"><select id="phone-link-id" aria-label="Portal pair"><option value="auto">Automatic pair</option></select></label>
     <p id="projected" role="status" hidden></p>
     <div class="build-actions">
      <button id="check" class="primary">Restore Harmony</button>
@@ -416,7 +424,7 @@ body {
     <details id="puzzle-options" class="disclosure">
      <summary>Puzzle options</summary>
      <div class="option-actions">
-      <button id="restart">Restart with same tools</button>
+      <button id="restart">Restart stage</button>
      </div>
     </details>
    </div>
@@ -518,9 +526,9 @@ function terrainError(m,element,index,component){
  if(!(m.rulesVersion>=3))return ordinaryGround.includes(terrain)||(terrain==='water'&&component==='bridge')?null:blocked;
  if(terrain==='forest'&&element!=='nature')return 'Only Plant can move through woods.';
  if(element==='nature'&&component==='portal')return 'Plant cannot use portals.';
- if(['earth','metal'].includes(element)&&component==='bridge')return 'This current cannot use ordinary bridges.';
+ if(['earth','metal'].includes(element)&&component==='bridge')return `${element==='earth'?'Earth':'Metal'} cannot use ordinary bridges.`;
  if(element==='ice'&&terrain==='heated')return 'Ice cannot enter heated ground.';
- if(terrain==='exposed'&&element==='shadow')return 'Shadow needs covered channels.';
+ if(terrain==='exposed'&&element==='shadow')return 'Shadow cannot pass through direct light.';
  if(terrain==='covered'&&element==='light')return 'Light needs exposed channels.';
  if([...ordinaryGround,'bank','exposed','covered'].includes(terrain))return null;
  if(terrain==='lava')return element==='fire'?null:'Only Fire can enter lava.';
@@ -561,6 +569,13 @@ function constraintError(m,element,path,placements={},partial=false){
  return null;
 }
 function canPlace(m,placements,i,kind){const c=m.cells[i];return !!c&&!c.node&&!c.component&&!placements[i]&&(spanKinds.includes(kind)?(c.terrain==='water'||m.rulesVersion>=3&&['river','shallow'].includes(c.terrain)):['intersection','portal','tunnel'].includes(kind)?['land','forest','ice','bank','exposed','covered'].includes(c.terrain):false)}
+function portalExit(m,path,placements){
+ const entry=path.at(-1);
+ if(effective(m,placements,entry)!=='portal')return null;
+ const partner=linkPartner(m,entry,placements);
+ return path.at(-2)===partner?null:partner;
+}
+const portalExitMessage='Continue from the paired portal exit.';
 function validatePath(m,element,path,other=[],placements={},partial=false){
  const p=pairs(m).find(x=>x.element===element);if(!p||p.source<0||p.destination<0)return 'Missing endpoints';
  if(!Array.isArray(path)||path.length<(partial?1:2)||path[0]!==p.source||(!partial&&path.at(-1)!==p.destination))return 'Route must connect its source to destination';
@@ -574,6 +589,10 @@ function validatePath(m,element,path,other=[],placements={},partial=false){
  if(k&&!allowedTransition(m,element,path[k-1],i,placements))return bankError(m,element,path[k-1],i)||'One-way direction violated';
  }
  const restriction=constraintError(m,element,path,placements,partial);if(restriction)return restriction;
+ for(let k=1;k<path.length;k++){
+  const exit=portalExit(m,path.slice(Math.max(0,k-2),k),placements);
+  if(exit!==null&&path[k]!==exit)return portalExitMessage;
+ }
  for(const r of other){if(r.element===element)continue;for(const i of path){if(!r.path.includes(i))continue;if(effective(m,placements,i)!=='intersection')return 'Different elements cannot share a cell';const a=path.indexOf(i),b=r.path.indexOf(i);if(partial&&a===path.length-1&&a>0&&b>0&&b<r.path.length-1)continue;if(a===0||a===path.length-1||b===0||b===r.path.length-1)return 'Crossing cannot be at an endpoint';const a1=axis(path[a-1],i,m.width),a2=axis(i,path[a+1],m.width),b1=axis(r.path[b-1],i,m.width),b2=axis(i,r.path[b+1],m.width);if(!direction(path[a-1],i,m.width)||!direction(i,path[a+1],m.width)||!direction(r.path[b-1],i,m.width)||!direction(i,r.path[b+1],m.width)||a1!==a2||b1!==b2||a1===b1)return 'Intersection needs straight perpendicular routes';}}
  return null;
 }
@@ -619,7 +638,8 @@ function solve(m,{limit=120000,maxPairs=6,allowPlacement=true,initialPlacements=
  const p=ordered[pi],stack=[{path:[p.source],seen:new Set([p.source]),placements}];
  while(stack.length){if(++nodes>limit){exhausted=true;return null;}const state=stack.pop(),cur=state.path.at(-1);
  if(cur===p.destination){if(validatePath(m,p.element,state.path,routes,state.placements))continue;const needed=m.cells.map((c,i)=>c.component==='checkpoint'&&['any',p.element].includes(c.props?.element)?i:-1).filter(i=>i>=0);if(needed.some(i=>!state.seen.has(i)))continue;const found=visitPair(pi+1,[...routes,{element:p.element,path:state.path}],state.placements);if(found)return found;if(exhausted)return null;continue;}
- const ns=routeNeighbors(m,cur,state.placements,p.element).filter(i=>!state.seen.has(i));ns.sort((a,b)=>distance(b,p.destination)-distance(a,p.destination));
+ const exit=portalExit(m,state.path,state.placements);
+ const ns=(exit===null?routeNeighbors(m,cur,state.placements,p.element):exit<0?[]:[exit]).filter(i=>!state.seen.has(i));ns.sort((a,b)=>distance(b,p.destination)-distance(a,p.destination));
  for(const i of ns){if(!allowedTransition(m,p.element,cur,i,state.placements))continue;const c=m.cells[i];if(c.node&&!(c.node.element===p.element&&c.node.role==='destination'))continue;let pl=state.placements,comp=effective(m,pl,i);const overlaps=routes.filter(r=>r.path.includes(i));let wanted=null;
  if(terrainError(m,p.element,i,comp)){if(!comp)wanted=spanKinds.find(kind=>budget[kind]&&canPlace(m,pl,i,kind)&&!terrainError(m,p.element,i,kind));if(!wanted)continue;}
  if(comp&&!['bridge','metalSpan','intersection','checkpoint','portal','tunnel','gate'].includes(comp))continue;
@@ -665,7 +685,7 @@ function solveConstruction(m,{limit=120000,maxPairs=6,maxCandidates=180}={}){
  }
  return {status:hitLimit||direct.status==='inconclusive'?'inconclusive':'unsolved',message:hitLimit?'Some construction searches exceeded their limits':'No solution found within supported construction candidates',constructionAttempts:attempts};
 }
-const api={terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
+const api={portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
 </script>
 <script>
@@ -1219,7 +1239,7 @@ if(typeof module!=='undefined')module.exports=api;
 
   function undo(){
    if(state.phase!=='build')return false;
-   if(state.active){
+   if(state.active&&!history.at(-1)?.routes.some(route=>route.element===state.active.element)){
     delete state.drafts[state.active.element];
     state.active=null;
     return true;
@@ -1269,17 +1289,21 @@ if(typeof module!=='undefined')module.exports=api;
    return ok();
   }
 
-  function placeTunnel(first,second){
+  function placeLink(first,second,kind){
    if(state.phase!=='build')return fail('Start building first.');
    if(!onboard(first)||!onboard(second)||first===second||
-      !E.canPlace(map,state.placements,first,'tunnel')||!E.canPlace(map,state.placements,second,'tunnel')){
-    return fail('Choose two different open tiles for the tunnel openings.');
+      !E.canPlace(map,state.placements,first,kind)||!E.canPlace(map,state.placements,second,kind)){
+    return fail('Choose two different open tiles for the '+kind+' openings.');
    }
-   if((E.placementCounts(state.placements).tunnel||0)+2>(state.loadout.tunnel||0))return fail('No tunnel pair remaining.');
+   if((E.placementCounts(state.placements)[kind]||0)+2>(state.loadout[kind]||0))return fail('No '+kind+' pair remaining.');
+   if([...state.routes,...Object.values(state.drafts)].some(({path})=>path.includes(first)||path.includes(second))){
+    return fail('Choose openings without an existing route.');
+   }
    const used=new Set(map.cells.map((_,i)=>E.pairIdAt(map,state.placements,i)).filter(Boolean));
+   const prefix=kind==='tunnel'?'T':'P';
    let number=1;
-   while(used.has('T'+number))number++;
-   const opening={kind:'tunnel',pairId:'T'+number};
+   while(used.has(prefix+number))number++;
+   const opening={kind,pairId:prefix+number};
    const placements={...state.placements,[first]:opening,[second]:opening};
    if(E.linkPartner(map,first,placements)!==second){
     return fail('Place the openings directly against opposite ends of a continuous ridge.');
@@ -1289,14 +1313,29 @@ if(typeof module!=='undefined')module.exports=api;
    return ok();
   }
 
+  const placeTunnel=(first,second)=>placeLink(first,second,'tunnel');
+  const placePortal=(first,second)=>placeLink(first,second,'portal');
+
   function route(index,reopen=false){
    if(state.phase!=='build'||!onboard(index))return fail('Choose an available board tile.');
    const cell=map.cells[index];
    if(state.active?.path.at(-2)===index){state.active.path.pop();return ok();}
+   if(state.active){
+    const {path}=state.active;
+    const exit=path.at(-1),entry=path.at(-2);
+    if(path.at(-3)===index&&E.effective(map,state.placements,exit)==='portal'&&E.linkPartner(map,exit,state.placements)===entry){
+     path.splice(-2);
+     return ok();
+    }
+   }
    const existing=Object.values(state.drafts).find(draft=>draft.path.at(-1)===index);
    if(existing){state.active=existing;return ok();}
    if(cell.node?.role==='source'){
     const element=cell.node.element;
+    if(state.routes.some(route=>route.element===element)){
+     remember();
+     state.routes=state.routes.filter(route=>route.element!==element);
+    }
     state.active=state.drafts[element]??{element,path:[index]};
     state.drafts[element]=state.active;
     return ok();
@@ -1310,6 +1349,10 @@ if(typeof module!=='undefined')module.exports=api;
      state.active=completed;
      return ok();
     }
+   }
+   if(reopen){
+    const pending=Object.values(state.drafts).find(({path})=>E.portalExit(map,path,state.placements)===index);
+    if(pending)state.active=pending;
    }
    if(!state.active)return fail('Start at an element source.');
    const {element,path}=state.active;
@@ -1373,16 +1416,19 @@ if(typeof module!=='undefined')module.exports=api;
      }
     }
     const used=new Set();
-    for(const route of saved.routes){
-     if(used.has(route.element)||E.validatePath(map,route.element,route.path,saved.routes,saved.placements))
+    const canKeep=route=>saved.phase==='complete'||E.validatePath(map,route.element,route.path,[],saved.placements,true)!==E.portalExitMessage;
+    const routes=saved.routes.filter(route=>!Object.hasOwn(saved.drafts,route.element)&&canKeep(route));
+    const drafts=Object.fromEntries(Object.entries(saved.drafts).filter(([,route])=>canKeep(route)));
+    for(const route of routes){
+     if(used.has(route.element)||E.validatePath(map,route.element,route.path,routes,saved.placements))
       throw Error('Invalid route');
      used.add(route.element);
     }
-    for(const [element,draft] of Object.entries(saved.drafts)){
-     if(element!==draft.element||E.validatePath(map,element,draft.path,saved.routes,saved.placements,true))
+    for(const [element,draft] of Object.entries(drafts)){
+     if(element!==draft.element||E.validatePath(map,element,draft.path,routes,saved.placements,true))
       throw Error('Invalid draft');
     }
-    const restored=copy(saved);
+    const restored=copy({...saved,routes,drafts});
     Object.assign(state,{loadout:restored.loadout,placements:restored.placements,routes:restored.routes,
      drafts:restored.drafts,active:restored.drafts[restored.active]||null});
     if(saved.phase==='complete'&&!verify().ok)throw Error('Invalid clear');
@@ -1394,7 +1440,7 @@ if(typeof module!=='undefined')module.exports=api;
    }
   }
 
-  return {map,state,start,restart,undo,place,placeTunnel,remove,route,evaluate,verify,snapshot,restore};
+  return {map,state,start,restart,undo,place,placeTunnel,placePortal,remove,route,evaluate,verify,snapshot,restore};
  }
 
  const api={createSession,score};
@@ -3529,7 +3575,7 @@ if(typeof module!=='undefined')module.exports=api;
  const terrainNames=Object.fromEntries(F.TERRAIN.map(([id,name])=>[id,name]));
  const arrows={N:'↑',E:'→',S:'↓',W:'←'};
  toolNames.tunnel='Tunnel';
- let session,tiles,tool,tunnelStart=null,levelIndex,timer=null,drag=null,importTicket=0;
+ let session,tiles,tool,linkStart=null,lastBridge=null,levelIndex,timer=null,drag=null,importTicket=0;
  const phone=matchMedia('(max-width: 600px), (hover: none) and (max-width: 950px)');
  const menu=$('game-menu');
  const menuItems=[document.querySelector('.campaign-picker'),$('description'),$('elements'),$('instructions'),
@@ -3601,7 +3647,8 @@ if(typeof module!=='undefined')module.exports=api;
 
   stopAnimation();
   drag=null;
-  tunnelStart=null;
+  lastBridge=null;
+  linkStart=null;
   session=window.EFSession.createSession(levels[index]);
   const {map}=session;
   levelIndex=index;
@@ -3685,6 +3732,7 @@ if(typeof module!=='undefined')module.exports=api;
   $('projected').textContent=result.ok?`Projected score ${result.points} points`:'';
  }
 
+ const toolUnit=kind=>['portal','tunnel'].includes(kind)?2:1;
  function toolEntries(){return Object.entries(session.map.inventory).filter(([,count])=>count>0);}
 
  function drawPlan(){
@@ -3692,7 +3740,7 @@ if(typeof module!=='undefined')module.exports=api;
   const rows=toolEntries().map(([kind,count])=>{
    const label=document.createElement('label');
    label.className='loadout-row';
-   const unit=kind==='tunnel'?2:1;
+   const unit=toolUnit(kind);
    const quantity=Math.floor(count/unit);
    label.textContent=toolNames[kind]+(map.construction?' · '+map.construction.prices[kind]*unit+' pt each':'');
    if(map.construction){
@@ -3736,7 +3784,7 @@ if(typeof module!=='undefined')module.exports=api;
  }
 
  function selection(){
-  return Object.fromEntries([...$('loadout').querySelectorAll('input')].map(field=>[field.name,Number(field.value)*(field.name==='tunnel'?2:1)]));
+  return Object.fromEntries([...$('loadout').querySelectorAll('input')].map(field=>[field.name,Number(field.value)*toolUnit(field.name)]));
  }
 
  function updateBudget(){
@@ -3751,7 +3799,7 @@ if(typeof module!=='undefined')module.exports=api;
   $('start').disabled=remaining<0;
   for(const field of $('loadout').querySelectorAll('input')){
    const [less,,more]=field.parentElement.children;
-   const unit=field.name==='tunnel'?2:1;
+   const unit=toolUnit(field.name);
    less.disabled=Number(field.value)<=0;
    more.disabled=Number(field.value)>=Number(field.max)||remaining<construction.prices[field.name]*unit;
   }
@@ -3761,9 +3809,9 @@ if(typeof module!=='undefined')module.exports=api;
   const {state}=session;
   const counts=E.placementCounts(state.placements);
   const remaining=Object.fromEntries(toolEntries().map(([kind])=>[kind,(state.loadout[kind]||0)-(counts[kind]||0)]));
-  remaining.tunnel=Math.floor((remaining.tunnel||0)/2);
+  for(const kind of ['tunnel','portal'])remaining[kind]=Math.floor((remaining[kind]||0)/2);
   const choices=Object.entries(remaining).filter(([kind,count])=>kind!=='bridge'&&count>0)
-   .map(([kind,count])=>[kind,`${toolNames[kind]} (${count})`]);
+   .map(([kind,count])=>[kind,`${toolNames[kind]} × ${count}`]);
   if(tool==='remove'&&!Object.keys(state.placements).length||Object.hasOwn(remaining,tool)&&remaining[tool]<=0)tool='route';
   const buttons=choices.map(([kind,label])=>{
    const button=document.createElement('button');
@@ -3781,23 +3829,13 @@ if(typeof module!=='undefined')module.exports=api;
   $('remove').hidden=!Object.keys(state.placements).length;
   $('remove').setAttribute('aria-pressed',String(tool==='remove'));
   $('replan').hidden=!session.map.construction;
-  $('link-field').hidden=tool!=='portal';
-  if(tool==='portal'){
-   const counts=new Map();
-   for(const value of Object.values(state.placements))if(E.placementKind(value)==='portal')
-    counts.set(value.pairId,(counts.get(value.pairId)||0)+1);
-   const picker=$('phone-link-id');
-   const previous=picker.value;
-   picker.replaceChildren(new Option('Automatic pair','auto'),
-    ...[...counts].filter(([,count])=>count===1).map(([id])=>new Option('Pair '+id,id)));
-   if([...picker.options].some(option=>option.value===previous))picker.value=previous;
-  }
   syncDragHandles();
   ready();
   $('instructions').textContent=tool==='remove'?'Choose a tool on the map to remove it.':
-   tool==='route'?'Tap a source or unfinished tip to draw. Tap a placed tool to remove it when no route is active.':
-   tool==='tunnel'?(tunnelStart===null?'Choose the first open tile for your tunnel.':
+   tool==='route'?'Drag from a source or route tip. Tap a placed bridge again to remove it.':
+   tool==='tunnel'?(linkStart===null?'Choose the first open tile for your tunnel.':
     'Choose the other opening at the opposite edge of the same ridge. Tap the first opening again or tap outside the board to cancel.'):
+   tool==='portal'?(linkStart===null?'Choose the first portal opening.':'Choose the exit opening. Tap the first opening again or tap outside the board to cancel.'):
    'Choose a tile for your '+toolNames[tool].toLowerCase()+'.';
  }
 
@@ -3825,7 +3863,12 @@ if(typeof module!=='undefined')module.exports=api;
 
  function syncDragHandles(){
   const {state,map}=session;
-  const tips=new Set([...Object.values(state.drafts),...state.routes].map(route=>route.path.at(-1)));
+  const tips=new Set(state.routes.map(route=>route.path.at(-1)));
+  for(const {path} of Object.values(state.drafts)){
+   tips.add(path.at(-1));
+   const exit=E.portalExit(map,path,state.placements);
+   if(exit>=0&&exit!==null)tips.add(exit);
+  }
   for(const [i,tile] of tiles.entries()){
    tile.classList.toggle('route-handle',state.phase==='build'&&tool==='route'&&
     (tips.has(i)||map.cells[i].node?.role==='source'));
@@ -3851,6 +3894,13 @@ if(typeof module!=='undefined')module.exports=api;
      const arm=document.createElement('i');
      arm.className={N:'north',S:'south',W:'west',E:'east'}[neighbor[1]];
      line.append(arm);
+    }
+    const arms=[...line.children].slice(1).map(arm=>arm.className);
+    if(E.effective(map,state.placements,i)==='bridge'&&arms.length===2&&
+       arms.some(arm=>arm==='north'||arm==='south')&&arms.some(arm=>arm==='east'||arm==='west')){
+     const deck=line.cloneNode(true);
+     deck.className='bent-bridge';
+     fragments[i].append(deck);
     }
     fragments[i].append(line);
    }
@@ -3882,7 +3932,7 @@ if(typeof module!=='undefined')module.exports=api;
    }
    fragments[i].append(mark);
    tile.classList.toggle('wind-landing',landings.has(i));
-   tile.classList.toggle('tunnel-preview',i===tunnelStart);
+   tile.classList.toggle('tunnel-preview',i===linkStart);
    tile.replaceChildren(fragments[i]);
    window.EFBoardArt.decorate(tile,kind,{link});
    const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
@@ -3906,6 +3956,10 @@ if(typeof module!=='undefined')module.exports=api;
   if(result.message==='Element component restriction violated'){
    return F.ELEMENTS[element].name+' cannot use '+toolNames[E.effective(map,state.placements,index)].toLowerCase()+' on this level.';
   }
+  if(result.message==='Different elements cannot share a cell'){
+   const occupying=state.routes.find(route=>route.element!==element&&route.path.includes(index));
+   if(occupying)return F.ELEMENTS[occupying.element].name+' already uses this tile.';
+  }
   if(/^Blocked terrain/.test(result.message)&&E.canPlace(map,state.placements,index,'bridge')&&state.loadout.bridge){
    return 'This water tile needs a bridge. Click or tap it to build one.';
   }
@@ -3914,50 +3968,46 @@ if(typeof module!=='undefined')module.exports=api;
 
  function cancelTool(){
   tool='route';
-  tunnelStart=null;
+  linkStart=null;
   drawToolBar();
   drawBoard();
   message('');
  }
 
- function portalPair(){
-  if(!phone.matches)return $('link-id').value.trim();
-  const picker=$('phone-link-id');
-  if(picker.value!=='auto')return picker.value;
-  if(picker.options.length>1)return picker.options[1].value;
-  const {map,state}=session;
-  let number=1;
-  const ids=new Set(map.cells.map((_,i)=>E.pairIdAt(map,state.placements,i)).filter(Boolean));
-  while(ids.has('P'+number))number++;
-  return 'P'+number;
- }
- function act(index,direct=false){
+ function act(index,direct=false,dragStart=false){
   if(session.state.phase!=='build')return;
   const {map,state}=session;
   const element=state.active?.element;
-  const removePlaced=direct&&tool==='route'&&!element&&Object.hasOwn(state.placements,index);
+  const placed=E.placementKind(state.placements[index]);
+  const activePath=state.active?.path;
+  const canFollowBridge=activePath&&E.neighbors(activePath.at(-1),map.width,map.height).some(([next])=>next===index)&&
+   !activePath.includes(index)&&!E.terrainError(map,element,index,'bridge');
+  const removePlaced=direct&&!dragStart&&tool==='route'&&placed&&
+   (placed==='bridge'?(lastBridge===index||!canFollowBridge):!element);
   const bridgeTile=direct&&tool==='route'&&state.loadout.bridge>(E.placementCounts(state.placements).bridge||0)&&
    E.canPlace(map,state.placements,index,'bridge')&&(!element||
     Boolean(E.terrainError(map,element,index,null))&&!E.terrainError(map,element,index,'bridge'));
-  if(tool==='tunnel'&&tunnelStart===index){cancelTool();return true;}
-  if(tool==='tunnel'&&tunnelStart===null){
-   if(!E.canPlace(map,state.placements,index,'tunnel')){message('Choose an open tile for the tunnel opening.');return false;}
-   tunnelStart=index;
+  const linked=toolUnit(tool)===2;
+  if(linked&&linkStart===index){cancelTool();return true;}
+  if(linked&&linkStart===null){
+   if(!E.canPlace(map,state.placements,index,tool)){message('Choose an open tile for the '+tool+' opening.');return false;}
+   linkStart=index;
    drawBoard();
    drawToolBar();
    message('');
    return true;
   }
-  const result=removePlaced?session.remove(index):bridgeTile?session.place(index,'bridge'):tool==='tunnel'?session.placeTunnel(tunnelStart,index):
-   tool==='route'?session.route(index,direct):tool==='remove'?session.remove(index):session.place(index,tool,tool==='portal'?portalPair():undefined);
+  const result=removePlaced?session.remove(index):bridgeTile?session.place(index,'bridge'):tool==='tunnel'?session.placeTunnel(linkStart,index):tool==='portal'?session.placePortal(linkStart,index):
+   tool==='route'?session.route(index,direct):tool==='remove'?session.remove(index):session.place(index,tool);
   if(!result.ok){message(explainMove(result,index));return false;}
   if(!removePlaced&&(bridgeTile||tool!=='route'&&tool!=='remove'))audio.effect('build');
   if(tool==='route'&&element&&!state.active&&!heardRoutes.has(element)&&state.routes.some(route=>route.element===element)){
    heardRoutes.add(element);
    audio.effect('route');
   }
+  lastBridge=bridgeTile?index:null;
   message(removePlaced?'Tool removed.':'');
-  tunnelStart=null;
+  linkStart=null;
   drawBoard();
   if(removePlaced||bridgeTile||tool!=='route'){tool='route';drawToolBar();}
   else ready();
@@ -4011,7 +4061,7 @@ if(typeof module!=='undefined')module.exports=api;
   const kind=event.target.dataset.tool;
   if(!kind)return;
   tool=tool===kind?'route':kind;
-  tunnelStart=null;
+  linkStart=null;
   drawBoard();
   drawToolBar();
   $('tools').querySelector(`[data-tool="${kind}"]`).focus();
@@ -4019,7 +4069,7 @@ if(typeof module!=='undefined')module.exports=api;
  });
  $('remove').onclick=()=>{
   tool='remove';
-  tunnelStart=null;
+  linkStart=null;
   $('puzzle-options').open=false;
   drawToolBar();
   focusSource();
@@ -4029,7 +4079,8 @@ if(typeof module!=='undefined')module.exports=api;
   if(menu.open)menu.close();
   stopAnimation();
   session.restart(replan);
-  tunnelStart=null;
+  lastBridge=null;
+  linkStart=null;
   $('puzzle-options').open=false;
   tool='route';
   drawPlan();
@@ -4156,13 +4207,13 @@ if(typeof module!=='undefined')module.exports=api;
   const tile=event.target.closest('.tile');
   if(!tile||!event.isPrimary||event.button!==0||session.state.phase!=='build')return;
   const index=Number(tile.dataset.index);
-  const routeStart=Object.values(session.state.drafts).some(route=>route.path.at(-1)===index)||
+  const routeStart=Object.values(session.state.drafts).some(({path})=>path.at(-1)===index||E.portalExit(session.map,path,session.state.placements)===index)||
    session.map.cells[index].node?.role==='source'||
    session.state.routes.some(route=>route.path.at(-1)===index);
   if(tool==='route'&&routeStart&&!drag){
    drag={pointer:event.pointerId,index};
    board.setPointerCapture(event.pointerId);
-   act(index,true);
+   act(index,true,true);
   }
  });
  board.addEventListener('pointermove',event=>{
@@ -4171,15 +4222,17 @@ if(typeof module!=='undefined')module.exports=api;
   if(!tile||!board.contains(tile))return;
   const index=Number(tile.dataset.index);
   if(index===drag.index)return;
+  drag.moved=true;
   drag.index=index;
-  const tip=session.state.active.path.at(-1);
+  const path=session.state.active.path;
+  const tip=path.at(-1);
   const map=session.map;
   const stride=Math.floor(tip/map.width)===Math.floor(index/map.width)?1:tip%map.width===index%map.width?map.width:0;
-  if(stride&&index!==tip&&index!==session.state.active.path.at(-2)&&E.linkPartner(map,tip,session.state.placements)!==index&&
+  if(stride&&index!==tip&&index!==path.at(-2)&&index!==path.at(-3)&&E.linkPartner(map,tip,session.state.placements)!==index&&
      !(session.state.active.element==='wind'&&E.windLandings(map,tip,session.state.placements).includes(index))){
    const delta=Math.sign(index-tip)*stride;
    for(let next=tip+delta;session.state.active;next+=delta){
-    if(!act(next)||next===index)break;
+    if(!act(next)||next===index||E.portalExit(map,session.state.active?.path??[next],session.state.placements)!==null)break;
    }
   }else act(index);
  });
@@ -4192,7 +4245,7 @@ if(typeof module!=='undefined')module.exports=api;
   const result=session.remove(index);
   if(!result.ok){message(result.message);return;}
   tool='route';
-  tunnelStart=null;
+  linkStart=null;
   drawBoard();
   drawToolBar();
   message('Tool removed. Any track using it was cleared.');
@@ -4202,7 +4255,7 @@ if(typeof module!=='undefined')module.exports=api;
   if(event.key==='Escape'&&!menu.open&&!$('mechanic-tip').open&&session?.state.phase==='build'&&tool!=='route'){event.preventDefault();cancelTool();}
  });
  document.addEventListener('pointerdown',event=>{
-  if(session?.state.phase==='build'&&tool==='tunnel'&&!board.contains(event.target)&&
+  if(session?.state.phase==='build'&&toolUnit(tool)===2&&!board.contains(event.target)&&
      !$('tools').contains(event.target))cancelTool();
  });
  board.addEventListener('keydown',event=>{
@@ -4214,7 +4267,12 @@ if(typeof module!=='undefined')module.exports=api;
   if(next){event.preventDefault();focusTile(next[0]);}
  });
  for(const type of ['pointerup','pointercancel','lostpointercapture']){
-  board.addEventListener(type,event=>{if(drag?.pointer===event.pointerId)drag=null;});
+  board.addEventListener(type,event=>{
+   if(drag?.pointer!==event.pointerId)return;
+   const {index,moved}=drag;
+   drag=null;
+   if(type==='pointerup'&&!moved&&E.placementKind(session.state.placements[index])==='bridge')act(index,true);
+  });
  }
 
  function focusTile(index){
