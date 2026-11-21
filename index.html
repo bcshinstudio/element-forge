@@ -1287,7 +1287,7 @@ if(typeof module!=='undefined')module.exports=api;
    return ok();
   }
 
-  function route(index){
+  function route(index,reopen=false){
    if(state.phase!=='build'||!onboard(index))return fail('Choose an available board tile.');
    const cell=map.cells[index];
    if(state.active?.path.at(-2)===index){state.active.path.pop();return ok();}
@@ -1298,6 +1298,16 @@ if(typeof module!=='undefined')module.exports=api;
     state.active=state.drafts[element]??{element,path:[index]};
     state.drafts[element]=state.active;
     return ok();
+   }
+   if((reopen||!state.active)&&cell.node?.role==='destination'){
+    const completed=state.routes.find(route=>route.path.at(-1)===index);
+    if(completed){
+     remember();
+     state.routes=state.routes.filter(route=>route!==completed);
+     state.drafts[completed.element]=completed;
+     state.active=completed;
+     return ok();
+    }
    }
    if(!state.active)return fail('Start at an element source.');
    const {element,path}=state.active;
@@ -3311,7 +3321,7 @@ if(typeof module!=='undefined')module.exports=api;
 
  function syncDragHandles(){
   const {state,map}=session;
-  const tips=new Set(Object.values(state.drafts).map(route=>route.path.at(-1)));
+  const tips=new Set([...Object.values(state.drafts),...state.routes].map(route=>route.path.at(-1)));
   for(const [i,tile] of tiles.entries()){
    tile.classList.toggle('route-handle',state.phase==='build'&&tool==='route'&&
     (tips.has(i)||map.cells[i].node?.role==='source'));
@@ -3435,7 +3445,7 @@ if(typeof module!=='undefined')module.exports=api;
    return true;
   }
   const result=removePlaced?session.remove(index):bridgeTile?session.place(index,'bridge'):tool==='tunnel'?session.placeTunnel(tunnelStart,index):
-   tool==='route'?session.route(index):tool==='remove'?session.remove(index):session.place(index,tool,tool==='portal'?portalPair():undefined);
+   tool==='route'?session.route(index,direct):tool==='remove'?session.remove(index):session.place(index,tool,tool==='portal'?portalPair():undefined);
   if(!result.ok){message(explainMove(result,index));return false;}
   if(!removePlaced&&(bridgeTile||tool!=='route'&&tool!=='remove'))audio.effect('build');
   if(tool==='route'&&element&&!state.active&&!heardRoutes.has(element)&&state.routes.some(route=>route.element===element)){
@@ -3643,7 +3653,8 @@ if(typeof module!=='undefined')module.exports=api;
   if(!tile||!event.isPrimary||event.button!==0||session.state.phase!=='build')return;
   const index=Number(tile.dataset.index);
   const routeStart=Object.values(session.state.drafts).some(route=>route.path.at(-1)===index)||
-   session.map.cells[index].node?.role==='source';
+   session.map.cells[index].node?.role==='source'||
+   session.state.routes.some(route=>route.path.at(-1)===index);
   if(tool==='route'&&routeStart&&!drag){
    drag={pointer:event.pointerId,index};
    board.setPointerCapture(event.pointerId);
@@ -3660,7 +3671,7 @@ if(typeof module!=='undefined')module.exports=api;
   const tip=session.state.active.path.at(-1);
   const map=session.map;
   const stride=Math.floor(tip/map.width)===Math.floor(index/map.width)?1:tip%map.width===index%map.width?map.width:0;
-  if(stride&&index!==tip&&E.linkPartner(map,tip,session.state.placements)!==index&&
+  if(stride&&index!==tip&&index!==session.state.active.path.at(-2)&&E.linkPartner(map,tip,session.state.placements)!==index&&
      !(session.state.active.element==='wind'&&E.windLandings(map,tip,session.state.placements).includes(index))){
    const delta=Math.sign(index-tip)*stride;
    for(let next=tip+delta;session.state.active;next+=delta){
