@@ -286,7 +286,7 @@
   $('instructions').textContent=tool==='remove'?'Choose a tool on the map to remove it.':
    tool==='route'?'Tap a source or unfinished tip to draw. Tap a placed tool to remove it when no route is active.':
    tool==='tunnel'?(tunnelStart===null?'Choose the first open tile for your tunnel.':
-    'Choose the other opening in the same row or column, across blocked terrain. Tap the first opening again or tap outside the board to cancel.'):
+    'Choose the other opening at the opposite edge of the same ridge. Tap the first opening again or tap outside the board to cancel.'):
    'Choose a tile for your '+toolNames[tool].toLowerCase()+'.';
  }
 
@@ -526,7 +526,12 @@
   persist();
  }
  $('restart').onclick=()=>reset(false);
- $('replan').onclick=()=>reset(true);
+ $('replan').onclick=()=>{
+  const {placements,routes,drafts}=session.state;
+  const hasWork=Object.keys(placements).length||routes.length||Object.keys(drafts).length;
+  if(hasWork&&!confirm('Change construction? This clears routes and placed tools on this stage.'))return;
+  reset(true);
+ };
  $('replay').onclick=()=>reset(true);
  $('undo').onclick=()=>{if(tool!=='route'){cancelTool();return;}if(session.undo()){drawBoard();drawToolBar();message('Last change undone.');persist();}};
  $('check').onclick=()=>{

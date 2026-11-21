@@ -217,7 +217,7 @@
    'R..~..r','...%...','###%###'
   ],{requires:['scree'],components:[[3,0,'bridge']]}),
   lesson('One Clear Jump','Wind jumps across one gap in a straight line. Two gaps are too wide and Wind cannot use tunnels.',[
-   'V..o..v','..oo...','...o...'
+   'V..o..v','..oo...','...#...'
   ],{requires:['jump'],components:[[2,2,'tunnel',{pairId:'T'}],[4,2,'tunnel',{pairId:'T'}]]}),
   lesson('Shallow Freeze','Ice can freeze shallow water to cross. Heated ground blocks Ice.',[
    'I..^..i','..._...','###_###'
@@ -237,7 +237,7 @@
   lesson('Cross at Right Angles','Use an intersection so two currents can cross. Both must go straight through.',[
    '###E###','###.###','F.....f','###.###','###e###'
   ],{tools:{intersection:1},requires:['intersection']}),
-  lesson('Choose Your Tunnel','Budget for a tunnel, then place both ends on open tiles across rock.',[
+  lesson('Choose Your Tunnel','Budget for a tunnel. Place its openings on open tiles directly against opposite edges of a continuous ridge.',[
    'F..#..f','...#...','...#...'
   ],{tools:{tunnel:2,bridge:1},budget:2,prices:{tunnel:1,bridge:1},requires:['tunnel']}),
   lesson('Portal Relay','Fire can use a paired portal. Visit the checkpoint before reaching the forge.',[

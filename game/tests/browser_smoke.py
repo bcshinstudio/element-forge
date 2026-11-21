@@ -79,6 +79,11 @@ def test_campaign(browser, url):
             page.locator("#return-lesson").click()
             expect(page.locator("#puzzle")).to_have_text("Dry Junction")
             expect(page.locator("#mechanic-tip")).to_be_hidden()
+        if index == 5:
+            page.locator("#start").click()
+            expect(page.locator("#replan")).to_be_visible()
+            page.locator("#replan").click()
+            expect(page.locator("#loadout")).to_be_visible()
         prepare(page, plan)
         finish(page, plan)
         if index == 2:

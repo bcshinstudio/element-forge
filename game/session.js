@@ -112,7 +112,7 @@
    const opening={kind:'tunnel',pairId:'T'+number};
    const placements={...state.placements,[first]:opening,[second]:opening};
    if(E.linkPartner(map,first,placements)!==second){
-    return fail('Align the openings in one row or column with blocked terrain between them.');
+    return fail('Place the openings directly against opposite ends of a continuous ridge.');
    }
    remember();
    state.placements=placements;
