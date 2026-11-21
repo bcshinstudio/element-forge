@@ -318,6 +318,7 @@ body {
  
  
  
+ 
 </head>
 <body>
  <header class="masthead">
@@ -2838,6 +2839,255 @@ if(typeof module!=='undefined')module.exports=api;
 <script>
 'use strict';
 (function(root){
+ const levels=[
+  {
+   ...{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"id":"astral-loom-37"},
+   map:{
+    ...{"format":"element-forge-map","schemaVersion":2,"rulesVersion":4,"name":"The Five-Thread Shuttle","description":"Stepping onto The Five-Thread Shuttle, the Conduit Weaver encounters the Loom's outermost weaving frame where five primeval threads—magma, tide, root, stone, and iron—run side by side. Guide Fire, Water, Plant, Earth, and Metal across their native terrain channels and claim the single Bridge to thread the first manifold of the Astral Loom.","width":12,"height":12,"constraints":{},"inventory":{"bridge":1}},
+    cells:[
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"fire","role":"source"}},{"terrain":"land"},{"terrain":"lava"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land","node":{"element":"water","role":"source"}},{"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"fire"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"lava"},{"terrain":"lava"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"wall"},{"terrain":"land","node":{"element":"nature","role":"source"}},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"forest"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"fire","role":"destination"}},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"forest"},{"terrain":"forest"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"water"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"water"},{"terrain":"heated"},{"terrain":"land","component":"gate","props":{"direction":"W"}},{"terrain":"land"},{"terrain":"land","node":{"element":"metal","role":"source"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"water"},{"terrain":"heated"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"earth","role":"source"}},{"terrain":"land","node":{"element":"metal","role":"destination"}},{"terrain":"land","component":"checkpoint","props":{"element":"metal"}},{"terrain":"land","node":{"element":"nature","role":"destination"}},{"terrain":"wall"},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"scree"},{"terrain":"scree"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"scree"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"earth","role":"destination"}},{"terrain":"land","node":{"element":"water","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"}
+    ]
+   }
+  },
+  {
+   ...{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"id":"astral-loom-38"},
+   map:{
+    ...{"format":"element-forge-map","schemaVersion":2,"rulesVersion":4,"name":"Starlight Bobbin","description":"Suspended beneath the celestial dome of the Astral Loom, Starlight Bobbin splits incoming beams across sunlit Exposed mirror-decks, pitch-dark Covered spool-vaults, glacial Shallows, and a bottomless Void rift. Thread Light, Shadow, Ice, Wind, and Earth into the bobbin core.","width":12,"height":12,"constraints":{},"inventory":{"tunnel":2}},
+    cells:[
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"light","role":"source"}},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"light","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"exposed","component":"checkpoint","props":{"element":"light"}},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"land"},{"terrain":"exposed"},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"wind","role":"source"}},{"terrain":"land","node":{"element":"earth","role":"source"}},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"earth","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"void"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"W"}},{"terrain":"covered"},{"terrain":"land","node":{"element":"shadow","role":"source"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"covered","component":"checkpoint","props":{"element":"shadow"}},{"terrain":"covered"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"wind","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"ice","role":"destination"}},{"terrain":"land"},{"terrain":"covered"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"ice","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"shallow"},{"terrain":"land"},{"terrain":"land"},{"terrain":"covered"},{"terrain":"land"},{"terrain":"land","node":{"element":"shadow","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"shallow"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"}
+    ]
+   }
+  },
+  {
+   ...{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"id":"astral-loom-39"},
+   map:{
+    ...{"format":"element-forge-map","schemaVersion":2,"rulesVersion":4,"name":"Conductive Spool","description":"Wrapped in copper coils and sunken aqueducts, the Conductive Spool channels raw storm-energy alongside molten slag, river sluices, and living root-lines. Braid Electricity, Water, Fire, Plant, and Metal through the spool locks.","width":12,"height":12,"constraints":{},"inventory":{"intersection":1}},
+    cells:[
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"fire","role":"source"}},{"terrain":"lava"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"metal","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"water","role":"source"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"lava","component":"checkpoint","props":{"element":"fire"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"heated"},{"terrain":"land"},{"terrain":"land"},{"terrain":"water"},{"terrain":"water"},{"terrain":"water"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"heated"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"water","component":"gate","props":{"direction":"W"}},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land","node":{"element":"fire","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"wall"},{"terrain":"land","node":{"element":"water","role":"destination"}},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"electricity","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"electricity"}},{"terrain":"land"},{"terrain":"land","node":{"element":"electricity","role":"destination"}},{"terrain":"land"},
+     {"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"nature","role":"source"}},{"terrain":"land","node":{"element":"nature","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"metal"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"forest"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"forest"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"metal","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"}
+    ]
+   }
+  },
+  {
+   ...{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"id":"astral-loom-40"},
+   map:{
+    ...{"format":"element-forge-map","schemaVersion":2,"rulesVersion":4,"name":"Tidal Spindle","description":"Suspended above a churning celestial tide-pool, the Tidal Spindle divides glacial meltwater across deep Water sluices, glassy Shallows, loose Scree shelves, and a bottomless Void drop. Braid Water, Ice, Electricity, Wind, and Earth through all three one-way locks.","width":12,"height":12,"constraints":{},"inventory":{"bridge":1,"intersection":1}},
+    cells:[
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"water","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"electricity","role":"source"}},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"water"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"shallow"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"W"}},{"terrain":"land"},{"terrain":"land","node":{"element":"ice","role":"source"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"ice","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"water"},{"terrain":"land"},{"terrain":"water"},{"terrain":"water"},{"terrain":"water"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"wind","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"earth","role":"source"}},{"terrain":"wall"},{"terrain":"water","component":"gate","props":{"direction":"S"}},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"electricity"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"void"},{"terrain":"scree"},{"terrain":"land"},{"terrain":"water","component":"checkpoint","props":{"element":"water"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"electricity","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"land","component":"checkpoint","props":{"element":"earth"}},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"water","role":"destination"}},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"earth","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"wind","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"}
+    ]
+   }
+  },
+  {
+   ...{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"id":"astral-loom-41"},
+   map:{
+    ...{"format":"element-forge-map","schemaVersion":2,"rulesVersion":4,"name":"The Amber Warping-Frame","description":"Suspended inside The Amber Warping-Frame, ancient root-vines tangle around glowing rift-mirrors while molten slag channels slice across the lower loom. Braid Plant, Light, Shadow, Fire, and Metal into the frame's manifold.","width":12,"height":12,"constraints":{},"inventory":{"portal":2}},
+    cells:[
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"nature","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"covered","component":"checkpoint","props":{"element":"shadow"}},{"terrain":"covered"},{"terrain":"land","component":"gate","props":{"direction":"W"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"shadow","role":"source"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"wall"},{"terrain":"forest"},{"terrain":"wall"},{"terrain":"land","node":{"element":"metal","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land","node":{"element":"light","role":"source"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"forest"},{"terrain":"wall"},{"terrain":"heated"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"heated"},{"terrain":"land","node":{"element":"light","role":"destination"}},{"terrain":"land"},{"terrain":"exposed"},{"terrain":"land","component":"gate","props":{"direction":"W"}},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"nature"}},{"terrain":"land"},{"terrain":"land","node":{"element":"metal","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land","node":{"element":"fire","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"nature","role":"destination"}},{"terrain":"land"},{"terrain":"wall"},{"terrain":"lava"},{"terrain":"land"},{"terrain":"covered"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land","component":"checkpoint","props":{"element":"fire"}},{"terrain":"lava"},{"terrain":"land"},{"terrain":"covered"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"fire","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"W"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"covered"},{"terrain":"land","node":{"element":"shadow","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"}
+    ]
+   }
+  },
+  {
+   ...{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"id":"astral-loom-42"},
+   map:{
+    ...{"format":"element-forge-map","schemaVersion":2,"rulesVersion":4,"name":"Gale-Shuttle Causeway","description":"High above the celestial slipstream, Gale-Shuttle Causeway splits its five elemental threads across a howling Void drop, a solid Mountain bulkhead, and a glacial spillway. Guide Wind, Earth, Metal, Water, and Ice through the causeway locks.","width":12,"height":12,"constraints":{},"inventory":{"bridge":1,"tunnel":2}},
+    cells:[
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"wind","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"metal","role":"source"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"metal"}},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"mountain"},{"terrain":"void"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"water","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"mountain"},
+     {"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"wind"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"land","node":{"element":"wind","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"metal","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"water"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"earth","role":"source"}},{"terrain":"land"},{"terrain":"scree"},{"terrain":"scree","component":"checkpoint","props":{"element":"earth"}},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"earth","role":"destination"}},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"W"}},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"ice","role":"destination"}},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"water","role":"destination"}},{"terrain":"land","component":"checkpoint","props":{"element":"ice"}},{"terrain":"water"},{"terrain":"land"},{"terrain":"land","node":{"element":"ice","role":"source"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"shallow"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"}
+    ]
+   }
+  },
+  {
+   ...{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"id":"astral-loom-43"},
+   map:{
+    ...{"format":"element-forge-map","schemaVersion":2,"rulesVersion":4,"name":"Prism-Thread Gallery","description":"Inside the Prism-Thread Gallery, crystalline lenses focus blinding Exposed sunbeams beside pitch-dark Covered spool-chambers and active Lava veins. Braid Light, Shadow, Electricity, Plant, and Fire across the gallery's central crossing.","width":12,"height":12,"constraints":{},"inventory":{"intersection":1,"portal":2}},
+    cells:[
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"nature","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"electricity","role":"source"}},{"terrain":"land"},{"terrain":"land","node":{"element":"shadow","role":"source"}},{"terrain":"covered","component":"checkpoint","props":{"element":"shadow"}},{"terrain":"land"},{"terrain":"land","node":{"element":"light","role":"source"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"wall"},{"terrain":"forest"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"exposed","component":"checkpoint","props":{"element":"light"}},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"forest"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"light","role":"destination"}},{"terrain":"land","component":"gate","props":{"direction":"W"}},{"terrain":"wall"},{"terrain":"exposed"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"fire","role":"source"}},{"terrain":"land"},{"terrain":"lava"},{"terrain":"lava"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"fire","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},
+     {"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"nature"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"covered"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"covered"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"nature","role":"destination"}},{"terrain":"land"},{"terrain":"land","node":{"element":"electricity","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"covered"},{"terrain":"land","node":{"element":"shadow","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"}
+    ]
+   }
+  },
+  {
+   ...{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"id":"astral-loom-44"},
+   map:{
+    ...{"format":"element-forge-map","schemaVersion":2,"rulesVersion":4,"name":"The Slag-Weave Manifold","description":"Deep within The Slag-Weave Manifold, white-hot iron channels and boiling aqueducts interlock around a windswept abyss. Guide Metal, Fire, Water, Earth, and Wind through all four one-way locks.","width":12,"height":12,"constraints":{},"inventory":{"bridge":1,"intersection":1,"tunnel":2}},
+    cells:[
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"metal","role":"source"}},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","component":"checkpoint","props":{"element":"metal"}},{"terrain":"land","node":{"element":"water","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"metal","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"fire","role":"destination"}},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"wind","role":"source"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"fire","role":"source"}},{"terrain":"lava"},{"terrain":"lava"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"land","component":"checkpoint","props":{"element":"fire"}},{"terrain":"land"},{"terrain":"water"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"mountain"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"water"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"wind","role":"destination"}},{"terrain":"land"},{"terrain":"void"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"water"},{"terrain":"land","component":"checkpoint","props":{"element":"wind"}},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"water"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"earth","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"scree"},{"terrain":"scree"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"land","component":"checkpoint","props":{"element":"earth"}},{"terrain":"land"},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"earth","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"water","role":"destination"}},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"}
+    ]
+   }
+  },
+  {
+   ...{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"id":"astral-loom-45"},
+   map:{
+    ...{"format":"element-forge-map","schemaVersion":2,"rulesVersion":4,"name":"Umbral Counterweight","description":"Balanced on giant stone pendulums, the Umbral Counterweight swings between blinding Exposed light-wells, pitch-dark Covered vaults, and melting glacial Shallows. Braid Light, Shadow, Ice, Plant, and Electricity through the counterweight gates.","width":12,"height":12,"constraints":{},"inventory":{"bridge":1,"intersection":1,"portal":2}},
+    cells:[
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"nature","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"light","role":"source"}},{"terrain":"land"},{"terrain":"covered","component":"checkpoint","props":{"element":"shadow"}},{"terrain":"covered"},{"terrain":"land","node":{"element":"shadow","role":"source"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"wall"},{"terrain":"forest"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"land","node":{"element":"ice","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"exposed","component":"checkpoint","props":{"element":"light"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"forest"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"water"},{"terrain":"water"},{"terrain":"water"},{"terrain":"shallow"},{"terrain":"shallow"},{"terrain":"land"},{"terrain":"land"},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"exposed"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"nature"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"land","node":{"element":"electricity","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"electricity"}},{"terrain":"land","node":{"element":"electricity","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},{"terrain":"wall"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"covered"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"covered"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"nature","role":"destination"}},{"terrain":"land","node":{"element":"ice","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"light","role":"destination"}},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land","node":{"element":"shadow","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"}
+    ]
+   }
+  },
+  {
+   ...{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"id":"astral-loom-46"},
+   map:{
+    ...{"format":"element-forge-map","schemaVersion":2,"rulesVersion":4,"name":"Chrono-Spindle Bastion","description":"Deep inside the Chrono-Spindle Bastion, three sealed inner vaults guard the time-keeping gears of the Astral Loom behind a 3-tile Mountain bulkhead, a bottomless Void chasm, and blinding Exposed sunbeams. Braid Earth, Metal, Wind, Shadow, and Water through all five one-way locks.","width":12,"height":12,"constraints":{},"inventory":{"intersection":1,"tunnel":2,"portal":2}},
+    cells:[
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"covered","component":"checkpoint","props":{"element":"shadow"}},{"terrain":"covered"},{"terrain":"land","node":{"element":"shadow","role":"source"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"wind","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"metal","role":"source"}},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"mountain"},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"metal"}},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"void"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"mountain"},
+     {"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"wind"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"water","role":"source"}},{"terrain":"exposed"},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land","node":{"element":"wind","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"water"},{"terrain":"exposed"},{"terrain":"exposed"},{"terrain":"land","node":{"element":"metal","role":"destination"}},{"terrain":"land"},
+     {"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"water"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"covered"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"earth","role":"source"}},{"terrain":"scree"},{"terrain":"scree","component":"checkpoint","props":{"element":"earth"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"land","node":{"element":"earth","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"covered"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"water","component":"gate","props":{"direction":"S"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"covered"},{"terrain":"land","node":{"element":"shadow","role":"destination"}},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"water","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"}
+    ]
+   }
+  },
+  {
+   ...{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"id":"astral-loom-47"},
+   map:{
+    ...{"format":"element-forge-map","schemaVersion":2,"rulesVersion":4,"name":"The Gordian Loom","description":"Knotted at the heart of the upper observatory, The Gordian Loom weaves five high-voltage currents around a flooded reservoir, a roofed Covered labyrinth, and smoldering Lava sluices. Untangle Fire, Water, Plant, Electricity, and Light through all five one-way locks.","width":12,"height":12,"constraints":{},"inventory":{"bridge":1,"intersection":1,"portal":2}},
+    cells:[
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"nature","role":"source"}},{"terrain":"land"},{"terrain":"land","node":{"element":"electricity","role":"source"}},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"light","role":"source"}},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"electricity"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"wall"},{"terrain":"forest"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"exposed","component":"checkpoint","props":{"element":"light"}},{"terrain":"exposed"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"forest"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"covered"},{"terrain":"covered"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"water"},{"terrain":"land"},{"terrain":"land","node":{"element":"water","role":"source"}},{"terrain":"shallow"},{"terrain":"water"},{"terrain":"land"},{"terrain":"water"},{"terrain":"water","component":"checkpoint","props":{"element":"water"}},{"terrain":"covered"},{"terrain":"covered"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"nature"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"wall"},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"wall"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"lava"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"fire","role":"source"}},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"lava","component":"checkpoint","props":{"element":"fire"}},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"water","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"electricity","role":"destination"}},{"terrain":"land"},{"terrain":"land","node":{"element":"fire","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","node":{"element":"light","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"nature","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"}
+    ]
+   }
+  },
+  {
+   ...{"format":"element-forge-level","schemaVersion":1,"rulesVersion":4,"id":"astral-loom-48"},
+   map:{
+    ...{"format":"element-forge-map","schemaVersion":2,"rulesVersion":4,"name":"The Grand Weaver Core","description":"At the apex of The Astral Loom spins The Grand Weaver Core—a colossal five-stream celestial engine locked behind six rotary one-way gates, a 3-tile Mountain bulkhead, a bottomless Void rift, a rushing Water aqueduct, scorching Heated Ground, smoldering Lava, and blinding Exposed light-wells. Unite Fire, Water, Wind, Metal, and Shadow using every tool in your arsenal to reweave the Astral Loom and complete Chapter 4.","width":12,"height":12,"constraints":{},"inventory":{"bridge":1,"intersection":1,"tunnel":2,"portal":2}},
+    cells:[
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"shadow","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land","node":{"element":"fire","role":"source"}},{"terrain":"land"},{"terrain":"land","node":{"element":"metal","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"covered"},{"terrain":"covered","component":"checkpoint","props":{"element":"shadow"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"heated"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"exposed"},{"terrain":"exposed"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"lava"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"metal"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"lava"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"mountain"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"fire"}},{"terrain":"land"},{"terrain":"land","node":{"element":"wind","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"water","role":"source"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"mountain"},{"terrain":"land","component":"gate","props":{"direction":"S"}},{"terrain":"mountain"},{"terrain":"void"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"water","component":"checkpoint","props":{"element":"water"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"metal","role":"destination"}},{"terrain":"land"},
+     {"terrain":"exposed"},{"terrain":"exposed"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"mountain"},{"terrain":"water"},{"terrain":"mountain"},{"terrain":"land","node":{"element":"wind","role":"destination"}},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land","component":"checkpoint","props":{"element":"wind"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"water"},{"terrain":"land","node":{"element":"fire","role":"destination"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"covered"},{"terrain":"land","component":"gate","props":{"direction":"E"}},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"water"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"covered"},{"terrain":"covered"},{"terrain":"land","node":{"element":"shadow","role":"destination"}},{"terrain":"mountain"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","node":{"element":"water","role":"destination"}},{"terrain":"land"},{"terrain":"land"},{"terrain":"land","component":"gate","props":{"direction":"N"}},{"terrain":"land"},
+     {"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"},{"terrain":"land"}
+    ]
+   }
+  }
+ ];
+ root.EFAstralLoom=levels;
+ if(typeof module!=='undefined')module.exports=levels;
+})(typeof window==='undefined'?globalThis:window);
+</script>
+<script>
+'use strict';
+(function(root){
  const L=typeof module==='undefined'?root.EFLevels:require('./levels');
  const boards=typeof module==='undefined'?root.EFRevisedBoards:require('./revised-boards');
  const [spark]=L.catalog;
@@ -2859,7 +3109,8 @@ if(typeof module!=='undefined')module.exports=api;
  const chapter=typeof module==='undefined'?root.EFSleepingValley:require('./sleeping-valley');
  const archivedTutorials=previousChapter.slice(1).map(level=>({...level,lesson:null}));
  const chapterThree=typeof module==='undefined'?root.EFPrimevalCrucible:require('./primeval-crucible');
- const api={chapter,chapterTwo,chapterThree,archivedTutorials,previousChapter};
+ const chapterFour=typeof module==='undefined'?root.EFAstralLoom:require('./astral-loom');
+ const api={chapter,chapterTwo,chapterThree,chapterFour,archivedTutorials,previousChapter};
  root.EFChapter=api;
  if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);
@@ -2987,7 +3238,8 @@ if(typeof module!=='undefined')module.exports=api;
  const chapters=[
   {title:'Chapter One',name:'The Sleeping Valley',stages:window.EFChapter.chapter},
   {title:'Chapter Two',name:'The Gatekeepers',stages:window.EFChapter.chapterTwo},
-  {title:'Chapter Three',name:'The Primeval Crucible',stages:window.EFChapter.chapterThree}
+  {title:'Chapter Three',name:'The Primeval Crucible',stages:window.EFChapter.chapterThree},
+  {title:'Chapter Four',name:'The Astral Loom',stages:window.EFChapter.chapterFour}
  ];
  let offset=0;
  for(const chapter of chapters){
@@ -3879,7 +4131,7 @@ if(typeof module!=='undefined')module.exports=api;
   const target=runTarget();
   document.body.classList.toggle('chapter-restored',Boolean(target?.complete));
   $('continue').disabled=!target||Boolean(target.complete);
-  $('home-total').textContent=target?.complete?'Campaign complete · The Primeval Crucible restored':
+  $('home-total').textContent=target?.complete?'Campaign complete · The Astral Loom restored':
    target?`${chapterAt(target.index).title} · Stage ${target.index+1} of ${campaignSize} · Campaign best total ${progress.total()}`:'Chapter One · The Sleeping Valley';
   renderChallengeChoices();
   showPanel(null);
