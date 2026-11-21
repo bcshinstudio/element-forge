@@ -340,9 +340,10 @@ body {
    <div id="tutorial-list" class="stage-list"></div>
   </section>
   <fieldset id="audio-settings" hidden>
-   <legend>Audio</legend>
+   <legend>Settings</legend>
    <label><input id="music-enabled" type="checkbox"> Music</label>
    <label><input id="effects-enabled" type="checkbox"> Sound Effects</label>
+   <label><input id="settings-skip-tutorial-popups" type="checkbox"> Don’t show tutorial popups</label>
   </fieldset>
   <div id="challenge-menu" hidden>
    <label>Difficulty <select id="challenge-tier"><option>Easy</option><option>Medium</option><option>Hard</option><option>Expert</option></select></label>
@@ -362,6 +363,7 @@ body {
  <dialog id="mechanic-tip" aria-labelledby="tip-name">
   <h2 id="tip-name"></h2>
   <p id="tip-description"></p>
+  <p><label><input id="skip-tutorial-popups" type="checkbox"> Don’t show tutorial popups</label></p>
   <button type="button" id="try-lesson">Try a Lesson</button>
   <button type="button" id="continue-stage">Continue to Stage</button>
  </dialog>
@@ -2040,7 +2042,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
 (function(root){
  const L=typeof module==='undefined'?root.EFLevels:require('./levels');
  const curated=typeof module==='undefined'?root.EFCurated:require('./challenge-release').release().pack;
- const [spark,river,,forest]=L.catalog;
+ const [spark,,,forest]=L.catalog;
  const [,tunnel,portal]=L.catalog.slice(12,15);
  const [ford,junction,,,scarce,timber,kiln,grove]=curated.stages;
  function stage(entry,id,hint,lesson=null){
@@ -2066,7 +2068,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   stage(twinCrossings,'twin-crossings','Look for the junction where both lines can continue straight.'),
   stage(ford,'cinder-ford','Follow the river before committing Fire to a crossing.'),
   stage(junction,'dry-junction','Look at which current can take the wooded approach.',forest.id),
-  stage(scarce,'scarce-crossing','Trace the dry circuit before choosing where Water leaves the river.',river.id),
+  stage({...scarce,map:{...scarce.map,description:'Connect all three currents without blocking the woods or the dry corridor.'}},'scarce-crossing','Trace the dry circuit first.'),
   stage(spillway,'spillway','Check which shore tiles leave room for a straight crossing.','rules4-build-a-bridge'),
   stage(timber,'scree-and-timber','Try the scree approach before spending your bridge.','rules4-scree-shelf'),
   stage(tunnels,'engine-underpass','Compare two alignments before placing a tunnel.',tunnel.id),
@@ -2273,6 +2275,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
  function canOpen(index){
   return index>=campaignSize||index<=progress.reachedIndex();
  }
+ function displayTerrain(map,cell){return map.rulesVersion>=4&&cell.terrain==='bank'?'land':cell.terrain;}
  function openLevel(index,saved=null,playMode='run'){
   if(!levels[index]||!canOpen(index))return;
   if(playMode!=='tutorial')tutorialReturn=null;
@@ -2320,7 +2323,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
    tile.type='button';
    tile.tabIndex=i===firstSource?0:-1;
    tile.dataset.index=i;
-   tile.className='tile '+cell.terrain;
+   tile.className='tile '+displayTerrain(map,cell);
    return tile;
   });
   board.replaceChildren(...tiles);
@@ -2337,7 +2340,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   update();
   persist();
   message(saved&&!restored?'This board changed. Your unlocked stages and scores were kept.':'');
-  if(index<campaignSize&&levels[index].lesson&&!tipSeen(levels[index].id))showTip();
+  if(index<campaignSize&&levels[index].lesson&&!skipTutorialPopups&&!tipSeen(levels[index].id))showTip();
  }
 
  function campaignSnapshot(){
@@ -2545,6 +2548,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   for(const [i,cell] of map.cells.entries()){
    const tile=tiles[i];
    const mark=document.createElement('span');
+   const terrain=displayTerrain(map,cell);
    const kind=E.effective(map,state.placements,i);
    const link=E.pairIdAt(map,state.placements,i);
    mark.className='mark';
@@ -2562,8 +2566,8 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
     const element=kind==='checkpoint'?cell.props?.element:null;
    mark.textContent=(componentSymbols[kind]||'')+(symbols[element]||link||arrows[cell.props?.direction]||'');
    if(colors[element])mark.style.color=colors[element];
-   }else if(!kind&&!window.EFBoardArt.terrains.has(cell.terrain)){
-    mark.textContent=cell.terrain==='oneway'?arrows[cell.props?.direction||'E']:terrainSymbols[cell.terrain]||'';
+   }else if(!kind&&!window.EFBoardArt.terrains.has(terrain)){
+    mark.textContent=cell.terrain==='oneway'?arrows[cell.props?.direction||'E']:terrainSymbols[terrain]||'';
    }
    fragments[i].append(mark);
    tile.classList.toggle('wind-landing',landings.has(i));
@@ -2572,7 +2576,7 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
    window.EFBoardArt.decorate(tile,kind,{link});
    const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
    const label=`Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, `+
-    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[cell.terrain]||cell.terrain));
+    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[terrain]||terrain));
    tile.title=label;
    tile.setAttribute('aria-label',label);
   }
@@ -2963,6 +2967,18 @@ window.EFCurated={"format":"element-forge-challenges","version":1,"revision":"au
   const saved=JSON.parse(storage?.getItem(tipsKey)??'[]');
   if(Array.isArray(saved))seenTips=new Set(saved);
  }catch{}
+ const popupKey='element-forge.skip-tutorial-popups.v1';
+ let skipTutorialPopups=false;
+ try{skipTutorialPopups=storage?.getItem(popupKey)==='yes';}catch{}
+ const popupControls=[$('skip-tutorial-popups'),$('settings-skip-tutorial-popups')];
+ for(const control of popupControls){
+  control.checked=skipTutorialPopups;
+  control.onchange=()=>{
+   skipTutorialPopups=control.checked;
+   for(const input of popupControls)input.checked=skipTutorialPopups;
+   try{storage?.setItem(popupKey,skipTutorialPopups?'yes':'no');}catch{}
+  };
+ }
  const tip=$('mechanic-tip');
  function tipSeen(id){return seenTips.has(id);}
  function dismissTip(){
