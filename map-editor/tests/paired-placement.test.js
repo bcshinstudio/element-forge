@@ -8,3 +8,17 @@ test('unpaired and over-budget links are rejected',()=>{const m=mk();endpoints(m
 test('tunnel links require straight alignment and intervening blocked terrain',()=>{const m=mk(),a=at(2,3),b=at(8,3),p={[a]:{kind:'tunnel',pairId:'T'},[b]:{kind:'tunnel',pairId:'T'}};assert.equal(E.linkPartner(m,a,p),-1);m.cells[at(5,3)].terrain='mountain';assert.equal(E.linkPartner(m,a,p),b);assert.equal(E.linkPartner(m,b,p),a);delete p[b];p[at(8,4)]={kind:'tunnel',pairId:'T'};assert.equal(E.linkPartner(m,a,p),-1);});
 test('placing and removing overlay preserves original water terrain',()=>{const m=mk(),i=at(4,4);m.cells[i].terrain='water';const p={[i]:'bridge'};assert.equal(E.effective(m,p,i),'bridge');assert.equal(m.cells[i].terrain,'water');delete p[i];assert.equal(E.effective(m,p,i),null);assert.equal(m.cells[i].terrain,'water');});
 test('fixed and player links can be distinguished and inventory counted',()=>{const m=mk(),a=at(2,2),b=at(8,8);m.cells[a].component='portal';m.cells[a].props={pairId:'X'};m.cells[b].component='portal';m.cells[b].props={pairId:'X'};assert.equal(E.linkPartner(m,a,{}),b);assert.equal(E.canPlace(m,{},a,'portal'),false);assert.equal(E.canPlace(m,{},at(3,3),'portal'),true);});
+
+test('modern tunnels require continuous rock with both mouths at its edges; portals are unchanged',()=>{
+ const m={...mk(),rulesVersion:4},start=at(2,3),end=at(6,3);
+ const link=kind=>({[start]:{kind,pairId:'A'},[end]:{kind,pairId:'A'}});
+ for(let x=3;x<6;x++)m.cells[at(x,3)].terrain='mountain';
+ assert.equal(E.linkPartner(m,start,link('tunnel')),end);
+ assert.equal(E.linkPartner(m,end,link('tunnel')),start);
+ m.cells[at(5,3)].terrain='land';
+ assert.equal(E.linkPartner(m,start,link('tunnel')),-1);
+ m.cells[at(5,3)].terrain='wall';
+ m.cells[at(4,3)].terrain='river';
+ assert.equal(E.linkPartner(m,end,link('tunnel')),-1);
+ assert.equal(E.linkPartner(m,start,link('portal')),end);
+});

@@ -11,6 +11,7 @@
 [hidden] { display: none !important; }
 body { margin: 0; min-height: 100vh; }
 .masthead {
+ position: sticky; top: 0; z-index: 5; background: #14241c;
  max-width: 1260px; margin: auto; padding: 22px clamp(16px,4vw,52px);
  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;
  border-bottom: 1px solid var(--border);
@@ -89,6 +90,7 @@ footer { padding: 0 16px 20px; text-align: center; color: var(--muted); font-siz
 }
 .build-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 14px; }
 .build-actions button { min-height: 42px; }
+.restart-stage { margin-top: 12px; min-height: 44px; }
 #undo { background: transparent; }
 .disclosure { color: var(--muted); font-size: .9rem; margin-top: 14px; }
 .disclosure summary { width: fit-content; cursor: pointer; padding: 6px 0; }
@@ -192,3 +194,43 @@ button.brand { background: transparent; border: 0; text-align: left; }
  .controls .restoration p, #score, #totals { margin: 3px 0; }
  #score-details { margin-top: 3px; }
 }
+
+.home-actions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.65rem; }
+#home .home-actions button { margin:0; height:48px; }
+.home-secondary { display:flex; gap:.4rem; margin-block:1rem; }
+.stage-list:not([hidden]) { display:grid; gap:.4rem; margin-block:1rem; }
+.stage-list button { text-align:left; }
+#back-to-game { position:sticky; top:0; z-index:5; background:#ead39e; color:#202a21; }
+#mechanic-tip { max-width:min(90vw,32rem); background:#1c3025; color:#f8f3e5; border:1px solid var(--border); border-radius:12px; }
+#mechanic-tip::backdrop { background:#0b1715aa; }
+#mechanic-tip button { min-height:44px; }
+@media (max-width:600px) {
+ .home-actions { grid-template-columns:1fr; }
+}
+
+:root { --world-engine-art: url(../art/world-engine.webp); }
+body {
+ background: linear-gradient(#102019ee,#102019eb), var(--world-engine-art) center / cover fixed;
+}
+#home {
+ background: linear-gradient(90deg,#14271cf2 0%,#14271cd9 42%,#14271c22 100%),
+  var(--world-engine-art) 68% center / cover;
+ min-height: 23rem;
+ padding: clamp(1rem,4vw,2rem);
+}
+#home button:not(.primary) { background:#20392ff5; }
+#home .home-actions .primary:disabled { opacity:.65; }
+.chapter-restored #home {
+ background: radial-gradient(ellipse at 81% 28%,#ffdea366,transparent 44%),
+  linear-gradient(90deg,#14271cf2,#14271c44), var(--world-engine-art) 68% center / cover;
+}
+@media (hover:none) and (min-width:601px) and (max-width:950px) and (orientation:landscape) {
+ .masthead { padding-block:4px; }
+ .layout { grid-template-columns:minmax(0,1fr) minmax(13rem,40%); gap:8px; padding:6px 10px; }
+ #board { width:min(100%, max(200px, calc(100svh - 100px))); margin-inline:auto; }
+ #link-id { display:none; }
+ #phone-link-id { display:inline-block; min-height:44px; }
+}
+
+#puzzle-nav { display:flex; gap:4px; }
+#puzzle-nav button { min-height: 40px; }

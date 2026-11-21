@@ -1,15 +1,23 @@
 'use strict';
 (()=>{
  const E=window.EFEngine,F=window.EFMap;
- const levels=[...window.EFLevels.catalog];
+ const chapterOneSize=window.EFChapter.chapter.length;
+ const levels=[...window.EFChapter.chapter,...window.EFChapter.chapterTwo];
  const campaignSize=levels.length;
- levels.push(window.EFLevels.prototype);
+ const tutorials=[...window.EFLevels.catalog,window.EFLevels.prototype];
+ levels.push(...tutorials);
+ const importIndex=levels.length;
  let storage;
  try{storage=window.localStorage;}catch{}
- const progress=window.EFProgress.createProgress(storage,levels.slice(0,campaignSize).map(level=>level.id),levels[0].rulesVersion);
- const challengeStart=campaignSize+2;
+ const progress=window.EFProgress.createProgress(storage,levels.slice(0,campaignSize).map(level=>level.id),levels[0].rulesVersion,'element-forge.chapter-one.v1',Object.fromEntries(levels.slice(0,campaignSize).map(level=>[level.id,level.layout??1])));
+ const tutorialProgress=window.EFProgress.createProgress(storage,tutorials.map(level=>level.id),4);
+ const audio=window.EFAudio.createAudio({storage,document,AudioContext:window.AudioContext||window.webkitAudioContext});
+ document.addEventListener('click',()=>audio.unlock(),true);
+ const challengeStart=importIndex+1;
  let challengeEnd=challengeStart,activePack=null,challengeBest={};
  const $=id=>document.getElementById(id);
+ let mode='run',tutorialReturn=null;
+ const heardRoutes=new Set();
  const board=$('board');
  const colors={fire:'#ff9875',water:'#79d7ff',nature:'#bdec81',electricity:'#ffdd72',arcane:'#d9b5ff',wind:'#a8f0dd'};
  const symbols={fire:'F',water:'W',nature:'P',electricity:'E',arcane:'A',wind:'V'};
@@ -25,7 +33,7 @@
  const arrows={N:'↑',E:'→',S:'↓',W:'←'};
  toolNames.tunnel='Tunnel';
  let session,tiles,tool,tunnelStart=null,levelIndex,timer=null,drag=null,importTicket=0;
- const phone=matchMedia('(max-width: 600px)');
+ const phone=matchMedia('(max-width: 600px), (hover: none) and (max-width: 950px)');
  const menu=$('game-menu');
  const menuItems=[document.querySelector('.campaign-picker'),$('description'),$('elements'),$('instructions'),
   $('puzzle-hint'),$('puzzle-options'),$('challenge-library'),$('custom-level'),$('world-intro')];
@@ -39,11 +47,11 @@
    if(phone.matches)$('menu-content').append(item);
    else menuHomes[i].after(item);
   }
-  if(!phone.matches&&menu.open)menu.close();
-  $('mobile-menu').hidden=!phone.matches||$('play-view').hidden;
+  $('puzzle-nav').hidden=$('play-view').hidden;
+  $('mobile-menu').hidden=$('play-view').hidden;
  }
  function fitBoard(){
-  if(!phone.matches||$('play-view').hidden)return;
+  if($('play-view').hidden)return;
   const height=['.masthead','#puzzle','.controls'].reduce((total,selector)=>
    total+document.querySelector(selector).getBoundingClientRect().height,24);
   board.style.setProperty('--mobile-chrome',height+'px');
@@ -51,14 +59,41 @@
  phone.addEventListener('change',()=>{adjustPhone();if(session)drawPlan();fitBoard();});
  const fitObserver=new ResizeObserver(fitBoard);
  for(const selector of ['.masthead','#puzzle','.controls'])fitObserver.observe(document.querySelector(selector));
- $('mobile-menu').onclick=()=>menu.showModal();
+ $('mobile-menu').onclick=()=>{
+  if(drag&&board.hasPointerCapture(drag.pointer))board.releasePointerCapture(drag.pointer);
+  drag=null;
+  if(!menu.open){menu.scrollTop=0;menu.showModal();menu.scrollTop=0;}
+ };
+ $('back-to-game').onclick=()=>menu.close();
+ $('menu-home').onclick=$('puzzle-home').onclick=()=>showHome();
+ const informationHome=$('information-panel').parentNode;
+ function showMenuInformation(show){
+  $('menu-lessons').hidden=!show;
+  $('menu-content').hidden=show;
+  $('menu-information').setAttribute('aria-expanded',String(show));
+  if(show)$('menu-lessons').append($('information-panel'));
+  else informationHome.insertBefore($('information-panel'),$('audio-settings'));
+  $('information-panel').hidden=!show;
+ }
+ $('menu-information').onclick=()=>{const show=$('menu-lessons').hidden;showMenuInformation(show);if(show)renderChoices();};
+ menu.addEventListener('close',()=>{if(!$('menu-lessons').hidden)showMenuInformation(false);});
+ menu.addEventListener('close',()=>{if(!$('mobile-menu').hidden)$('mobile-menu').focus({preventScroll:true});});
+ menu.addEventListener('click',event=>{
+  if(event.target!==menu)return;
+  const bounds=menu.getBoundingClientRect();
+  if(event.clientX<bounds.left||event.clientX>bounds.right||event.clientY<bounds.top||event.clientY>bounds.bottom)menu.close();
+ });
  const message=value=>{$('status').textContent=value;};
 
  function canOpen(index){
-  return index>=campaignSize||index<=progress.unlockedIndex();
+  return index>=campaignSize||index<=progress.reachedIndex();
  }
- function openLevel(index,saved=null){
-  if(!levels[index])return;
+ function displayTerrain(map,cell){return map.rulesVersion>=4&&cell.terrain==='bank'?'land':cell.terrain;}
+ function openLevel(index,saved=null,playMode='run'){
+  if(!levels[index]||!canOpen(index))return;
+  if(playMode!=='tutorial')tutorialReturn=null;
+  mode=index>=campaignSize?(index<importIndex?'tutorial':'independent'):playMode;
+  audio.scene('play');
   $('home').hidden=true;
   $('play-view').hidden=false;
   adjustPhone();
@@ -66,7 +101,7 @@
   document.querySelector('.campaign-picker').hidden=false;
   intro.hidden=index!==0||introSeen;
   tool='route';
-  if(!canOpen(index)){ $('level').value=levelIndex;return; }
+
   stopAnimation();
   drag=null;
   tunnelStart=null;
@@ -75,8 +110,16 @@
   levelIndex=index;
   const restored=session.restore(saved);
   if(restored&&session.state.phase==='complete')drawResult(session.evaluate());
-  if(index<campaignSize){progress.select(levels[index].id);updateLevelLabels();}
+  heardRoutes.clear();
+  for(const route of session.state.routes)heardRoutes.add(route.element);
+  if(index<campaignSize&&mode==='run')progress.select(levels[index].id);
+  updateLevelLabels();
+  for(const option of $('level').options){
+   const candidate=Number(option.value);
+   if(candidate>=campaignSize&&candidate<importIndex)option.hidden=candidate!==index;
+  }
   $('level').value=index;
+  $('menu-tip').hidden=!levels[index].lesson;
   $('puzzle-options').open=false;
   $('custom-level').open=false;
   $('import-error').textContent='';
@@ -93,7 +136,7 @@
    tile.type='button';
    tile.tabIndex=i===firstSource?0:-1;
    tile.dataset.index=i;
-   tile.className='tile '+cell.terrain;
+   tile.className='tile '+displayTerrain(map,cell);
    return tile;
   });
   board.replaceChildren(...tiles);
@@ -110,14 +153,15 @@
   update();
   persist();
   message(saved&&!restored?'This board changed. Your unlocked stages and scores were kept.':'');
+  if(index<campaignSize&&levels[index].lesson&&!skipTutorialPopups&&!tipSeen(levels[index].id))showTip();
  }
 
  function campaignSnapshot(){
-  return {id:levels[levelIndex].id,rules:levels[levelIndex].rulesVersion,board:session.snapshot()};
+  return {id:levels[levelIndex].id,rules:levels[levelIndex].rulesVersion,layout:levels[levelIndex].layout??1,board:session.snapshot()};
  }
 
  function persist(){
-  if(levelIndex<campaignSize)progress.saveCampaign(campaignSnapshot());
+  if(levelIndex<campaignSize&&mode==='run')progress.saveCampaign(campaignSnapshot());
   else if(levelIndex>=challengeStart&&activePack)progress.saveChallenge({
    pack:activePack,index:levelIndex-challengeStart,best:challengeBest,board:session.snapshot()
   });
@@ -132,7 +176,8 @@
   $('score-bonus').hidden=!unspent;
   $('score-bonus').textContent=`Unused construction +${10*unspent}`;
   $('score-floor').hidden=available-2*tiles+10*unspent>=0;
-  const best=levelIndex<campaignSize?progress.best(levels[levelIndex].id):challengeBest[levelIndex-challengeStart];
+  const id=levels[levelIndex].id;
+  const best=levelIndex<campaignSize?progress.best(id):mode==='tutorial'?tutorialProgress.best(id):challengeBest[levelIndex-challengeStart];
   $('totals').textContent=best==null?'':`Stage best ${best}`+(levelIndex<campaignSize?` · Campaign total ${progress.total()}`:'');
  }
 
@@ -255,7 +300,7 @@
   $('instructions').textContent=tool==='remove'?'Choose a tool on the map to remove it.':
    tool==='route'?'Tap a source or unfinished tip to draw. Tap a placed tool to remove it when no route is active.':
    tool==='tunnel'?(tunnelStart===null?'Choose the first open tile for your tunnel.':
-    'Choose the other opening in the same row or column, across blocked terrain. Tap the first opening again or tap outside the board to cancel.'):
+    'Choose the other opening at the opposite edge of the same ridge. Tap the first opening again or tap outside the board to cancel.'):
    'Choose a tile for your '+toolNames[tool].toLowerCase()+'.';
  }
 
@@ -273,10 +318,10 @@
   $('finish').hidden=phase!=='complete';
   $('engine-restoration').hidden=phase!=='complete';
   if(phase==='build')drawToolBar();
-  $('next').disabled=levelIndex<campaignSize?levelIndex===campaignSize-1:
-   levelIndex<challengeStart||levelIndex+1>=challengeEnd;
-  $('next').textContent=levelIndex===campaignSize-1?'Campaign summary':'Next Stage';
-  if(levelIndex===campaignSize-1)$('next').disabled=false;
+  $('next').disabled=mode==='independent'&&(levelIndex<challengeStart||levelIndex+1>=challengeEnd);
+  $('next').textContent=mode==='tutorial'?(tutorialReturn?'Return to Stage':'Tutorials'):
+   mode==='replay'?'Stage Select':levelIndex===campaignSize-1?'Campaign summary':levelIndex===chapterOneSize-1?'Start Chapter Two':'Next Stage';
+  $('return-lesson').hidden=mode!=='tutorial';
   drawBoard();
  }
 
@@ -316,6 +361,7 @@
   for(const [i,cell] of map.cells.entries()){
    const tile=tiles[i];
    const mark=document.createElement('span');
+   const terrain=displayTerrain(map,cell);
    const kind=E.effective(map,state.placements,i);
    const link=E.pairIdAt(map,state.placements,i);
    mark.className='mark';
@@ -328,19 +374,22 @@
     role.textContent=cell.node.role==='source'?'S':'D';
     role.setAttribute('aria-hidden','true');
     mark.append(role);
-   }else if(kind){
+   }else if(kind&&!window.EFBoardArt.structures.has(kind)){
     mark.classList.add('structure');
     const element=kind==='checkpoint'?cell.props?.element:null;
    mark.textContent=(componentSymbols[kind]||'')+(symbols[element]||link||arrows[cell.props?.direction]||'');
    if(colors[element])mark.style.color=colors[element];
-   }else mark.textContent=cell.terrain==='oneway'?arrows[cell.props?.direction||'E']:terrainSymbols[cell.terrain]||'';
+   }else if(!kind&&!window.EFBoardArt.terrains.has(terrain)){
+    mark.textContent=cell.terrain==='oneway'?arrows[cell.props?.direction||'E']:terrainSymbols[terrain]||'';
+   }
    fragments[i].append(mark);
    tile.classList.toggle('wind-landing',landings.has(i));
    tile.classList.toggle('tunnel-preview',i===tunnelStart);
    tile.replaceChildren(fragments[i]);
+   window.EFBoardArt.decorate(tile,kind,{link});
    const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
    const label=`Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, `+
-    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[cell.terrain]||cell.terrain));
+    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[terrain]||terrain));
    tile.title=label;
    tile.setAttribute('aria-label',label);
   }
@@ -404,6 +453,11 @@
   const result=removePlaced?session.remove(index):bridgeTile?session.place(index,'bridge'):tool==='tunnel'?session.placeTunnel(tunnelStart,index):
    tool==='route'?session.route(index):tool==='remove'?session.remove(index):session.place(index,tool,tool==='portal'?portalPair():undefined);
   if(!result.ok){message(explainMove(result,index));return false;}
+  if(!removePlaced&&(bridgeTile||tool!=='route'&&tool!=='remove'))audio.effect('build');
+  if(tool==='route'&&element&&!state.active&&!heardRoutes.has(element)&&state.routes.some(route=>route.element===element)){
+   heardRoutes.add(element);
+   audio.effect('route');
+  }
   message(removePlaced?'Tool removed.':'');
   tunnelStart=null;
   drawBoard();
@@ -487,15 +541,23 @@
   persist();
  }
  $('restart').onclick=()=>reset(false);
- $('replan').onclick=()=>reset(true);
+ $('replan').onclick=()=>{
+  const {placements,routes,drafts}=session.state;
+  const hasWork=Object.keys(placements).length||routes.length||Object.keys(drafts).length;
+  if(hasWork&&!confirm('Restart this stage and choose tools again? This clears routes and placed tools.'))return;
+  reset(true);
+ };
  $('replay').onclick=()=>reset(true);
  $('undo').onclick=()=>{if(tool!=='route'){cancelTool();return;}if(session.undo()){drawBoard();drawToolBar();message('Last change undone.');persist();}};
  $('check').onclick=()=>{
+  if(session.state.phase!=='build')return;
   const result=session.verify();
   if(!result.ok){message(result.message);return;}
   if(levelIndex<campaignSize){
-   progress.complete(levels[levelIndex].id,result.points,campaignSnapshot());
+   progress.complete(levels[levelIndex].id,result.points,mode==='run'?campaignSnapshot():null);
    updateLevelLabels();
+  }else if(mode==='tutorial'){
+   tutorialProgress.complete(levels[levelIndex].id,result.points);
   }else if(levelIndex>=challengeStart){
    const index=levelIndex-challengeStart;
    challengeBest={...challengeBest,[index]:Math.max(challengeBest[index]??0,result.points)};
@@ -504,14 +566,22 @@
   drawResult(result);
   update();
   message('');
+  audio.effect('harmony');
   animate();
  };
  $('skip-animation').onclick=stopAnimation;
- $('next').onclick=()=>{if(session.state.phase==='complete'){
-  if(levelIndex===campaignSize-1)showHome();
+ $('next').onclick=()=>{
+  if(session.state.phase!=='complete')return;
+  if(mode==='tutorial')returnFromTutorial();
+  else if(mode==='replay'){showHome();showPanel('stage-list');}
+  else if(levelIndex===campaignSize-1)showHome();
   else openLevel(levelIndex+1);
- }};
- $('level').onchange=()=>{importTicket++;openLevel(Number($('level').value));};
+ };
+ $('level').onchange=()=>{
+  importTicket++;
+  const target=Number($('level').value);
+  if(target!==levelIndex)openLevel(target,null,'replay');
+ };
  $('import').onchange=async event=>{
   const input=event.target,file=input.files[0],ticket=++importTicket;
   input.value='';
@@ -521,8 +591,9 @@
    if(file.size>1024*1024)throw Error('Choose a level file smaller than 1 MiB.');
    const level=JSON.parse((await file.text()).replace(/^\uFEFF/,''));
    if(ticket!==importTicket)return;
+   if(level?.format==='element-forge-challenges'){startImportedPack(level);return;}
    const map=F.readLevel(level);
-   const index=campaignSize+1;
+   const index=importIndex;
    levels[index]=level;
    $('level').querySelector('[data-import]')?.remove();
    const option=new Option(map.name+' (imported)',index);
@@ -549,20 +620,36 @@
   openLevel(challengeStart+index,saved?.board);
  }
 
- $('curated-pack').onclick=()=>{loadPack(window.EFCurated);$('challenge-library').open=false;};
- $('pack-file').onchange=async event=>{
-  const file=event.target.files[0];
-  event.target.value='';
+ function startImportedPack(pack){
+  loadPack(pack);
+  $('challenge-library').open=false;
+  message(`Imported ${challengeEnd-challengeStart} puzzles. Find them under Challenges on the home screen.`);
+ }
+
+ $('curated-pack').onclick=()=>{loadPack(window.EFRevisedBoards.pack);$('challenge-library').open=false;};
+ async function importPack(event){
+  const input=event.currentTarget;
+  const file=input.files[0];
+  input.value='';
   if(!file)return;
+  const fromHome=input.id==='home-pack-file';
+  const status=$(fromHome?'challenge-status':'pack-import-error');
+  status.textContent='';
   const ticket=++importTicket;
   try{
    if(file.size>1024*1024)throw Error('Choose a pack smaller than 1 MiB.');
-   const pack=JSON.parse((await file.text()).replace(/^\uFEFF/,''));
-   if(ticket!==importTicket)return;
-   loadPack(pack);
-   $('challenge-library').open=false;
-  }catch(error){if(ticket===importTicket)message('Pack import failed. '+error.message);}
- };
+   const pack=window.EFChallenges.repairGeneratedRivers(JSON.parse((await file.text()).replace(/^\uFEFF/,'')));
+   if(ticket!==importTicket||fromHome===$('home').hidden)return;
+   if(fromHome){
+    const puzzles=window.EFChallenges.readPack(pack);
+    progress.saveChallenge({pack,index:0,best:{},board:null});
+    renderChallengeChoices();
+    status.textContent=`Imported ${puzzles.length} puzzle${puzzles.length===1?'':'s'}. Choose one below.`;
+   }else startImportedPack(pack);
+  }catch(error){if(ticket===importTicket)status.textContent='Pack import failed. '+error.message;}
+ }
+ $('pack-file').onchange=importPack;
+ $('home-pack-file').onchange=importPack;
  board.addEventListener('click',event=>{
   const tile=event.target.closest('.tile');
   if(tile)act(Number(tile.dataset.index),true);
@@ -613,7 +700,7 @@
   persist();
  });
  document.addEventListener('keydown',event=>{
-  if(event.key==='Escape'&&session?.state.phase==='build'&&tool!=='route'){event.preventDefault();cancelTool();}
+  if(event.key==='Escape'&&!menu.open&&!$('mechanic-tip').open&&session?.state.phase==='build'&&tool!=='route'){event.preventDefault();cancelTool();}
  });
  document.addEventListener('pointerdown',event=>{
   if(session?.state.phase==='build'&&tool==='tunnel'&&!board.contains(event.target)&&
@@ -651,7 +738,9 @@
    $('level').options[i].disabled=!canOpen(i);
    $('level').options[i].textContent=`${i+1}. ${map.name}${progress.hasCompleted(id)?' ✓':canOpen(i)?'':' · Locked'}`;
   }
-  $('campaign-progress').textContent=`${progress.completedCount()} / ${campaignSize} complete`;
+  const second=levelIndex>=chapterOneSize&&levelIndex<campaignSize;
+  const stages=second?levels.slice(chapterOneSize,campaignSize):levels.slice(0,chapterOneSize);
+  $('campaign-progress').textContent=`${stages.filter(level=>progress.hasCompleted(level.id)).length} / ${stages.length} complete`;
  }
  const introKey='element-forge.world-engine-intro.v1';
  const intro=$('world-intro');
@@ -662,49 +751,162 @@
   introSeen=true;
   try{storage?.setItem(introKey,'seen');}catch{}
  }
- function continueCampaign(){
+ function runTarget(){
   const saved=progress.campaign();
-  const index=levels.findIndex(level=>level?.id===saved?.id);
-  if(index>=0&&index<campaignSize&&canOpen(index)&&saved.board?.phase!=='complete'){
-   openLevel(index,saved.rules===levels[index].rulesVersion?saved.board:{});
-  }else openLevel(progress.unlockedIndex());
+  const index=levels.slice(0,campaignSize).findIndex(level=>level.id===saved?.id);
+  if(index<0)return null;
+  if(saved.board?.phase==='complete'){
+   if(index===campaignSize-1)return {complete:true};
+   return {index:index+1};
+  }
+  const changed=(saved.layout??1)!==(levels[index].layout??1);
+  return {index,changed,board:!changed&&saved.rules===levels[index].rulesVersion?saved.board:null};
  }
+ function continueCampaign(){
+  const target=runTarget();
+  if(!target||target.complete)return;
+  openLevel(target.index,target.board);
+  if(target.changed)message('This stage has a new layout. The board restarted; your unlocks and old layout score were kept.');
+
+ }
+ const panels=['stage-list','information-panel','audio-settings','challenge-menu'];
+ function showPanel(id){
+  for(const panel of panels)$(panel).hidden=panel!==id;
+ }
+ function makeChoice(parent,label,callback,disabled=false){
+  const button=document.createElement('button');
+  button.type='button';
+  button.textContent=label;
+  button.disabled=disabled;
+  button.onclick=callback;
+  parent.append(button);
+ }
+ function renderChallengeChoices(){
+  const saved=progress.challenge();
+  const list=$('challenge-puzzles');
+  list.replaceChildren();
+  list.hidden=true;
+  $('resume-challenge').hidden=!saved?.pack||!saved.board;
+  if(!saved?.pack)return;
+  try{
+   window.EFChallenges.readPack(saved.pack).forEach(({map},index)=>makeChoice(list,
+    `${index+1}. ${map.name}`,()=>loadPack(saved.pack,{...saved,index,board:index===saved.index?saved.board:null})));
+   list.hidden=false;
+  }catch{}
+ }
+ function renderChoices(){
+  $('stage-list').replaceChildren();
+  levels.slice(0,campaignSize).forEach((level,index)=>{
+   if(index===0||index===chapterOneSize){
+    const heading=document.createElement('h3');
+    heading.textContent=index===0?'Chapter One · The Sleeping Valley':'Chapter Two · The Gatekeepers';
+    $('stage-list').append(heading);
+   }
+   makeChoice($('stage-list'),`${index+1}. ${level.map.name}${progress.hasCompleted(level.id)?' ✓':''}`,
+    ()=>openLevel(index,null,'replay'),!canOpen(index));
+  });
+  $('tutorial-list').replaceChildren();
+  const groups=[['Route basics and elements',0,11],['Construction and combined routing',11,17],['Wind practice',17,18]];
+  for(const [title,start,end] of groups){
+   const heading=document.createElement('h3');
+   heading.textContent=title;
+   $('tutorial-list').append(heading);
+   tutorials.slice(start,end).forEach((level,index)=>makeChoice($('tutorial-list'),
+    level.map.name+(tutorialProgress.hasCompleted(level.id)?' ✓':''),
+    ()=>{tutorialReturn=menu.open?{index:levelIndex,board:session.snapshot(),mode}:null;openLevel(campaignSize+start+index,null,'tutorial');}));
+  }
+ }
+ let seenTips=new Set();
+ const tipsKey='element-forge.chapter-one.tips.v1';
+ try{
+  const saved=JSON.parse(storage?.getItem(tipsKey)??'[]');
+  if(Array.isArray(saved))seenTips=new Set(saved);
+ }catch{}
+ const popupKey='element-forge.skip-tutorial-popups.v1';
+ let skipTutorialPopups=false;
+ try{skipTutorialPopups=storage?.getItem(popupKey)==='yes';}catch{}
+ const popupControls=[$('skip-tutorial-popups'),$('settings-skip-tutorial-popups')];
+ for(const control of popupControls){
+  control.checked=skipTutorialPopups;
+  control.onchange=()=>{
+   skipTutorialPopups=control.checked;
+   for(const input of popupControls)input.checked=skipTutorialPopups;
+   try{storage?.setItem(popupKey,skipTutorialPopups?'yes':'no');}catch{}
+  };
+ }
+ const tip=$('mechanic-tip');
+ function tipSeen(id){return seenTips.has(id);}
+ function dismissTip(){
+  seenTips.add(levels[levelIndex].id);
+  try{storage?.setItem(tipsKey,JSON.stringify([...seenTips]));}catch{}
+  tip.close();
+ }
+ function showTip(){
+  const lesson=tutorials.find(level=>level.id===levels[levelIndex].lesson);
+  if(!lesson)return;
+  if(menu.open)menu.close();
+  if(tip.open)return;
+  $('tip-name').textContent=lesson.map.name;
+  $('tip-description').textContent=lesson.map.description;
+  tip.showModal();
+ }
+ function returnFromTutorial(){
+  const target=tutorialReturn;
+  tutorialReturn=null;
+  if(target)openLevel(target.index,target.board,target.mode);
+  else{showHome();showPanel('information-panel');}
+ }
+ $('menu-tip').onclick=showTip;
+ $('continue-stage').onclick=dismissTip;
+ tip.addEventListener('cancel',event=>{event.preventDefault();dismissTip();});
+ $('try-lesson').onclick=()=>{
+  const index=tutorials.findIndex(level=>level.id===levels[levelIndex].lesson);
+  if(index<0)return;
+  tutorialReturn={index:levelIndex,board:session.snapshot(),mode};
+  dismissTip();
+  openLevel(campaignSize+index,null,'tutorial');
+ };
+ $('return-lesson').onclick=returnFromTutorial;
  function showHome(){
   stopAnimation();
+  audio.scene('home');
   $('home').hidden=false;
   $('play-view').hidden=true;
   adjustPhone();
   if(menu.open)menu.close();
+  if(!$('menu-lessons').hidden)showMenuInformation(false);
+  if(tip.open)tip.close();
   document.querySelector('.campaign-picker').hidden=true;
   intro.hidden=true;
-  const saved=progress.campaign();
-  const started=saved||progress.selected()||progress.completedCount()>0;
-  const target=saved?.board?.phase!=='complete'?levels.findIndex(level=>level?.id===saved?.id):-1;
-  const done=progress.completedCount()===campaignSize;
-  $('continue').textContent=done&&target<0?'Campaign complete · Replay final stage':started?
-   `Continue · Stage ${(target>=0&&target<campaignSize&&canOpen(target)?target:progress.unlockedIndex())+1}`:'Start Campaign';
-  $('home-total').textContent=started?`Campaign total ${progress.total()} · ${progress.completedCount()} of ${campaignSize} stages cleared`:'';
-  $('stage-select').hidden=!started;
-  $('new-campaign').hidden=!started;
-  $('resume-challenge').hidden=!progress.challenge()?.pack;
-  $('continue').focus();
+  const target=runTarget();
+  document.body.classList.toggle('chapter-restored',Boolean(target?.complete));
+  $('continue').disabled=!target||Boolean(target.complete);
+  $('home-total').textContent=target?.complete?'Campaign complete · The Gatekeepers restored':
+   target?`${target.index<chapterOneSize?'Chapter One':'Chapter Two'} · Stage ${target.index+1} of ${campaignSize} · Campaign best total ${progress.total()}`:'Chapter One · The Sleeping Valley';
+  renderChallengeChoices();
+  showPanel(null);
+  renderChoices();
+  (target&&!target.complete?$('continue'):$('new-campaign')).focus();
  }
  $('intro-begin').onclick=dismissIntro;
  $('intro-skip').onclick=dismissIntro;
  $('home-button').onclick=showHome;
  $('continue').onclick=continueCampaign;
- $('stage-select').onclick=()=>{
-  continueCampaign();
-  if(phone.matches&&!menu.open)menu.showModal();
-  $('level').focus();
-  if(typeof $('level').showPicker==='function')try{$('level').showPicker();}catch{}
- };
+ $('stage-select').onclick=()=>showPanel($('stage-list').hidden?'stage-list':null);
+ $('information').onclick=()=>showPanel($('information-panel').hidden?'information-panel':null);
+ $('settings').onclick=()=>showPanel($('audio-settings').hidden?'audio-settings':null);
  $('new-campaign').onclick=()=>{
-  if(!confirm('Start a new campaign and reset campaign progress and scores?'))return;
-  progress.reset();updateLevelLabels();openLevel(0);
+  const target=runTarget();
+  if(target&&!target.complete&&!confirm('Replace your active run? Stage unlocks and personal bests are kept.'))return;
+  openLevel(0);
  };
- $('choose-challenge').onclick=()=>{$('challenge-menu').hidden=!$('challenge-menu').hidden;};
- $('home-curated').onclick=()=>loadPack(window.EFCurated);
+ $('choose-challenge').onclick=()=>showPanel($('challenge-menu').hidden?'challenge-menu':null);
+ for(const key of ['music','effects']){
+  const input=$(key+'-enabled');
+  input.checked=audio.preferences[key];
+  input.onchange=()=>audio.set(key,input.checked);
+ }
+ $('home-curated').onclick=()=>loadPack(window.EFRevisedBoards.pack);
  $('resume-challenge').onclick=()=>{
   const saved=progress.challenge();
   try{loadPack(saved.pack,saved);}catch{progress.saveChallenge(null);$('resume-challenge').hidden=true;
@@ -720,15 +922,15 @@
     const {pack}=window.EFChallenges.generate({difficulty,count:1,attempts:48,seed:String(Date.now())});
     if(pack.stages.length)loadPack(pack);
     else{
-     const reference=window.EFCurated.stages.find(stage=>stage.difficulty===difficulty);
-     if(reference)loadPack({...window.EFCurated,stages:[reference]});
+     const reference=window.EFRevisedBoards.pack.stages.find(stage=>stage.difficulty===difficulty);
+     if(reference)loadPack({...window.EFRevisedBoards.pack,stages:[reference]});
      else status.textContent='No verified puzzle found at this difficulty. Try again or open the curated pack.';
     }
    }catch(error){status.textContent=error.message;}
    finally{button.disabled=false;}
   },0);
  };
- for(const [index,level] of levels.entries())$('level').add(new Option(level.map.name+(index===campaignSize?' · Optional':''),index));
+ for(const [index,level] of levels.entries())$('level').add(new Option(level.map.name+(index>=campaignSize?' · Tutorial':''),index));
  updateLevelLabels();
  showHome();
 })();

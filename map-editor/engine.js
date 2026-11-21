@@ -18,8 +18,15 @@ const linkPartner=(m,i,placements={})=>{
   const row=Math.floor(i/m.width)===Math.floor(other/m.width),col=i%m.width===other%m.width;
   if(!row&&!col)return -1;
   const step=row?(other>i?1:-1):(other>i?m.width:-m.width);
-  let blocked=false;for(let k=i+step;k!==other;k+=step)if(!['land','forest','ice'].includes(m.cells[k].terrain))blocked=true;
-  if(!blocked)return -1;
+  if(m.rulesVersion>=4){
+   if(i+step===other)return -1;
+   for(let k=i+step;k!==other;k+=step){
+    if(!['mountain','wall'].includes(m.cells[k].terrain))return -1;
+   }
+  }else{
+   let blocked=false;for(let k=i+step;k!==other;k+=step)if(!['land','forest','ice'].includes(m.cells[k].terrain))blocked=true;
+   if(!blocked)return -1;
+  }
  }
  return other;
 };

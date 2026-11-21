@@ -10,343 +10,270 @@ from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = "/game/index.html"
-FIRE_SHORTCUT = [50, 51, 52, 53, 54, 55, 56]
-FIRE_DETOUR = [50, 51, 52, 40, 39, 27, 28, 29, 30, 42, 54, 55, 56]
-WATER = [99, 111, 112, 113, 114, 115]
-
-
 def tile(page, index):
     return page.locator(f'[data-index="{index}"]')
 
 
-def route(page, path, drag=False):
-    if not drag:
-        for index in path:
-            tile(page, index).click()
-        return
-    tile(page, path[0]).scroll_into_view_if_needed()
-    points = [tile(page, i).bounding_box() for i in path]
-    center = [(rect["x"] + rect["width"] / 2, rect["y"] + rect["height"] / 2)
-              for rect in points]
-    page.mouse.move(*center[0])
-    page.mouse.down()
-    for point in center[1:]:
-        page.mouse.move(*point, steps=3)
-    page.mouse.up()
+def current_plan(page, index):
+    return page.evaluate("index => EFEngine.solveConstruction(EFMap.readLevel([...EFChapter.chapter,...EFChapter.chapterTwo][index]))", index)
 
 
-def use_harmony_catalog(page):
-    page.add_init_script("""Object.defineProperty(window, 'EFLevels', {
-        configurable: true,
-        set(levels) {
-            Object.defineProperty(window, 'EFLevels', {
-                value: {...levels, catalog: levels.harmonyCatalog}, configurable: true
-            });
-        }
-    });""")
+def prepare(page, plan, tap=False):
+    press = lambda locator: locator.tap() if tap else locator.click()
+    if page.locator("#mechanic-tip").evaluate("dialog => dialog.open"):
+        press(page.locator("#continue-stage"))
+    counts = {}
+    for placement in plan["placements"].values():
+        kind = placement if isinstance(placement, str) else placement["kind"]
+        counts[kind] = counts.get(kind, 0) + 1
+    for kind, count in counts.items():
+        if page.locator(f'#loadout input[name="{kind}"]').count():
+            label = {"tunnel": "Tunnel", "intersection": "Intersection", "bridge": "Bridge"}[kind]
+            for _ in range(count // 2 if kind == "tunnel" else count):
+                press(page.get_by_role("button", name="Add " + label, exact=True))
+    press(page.locator("#start"))
+    tunnel = []
+    for index, placement in plan["placements"].items():
+        kind = placement if isinstance(placement, str) else placement["kind"]
+        if kind == "tunnel":
+            tunnel.append(index)
+        else:
+            if kind != "bridge":
+                press(page.locator(f'[data-tool="{kind}"]'))
+            press(tile(page, index))
+    if tunnel:
+        press(page.locator('[data-tool="tunnel"]'))
+        for index in tunnel:
+            press(tile(page, index))
 
 
-def unlock_through(page, count):
-    page.evaluate("""count => {
-        const completed = EFLevels.catalog.slice(0, count).map(level => level.id);
-        localStorage.setItem('element-forge.campaign.v1', JSON.stringify({completed}));
-    }""", count)
-    page.evaluate("localStorage.removeItem('element-forge.campaign.v2')")
-    page.reload()
-    page.locator("#continue").click()
+def finish(page, plan, tap=False):
+    for route in plan["routes"]:
+        for index in route["path"]:
+            locator = tile(page, index)
+            locator.tap() if tap else locator.click()
+    button = page.locator("#check")
+    button.tap() if tap else button.click()
+    expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
 
 
-def test_main_loop(browser, url):
-    page = browser.new_page(viewport={"width": 1280, "height": 1000})
+def test_campaign(browser, url):
+    page = browser.new_page(viewport={"width": 1280, "height": 950}, reduced_motion="reduce")
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
-    use_harmony_catalog(page)
     page.goto(url + BASE)
+    expect(page.locator("#continue")).to_be_disabled()
+    assert page.locator(".home-actions button").evaluate_all(
+        "buttons => { const widths = buttons.map(b => b.getBoundingClientRect().width); "
+        "return Math.max(...widths) - Math.min(...widths) < 0.1; }"
+    )
+    page.locator("#new-campaign").click()
+    if page.locator("#intro-skip").is_visible():
+        page.locator("#intro-skip").click()
+    for index in range(17):
+        plan = current_plan(page, index)
+        assert plan["status"] == "solved"
+        if index == 3:
+            expect(page.locator("#mechanic-tip")).to_be_visible()
+            page.locator("#try-lesson").click()
+            expect(page.locator("#puzzle")).to_have_text("Forest Shortcut")
+            page.locator("#return-lesson").click()
+            expect(page.locator("#puzzle")).to_have_text("Crosswind Commons")
+            expect(page.locator("#mechanic-tip")).to_be_hidden()
+        if index == 4:
+            expect(page.locator("#mechanic-tip")).to_be_hidden()
+            expect(page.locator(".tile.bank")).to_have_count(0)
+        if index == 5:
+            page.locator("#skip-tutorial-popups").check()
+            page.locator("#continue-stage").click()
+            page.locator("#start").click()
+            expect(page.locator("#replan")).to_be_visible()
+            page.locator("#replan").click()
+            expect(page.locator("#loadout")).to_be_visible()
+        if index == 6:
+            expect(page.locator("#board .scree").first).to_have_css("background-image", re.compile("scree.webp"))
+            expect(page.locator("#mechanic-tip")).to_be_hidden()
+            page.locator("#mobile-menu").click()
+            page.locator("#menu-tip").click()
+            expect(page.locator("#mechanic-tip")).to_be_visible()
+            page.locator("#continue-stage").click()
+        prepare(page, plan)
+        finish(page, plan)
+        if index == 11:
+            expect(page.locator("#next")).to_have_text("Start Chapter Two")
+        if index == 2:
+            page.reload()
+            page.locator("#continue").click()
+            expect(page.locator("#puzzle")).to_have_text("Crosswind Commons")
+        else:
+            page.locator("#next").click()
+    expect(page.locator("#home-total")).to_contain_text("Campaign complete")
+    page.reload()
+    page.locator("#settings").click()
+    expect(page.locator("#settings-skip-tutorial-popups")).to_be_checked()
+    page.locator("#new-campaign").click()
+    expect(page.locator("#puzzle")).to_have_text("First Spark")
+    page.locator("#home-button").click()
+    page.locator("#stage-select").click()
+    expect(page.locator("#stage-list button").last).to_be_enabled()
+    page.locator("#stage-list button").last.click()
+    expect(page.locator("#puzzle")).to_have_text("The Two Inlets")
+    page.locator("#home-button").click()
     page.locator("#continue").click()
-    expect(page.get_by_role("heading", name="Ember Meadow")).to_be_visible()
-    expect(page.locator(".tile")).to_have_count(144)
-    page.get_by_role("button", name="Start building").click()
-    route(page, [40, 52, 64], drag=True)
-    expect(tile(page, 64).locator(".track")).to_have_count(1)
-    route(page, [64, 76, 88, 89, 90, 102, 103, 104, 92], drag=True)
-    page.get_by_role("button", name="Restore Harmony").click()
-    expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
-    expect(page.locator(".orb")).to_have_count(1)
-    page.get_by_role("button", name="Next Stage").click()
-    expect(page.get_by_role("heading", name="Brook Bridge")).to_be_visible()
-
-    legacy = page.evaluate("EFLevels.legacyCatalog[3]")
-    page.locator("#import").set_input_files({"name": "old.level.json", "mimeType": "application/json",
-                                             "buffer": json.dumps(legacy).encode()})
-    expect(page.locator("#puzzle")).to_have_text("The River Crossing")
-    imported = page.locator("#level").input_value()
-
-    expect(page.get_by_role("heading", name="Plan your route")).to_be_visible()
-    expect(tile(page, 113)).to_be_visible()
-    expect(page.get_by_role("button", name="Draw track")).to_be_hidden()
-    bridge_count = page.locator('input[name="bridge"]')
-    bridge_count.fill("2")
-    expect(page.get_by_role("button", name="Start building")).to_be_disabled()
-    expect(page.locator("#budget")).to_have_text("2 points over budget")
-    # Visiting a fixed-inventory puzzle clears the over-budget button state.
-    page.locator("#level").select_option("1")
-    expect(page.get_by_role("button", name="Start building")).to_be_enabled()
-    page.locator("#level").select_option(imported)
-    bridge_count.fill("1")
-    page.get_by_role("button", name="Start building").click()
-
-    expect(page.locator("#bridge-count")).to_have_text("Bridges left: 1")
-    tile(page, 53).click()
-    expect(page.locator("#bridge-count")).to_have_text("Bridges left: 0")
-    tile(page, 53).click(button="right")
-    expect(page.locator("#bridge-count")).to_have_text("Bridges left: 1")
-    tile(page, 53).click()
-    route(page, FIRE_SHORTCUT)
-    page.get_by_role("button", name="Restore Harmony").click()
-    expect(page.locator("#status")).to_contain_text("water: missing route")
-    expect(page.get_by_role("button", name="Restart", exact=True)).to_be_hidden()
-    expect(page.locator("#import")).to_be_hidden()
-    expect(page.get_by_role("button", name="Bridge (0)")).to_have_count(0)
-    page.get_by_text("Puzzle options", exact=True).click()
-    expect(page.get_by_role("button", name="Remove tool")).to_be_visible()
-    page.get_by_role("button", name="Restart", exact=True).click()
-    expect(page.locator("#bridge-count")).to_have_text("Bridges left: 1")
-    expect(tile(page, 53)).to_have_attribute("aria-label", "Row 5, column 6, Water")
-    page.get_by_text("Puzzle options", exact=True).click()
-    page.get_by_role("button", name="Replan tools").click()
-    expect(page.get_by_role("heading", name="Plan your route")).to_be_visible()
-    expect(bridge_count).to_have_value("1")
-    page.get_by_role("button", name="Start building").click()
-    route(page, FIRE_DETOUR[:3])
-    route(page, WATER[:3])
-    tile(page, 113).click()
-    route(page, WATER[3:])
-    route(page, FIRE_DETOUR[2:])
-    page.get_by_role("button", name="Undo").click()
-    route(page, FIRE_DETOUR)
-    page.get_by_role("button", name="Restore Harmony").click()
-    expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
-    expect(page.locator("#score")).to_contain_text("106 points")
-    expect(page.locator(".orb")).to_have_count(2)
-    expect(page.get_by_role("button", name="Replay puzzle")).to_be_enabled(timeout=8000)
-    page.get_by_role("button", name="Replay puzzle").click()
-    expect(page.get_by_role("heading", name="Plan your route")).to_be_visible()
+    expect(page.locator("#puzzle")).to_have_text("First Spark")
     assert not errors, errors
     page.close()
 
 
-def test_reedwater_endpoints_and_lock(browser, url):
-    page = browser.new_page(viewport={"width": 1280, "height": 1000})
-    use_harmony_catalog(page)
-    page.goto(url + BASE)
-    page.locator("#continue").click()
-    unlock_through(page, 5)
-    page.locator("#level").select_option("5")
-    page.locator("#start").click()
-    left, right = tile(page, 98), tile(page, 117)
-    expect(left.locator(".endpoint-role")).to_have_text("D")
-    expect(right.locator(".endpoint-role")).to_have_text("S")
-    left.click()
-    expect(page.locator("#status")).to_contain_text("This is a destination (D)")
-    right.click()
-    expect(right.locator(".track")).to_have_count(1)
-    assert page.locator('#level option[value="6"]').evaluate("option => option.disabled")
-    page.locator("#level").evaluate("""select => {
-        select.value = '6';
-        select.dispatchEvent(new Event('change'));
-    }""")
-    expect(page.get_by_role("heading", name="Reedwater Ford")).to_be_visible()
-    expect(page.locator("#level")).to_have_value("5")
-    expect(page.get_by_role("button", name="Skip to next puzzle")).to_have_count(0)
-    expect(page.locator("#campaign-progress")).to_have_text("5 / 21 complete")
-    page.close()
-
-
-def test_offline_touch_and_import(browser, offline):
-    page = browser.new_page(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True,
+def test_mobile_resume(browser, offline, width, height):
+    page = browser.new_page(viewport={"width": width, "height": height}, is_mobile=True, has_touch=True,
                             reduced_motion="reduce")
-    errors = []
-    page.on("pageerror", lambda error: errors.append(str(error)))
     page.context.set_offline(True)
-    use_harmony_catalog(page)
     page.goto(offline.as_uri())
-    page.locator("#continue").tap()
-    expect(page.locator(".tile")).to_have_count(144)
-    assert page.evaluate("document.documentElement.scrollWidth === window.innerWidth")
-    page.locator("#start").tap()
-    route(page, [40, 52, 64, 76, 88, 89, 90, 102, 103, 104, 92])
-    page.locator("#check").tap()
-    page.locator("#next").tap()
-    page.locator("#start").tap()
-    plan = page.evaluate("EFEngine.solveConstruction(EFMap.readLevel(EFLevels.catalog[1]))")
-    for index in plan["routes"][0]["path"]:
+    page.locator("#settings").tap()
+    page.locator("#music-enabled").uncheck()
+    page.locator("#effects-enabled").uncheck()
+    page.locator("#new-campaign").tap()
+    plan = current_plan(page, 0)
+    prepare(page, plan, tap=True)
+    path = plan["routes"][0]["path"]
+    for index in path[:2]:
         tile(page, index).tap()
-    expect(page.locator("#projected")).to_contain_text("points")
-
-    cells = [{"terrain": "land"} for _ in range(16)]
-    for index, role in ((0, "source"), (3, "destination")):
-        cells[index]["node"] = {"role": role, "element": "fire"}
-    level = {"format": "element-forge-level", "schemaVersion": 1, "rulesVersion": 1,
-             "map": {"format": "element-forge-map", "schemaVersion": 2, "name": "Legacy path",
-                     "width": 4, "height": 4, "cells": cells, "inventory": {}}}
-    field = page.locator("#import")
-    expect(field).to_be_hidden()
+    for _ in range(3):
+        page.locator("#mobile-menu").tap()
+        expect(page.locator("#game-menu")).to_be_visible()
+        page.locator("#back-to-game").tap()
+        expect(page.locator("#game-menu")).to_be_hidden()
+        expect(tile(page, path[1]).locator(".track")).to_have_count(1)
     page.locator("#mobile-menu").tap()
-    page.get_by_text("Open a custom level", exact=True).tap()
-    expect(field).to_be_visible()
-    field.set_input_files({"name": "legacy.level.json", "mimeType": "application/json",
-                           "buffer": json.dumps(level).encode()})
-    expect(page.get_by_role("heading", name="Legacy path")).to_be_visible()
-    expect(page.locator(".tile")).to_have_count(16)
-    page.get_by_role("button", name="Start building").tap()
-    for index in range(4):
+    page.keyboard.press("Escape")
+    expect(page.locator("#game-menu")).to_be_hidden()
+    tile(page, path[2]).tap()
+    page.reload()
+    page.locator("#settings").tap()
+    expect(page.locator("#music-enabled")).not_to_be_checked()
+    expect(page.locator("#effects-enabled")).not_to_be_checked()
+    page.locator("#continue").tap()
+    expect(tile(page, path[2]).locator(".track")).to_have_count(1)
+    for index in path[3:]:
         tile(page, index).tap()
-    page.get_by_role("button", name="Restore Harmony").tap()
+    page.locator("#check").tap()
     expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
-    expect(page.locator(".orb")).to_have_count(0)
-    expect(page.locator("#campaign-progress")).to_have_text("1 / 21 complete")
-    assert not errors, errors
-    page.close()
-
-
-def test_campaign_and_progress(browser, url):
-    page = browser.new_page(viewport={"width": 1280, "height": 1000}, reduced_motion="reduce")
-    errors = []
-    page.on("pageerror", lambda error: errors.append(str(error)))
-    page.goto(url + BASE)
-    page.locator("#continue").click()
-    plans = page.evaluate("""EFLevels.catalog.map(level => {
-        const map = EFMap.readLevel(level);
-        const solution = EFEngine.solveConstruction(map);
-        return {name: map.name, budget: !!map.construction, ...solution};
-    })""")
-    assert len(plans) == 17
-    for i, plan in enumerate(plans):
-        expect(page.get_by_role("heading", name=plan["name"], exact=True)).to_be_visible()
-        assert plan["status"] == "solved", plan
-        if plan["budget"]:
-            counts = {}
-            for placement in plan["placements"].values():
-                kind = placement if isinstance(placement, str) else placement["kind"]
-                counts[kind] = counts.get(kind, 0) + 1
-            for kind, count in counts.items():
-                page.locator(f'input[name="{kind}"]').fill(str(count // 2 if kind == "tunnel" else count))
-        page.get_by_role("button", name="Start building").click()
-        tunnel_openings = {}
-        for index, placement in plan["placements"].items():
-            kind = placement if isinstance(placement, str) else placement["kind"]
-            if kind == "tunnel":
-                pair = tunnel_openings.setdefault(placement["pairId"], [])
-                pair.append(index)
-                if len(pair) == 1:
-                    continue
-                page.locator('[data-tool="tunnel"]').click()
-                tile(page, pair[0]).click()
-                expect(tile(page, pair[0])).to_have_class("tile land tunnel-preview")
-                page.keyboard.press("Escape")
-                expect(tile(page, pair[0])).to_have_class("tile land")
-                page.locator('[data-tool="tunnel"]').click()
-                tile(page, pair[0]).click()
-                tile(page, pair[1]).click()
-                expect(tile(page, pair[0])).to_have_attribute("aria-label", re.compile(r"Tunnel T[0-9]+$"))
-            else:
-                if kind != "bridge":
-                    page.locator(f'[data-tool="{kind}"]').click()
-                tile(page, index).click()
-            expect(page.locator("#instructions")).to_contain_text("Tap a source")
-        for path in plan["routes"]:
-            route(page, path["path"])
-        page.get_by_role("button", name="Restore Harmony").click()
-        expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
-        expect(page.locator("#campaign-progress")).to_have_text(f"{i+1} / 17 complete")
-        if i < len(plans) - 1:
-            page.get_by_role("button", name="Next Stage").click()
-    expect(page.get_by_role("button", name="Campaign summary")).to_be_visible()
-    page.reload()
-    expect(page.locator("#continue")).to_contain_text("Campaign complete")
-    page.locator("#continue").click()
-    expect(page.get_by_role("heading", name="Two Currents, One Crossing")).to_be_visible()
-    expect(page.locator("#campaign-progress")).to_have_text("17 / 17 complete")
-    page.locator("#level").select_option("0")
-    expect(page.locator("#level option").first).to_have_text("1. First Spark ✓")
-    expect(page.locator("#campaign-progress")).to_have_text("17 / 17 complete")
-    assert not errors, errors
-    page.close()
-
-
-def test_portrait_tunnels(browser, url):
-    page = browser.new_page(viewport={"width": 360, "height": 640},
-                            is_mobile=True, has_touch=True, reduced_motion="reduce")
-    use_harmony_catalog(page)
-    page.goto(url + BASE)
-    page.locator("#continue").click()
-    unlock_through(page, 7)
-    page.locator("#mobile-menu").tap()
-    page.locator("#level").select_option("7")
-    page.locator("#mobile-menu").tap()
-    assert page.evaluate("document.documentElement.scrollWidth === innerWidth")
-    page.locator("#puzzle-hint summary").tap()
-    expect(page.locator("#hint-text")).to_contain_text("Either opening")
-    page.get_by_role("button", name="Close menu").tap()
-    page.locator("#start").tap()
-    assert tile(page, 50).evaluate("tile => getComputedStyle(tile).touchAction") == "none"
-    assert page.locator("#board").evaluate("board => getComputedStyle(board).touchAction") == "pinch-zoom"
-    for selector in ("#board", "#check", "#undo"):
-        assert page.locator(selector).evaluate("e => e.getBoundingClientRect().bottom <= innerHeight"), selector
-    assert page.evaluate("scrollY === 0")
-    expect(page.locator(".track")).to_have_count(0)
-    tunnel = page.get_by_role("button", name="Tunnel (1)", exact=True)
-    tunnel.tap()
-    tile(page, 51).tap()
-    expect(tile(page, 51)).to_have_class(re.compile("tunnel-preview"))
-    tile(page, 51).tap()
-    expect(page.locator(".tunnel-preview")).to_have_count(0)
-    tunnel.tap()
-    tile(page, 51).tap()
-    page.locator("#puzzle").tap()
-    expect(page.locator(".tunnel-preview")).to_have_count(0)
-    expect(tunnel).to_be_visible()
-    tunnel.tap()
-    tile(page, 51).tap()
-    tile(page, 56).tap()
-    for index in (51, 56):
-        expect(tile(page, index)).to_have_attribute("aria-label", re.compile("Tunnel T1$"))
-    tile(page, 56).tap()
-    for index in (51, 56):
-        expect(tile(page, index)).to_have_attribute("aria-label", re.compile("Land$"))
-    expect(tunnel).to_be_visible()
-    page.close()
-
-
-def test_world_engine_offline(browser, offline):
-    page = browser.new_page(viewport={"width": 390, "height": 844},
-                            is_mobile=True, has_touch=True, reduced_motion="reduce")
-    page.context.set_offline(True)
-    use_harmony_catalog(page)
-    page.goto(offline.as_uri())
+    page.locator("#home-button").tap()
+    page.locator("#information").tap()
+    expect(page.locator("#tutorial-list button")).to_have_count(18)
+    page.locator("#tutorial-list button").last.tap()
+    expect(page.locator("#puzzle")).to_have_text("Wind over the Rift")
+    page.locator("#return-lesson").tap()
     page.locator("#continue").tap()
+    expect(page.locator("#puzzle")).to_have_text("Twin Crossings")
+    prepare(page, current_plan(page, 1), tap=True)
     page.locator("#mobile-menu").tap()
-    expect(page.locator("#world-intro")).to_be_visible()
-    page.locator("#intro-skip").tap()
-    expect(page.locator("#world-intro")).to_be_hidden()
-    page.locator("#level").select_option(str(page.evaluate("EFLevels.catalog.length")))
-    page.locator("#start").tap()
-    for index in (62, 63, 64):
-        tile(page, index).tap()
-    expect(tile(page, 66)).to_have_class(re.compile("wind-landing"))
-    tile(page, 65).tap()
-    expect(page.locator("#status")).to_contain_text("cannot stop")
-    for index in (66, 67, 68, 69):
-        tile(page, index).tap()
-    page.locator("#check").tap()
-    expect(page.locator("#engine-restoration")).to_contain_text("Harmony restored.")
-    expect(page.locator(".orb")).to_have_count(0)
-    expect(page.locator("#skip-animation")).to_be_hidden()
-    expect(page.locator("#campaign-progress")).to_have_text("0 / 21 complete")
-    page.locator("#replay").tap()
-    expect(page.locator("#world-intro")).to_be_hidden()
+    page.locator("#back-to-game").tap()
+    expect(tile(page, 65)).to_have_attribute("data-structure", "intersection")
     page.reload()
-    expect(page.locator("#world-intro")).to_be_hidden()
+    page.locator("#continue").tap()
+    expect(tile(page, 65)).to_have_attribute("data-structure", "intersection")
+    page.close()
+
+
+def test_keyboard_and_import(browser, url):
+    page = browser.new_page(reduced_motion="reduce")
+    page.goto(url + BASE)
+    page.locator("#new-campaign").press("Enter")
+    page.locator("#intro-skip").press("Enter")
+    page.locator("#start").press("Enter")
+    plan = current_plan(page, 0)
+    path = plan["routes"][0]["path"]
+    tile(page, path[0]).press("Enter")
+    for previous, index in zip(path, path[1:]):
+        direction = {1: "ArrowRight", -1: "ArrowLeft", 12: "ArrowDown", -12: "ArrowUp"}[index-previous]
+        page.keyboard.press(direction)
+        page.keyboard.press("Enter")
+    page.locator("#check").press("Enter")
+    expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
+    page.locator("#custom-level summary").click()
+    level = page.evaluate("EFLevels.prototype")
+    page.locator("#import").set_input_files({"name": "wind.json", "mimeType": "application/json",
+                                             "buffer": json.dumps(level).encode()})
+    expect(page.locator("#puzzle")).to_have_text("Wind over the Rift")
+    page.close()
+
+
+def test_import_navigation(browser, offline, width, height, touch):
+    page = browser.new_page(viewport={"width": width, "height": height}, is_mobile=touch,
+                            has_touch=touch, reduced_motion="reduce")
+    press = lambda locator: locator.tap() if touch else locator.click()
+    page.context.set_offline(True)
+    page.goto(offline.as_uri())
+    press(page.locator("#new-campaign"))
+    if not touch:
+        press(page.locator("#intro-skip"))
+    if touch:
+        press(page.locator("#mobile-menu"))
+    press(page.locator("#challenge-library summary"))
+    original = ROOT / "game/tests/fixtures/original-harder-pack.json"
+    page.locator("#pack-file").set_input_files(original)
+    expect(page.locator("#puzzle")).to_have_text("Hard · Grove Crossing 1")
+    page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+    for control in ["#mobile-menu", "#puzzle-home"]:
+        assert page.locator(control).evaluate("e => e.getBoundingClientRect().top >= 0 && e.getBoundingClientRect().bottom <= innerHeight")
+    press(page.locator("#mobile-menu"))
+    press(page.locator("#menu-information"))
+    expect(page.locator("#menu-lessons #tutorial-list button")).to_have_count(18)
+    press(page.locator("#back-to-game"))
+    expect(page.locator("#puzzle")).to_have_text("Hard · Grove Crossing 1")
+    expect(page.locator("#start")).to_be_visible()
+    press(page.locator("#puzzle-home"))
+    press(page.locator("#choose-challenge"))
+    expect(page.locator("#challenge-puzzles button")).to_have_count(6)
+    page.reload()
+    press(page.locator("#choose-challenge"))
+    press(page.locator("#challenge-puzzles button").first)
+    expect(page.locator("#puzzle")).to_have_text("Hard · Grove Crossing 1")
+    press(page.locator("#puzzle-home"))
+    press(page.locator("#choose-challenge"))
+    page.locator("#home-pack-file").set_input_files(ROOT / "game/tests/fixtures/revised-harder-pack.json")
+    expect(page.locator("#challenge-puzzles button")).to_have_count(6)
+    press(page.locator("#challenge-puzzles button").last)
+    expect(page.locator("#puzzle")).to_have_text("Wide Relay")
+    page.close()
+
+
+def test_challenge_fallback(browser, url):
+    page = browser.new_page()
+    page.goto(url + BASE)
+    page.evaluate("EFChallenges.generate = () => ({pack:{stages:[]}})")
+    page.locator("#choose-challenge").click()
+    page.locator("#challenge-tier").select_option("Easy")
+    page.locator("#generate-challenge").click()
+    expect(page.locator("#challenge-status")).to_contain_text("No verified puzzle")
+    page.locator("#challenge-tier").select_option("Hard")
+    page.locator("#generate-challenge").click()
+    expected = page.evaluate("EFRevisedBoards.pack.stages.find(s => s.difficulty === 'Hard').map.name")
+    expect(page.locator("#puzzle")).to_have_text(expected)
+    page.close()
+
+
+def test_layout_migration(browser, url):
+    page = browser.new_page()
+    page.goto(url + BASE)
+    page.evaluate("""() => {
+      const ids=EFChapter.chapter.map(l=>l.id);
+      localStorage.setItem('element-forge.chapter-one.v1', JSON.stringify({
+        version:2, completed:ids.slice(0,4), best:{[ids[3]]:99},
+        campaign:{id:ids[3],rules:4,board:{phase:'build'}}
+      }));
+      localStorage.setItem('element-forge.skip-tutorial-popups.v1','yes');
+    }""")
+    page.reload()
+    page.locator("#continue").click()
+    expect(page.locator("#puzzle")).to_have_text("Crosswind Commons")
+    expect(page.locator("#status")).to_contain_text("new layout")
+    expect(page.locator("#start")).to_be_visible()
+    expect(page.locator("#campaign-progress")).to_have_text("4 / 12 complete")
+    assert page.evaluate("""() => JSON.parse(localStorage.getItem('element-forge.chapter-one.v1'))
+      .archivedBest['chapter-one-dry-junction']['1'] === 99""")
     page.close()
 
 
@@ -357,9 +284,9 @@ def test_challenge_pack_offline(browser, offline):
     page.goto(offline.as_uri())
     page.locator("#choose-challenge").tap()
     page.locator("#home-curated").tap()
-    pack = page.evaluate("EFCurated")
+    pack = page.evaluate("EFRevisedBoards.pack")
     expect(page.locator("#puzzle")).to_contain_text(pack["stages"][0]["map"]["name"])
-    plans = page.evaluate("EFCurated.stages.map(level => level.map.name === 'Scarce Crossing' ? EFChallenges.verifyScarce().solution : EFEngine.solveConstruction(EFMap.readLevel(level)))")
+    plans = page.evaluate("EFRevisedBoards.pack.stages.map(level => EFEngine.solveConstruction(EFMap.readLevel(level)))")
     assert all(plan and plan["status"] == "solved" for plan in plans)
     for i, plan in enumerate(plans):
         assert page.locator("#start").evaluate("e => e.getBoundingClientRect().bottom <= innerHeight")
@@ -387,68 +314,27 @@ def test_challenge_pack_offline(browser, offline):
         if i < len(plans)-1:
             page.get_by_role("button", name="Next Stage").tap()
     expect(page.locator("#next")).to_be_disabled()
-    expect(page.locator("#campaign-progress")).to_have_text("0 / 17 complete")
+    expect(page.locator("#campaign-progress")).to_have_text("0 / 12 complete")
+    assert not page.locator("#game-menu").evaluate("dialog => dialog.open")
     page.locator("#mobile-menu").tap()
     page.locator("#challenge-library summary").tap()
     page.locator("#pack-file").set_input_files({"name": "pack.json", "mimeType": "application/json",
                                                "buffer": json.dumps(pack).encode()})
     expect(page.locator("#puzzle")).to_contain_text(pack["stages"][0]["map"]["name"])
-    page.close()
-
-
-def test_autosave_and_scoring(browser, url):
-    page = browser.new_page(viewport={"width": 1280, "height": 1000})
-    page.goto(url + BASE)
-    expect(page.locator("#continue")).to_have_text("Start Campaign")
-    page.locator("#continue").click()
-    page.locator("#start").click()
-    path = page.evaluate("EFEngine.solveConstruction(EFMap.readLevel(EFLevels.catalog[0])).routes[0].path")
-    points = 144 - 2 * len(path)
-    route(page, path[:3])
+    file = {"name": "pack.json", "mimeType": "application/json", "buffer": json.dumps(pack).encode()}
+    page.locator("#mobile-menu").tap()
+    page.locator("#custom-level summary").tap()
+    page.locator("#import").set_input_files(file)
+    expect(page.locator("#status")).to_contain_text("Imported")
     page.reload()
-    expect(page.locator("#continue")).to_have_text("Continue · Stage 1")
-    page.locator("#continue").click()
-    expect(tile(page, path[2]).locator(".track")).to_have_count(1)
-    route(page, path[3:])
-    expect(page.locator("#projected")).to_have_text(f"Projected score {points} points")
-    page.locator("#check").click()
-    expect(page.locator("#skip-animation")).to_be_visible()
-    expect(page.locator("#totals")).to_have_text(f"Stage best {points} · Campaign total {points}")
-    expect(page.locator("#score")).to_have_text(f"{points} points")
-    expect(page.locator("#score-route")).to_be_hidden()
-    page.get_by_text("Score details", exact=True).click()
-    expect(page.locator("#score-route")).to_have_text(f"Route tiles −{2 * len(path)}")
-    expect(page.locator("#score-bonus")).to_be_hidden()
-    page.reload()
-    expect(page.locator("#continue")).to_have_text("Continue · Stage 2")
-    page.locator("#continue").click()
-    page.locator("#level").select_option("0")
-    page.locator("#start").click()
-    route(page, path)
-    page.locator("#check").click()
-    expect(page.locator("#totals")).to_have_text(f"Stage best {points} · Campaign total {points}")
-    page.locator("#skip-animation").click()
-    expect(page.locator("#skip-animation")).to_be_hidden()
+    page.locator("#choose-challenge").tap()
+    expect(page.locator("#challenge-puzzles button")).to_have_count(len(pack["stages"]))
+    page.locator("#home-pack-file").set_input_files(file)
+    expect(page.locator("#challenge-status")).to_contain_text("Choose one below")
+    page.locator("#challenge-puzzles button").nth(1).tap()
+    expect(page.locator("#puzzle")).to_have_text(pack["stages"][1]["map"]["name"])
     page.close()
 
-
-def test_keyboard(browser, url):
-    page = browser.new_page(reduced_motion="reduce")
-    use_harmony_catalog(page)
-    page.goto(url + BASE)
-    page.locator("#continue").click()
-    page.locator("#start").focus()
-    page.keyboard.press("Enter")
-    expect(tile(page, 40)).to_be_focused()
-    page.keyboard.press("Enter")
-    for key in ["ArrowDown", "ArrowDown", "ArrowDown", "ArrowDown", "ArrowRight",
-                "ArrowRight", "ArrowDown", "ArrowRight", "ArrowRight", "ArrowUp"]:
-        page.keyboard.press(key)
-        page.keyboard.press("Enter")
-    page.locator("#check").focus()
-    page.keyboard.press("Enter")
-    expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
-    page.close()
 
 
 if __name__ == "__main__":
@@ -458,7 +344,6 @@ if __name__ == "__main__":
     with TemporaryDirectory() as temp:
         offline = Path(temp, "standalone.html")
         subprocess.run(["python", str(ROOT / "game/build.py"), str(offline)], check=True)
-
         with ThreadingHTTPServer(("127.0.0.1", 0), partial(SimpleHTTPRequestHandler, directory=str(ROOT))) as server:
             thread = Thread(target=server.serve_forever, daemon=True)
             thread.start()
@@ -466,24 +351,22 @@ if __name__ == "__main__":
                 url = f"http://127.0.0.1:{server.server_port}"
                 with sync_playwright() as playwright:
                     browser = playwright.chromium.launch(executable_path=os.getenv("CHROMIUM_EXECUTABLE"))
-                    test_main_loop(browser, url)
-                    print("PASS desktop: start and resume drag routing, overspend, direct bridge placement and removal, wrong bridge, restart, replan, undo, animation, next and replay")
-                    test_reedwater_endpoints_and_lock(browser, url)
-                    print("PASS Reedwater: distinguish Water endpoints, start from its source and keep the next puzzle locked")
-                    test_offline_touch_and_import(browser, offline)
-                    print("PASS standalone mobile emulation: responsive board, legacy import, touch routing and reduced motion")
-                    test_portrait_tunnels(browser, url)
-                    print("PASS portrait touch: compact viewport, hints, cancel either way, paired placement and tap removal")
-                    test_world_engine_offline(browser, offline)
-                    print("PASS offline World-Engine intro, Wind jump, reduced motion and replay")
+                    test_campaign(browser, url)
+                    print("PASS all chapter stages, lesson return, replay isolation and new run")
+                    test_mobile_resume(browser, offline, 390, 844)
+                    test_mobile_resume(browser, offline, 844, 390)
+                    print("PASS offline portrait and landscape touch, menu dismissal, resume and audio settings")
+                    test_keyboard_and_import(browser, url)
+                    print("PASS keyboard routing and editor import")
+                    test_challenge_fallback(browser, url)
+                    print("PASS challenge fallback uses only the requested tier")
+                    test_layout_migration(browser, url)
+                    print("PASS saved layout migration and score archive")
+                    for width, height, touch in [(1280, 650, False), (390, 844, True), (844, 390, True)]:
+                        test_import_navigation(browser, offline, width, height, touch)
+                    print("PASS exact six-pack navigation on desktop and portrait/landscape touch")
                     test_challenge_pack_offline(browser, offline)
-                    print("PASS offline touch challenge pack: all eight stages, exact resume, next and import")
-                    test_autosave_and_scoring(browser, url)
-                    print("PASS autosave: exact unfinished route, interrupted completion, projected score, replay best and animation skip")
-                    test_keyboard(browser, url)
-                    print("PASS keyboard: start, navigate, draw and deliver without a pointer")
-                    test_campaign_and_progress(browser, url)
-                    print("PASS campaign: all 17 new lessons playable, next and replay navigation, completed progress survives reload")
+                    print("PASS offline challenge pack, resume, next and pack import")
                     browser.close()
             finally:
                 server.shutdown()
