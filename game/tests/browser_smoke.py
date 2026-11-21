@@ -79,12 +79,23 @@ def test_campaign(browser, url):
             page.locator("#return-lesson").click()
             expect(page.locator("#puzzle")).to_have_text("Dry Junction")
             expect(page.locator("#mechanic-tip")).to_be_hidden()
+        if index == 4:
+            expect(page.locator("#mechanic-tip")).to_be_hidden()
+            expect(page.locator(".tile.bank")).to_have_count(0)
+            expect(tile(page, 41)).to_have_attribute("aria-label", "Row 4, column 6, Land")
         if index == 5:
+            page.locator("#skip-tutorial-popups").check()
             page.locator("#continue-stage").click()
             page.locator("#start").click()
             expect(page.locator("#replan")).to_be_visible()
             page.locator("#replan").click()
             expect(page.locator("#loadout")).to_be_visible()
+        if index == 6:
+            expect(page.locator("#mechanic-tip")).to_be_hidden()
+            page.locator("#mobile-menu").click()
+            page.locator("#menu-tip").click()
+            expect(page.locator("#mechanic-tip")).to_be_visible()
+            page.locator("#continue-stage").click()
         prepare(page, plan)
         finish(page, plan)
         if index == 2:
@@ -94,6 +105,9 @@ def test_campaign(browser, url):
         else:
             page.locator("#next").click()
     expect(page.locator("#home-total")).to_contain_text("Chapter One complete")
+    page.reload()
+    page.locator("#settings").click()
+    expect(page.locator("#settings-skip-tutorial-popups")).to_be_checked()
     page.locator("#new-campaign").click()
     expect(page.locator("#puzzle")).to_have_text("First Spark")
     page.locator("#home-button").click()

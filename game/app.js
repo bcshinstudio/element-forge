@@ -75,6 +75,7 @@
  function canOpen(index){
   return index>=campaignSize||index<=progress.reachedIndex();
  }
+ function displayTerrain(map,cell){return map.rulesVersion>=4&&cell.terrain==='bank'?'land':cell.terrain;}
  function openLevel(index,saved=null,playMode='run'){
   if(!levels[index]||!canOpen(index))return;
   if(playMode!=='tutorial')tutorialReturn=null;
@@ -122,7 +123,7 @@
    tile.type='button';
    tile.tabIndex=i===firstSource?0:-1;
    tile.dataset.index=i;
-   tile.className='tile '+cell.terrain;
+   tile.className='tile '+displayTerrain(map,cell);
    return tile;
   });
   board.replaceChildren(...tiles);
@@ -139,7 +140,7 @@
   update();
   persist();
   message(saved&&!restored?'This board changed. Your unlocked stages and scores were kept.':'');
-  if(index<campaignSize&&levels[index].lesson&&!tipSeen(levels[index].id))showTip();
+  if(index<campaignSize&&levels[index].lesson&&!skipTutorialPopups&&!tipSeen(levels[index].id))showTip();
  }
 
  function campaignSnapshot(){
@@ -347,6 +348,7 @@
   for(const [i,cell] of map.cells.entries()){
    const tile=tiles[i];
    const mark=document.createElement('span');
+   const terrain=displayTerrain(map,cell);
    const kind=E.effective(map,state.placements,i);
    const link=E.pairIdAt(map,state.placements,i);
    mark.className='mark';
@@ -364,8 +366,8 @@
     const element=kind==='checkpoint'?cell.props?.element:null;
    mark.textContent=(componentSymbols[kind]||'')+(symbols[element]||link||arrows[cell.props?.direction]||'');
    if(colors[element])mark.style.color=colors[element];
-   }else if(!kind&&!window.EFBoardArt.terrains.has(cell.terrain)){
-    mark.textContent=cell.terrain==='oneway'?arrows[cell.props?.direction||'E']:terrainSymbols[cell.terrain]||'';
+   }else if(!kind&&!window.EFBoardArt.terrains.has(terrain)){
+    mark.textContent=cell.terrain==='oneway'?arrows[cell.props?.direction||'E']:terrainSymbols[terrain]||'';
    }
    fragments[i].append(mark);
    tile.classList.toggle('wind-landing',landings.has(i));
@@ -374,7 +376,7 @@
    window.EFBoardArt.decorate(tile,kind,{link});
    const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
    const label=`Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, `+
-    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[cell.terrain]||cell.terrain));
+    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[terrain]||terrain));
    tile.title=label;
    tile.setAttribute('aria-label',label);
   }
@@ -765,6 +767,18 @@
   const saved=JSON.parse(storage?.getItem(tipsKey)??'[]');
   if(Array.isArray(saved))seenTips=new Set(saved);
  }catch{}
+ const popupKey='element-forge.skip-tutorial-popups.v1';
+ let skipTutorialPopups=false;
+ try{skipTutorialPopups=storage?.getItem(popupKey)==='yes';}catch{}
+ const popupControls=[$('skip-tutorial-popups'),$('settings-skip-tutorial-popups')];
+ for(const control of popupControls){
+  control.checked=skipTutorialPopups;
+  control.onchange=()=>{
+   skipTutorialPopups=control.checked;
+   for(const input of popupControls)input.checked=skipTutorialPopups;
+   try{storage?.setItem(popupKey,skipTutorialPopups?'yes':'no');}catch{}
+  };
+ }
  const tip=$('mechanic-tip');
  function tipSeen(id){return seenTips.has(id);}
  function dismissTip(){

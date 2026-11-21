@@ -50,9 +50,10 @@
    <div id="tutorial-list" class="stage-list"></div>
   </section>
   <fieldset id="audio-settings" hidden>
-   <legend>Audio</legend>
+   <legend>Settings</legend>
    <label><input id="music-enabled" type="checkbox"> Music</label>
    <label><input id="effects-enabled" type="checkbox"> Sound Effects</label>
+   <label><input id="settings-skip-tutorial-popups" type="checkbox"> Don’t show tutorial popups</label>
   </fieldset>
   <div id="challenge-menu" hidden>
    <label>Difficulty <select id="challenge-tier"><option>Easy</option><option>Medium</option><option>Hard</option><option>Expert</option></select></label>
@@ -72,6 +73,7 @@
  <dialog id="mechanic-tip" aria-labelledby="tip-name">
   <h2 id="tip-name"></h2>
   <p id="tip-description"></p>
+  <p><label><input id="skip-tutorial-popups" type="checkbox"> Don’t show tutorial popups</label></p>
   <button type="button" id="try-lesson">Try a Lesson</button>
   <button type="button" id="continue-stage">Continue to Stage</button>
  </dialog>

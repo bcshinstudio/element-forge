@@ -2,7 +2,7 @@
 (function(root){
  const L=typeof module==='undefined'?root.EFLevels:require('./levels');
  const curated=typeof module==='undefined'?root.EFCurated:require('./challenge-release').release().pack;
- const [spark,river,,forest]=L.catalog;
+ const [spark,,,forest]=L.catalog;
  const [,tunnel,portal]=L.catalog.slice(12,15);
  const [ford,junction,,,scarce,timber,kiln,grove]=curated.stages;
  function stage(entry,id,hint,lesson=null){
@@ -28,7 +28,7 @@
   stage(twinCrossings,'twin-crossings','Look for the junction where both lines can continue straight.'),
   stage(ford,'cinder-ford','Follow the river before committing Fire to a crossing.'),
   stage(junction,'dry-junction','Look at which current can take the wooded approach.',forest.id),
-  stage(scarce,'scarce-crossing','Trace the dry circuit before choosing where Water leaves the river.',river.id),
+  stage({...scarce,map:{...scarce.map,description:'Connect all three currents without blocking the woods or the dry corridor.'}},'scarce-crossing','Trace the dry circuit first.'),
   stage(spillway,'spillway','Check which shore tiles leave room for a straight crossing.','rules4-build-a-bridge'),
   stage(timber,'scree-and-timber','Try the scree approach before spending your bridge.','rules4-scree-shelf'),
   stage(tunnels,'engine-underpass','Compare two alignments before placing a tunnel.',tunnel.id),
