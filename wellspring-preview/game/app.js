@@ -175,10 +175,7 @@
    }
    return item;
   });
-  const key=document.createElement('span');
-  key.className='legend-key';
-  key.textContent='S = Source · D = Inlet';
-  $('elements').replaceChildren(...legend,key);
+  $('elements').replaceChildren(...legend,endpointKey());
   drawPlan();
   update();
   persist();
@@ -432,11 +429,6 @@
     mark.classList.add('endpoint',cell.node.role);
     mark.style.setProperty('--element',colors[cell.node.element]);
     mark.textContent=symbols[cell.node.element];
-    const role=document.createElement('small');
-    role.className='endpoint-role';
-    role.textContent=cell.node.role==='source'?'S':'D';
-    role.setAttribute('aria-hidden','true');
-    mark.append(role);
    }else if(kind&&!window.EFBoardArt.structures.has(kind)){
     mark.classList.add('structure');
     const element=kind==='checkpoint'?cell.props?.element:null;
@@ -967,6 +959,21 @@
   };
  }
  const reference=window.EFReference;
+ function endpointKey(){
+  const key=document.createElement('span');
+  key.className='legend-key';
+  for(const [role,label] of [['source','Source'],['destination','Inlet']]){
+   const item=document.createElement('span');
+   const marker=document.createElement('span');
+   marker.className='mark endpoint '+role;
+   marker.style.setProperty('--element',colors.water);
+   marker.textContent=symbols.water;
+   marker.setAttribute('aria-hidden','true');
+   item.append(marker,label);
+   key.append(item);
+  }
+  return key;
+ }
  function referenceTable(title,entries,fixed=false){
   const table=document.createElement('table');
   table.className='quick-reference';
@@ -1010,7 +1017,7 @@
    ...Object.entries(map.inventory).filter(([,count])=>count>0).map(([id])=>id),
    ...map.cells.map(cell=>cell.component).filter(Boolean)
   ]):new Set([...Object.keys(reference.tools),...reference.reserved]);
-  const blocks=[referenceTable('Elements',elements.map(id=>[id,reference.elements[id]]))];
+  const blocks=[endpointKey(),referenceTable('Elements',elements.map(id=>[id,reference.elements[id]]))];
   const tools=[...toolIds].map(id=>[id,reference.tools[id]??['Editor component. Reserved for future puzzles.']]);
   if(tools.length)blocks.push(referenceTable('Tools',tools,true));
   if(!map){
