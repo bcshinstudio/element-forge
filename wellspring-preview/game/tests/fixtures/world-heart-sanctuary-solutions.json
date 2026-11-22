@@ -1,0 +1,1332 @@
+[
+  {
+    "id": "world-heart-sanctuary-85",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "water",
+        "path": [
+          19,
+          31,
+          43,
+          55,
+          67,
+          79,
+          91,
+          103,
+          115,
+          127
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          106,
+          118,
+          117,
+          116,
+          128
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          20,
+          32,
+          33,
+          34,
+          46,
+          58,
+          57
+        ]
+      },
+      {
+        "element": "metal",
+        "path": [
+          13,
+          25,
+          29,
+          41,
+          53
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          82,
+          81,
+          80,
+          79,
+          78,
+          77,
+          75,
+          87,
+          88
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          61,
+          73,
+          85,
+          97,
+          109,
+          110,
+          111,
+          112,
+          124,
+          125
+        ]
+      }
+    ],
+    "placements": {
+      "25": {
+        "kind": "tunnel",
+        "pairId": "L1"
+      },
+      "29": {
+        "kind": "tunnel",
+        "pairId": "L1"
+      },
+      "79": "intersection",
+      "80": "bridge"
+    }
+  },
+  {
+    "id": "world-heart-sanctuary-86",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "metal",
+        "path": [
+          51,
+          63,
+          75,
+          76,
+          64,
+          65
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          10,
+          9,
+          8,
+          20,
+          21,
+          116,
+          117,
+          118,
+          130
+        ]
+      },
+      {
+        "element": "light",
+        "path": [
+          19,
+          31,
+          43,
+          55,
+          67,
+          79,
+          91,
+          103,
+          115,
+          127
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          13,
+          25,
+          37,
+          49,
+          50,
+          62,
+          74,
+          73,
+          85,
+          86,
+          87,
+          88,
+          100,
+          101,
+          113,
+          125
+        ]
+      },
+      {
+        "element": "electricity",
+        "path": [
+          89,
+          90,
+          91,
+          92,
+          93,
+          94
+        ]
+      },
+      {
+        "element": "ice",
+        "path": [
+          40,
+          28,
+          27,
+          26,
+          14,
+          2,
+          1,
+          0,
+          12,
+          24,
+          36,
+          48,
+          60,
+          72,
+          84,
+          96,
+          108,
+          109,
+          110,
+          111,
+          112
+        ]
+      }
+    ],
+    "placements": {
+      "21": {
+        "kind": "portal",
+        "pairId": "L1"
+      },
+      "62": "bridge",
+      "91": "intersection",
+      "116": {
+        "kind": "portal",
+        "pairId": "L1"
+      }
+    }
+  },
+  {
+    "id": "world-heart-sanctuary-87",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "water",
+        "path": [
+          55,
+          67,
+          79,
+          91,
+          103,
+          115,
+          127
+        ]
+      },
+      {
+        "element": "ice",
+        "path": [
+          52,
+          64,
+          76,
+          88,
+          87,
+          99
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          94,
+          93,
+          92,
+          91,
+          90,
+          89
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          49,
+          61,
+          85,
+          97,
+          109,
+          110,
+          111,
+          123
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          13,
+          25,
+          26,
+          30,
+          18,
+          19,
+          20,
+          32,
+          44,
+          45
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0,
+          12,
+          24,
+          36,
+          48,
+          60,
+          72,
+          84,
+          96,
+          108,
+          120,
+          132,
+          133,
+          134,
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143,
+          131,
+          119,
+          107,
+          95,
+          83,
+          71,
+          59,
+          47,
+          35,
+          23,
+          22,
+          21,
+          116,
+          117,
+          118,
+          130
+        ]
+      }
+    ],
+    "placements": {
+      "21": {
+        "kind": "portal",
+        "pairId": "L1"
+      },
+      "26": {
+        "kind": "tunnel",
+        "pairId": "L0"
+      },
+      "30": {
+        "kind": "tunnel",
+        "pairId": "L0"
+      },
+      "91": "intersection",
+      "116": {
+        "kind": "portal",
+        "pairId": "L1"
+      }
+    }
+  },
+  {
+    "id": "world-heart-sanctuary-88",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "wind",
+        "path": [
+          94,
+          93,
+          92,
+          91,
+          90,
+          89,
+          87,
+          75
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          19,
+          31,
+          43,
+          55,
+          67,
+          79,
+          91,
+          103,
+          115,
+          127
+        ]
+      },
+      {
+        "element": "electricity",
+        "path": [
+          61,
+          73,
+          85,
+          97,
+          109,
+          121,
+          122,
+          123,
+          124,
+          125
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          20,
+          21,
+          33,
+          34,
+          46,
+          58,
+          57
+        ]
+      },
+      {
+        "element": "metal",
+        "path": [
+          13,
+          25,
+          29,
+          41,
+          53
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          118,
+          117,
+          129,
+          128
+        ]
+      }
+    ],
+    "placements": {
+      "25": {
+        "kind": "tunnel",
+        "pairId": "L1"
+      },
+      "29": {
+        "kind": "tunnel",
+        "pairId": "L1"
+      },
+      "90": "bridge",
+      "91": "intersection"
+    }
+  },
+  {
+    "id": "world-heart-sanctuary-89",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "ice",
+        "path": [
+          55,
+          67,
+          79,
+          91,
+          103,
+          115,
+          127
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          51,
+          63,
+          75,
+          87,
+          99,
+          111,
+          112,
+          113
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          10,
+          9,
+          8,
+          20,
+          21,
+          116,
+          117,
+          118,
+          130
+        ]
+      },
+      {
+        "element": "metal",
+        "path": [
+          13,
+          25,
+          26,
+          30,
+          18,
+          19,
+          31,
+          43,
+          44,
+          45
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          49,
+          61,
+          85,
+          97,
+          109,
+          121,
+          122,
+          123
+        ]
+      },
+      {
+        "element": "light",
+        "path": [
+          89,
+          90,
+          91,
+          92,
+          93,
+          81,
+          82
+        ]
+      }
+    ],
+    "placements": {
+      "21": {
+        "kind": "portal",
+        "pairId": "L1"
+      },
+      "26": {
+        "kind": "tunnel",
+        "pairId": "L0"
+      },
+      "30": {
+        "kind": "tunnel",
+        "pairId": "L0"
+      },
+      "91": "intersection",
+      "116": {
+        "kind": "portal",
+        "pairId": "L1"
+      }
+    }
+  },
+  {
+    "id": "world-heart-sanctuary-90",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          19,
+          31,
+          43,
+          55,
+          67,
+          79,
+          91,
+          103,
+          115,
+          127
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          10,
+          9,
+          8,
+          20,
+          21,
+          116,
+          117,
+          118,
+          130
+        ]
+      },
+      {
+        "element": "electricity",
+        "path": [
+          89,
+          90,
+          91,
+          92,
+          93,
+          81,
+          82
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          40,
+          52,
+          64,
+          76,
+          88,
+          100,
+          112,
+          124
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          13,
+          25,
+          37,
+          49,
+          50,
+          62,
+          74,
+          73,
+          85,
+          97,
+          109,
+          121,
+          122,
+          123,
+          135,
+          136,
+          137,
+          125
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          120,
+          108,
+          96,
+          84,
+          72,
+          60,
+          48,
+          36,
+          24,
+          12,
+          0,
+          1,
+          2,
+          14,
+          26,
+          27,
+          39,
+          51,
+          63,
+          75,
+          87,
+          86,
+          98,
+          110
+        ]
+      }
+    ],
+    "placements": {
+      "21": {
+        "kind": "portal",
+        "pairId": "L1"
+      },
+      "62": "bridge",
+      "91": "intersection",
+      "116": {
+        "kind": "portal",
+        "pairId": "L1"
+      }
+    }
+  },
+  {
+    "id": "world-heart-sanctuary-91",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "fire",
+        "path": [
+          19,
+          20,
+          21,
+          33,
+          34,
+          46,
+          58,
+          57
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          118,
+          117,
+          116,
+          128,
+          127
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          18,
+          30,
+          42,
+          54,
+          66,
+          78,
+          90,
+          102,
+          114,
+          126
+        ]
+      },
+      {
+        "element": "ice",
+        "path": [
+          94,
+          93,
+          92,
+          91,
+          103
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          61,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          85,
+          97,
+          109,
+          110,
+          122,
+          123,
+          124,
+          125,
+          113
+        ]
+      },
+      {
+        "element": "metal",
+        "path": [
+          13,
+          25,
+          29,
+          41,
+          53
+        ]
+      }
+    ],
+    "placements": {
+      "25": {
+        "kind": "tunnel",
+        "pairId": "L1"
+      },
+      "29": {
+        "kind": "tunnel",
+        "pairId": "L1"
+      },
+      "65": "bridge",
+      "66": "intersection"
+    }
+  },
+  {
+    "id": "world-heart-sanctuary-92",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "earth",
+        "path": [
+          118,
+          130,
+          129,
+          128,
+          127
+        ]
+      },
+      {
+        "element": "metal",
+        "path": [
+          13,
+          14,
+          26,
+          38,
+          39,
+          40
+        ]
+      },
+      {
+        "element": "light",
+        "path": [
+          46,
+          58,
+          70,
+          69,
+          68
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          61,
+          63,
+          64,
+          65
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          10,
+          9,
+          8,
+          20,
+          21,
+          109,
+          110,
+          111,
+          123
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          18,
+          30,
+          42,
+          54,
+          66,
+          78,
+          90,
+          102,
+          114,
+          126
+        ]
+      },
+      {
+        "element": "electricity",
+        "path": [
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94
+        ]
+      }
+    ],
+    "placements": {
+      "21": {
+        "kind": "portal",
+        "pairId": "L1"
+      },
+      "58": "bridge",
+      "90": "intersection",
+      "109": {
+        "kind": "portal",
+        "pairId": "L1"
+      }
+    }
+  },
+  {
+    "id": "world-heart-sanctuary-93",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "metal",
+        "path": [
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          94
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          36,
+          48,
+          49,
+          129,
+          130
+        ]
+      },
+      {
+        "element": "ice",
+        "path": [
+          63,
+          75,
+          87,
+          99,
+          111,
+          112,
+          113
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          67,
+          79,
+          91,
+          103,
+          115,
+          127
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          19,
+          20,
+          32,
+          33,
+          45,
+          57
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          61,
+          73,
+          85,
+          97,
+          109,
+          121,
+          122,
+          123
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          13,
+          25,
+          29,
+          41,
+          53
+        ]
+      }
+    ],
+    "placements": {
+      "25": {
+        "kind": "tunnel",
+        "pairId": "L0"
+      },
+      "29": {
+        "kind": "tunnel",
+        "pairId": "L0"
+      },
+      "49": {
+        "kind": "portal",
+        "pairId": "L1"
+      },
+      "103": "intersection",
+      "129": {
+        "kind": "portal",
+        "pairId": "L1"
+      }
+    }
+  },
+  {
+    "id": "world-heart-sanctuary-94",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "metal",
+        "path": [
+          13,
+          25,
+          29,
+          41,
+          53
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          19,
+          31,
+          32,
+          33,
+          34,
+          46,
+          58,
+          57
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          18,
+          30,
+          42,
+          54,
+          66,
+          78,
+          90,
+          102,
+          114,
+          126
+        ]
+      },
+      {
+        "element": "electricity",
+        "path": [
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          85,
+          109,
+          110,
+          111,
+          112,
+          113
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          36,
+          48,
+          49,
+          116,
+          128,
+          129,
+          130
+        ]
+      },
+      {
+        "element": "light",
+        "path": [
+          92,
+          104,
+          105,
+          106,
+          107,
+          95,
+          94,
+          93
+        ]
+      }
+    ],
+    "placements": {
+      "25": {
+        "kind": "tunnel",
+        "pairId": "L1"
+      },
+      "29": {
+        "kind": "tunnel",
+        "pairId": "L1"
+      },
+      "49": {
+        "kind": "portal",
+        "pairId": "L2"
+      },
+      "78": "intersection",
+      "111": "bridge",
+      "116": {
+        "kind": "portal",
+        "pairId": "L2"
+      }
+    }
+  },
+  {
+    "id": "world-heart-sanctuary-95",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "water",
+        "path": [
+          18,
+          30,
+          42,
+          54,
+          66,
+          78,
+          90,
+          102,
+          114,
+          126
+        ]
+      },
+      {
+        "element": "ice",
+        "path": [
+          15,
+          27,
+          39,
+          40,
+          52,
+          53
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          111,
+          123,
+          124,
+          116,
+          117,
+          118,
+          130
+        ]
+      },
+      {
+        "element": "light",
+        "path": [
+          94,
+          93,
+          92,
+          91,
+          90,
+          89,
+          88,
+          87
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          19,
+          20,
+          21,
+          33,
+          45,
+          57
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          13,
+          25,
+          37,
+          49,
+          61,
+          73,
+          85,
+          97,
+          109
+        ]
+      }
+    ],
+    "placements": {
+      "49": "bridge",
+      "66": "intersection",
+      "90": "intersection",
+      "116": {
+        "kind": "portal",
+        "pairId": "L1"
+      },
+      "124": {
+        "kind": "portal",
+        "pairId": "L1"
+      }
+    }
+  },
+  {
+    "id": "world-heart-sanctuary-96",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "metal",
+        "path": [
+          13,
+          1,
+          0,
+          12,
+          24,
+          25,
+          29,
+          41,
+          53
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          85,
+          97,
+          109,
+          110,
+          122,
+          123,
+          124,
+          112,
+          113
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          36,
+          37,
+          49,
+          116,
+          128,
+          129,
+          130
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          61,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          18,
+          30,
+          42,
+          54,
+          66,
+          78,
+          90,
+          102,
+          114,
+          126
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          19,
+          31,
+          32,
+          33,
+          34,
+          46,
+          58,
+          57
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          94,
+          93,
+          92,
+          91,
+          90,
+          89,
+          88,
+          87
+        ]
+      },
+      {
+        "element": "light",
+        "path": [
+          104,
+          105,
+          106,
+          118,
+          117
+        ]
+      }
+    ],
+    "placements": {
+      "25": {
+        "kind": "tunnel",
+        "pairId": "L1"
+      },
+      "29": {
+        "kind": "tunnel",
+        "pairId": "L1"
+      },
+      "49": {
+        "kind": "portal",
+        "pairId": "L2"
+      },
+      "65": "bridge",
+      "66": "intersection",
+      "90": "intersection",
+      "116": {
+        "kind": "portal",
+        "pairId": "L2"
+      }
+    }
+  }
+]

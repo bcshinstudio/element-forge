@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <meta name="theme-color" content="#102019">
+ <title>Wellspring</title>
+ <link rel="stylesheet" href="styles.css">
+ <script defer src="../map-editor/engine.js"></script>
+ <script defer src="../map-editor/map-format.js"></script>
+ <script defer src="levels.js"></script>
+ <script defer src="progress.js"></script>
+ <script defer src="session.js"></script>
+ <script defer src="routing-search.js"></script>
+ <script defer src="challenges.js"></script>
+ <script defer src="revised-boards.js"></script>
+ <link rel="stylesheet" href="../art/board.css">
+ <script defer src="../art/catalog.js"></script><script defer src="../art/variants.js"></script><script defer src="../art/board.js"></script>
+ <script defer src="sleeping-valley.js"></script>
+ <script defer src="gatekeepers.js"></script>
+ <script defer src="primeval-crucible.js"></script>
+ <script defer src="astral-loom.js"></script>
+ <script defer src="celestial-confluence.js"></script>
+ <script defer src="weavers-playground.js"></script>
+ <script defer src="shattered-abyss.js"></script>
+ <script defer src="world-heart-sanctuary.js"></script>
+ <script defer src="chapter.js"></script>
+ <script defer src="audio.js"></script>
+ <script defer src="story-data.js"></script>
+<script defer src="story-motion.js"></script>
+<script defer src="story.js"></script>
+<script defer src="app.js"></script>
+</head>
+<body>
+ <dialog id="title-screen" aria-label="Wellspring">
+  <div class="title-art">
+   <button id="title-enter" type="button" aria-label="Enter Wellspring" autofocus></button>
+  </div>
+ </dialog>
+ <header class="masthead">
+  <button id="home-button" class="brand" type="button">Wellspring</button>
+  <div id="puzzle-nav" hidden><button id="mobile-menu" type="button" hidden>Menu</button> <button id="puzzle-home" type="button">Home</button></div>
+  <div class="campaign-picker">
+  <label for="level">Puzzle
+   <select id="level"></select>
+  </label>
+  <span id="campaign-progress"></span>
+ </div>
+ </header>
+ <section id="home" class="world-intro" aria-labelledby="home-title">
+  <div class="home-panel" id="home-start">
+  <div class="home-utilities" aria-label="Game options" role="group">
+   <button id="information" class="home-icon" type="button" aria-controls="information-panel" aria-expanded="false"><span aria-hidden="true">?</span>Info</button>
+   <button id="settings" class="home-icon" type="button" aria-controls="audio-settings" aria-expanded="false"><span aria-hidden="true">⚙</span>Settings</button>
+  </div>
+  <h1 id="home-title">Wellspring</h1>
+  <div class="home-actions">
+   <button id="continue" class="primary" type="button" aria-describedby="home-total">Continue</button>
+   <button id="new-campaign" type="button">New</button>
+  </div>
+  <p id="home-total"></p>
+  <nav class="home-links" aria-label="More ways to play">
+   <button id="stage-select" type="button" aria-controls="stage-list" aria-expanded="false">Stage Select</button>
+   <button id="choose-challenge" type="button" aria-controls="challenge-menu" aria-expanded="false">Challenge stages</button>
+   <button id="home-custom" type="button" aria-controls="home-custom-panel" aria-expanded="false">Open a custom level</button>
+  </nav>
+  <div id="home-custom-panel" hidden>
+   <label class="import">Choose a level or challenge pack <input type="file" id="home-import" accept=".json,application/json"></label>
+   <p id="home-import-error" role="status"></p>
+  </div>
+  <div id="stage-list" class="stage-list" hidden></div>
+  <div id="challenge-menu" hidden>
+   <label>Difficulty <select id="challenge-tier"><option>Easy</option><option>Medium</option><option>Hard</option><option>Expert</option></select></label>
+   <button id="generate-challenge" type="button">Find puzzle</button>
+   <button id="resume-challenge" type="button">Resume challenge</button>
+   <button id="home-curated" type="button">Play curated pack</button>
+   <label class="import">Import challenge pack <input id="home-pack-file" type="file" accept=".json,application/json"></label>
+   <div id="challenge-puzzles" class="stage-list" hidden></div>
+   <p id="challenge-status" role="status"></p>
+  </div>
+  </div>
+  <div class="home-panel" id="home-support" hidden>
+   <section id="information-panel" aria-labelledby="info-heading" hidden>
+    <button id="info-back" class="support-back" type="button">← Back</button>
+    <h1 id="info-heading">Information</h1>
+    <p class="support-description">Connect each source to its matching inlet. Practice an element or a tool in the tutorials below.</p>
+    <h2 class="support-subheading">Tutorials</h2>
+    <div id="tutorial-list" class="tutorial-groups"></div>
+   </section>
+   <section id="audio-settings" aria-labelledby="settings-heading" hidden>
+    <button id="settings-back" class="support-back" type="button">← Back</button>
+    <h1 id="settings-heading">Settings</h1>
+    <div class="settings-list">
+     <label class="setting-row"><span>Music</span><input id="music-enabled" type="checkbox"></label>
+     <label class="setting-row"><span>Sound effects</span><input id="effects-enabled" type="checkbox"></label>
+     <label class="setting-row"><span>Don’t show tutorial popups</span><input id="settings-skip-tutorial-popups" type="checkbox"></label>
+    </div>
+   </section>
+  </div>
+ </section>
+ <dialog id="new-game-confirm" aria-labelledby="new-game-title" aria-describedby="new-game-description">
+  <h2 id="new-game-title">Start a new game?</h2>
+  <p id="new-game-description">This replaces your current run and starts at Stage 1. Your unlocked stages and best scores are kept.</p>
+  <form method="dialog" class="story-actions">
+   <button id="new-game-cancel" type="submit" autofocus>Cancel</button>
+   <button id="new-game-start" class="primary" type="button">Start New Game</button>
+  </form>
+ </dialog>
+ <dialog id="world-intro" aria-labelledby="world-intro-title">
+  <canvas id="story-art" width="960" height="540" role="img"></canvas>
+  <div class="opening-story">
+   <h2 id="world-intro-title"></h2>
+   <h3 id="story-caption"></h3>
+   <div class="jeeah-dialogue">
+    <div class="jeeah-portrait" role="img" aria-label="Jeeah"></div>
+    <div><strong>Jeeah</strong><p id="story-line" aria-live="polite"></p></div>
+   </div>
+   <div class="story-actions">
+    <button id="intro-back" type="button">Back</button>
+    <button id="story-replay" type="button" hidden>Replay</button>
+    <button id="story-skip" type="button" hidden>Skip Animation</button>
+    <button id="intro-next" class="primary" type="button">Next</button>
+    <button id="intro-begin" class="primary" type="button" hidden>Begin</button>
+   </div>
+  </div>
+ </dialog>
+ <dialog id="mechanic-tip" aria-labelledby="tip-name">
+  <h2 id="tip-name"></h2>
+  <p id="tip-description"></p>
+  <p><label><input id="skip-tutorial-popups" type="checkbox"> Don’t show tutorial popups</label></p>
+  <button type="button" id="try-lesson">Try a Lesson</button>
+  <button type="button" id="continue-stage">Continue to Stage</button>
+ </dialog>
+ <main id="play-view" class="layout" hidden>
+  <section class="field" aria-labelledby="puzzle">
+   <h1 id="puzzle"></h1>
+   <button type="button" id="return-lesson" hidden>Leave Lesson</button>
+   <p id="description"></p>
+   <div id="board" role="group" aria-label="Puzzle board"></div>
+   <div id="elements" class="legend"></div>
+  </section>
+  <div class="sidebar">
+  <section class="controls" aria-labelledby="phase">
+   <h2 id="phase">Plan your route</h2>
+   <p id="instructions"></p>
+   <details id="puzzle-hint" class="disclosure" hidden>
+    <summary>Puzzle hint</summary>
+    <p id="hint-text"></p>
+   </details>
+   <form id="plan">
+    <p class="routing-goal">Connect each source to its matching inlet.</p>
+    <p id="tool-availability" hidden>Tools available</p>
+    <div id="loadout"></div>
+    <p id="budget"></p>
+    <button class="primary" id="start">Start Routing</button>
+   </form>
+   <div id="build" hidden>
+    <div id="bridge-count" class="inventory-count" role="status" hidden></div>
+    <p id="bridge-hint" hidden>Tap an empty water tile to place a bridge, even mid-route.</p>
+    <div id="tools" class="tools" role="group" aria-label="Build tools"></div>
+    <button id="remove" hidden>Remove tool</button>
+    <p id="projected" role="status" hidden></p>
+    <div class="build-actions">
+     <button id="check" class="primary">Restore Harmony</button>
+     <button id="undo">Undo</button>
+    </div>
+    <button id="replan" class="restart-stage" type="button">Restart stage</button>
+    <details id="puzzle-options" class="disclosure">
+     <summary>Puzzle options</summary>
+     <div class="option-actions">
+      <button id="restart">Restart stage</button>
+     </div>
+    </details>
+   </div>
+   <div id="finish" hidden>
+    <div id="engine-restoration" class="restoration" hidden>
+     <p><strong>Harmony restored.</strong><br>Life energy flows through the valley again.</p>
+    </div>
+    <p id="score"></p>
+    <p id="totals"></p>
+    <details id="score-details" class="disclosure">
+     <summary>Score details</summary>
+     <ul><li id="score-base"></li><li id="score-route"></li><li id="score-bonus"></li>
+      <li id="score-floor" hidden>Scores stop at zero.</li></ul>
+    </details>
+    <button id="skip-animation" type="button" hidden>Skip animation</button>
+    <div class="actions"><button id="replay">Replay puzzle</button><button id="next" class="primary">Next puzzle</button></div>
+   </div>
+   <p id="status" role="status" aria-live="polite"></p>
+  </section>
+  <details id="challenge-library" class="disclosure custom-level">
+   <summary>Challenge stages</summary>
+   <button id="curated-pack" type="button">Play curated pack</button>
+   <label class="import">Import challenge pack <input type="file" id="pack-file" accept=".json,application/json"></label>
+   <p id="pack-import-error" role="alert"></p>
+  </details>
+  <details id="custom-level" class="disclosure custom-level">
+   <summary>Open a custom level</summary>
+   <label class="import">Choose a level or challenge pack <input type="file" id="import" accept=".json,application/json"></label>
+   <p id="import-error" role="status"></p>
+  </details>
+  </div>
+ </main>
+ <dialog id="game-menu" aria-label="Puzzle menu">
+  <button type="button" id="back-to-game" autofocus>Back to Game</button>
+  <button type="button" id="menu-tip" hidden>Mechanic tip</button>
+  <button type="button" id="menu-home">Main menu</button>
+  <button type="button" id="menu-information">Information / Tutorials</button>
+  <div id="menu-content"></div>
+  <div id="menu-lessons" hidden></div>
+ </dialog>
+ <footer>BC Shin Studio</footer>
+</body>
+</html>
