@@ -432,19 +432,21 @@
    if(variant&&mark.classList.contains('structure'))mark.classList.add('terrain-marker');
    fragments[i].append(mark);
    tile.classList.toggle('wind-landing',landings.has(i));
-   tile.classList.toggle('tunnel-preview',i===linkStart);
+   const pendingOpening=i===linkStart?tool:null;
+   tile.classList.toggle('tunnel-preview',Boolean(pendingOpening));
    const terrainLayer=tile.querySelector('.terrain-variant');
    if(terrainLayer)tile.replaceChildren(terrainLayer,fragments[i]);
    else{
     tile.replaceChildren(fragments[i]);
     window.EFBoardArt.setTerrain(tile,cell.terrain,cell.terrainArt);
    }
-   window.EFBoardArt.decorate(tile,kind,{link,spec:appearance});
+   window.EFBoardArt.decorate(tile,pendingOpening??kind,{link,spec:pendingOpening?map.toolArt?.[pendingOpening]:appearance});
    const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
    const label=`Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, `+
     (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[terrain]||terrain));
-   tile.title=label;
-   tile.setAttribute('aria-label',label);
+   const tileLabel=pendingOpening?label+' · '+toolNames[pendingOpening]+' opening selected':label;
+   tile.title=tileLabel;
+   tile.setAttribute('aria-label',tileLabel);
   }
  }
 
