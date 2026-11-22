@@ -229,6 +229,59 @@ def test_campaign(browser, url):
     page.close()
 
 
+def test_android_report(browser, offline):
+    context = browser.new_context(viewport={"width": 393, "height": 720},
+                                  is_mobile=True, has_touch=True, reduced_motion="reduce")
+    page = context.new_page()
+    errors = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    page.goto(offline.as_uri())
+    title = page.locator(".title-art").bounding_box()
+    assert title["height"] >= 719 and title["width"] >= 392, title
+    expect(page.locator(".portrait-enter")).to_be_visible()
+    page.evaluate("""key => {
+      const stage = EFChapter.chapter[1];
+      localStorage.setItem(key, JSON.stringify({version:2, completed:[],
+        campaign:{id:stage.id, rules:stage.rulesVersion}}));
+    }""", CAMPAIGN_KEY)
+    page.reload()
+    page.locator("#title-enter").tap()
+    page.locator("#continue").tap()
+    expect(page.locator("#puzzle")).to_have_text("Sunken Ashwood")
+    expect(page.locator("#status")).to_contain_text("first unfinished stage")
+
+    open_stage_two(page, tap=True)
+    plan = current_plan(page, 1)
+    prepare(page, {**plan, "placements": {i: p for i, p in plan["placements"].items()
+                                         if not isinstance(p, dict) or p["kind"] != "tunnel"}}, tap=True)
+    for route in plan["routes"]:
+        if route["element"] != "earth":
+            for index in route["path"]:
+                tile(page, index).tap()
+    button = page.locator('[data-tool="tunnel"]')
+    button.tap()
+    expect(button).to_have_attribute("aria-pressed", "true")
+    expect(page.locator("#status")).to_contain_text("beside the ridge")
+    page.locator("#puzzle").tap()
+    expect(button).to_have_attribute("aria-pressed", "true")
+    tile(page, 0).tap()
+    expect(page.locator("#status")).to_contain_text("open tunnel exit")
+    expect(button).to_have_attribute("aria-pressed", "true")
+    for index in (44, 92):
+        tile(page, index).tap()
+        if index == 44:
+            expect(tile(page, index)).to_have_class(re.compile(r"\btunnel-preview\b"))
+            expect(page.locator("#status")).to_contain_text("First opening selected")
+    for index in (44, 92):
+        expect(tile(page, index)).to_have_attribute("data-structure", "tunnel")
+    for index in next(route["path"] for route in plan["routes"] if route["element"] == "earth"):
+        tile(page, index).tap()
+    page.locator("#check").tap()
+    expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
+    assert not errors, errors
+    context.close()
+
+
 def test_mobile_resume(browser, offline, width, height):
     page = browser.new_page(viewport={"width": width, "height": height}, is_mobile=True, has_touch=True,
                             reduced_motion="reduce")
@@ -474,6 +527,8 @@ if __name__ == "__main__":
                     for width, height, touch in [(1280, 950, False), (390, 844, True), (844, 390, True)]:
                         test_opening(browser, offline, width, height, touch)
                     print("PASS offline opening, restart cancellation and draft resume")
+                    test_android_report(browser, offline)
+                    print("PASS portrait title, recovery from a locked save, touch tunnel and Stage 2 completion")
                     test_terrain_and_bridge(browser, offline)
                     test_campaign(browser, url)
                     print("PASS Stages 1–96 clear, finale unlock, replay isolation and new run")

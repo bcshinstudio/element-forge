@@ -299,16 +299,20 @@
   const choices=Object.entries(remaining).filter(([kind,count])=>kind!=='bridge'&&count>0)
    .map(([kind,count])=>[kind,`${toolNames[kind]} × ${count}`]);
   if(tool==='remove'&&!Object.keys(state.placements).length||Object.hasOwn(remaining,tool)&&remaining[tool]<=0)tool='route';
-  const buttons=choices.map(([kind,label])=>{
-   const button=document.createElement('button');
+  const toolbar=$('tools');
+  const current=new Map([...toolbar.children].map(button=>[button.dataset.tool,button]));
+  for(const [kind,button] of current){
+   if(!choices.some(([available])=>available===kind))button.remove();
+  }
+  for(const [kind,label] of choices){
+   const button=current.get(kind)??document.createElement('button');
    button.type='button';
    button.dataset.tool=kind;
    button.setAttribute('aria-pressed',String(kind===tool));
    button.textContent=label;
-   return button;
-  });
-  $('tools').replaceChildren(...buttons);
-  $('tools').hidden=!buttons.length;
+   if(button.parentNode!==toolbar)toolbar.append(button);
+  }
+  toolbar.hidden=!choices.length;
   $('bridge-count').hidden=!state.loadout.bridge;
   $('bridge-count').textContent=`Bridges left: ${remaining.bridge??0}`;
   $('bridge-hint').hidden=!remaining.bridge;
@@ -320,8 +324,8 @@
   $('instructions').textContent=tool==='remove'?'Choose a tool on the map to remove it.':
    tool==='route'?'Drag from a source or route tip. Tap a placed bridge again to remove it.':
    tool==='tunnel'?(linkStart===null?'Choose the first open tile for your tunnel.':
-    'Choose the other opening at the opposite edge of the same ridge. Tap the first opening again or tap outside the board to cancel.'):
-   tool==='portal'?(linkStart===null?'Choose the first portal opening.':'Choose the exit opening. Tap the first opening again or tap outside the board to cancel.'):
+    'Choose the other opening at the opposite edge of the same ridge. Tap the first opening or tool button again to cancel.'):
+   tool==='portal'?(linkStart===null?'Choose the first portal opening.':'Choose the exit opening. Tap the first opening or tool button again to cancel.'):
    'Choose a tile for your '+toolNames[tool].toLowerCase()+'.';
  }
 
@@ -480,6 +484,14 @@
   message('');
  }
 
+ function hasTunnelExit(map,placements,index){
+  const opening={kind:'tunnel',pairId:Symbol()};
+  return map.cells.some((_,exit)=>exit!==index&&
+   (exit%map.width===index%map.width||Math.floor(exit/map.width)===Math.floor(index/map.width))&&
+   E.canPlace(map,placements,exit,'tunnel')&&
+   E.linkPartner(map,index,{...placements,[index]:opening,[exit]:opening})===exit);
+ }
+
  function act(index,direct=false,dragStart=false){
   if(session.state.phase!=='build')return;
   const {map,state}=session;
@@ -496,10 +508,14 @@
   if(linked&&linkStart===index){cancelTool();return true;}
   if(linked&&linkStart===null){
    if(!E.canPlace(map,state.placements,index,tool)){message('Choose an open tile for the '+tool+' opening.');return false;}
+   if(tool==='tunnel'&&!hasTunnelExit(map,state.placements,index)){
+    message('Choose a tile with an open tunnel exit across the ridge.');
+    return false;
+   }
    linkStart=index;
    drawBoard();
    drawToolBar();
-   message('');
+   message(tool==='tunnel'?'First opening selected. Tap the opposite end of the ridge.':'First opening selected. Tap the portal exit.');
    return true;
   }
   const result=removePlaced?session.remove(index):bridgeTile?session.place(index,'bridge'):tool==='tunnel'?session.placeTunnel(linkStart,index):tool==='portal'?session.placePortal(linkStart,index):
@@ -564,14 +580,15 @@
   persist();
  });
  $('tools').addEventListener('click',event=>{
-  const kind=event.target.dataset.tool;
+  const kind=event.target.closest('[data-tool]')?.dataset.tool;
   if(!kind)return;
   tool=tool===kind?'route':kind;
   linkStart=null;
   drawBoard();
   drawToolBar();
-  $('tools').querySelector(`[data-tool="${kind}"]`).focus();
-  message('');
+  if(event.detail===0)$('tools').querySelector(`[data-tool="${kind}"]`)?.focus({preventScroll:true});
+  message(tool==='tunnel'?'Tap open land directly beside the ridge.':
+   tool==='portal'?'Tap an open tile for the first portal opening.':'');
  });
  $('remove').onclick=()=>{
   tool='remove';
@@ -766,10 +783,6 @@
  document.addEventListener('keydown',event=>{
   if(event.key==='Escape'&&!menu.open&&!$('mechanic-tip').open&&session?.state.phase==='build'&&tool!=='route'){event.preventDefault();cancelTool();}
  });
- document.addEventListener('pointerdown',event=>{
-  if(session?.state.phase==='build'&&toolUnit(tool)===2&&!board.contains(event.target)&&
-     !$('tools').contains(event.target))cancelTool();
- });
  board.addEventListener('keydown',event=>{
   const tile=event.target.closest('.tile');
   if(!tile||!event.key.startsWith('Arrow'))return;
@@ -820,9 +833,11 @@
    if(saved?.id?.startsWith("chapter-two-")&&progress.reachedIndex()>=chapterOneSize)return {index:progress.unlockedIndex()};
    return null;
   }
+  if(!canOpen(index))return {index:progress.unlockedIndex(),recovered:true};
   if(saved.board?.phase==='complete'){
    if(saved.storyPending&&isChapterEnd(index))return {index,ending:true};
    if(index===campaignSize-1)return {complete:true};
+   if(!canOpen(index+1))return {index:progress.unlockedIndex(),recovered:true};
    return {index:index+1,opening:isChapterEnd(index)};
   }
   const changed=(saved.layout??1)!==(levels[index].layout??1);
@@ -834,7 +849,8 @@
   if(target.ending){showChapterEnding(target.index);return;}
   if(target.opening){showChapterOpening(target.index);return;}
   openLevel(target.index,target.board);
-  if(target.changed)message('This stage has a new layout. The board restarted; your unlocks and old layout score were kept.');
+  if(target.recovered)message('Your saved stage was unavailable. Opened the first unfinished stage.');
+  else if(target.changed)message('This stage has a new layout. The board restarted; your unlocks and old layout score were kept.');
 
  }
  const panels={
