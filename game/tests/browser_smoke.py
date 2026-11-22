@@ -560,6 +560,8 @@ def test_layout_migration(browser, url):
 def test_challenge_pack_offline(browser, offline):
     page = browser.new_page(viewport={"width": 390, "height": 844},
                             is_mobile=True, has_touch=True, reduced_motion="reduce")
+    errors = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
     page.context.set_offline(True)
     page.goto(offline.as_uri())
     page.locator("#title-enter").click()
@@ -598,8 +600,18 @@ def test_challenge_pack_offline(browser, offline):
         assert page.locator("#check").evaluate("button => button.classList.contains('ready')"), (
             pack["stages"][i]["map"]["name"], page.locator("#status").text_content(),
         )
-        page.locator("#check").tap()
-        expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
+        check = page.locator("#check")
+        check.scroll_into_view_if_needed()
+        check.tap()
+        try:
+            expect(page.locator("#phase")).to_have_text("Delivery complete")
+        except AssertionError as failure:
+            raise AssertionError((
+                pack["stages"][i]["map"]["name"],
+                page.locator("#phase").text_content(),
+                page.locator("#status").text_content(),
+                errors,
+            )) from failure
         if i < len(plans)-1:
             page.get_by_role("button", name="Next Stage").tap()
     expect(page.locator("#next")).to_be_disabled()
