@@ -301,7 +301,35 @@ def test_campaign(browser, url):
         plan = current_plan(page, index)
         assert plan["status"] == "solved"
         prepare(page, plan)
-        finish(page, plan)
+        if index == 2:
+            checkpoints = page.locator("#board .badge-checkpoint")
+            assert checkpoints.count()
+            expect(page.locator("#board .badge-checkpoint[data-visited]")).to_have_count(0)
+            light = next(route["path"] for route in plan["routes"] if route["element"] == "light")
+            checkpoint_step = next(step for step, cell in enumerate(light)
+                                   if tile(page, cell).locator(".badge-checkpoint").count())
+            checkpoint = tile(page, light[checkpoint_step]).locator(".badge-checkpoint")
+            trace_route(page, light[:checkpoint_step + 1])
+            expect(checkpoint).to_have_attribute("data-visited", "true")
+            tile(page, light[checkpoint_step - 1]).click()
+            expect(checkpoint).not_to_have_attribute("data-visited", "true")
+            for route in reversed(plan["routes"]):
+                path = route["path"]
+                trace_route(page, path[checkpoint_step - 1:] if path == light else path)
+            expect(page.locator("#board .badge-checkpoint[data-visited]")).to_have_count(checkpoints.count())
+            expect(page.locator("#board .crossing-over")).to_have_count(1)
+            expect(page.locator("#board .crossing-under")).to_have_count(1)
+            expect(page.locator("#board .crossing-over .east")).to_be_visible()
+            expect(page.locator("#board .crossing-under .dot")).to_be_hidden()
+            directions = page.locator("#board .badge-arrow").evaluate_all(
+                "badges => badges.map(badge => [badge.dataset.direction, getComputedStyle(badge).transform])"
+            )
+            assert directions
+            assert all((matrix == "none") == (direction == "E") for direction, matrix in directions)
+            page.locator("#check").click()
+            expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
+        else:
+            finish(page, plan)
         if (index + 1) % 12:
             page.locator("#next").click()
             continue
