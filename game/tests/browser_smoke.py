@@ -309,7 +309,11 @@ def test_campaign(browser, url):
                 page.set_viewport_size({"width": width, "height": 950})
                 title = page.locator("#puzzle").bounding_box()
                 actions = page.locator(".stage-actions").bounding_box()
-                assert title["x"] + title["width"] <= actions["x"]
+                number = page.locator("#stage-number").bounding_box()
+                assert number["x"] + number["width"] <= actions["x"]
+                assert actions["y"] <= number["y"] <= actions["y"] + actions["height"]
+                assert title["y"] >= actions["y"] + actions["height"] - 0.5
+                assert title["width"] > actions["x"] - title["x"]
                 assert actions["x"] + actions["width"] <= width
                 page.locator("#story-toggle").click()
                 expect(page.locator("#stage-story")).to_be_visible()

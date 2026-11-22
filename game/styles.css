@@ -478,7 +478,14 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 .stage-heading button { min-height: 44px; flex: none; }
 #stage-tip { width: 44px; padding: 0; border: 0; background: transparent; color: var(--accent); }
 #stage-tip span { display: inline-grid; place-items: center; font-size: 1.1rem; line-height: 1; }
-.field .stage-heading { align-items: center; }
+.field .stage-heading {
+ display: grid;
+ grid-template-columns: minmax(0,1fr) auto;
+ align-items: center;
+ gap: 0 .4rem;
+ padding-top: 4px;
+}
+.field .stage-heading #puzzle { grid-column: 1 / -1; margin: 0 0 .35rem; overflow-wrap: anywhere; }
 #stage-story { margin: .35rem 0 .65rem; color: var(--muted); line-height: 1.45; }
 #stage-note { margin-bottom: .45rem; font-size: .92rem; }
 #stage-note p { margin: .18rem 0; }
@@ -600,9 +607,8 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 #board .tile:has(.span-bend) .structure-art { visibility: hidden; }
 #board .span-edge { z-index: 2; }
 
-.stage-title { flex: 1; min-width: 0; }
-#stage-number { margin: 0 0 .15rem; color: #d7c096; font-size: .74rem; font-weight: 650; line-height: 1.2; }
-.stage-actions { display: flex; align-items: center; flex: none; }
+#stage-number { margin: 0; color: #d7c096; font-size: .74rem; font-weight: 650; line-height: 1.2; }
+.stage-actions { grid-column: 2; display: flex; align-items: center; flex: none; }
 #story-toggle { padding: .2rem .3rem; border: 0; background: transparent; color: #ecd3a2; white-space: nowrap; font-size: .85rem; }
 #story-toggle:is(:hover,:focus-visible,[aria-expanded="true"]) { text-decoration: underline; }
 .status-row { display: flex; align-items: baseline; gap: .55rem; }
