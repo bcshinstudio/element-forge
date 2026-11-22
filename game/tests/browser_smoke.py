@@ -96,14 +96,23 @@ def drag_route(page, path, touch=False):
 
 
 def trace_route(page, path, tap=False, after_step=None):
-    for step, index in enumerate(path):
+    step = 0
+    while step < len(path):
+        index = path[step]
         locator = tile(page, index)
-        if locator.get_attribute("data-structure") == "bridge" and step:
-            drag_route(page, [path[step - 1], index], tap)
+        if step and locator.get_attribute("data-structure") == "bridge":
+            end = step + 1
+            while end < len(path) and tile(page, path[end]).get_attribute("data-structure") == "bridge":
+                end += 1
+            end = min(end + 1, len(path))
+            drag_route(page, path[step - 1:end], tap)
         else:
+            end = step + 1
             locator.tap() if tap else locator.click()
         if after_step:
-            after_step(step, index)
+            for traced in range(step, end):
+                after_step(traced, path[traced])
+        step = end
 
 
 def finish(page, plan, tap=False):
@@ -186,7 +195,9 @@ def test_stage_controls(browser, offline, touch):
     expect(tile(page, bridge)).to_have_attribute("data-structure", "bridge")
     expect(tile(page, bridge).locator(".track")).to_have_count(1)
     expect(tile(page, path[2]).locator(".track")).to_have_count(1)
-    trace_route(page, route[5:], tap=touch)
+    def check_plant(step, index):
+        assert tile(page, index).locator(".track").count(), (touch, step, index, page.locator("#status").text_content())
+    trace_route(page, route[5:], tap=touch, after_step=check_plant)
     expect(tile(page, route[-1]).locator(".track")).to_have_count(1)
     press(tile(page, bridge))
     expect(tile(page, bridge)).to_have_attribute("data-structure", "")
@@ -635,12 +646,12 @@ if __name__ == "__main__":
                     print("PASS offline opening, restart cancellation and draft resume")
                     test_android_report(browser, offline)
                     print("PASS portrait title, recovery from a locked save, touch tunnel and Stage 2 completion")
+                    test_challenge_pack_offline(browser, offline)
+                    print("PASS offline challenge pack, resume, next and pack import")
                     test_terrain_and_bridge(browser, offline)
                     for touch in (False, True):
                         test_stage_controls(browser, offline, touch)
                     print("PASS stage story, reference, mouse and touch bridge gestures, and restart")
-                    test_challenge_pack_offline(browser, offline)
-                    print("PASS offline challenge pack, resume, next and pack import")
                     test_campaign(browser, url)
                     print("PASS Stages 1–96 clear, finale unlock, replay isolation and new run")
                     test_mobile_resume(browser, offline, 390, 844)
