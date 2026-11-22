@@ -190,12 +190,15 @@ def test_stage_controls(browser, offline, touch):
     expect(page.locator("#stage-reference tbody tr")).to_have_count(4)
     press(page.locator("#close-stage-help"))
     prepare(page, {"placements": {}}, tap=touch)
+    board = page.locator("#board")
+    width = board.bounding_box()["width"]
     # The approved Ashwood solution carries Plant over a bridge.
     route = next(r["path"] for r in PLANS[0]["routes"] if r["element"] == "nature")
     path = route[2:5]
     bridge = path[1]
     trace_route(page, route[:3], tap=touch)
     press(tile(page, bridge))
+    assert abs(board.bounding_box()["width"] - width) < 0.5
     drag_route(page, path, touch)
     expect(tile(page, bridge)).to_have_attribute("data-structure", "bridge")
     expect(tile(page, bridge).locator(".track")).to_have_count(1)
@@ -213,6 +216,9 @@ def test_stage_controls(browser, offline, touch):
     expect(tile(page, path[2]).locator(".track")).to_have_count(1)
     press(page.locator("#replan"))
     expect(page.locator("#restart-confirm")).to_be_visible()
+    cancel = page.locator('#restart-confirm [value="cancel"]')
+    confirm = page.locator('#restart-confirm [value="restart"]')
+    assert abs(cancel.bounding_box()["width"] - confirm.bounding_box()["width"]) < 0.5
     press(page.locator('#restart-confirm [value="cancel"]'))
     expect(tile(page, path[2]).locator(".track")).to_have_count(1)
     press(page.locator("#replan"))

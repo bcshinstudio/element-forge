@@ -152,7 +152,7 @@
    <div class="stage-heading">
     <h1 id="puzzle"></h1>
     <button id="story-toggle" type="button" aria-expanded="false" aria-controls="stage-story" hidden>Story</button>
-    <button id="stage-tip" type="button" aria-label="Stage tips">ⓘ</button>
+    <button id="stage-tip" type="button" aria-label="Stage tips"><span aria-hidden="true">ⓘ</span></button>
    </div>
    <p id="stage-story" hidden></p>
    <button type="button" id="return-lesson" hidden>Leave Lesson</button>
@@ -177,9 +177,11 @@
     <button class="primary" id="start">Start Routing</button>
    </form>
    <div id="build" hidden>
-    <div id="bridge-count" class="inventory-count" role="status" hidden></div>
+    <div class="tool-strip">
+     <div id="bridge-count" class="inventory-count" role="status" hidden></div>
+     <div id="tools" class="tools" role="group" aria-label="Build tools"></div>
+    </div>
     <p id="bridge-hint" hidden>Tap an empty water tile to place a bridge, even mid-route.</p>
-    <div id="tools" class="tools" role="group" aria-label="Build tools"></div>
     <p id="projected" role="status" hidden></p>
     <div class="build-actions">
      <button id="check" class="primary">Restore Harmony</button>
