@@ -167,7 +167,7 @@ def test_terrain_and_bridge(browser, offline):
 
 
 def test_stage_controls(browser, offline, touch):
-    viewport = {"width": 393, "height": 720} if touch else {"width": 1280, "height": 920}
+    viewport = {"width": 360, "height": 760} if touch else {"width": 1280, "height": 920}
     page = browser.new_page(viewport=viewport, is_mobile=touch, has_touch=touch, reduced_motion="reduce")
     press = lambda locator: locator.tap() if touch else locator.click()
     page.goto(offline.as_uri())
@@ -180,6 +180,8 @@ def test_stage_controls(browser, offline, touch):
     press(page.locator("#new-campaign"))
     press(page.locator("#intro-next"))
     press(page.locator("#intro-begin"))
+    expect(page.locator("#stage-number")).to_have_text("Chapter 1 · Stage 1")
+    assert page.locator(".stage-actions").evaluate("e => e.getBoundingClientRect().right <= innerWidth")
     press(page.locator("#story-toggle"))
     expect(page.locator("#stage-story")).to_contain_text("collapsed aqueduct")
     expect(page.locator("#stage-story")).to_be_visible()
@@ -211,7 +213,9 @@ def test_stage_controls(browser, offline, touch):
     expect(tile(page, bridge)).to_have_attribute("data-structure", "")
     expect(tile(page, path[2]).locator(".track")).to_have_count(0)
     expect(page.locator("#bridge-count")).to_have_text("Bridges left: 1")
-    press(page.locator("#undo"))
+    expect(page.locator("#status")).to_have_text("Bridge removed. Route cleared.")
+    press(page.locator("#undo-bridge"))
+    expect(page.locator("#undo-bridge")).to_be_hidden()
     expect(tile(page, bridge)).to_have_attribute("data-structure", "bridge")
     expect(tile(page, path[2]).locator(".track")).to_have_count(1)
     press(page.locator("#replan"))
@@ -298,6 +302,20 @@ def test_campaign(browser, url):
     page.locator("#intro-begin").click()
     expect(page.locator("#puzzle")).to_have_text("Sunken Ashwood")
     for index in range(len(PLANS)):
+        expect(page.locator("#stage-number")).to_have_text(f"Chapter {index // 12 + 1} · Stage {index % 12 + 1}")
+        if index == 14:
+            expect(page.locator("#level option:checked")).to_contain_text("15. The Smelter")
+            for width in (1280, 320):
+                page.set_viewport_size({"width": width, "height": 950})
+                title = page.locator("#puzzle").bounding_box()
+                actions = page.locator(".stage-actions").bounding_box()
+                assert title["x"] + title["width"] <= actions["x"]
+                assert actions["x"] + actions["width"] <= width
+                page.locator("#story-toggle").click()
+                expect(page.locator("#stage-story")).to_be_visible()
+                page.locator("#story-toggle").click()
+                expect(page.locator("#stage-story")).to_be_hidden()
+            page.set_viewport_size({"width": 1280, "height": 950})
         plan = current_plan(page, index)
         assert plan["status"] == "solved"
         prepare(page, plan)
@@ -513,6 +531,35 @@ def test_keyboard_and_import(browser, url):
     page.locator("#import").set_input_files({"name": "wind.json", "mimeType": "application/json",
                                              "buffer": json.dumps(level).encode()})
     expect(page.locator("#puzzle")).to_have_text("Wind over the Rift")
+    expect(page.locator("#stage-number")).to_be_hidden()
+    level = page.evaluate("""() => {
+      const level = structuredClone(EFChapter.chapter[0]);
+      const map = level.map;
+      map.cells[16] = {terrain: 'water', component: 'bridge'};
+      map.cells[130] = {terrain: 'mountain'};
+      map.cells[129] = map.cells[131] = {terrain: 'land'};
+      Object.assign(map.inventory, {bridge: 1, tunnel: 2, portal: 2});
+      return level;
+    }""")
+    page.locator("#custom-level summary").click()
+    page.locator("#import").set_input_files({"name": "bridge.json", "mimeType": "application/json",
+                                             "buffer": json.dumps(level).encode()})
+    prepare(page, {"placements": {}})
+    tile(page, 16).click()
+    expect(page.locator("#status")).to_have_text("This bridge is part of the stage.")
+    tile(page, 50).click()
+    expect(tile(page, 50)).to_have_attribute("data-structure", "bridge")
+    for kind, origin in [("tunnel", 129), ("portal", 0)]:
+        button = page.locator(f'[data-tool="{kind}"]')
+        button.click()
+        tile(page, origin).click()
+        expect(tile(page, origin)).to_have_class(re.compile("tunnel-preview"))
+        tile(page, 50).click()
+        expect(page.locator("#status")).to_contain_text(kind.capitalize() + " is selected.")
+        expect(tile(page, origin)).to_have_class(re.compile("tunnel-preview"))
+        expect(button).to_have_attribute("aria-pressed", "true")
+        expect(tile(page, 50)).to_have_attribute("data-structure", "bridge")
+        button.click()
     page.close()
 
 
