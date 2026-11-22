@@ -296,3 +296,54 @@ test('redrawing from a source frees all tiles of the previous completed line',()
  assert.equal(session.undo(),true);
  assert.deepEqual(session.state.routes,[{element:'fire',path:fireLand}]);
 });
+
+test('bridge removal and undo restore a completed route alongside another active draft',()=>{
+ const {chapter}=require('../chapter.js');
+ const [plan]=require('./fixtures/sleeping-valley-solutions.json');
+ const session=createSession(chapter[0]);
+ assert.equal(session.start().ok,true);
+ const bridge=Number(Object.keys(plan.placements)[0]);
+ assert.equal(session.place(bridge,'bridge').ok,true);
+ const plant=plan.routes.find(route=>route.element==='nature');
+ draw(session,plant.path);
+ const water=plan.routes.find(route=>route.element==='water');
+ draw(session,water.path.slice(0,3));
+ assert.equal(session.remove(bridge).ok,true);
+ assert.equal(session.state.placements[bridge],undefined);
+ assert.equal(session.state.routes.length,0);
+ assert.equal(session.undo(),true);
+ assert.equal(session.state.placements[bridge],'bridge');
+ assert.deepEqual(session.state.routes,[plant]);
+ assert.deepEqual(session.state.active.path,water.path.slice(0,3));
+});
+
+test('retry keeps a chosen construction loadout and clears tools, drafts and undo history',()=>{
+ const session=river();
+ assert.equal(session.start({bridge:1}).ok,true);
+ assert.equal(session.place(53,'bridge').ok,true);
+ draw(session,fireLand.slice(0,3));
+ session.restart();
+ assert.equal(session.state.phase,'build');
+ assert.deepEqual(session.state.loadout,{bridge:1});
+ assert.deepEqual(session.state.placements,{});
+ assert.deepEqual(session.state.drafts,{});
+ assert.equal(session.state.active,null);
+ assert.equal(session.undo(),false);
+});
+
+test('quick reference covers all engine elements and editor components and notes match the campaign',()=>{
+ const reference=require('../reference.js');
+ const chapters=require('../chapter.js');
+ assert.deepEqual(Object.keys(reference.elements).sort(),Object.keys(F.ELEMENTS).sort());
+ assert.deepEqual([...Object.keys(reference.tools),...reference.reserved].sort(),F.COMPONENTS.map(([kind])=>kind).sort());
+ const campaign=Object.entries(chapters).filter(([key])=>key.startsWith('chapter')).flatMap(([,stages])=>stages);
+ assert.equal(campaign.length,96);
+ for(const [id,note] of Object.entries(reference.notes)){
+  assert.ok(campaign.some(stage=>stage.id===id),id);
+  assert.ok(note.length<=2,id);
+ }
+ const firstUse=element=>campaign.findIndex(level=>E.pairs(level.map).some(pair=>pair.element===element))+1;
+ for(const element of ['light','shadow','electricity'])assert.equal(firstUse(element),3);
+ assert.match(reference.story(campaign[0].map.description),/collapsed aqueduct/);
+ assert.doesNotMatch(reference.story(campaign[0].map.description),/Reconnect Fire/);
+});

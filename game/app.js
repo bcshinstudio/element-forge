@@ -320,7 +320,7 @@
   $('bridge-hint').hidden=!remaining.bridge;
   $('remove').hidden=!Object.keys(state.placements).length;
   $('remove').setAttribute('aria-pressed',String(tool==='remove'));
-  $('puzzle-options').hidden=!session.map.construction&&!Object.keys(state.placements).length;
+  $('puzzle-options').hidden=!session.map.construction;
   $('restart').hidden=!session.map.construction;
   syncDragHandles();
   ready();
@@ -1005,7 +1005,7 @@
   if(tools.length)blocks.push(referenceTable('Tools',tools,true));
   if(!map){
    const removal=document.createElement('p');
-   removal.textContent='To take back another tool you placed, open Puzzle options, choose Remove tool and select the tile. Fixed tools stay in place.';
+   removal.textContent='To take back another tool you placed, choose Remove tool and select the tile. Fixed tools stay in place.';
    blocks.push(removal);
   }else if(map.cells.some(cell=>cell.terrain==='oneway')){
    const direction=document.createElement('p');

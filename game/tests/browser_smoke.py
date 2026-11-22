@@ -184,6 +184,8 @@ def test_stage_controls(browser, offline, touch):
     expect(tile(page, bridge)).to_have_attribute("data-structure", "bridge")
     expect(tile(page, bridge).locator(".track")).to_have_count(1)
     expect(tile(page, path[2]).locator(".track")).to_have_count(1)
+    trace_route(page, route[5:], tap=touch)
+    expect(tile(page, route[-1]).locator(".track")).to_have_count(1)
     press(tile(page, bridge))
     expect(tile(page, bridge)).to_have_attribute("data-structure", "")
     expect(tile(page, path[2]).locator(".track")).to_have_count(0)

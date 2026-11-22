@@ -97,6 +97,7 @@ footer { padding: 0 16px 20px; text-align: center; color: var(--muted); font-siz
 }
 .build-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 14px; }
 .build-actions button { min-height: 42px; }
+.retry-actions { display: flex; flex-wrap: wrap; gap: 5px; }
 .restart-stage { margin-top: 4px; min-height: 44px; padding: 4px 9px; font-size: .83rem; }
 #undo { background: transparent; }
 .disclosure { color: var(--muted); font-size: .9rem; margin-top: 14px; }
