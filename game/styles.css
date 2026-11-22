@@ -472,7 +472,9 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 .stage-heading { display: flex; align-items: start; gap: .4rem; }
 .stage-heading :is(h1,h2) { flex: 1; min-width: 0; margin-block: 0; }
 .stage-heading button { min-height: 44px; flex: none; }
-#stage-tip { min-width: 44px; padding: 0; font-size: 1.3rem; color: var(--accent, #f3ce83); }
+#stage-tip { width: 44px; padding: 0; border: 0; background: transparent; color: var(--accent); }
+#stage-tip span { display: inline-grid; place-items: center; font-size: 1.1rem; line-height: 1; }
+.field .stage-heading { align-items: center; }
 #stage-story { margin: .35rem 0 .65rem; color: var(--muted); line-height: 1.45; }
 #stage-note { margin-bottom: .45rem; font-size: .92rem; }
 #stage-note p { margin: .18rem 0; }
@@ -489,4 +491,38 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 
 @media (pointer: coarse) {
  .controls button, .stage-heading button, .play-dialog button { touch-action: manipulation; }
+}
+
+
+.reference-initial { color: var(--element); }
+.element-reference-name { white-space: nowrap; }
+#restart-confirm .build-actions { grid-template-columns: repeat(2,minmax(0,1fr)); }
+#restart-confirm .build-actions button { padding-inline: .4rem; }
+.tool-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tool-strip:has(> [hidden] + [hidden]) { display: none; }
+.tool-strip .tools { margin: 0; }
+.tool-strip #bridge-count {
+ margin: 0;
+ padding: .35rem .65rem;
+ border-radius: 999px;
+ background: #243a2d;
+ color: #edcf91;
+}
+.tool-strip .tools button { border-radius: 999px; font-size: .88rem; }
+#build .build-actions { grid-template-columns: minmax(0,1fr) minmax(66px,auto); }
+#build .retry-actions { gap: .45rem; }
+#build .restart-stage {
+ margin: 0;
+ background: transparent;
+ border-color: transparent;
+ color: var(--muted);
+}
+#build .restart-stage:hover,
+#build .restart-stage[aria-pressed=true] { color: var(--accent); }
+@media (max-width: 600px) and (orientation: portrait) {
+ #play-view:has(#build:not([hidden])) #board { width: 100%; }
+ #play-view:has(#build:not([hidden])) .controls { padding: 8px 10px 3px; border-radius: 12px; }
+ #build .build-actions button { font-size: .94rem; }
+ #build .retry-actions { margin-top: 2px; }
+ .quick-reference { font-size: .85rem; }
 }

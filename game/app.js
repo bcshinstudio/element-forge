@@ -983,7 +983,17 @@
    const row=body.insertRow();
    const heading=document.createElement('th');
    heading.scope='row';
-   heading.textContent=fixed?componentSymbols[id]+' '+toolNames[id]:symbols[id]+' '+F.ELEMENTS[id].name;
+   if(fixed)heading.textContent=componentSymbols[id]+' '+toolNames[id];
+   else{
+    const name=F.ELEMENTS[id].name;
+    const symbol=symbols[id];
+    const initial=document.createElement('span');
+    initial.className='reference-initial';
+    initial.style.setProperty('--element',colors[id]);
+    initial.textContent=symbol;
+    heading.className='element-reference-name';
+    heading.append(initial,symbol===name[0]?name.slice(1):' '+name);
+   }
    row.append(heading);
    const cell=row.insertCell();
    for(const line of lines){
