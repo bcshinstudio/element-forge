@@ -19,7 +19,7 @@
   const state={phase:'inspect',loadout:{},placements:{},routes:[],drafts:{},active:null};
   let history=[];
   const onboard=index=>Number.isInteger(index)&&index>=0&&index<map.cells.length;
-  const remember=()=>{history.push(copy({placements:state.placements,routes:state.routes,drafts:state.drafts,active:state.active?.element}));};
+  const remember=(toolChange=false)=>{history.push(copy({toolChange,placements:state.placements,routes:state.routes,drafts:state.drafts,active:state.active?.element}));};
   const activeMap=()=>({...map,inventory:state.loadout});
 
   function start(selection){
@@ -49,7 +49,7 @@
 
   function undo(){
    if(state.phase!=='build')return false;
-   if(state.active&&!history.at(-1)?.routes.some(route=>route.element===state.active.element)){
+   if(state.active&&!history.at(-1)?.toolChange&&!history.at(-1)?.routes.some(route=>route.element===state.active.element)){
     delete state.drafts[state.active.element];
     state.active=null;
     return true;
@@ -86,7 +86,7 @@
   function remove(index){
    if(state.phase!=='build')return fail('Start building first.');
    if(!onboard(index)||!Object.hasOwn(state.placements,index))return fail('Choose a tool you placed.');
-   remember();
+   remember(true);
    const linked=E.linkPartner(map,index,state.placements);
    const tiles=linked<0?[index]:[index,linked];
    for(const i of tiles)delete state.placements[i];

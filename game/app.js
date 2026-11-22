@@ -50,7 +50,7 @@
  const terrainNames=Object.fromEntries(F.TERRAIN.map(([id,name])=>[id,name]));
  const arrows={N:'↑',E:'→',S:'↓',W:'←'};
  toolNames.tunnel='Tunnel';
- let session,tiles,tool,linkStart=null,lastBridge=null,levelIndex,timer=null,drag=null,importTicket=0;
+ let session,tiles,tool,linkStart=null,levelIndex,timer=null,drag=null,importTicket=0;
  const phone=matchMedia('(max-width: 600px), (hover: none) and (max-width: 950px)');
  const menu=$('game-menu');
  const menuItems=[document.querySelector('.campaign-picker'),$('description'),$('elements'),$('instructions'),
@@ -70,13 +70,13 @@
  }
  function fitBoard(){
   if($('play-view').hidden)return;
-  const height=['.masthead','#puzzle','.controls'].reduce((total,selector)=>
+  const height=['.masthead','.field .stage-heading','#stage-story','.controls'].reduce((total,selector)=>
    total+document.querySelector(selector).getBoundingClientRect().height,24);
   board.style.setProperty('--mobile-chrome',height+'px');
  }
  phone.addEventListener('change',()=>{adjustPhone();if(session)drawPlan();fitBoard();});
  const fitObserver=new ResizeObserver(fitBoard);
- for(const selector of ['.masthead','#puzzle','.controls'])fitObserver.observe(document.querySelector(selector));
+ for(const selector of ['.masthead','.field .stage-heading','#stage-story','.controls'])fitObserver.observe(document.querySelector(selector));
  $('mobile-menu').onclick=()=>{
   if(drag&&board.hasPointerCapture(drag.pointer))board.releasePointerCapture(drag.pointer);
   drag=null;
@@ -122,7 +122,6 @@
 
   stopAnimation();
   drag=null;
-  lastBridge=null;
   linkStart=null;
   session=window.EFSession.createSession(levels[index]);
   const {map}=session;
@@ -144,6 +143,9 @@
   $('import-error').textContent='';
   $('puzzle').textContent=map.name;
   $('description').textContent=map.description;
+  $('stage-story').textContent=window.EFReference.story(map.description);
+  $('stage-story').hidden=true;
+  $('story-toggle').setAttribute('aria-expanded','false');
   $('puzzle-hint').open=false;
   $('puzzle-hint').hidden=!levels[index].hint;
   $('hint-text').textContent=levels[index].hint??'';
@@ -318,7 +320,8 @@
   $('bridge-hint').hidden=!remaining.bridge;
   $('remove').hidden=!Object.keys(state.placements).length;
   $('remove').setAttribute('aria-pressed',String(tool==='remove'));
-  $('replan').hidden=!session.map.construction;
+  $('puzzle-options').hidden=!session.map.construction&&!Object.keys(state.placements).length;
+  $('restart').hidden=!session.map.construction;
   syncDragHandles();
   ready();
   $('instructions').textContent=tool==='remove'?'Choose a tool on the map to remove it.':
@@ -338,7 +341,24 @@
    complete:'Every element reached its destination.'
   }[phase];
   $('plan').hidden=phase!=='inspect';
-  $('puzzle-options').hidden=phase!=='build';
+  $('puzzle-options').hidden=phase!=='build'||!session.map.construction;
+  $('routing-goal').hidden=mode!=='tutorial';
+  $('description').hidden=phase==='inspect'&&mode!=='tutorial';
+  $('story-toggle').hidden=phase!=='inspect'||!$('stage-story').textContent;
+  if(phase!=='inspect'){
+   $('stage-story').hidden=true;
+   $('story-toggle').setAttribute('aria-expanded','false');
+  }
+  const note=window.EFReference.notes[levels[levelIndex].id];
+  $('stage-note').replaceChildren(...(note??[]).map(([label,copy])=>{
+   const line=document.createElement('p');
+   const strong=document.createElement('strong');
+   strong.textContent=label+' · ';
+   line.append(strong,copy);
+   return line;
+  }));
+  $('stage-note').hidden=!note;
+
   $('build').hidden=phase!=='build';
   $('finish').hidden=phase!=='complete';
   $('engine-restoration').hidden=phase!=='complete';
@@ -499,11 +519,8 @@
   const {map,state}=session;
   const element=state.active?.element;
   const placed=E.placementKind(state.placements[index]);
-  const activePath=state.active?.path;
-  const canFollowBridge=activePath&&E.neighbors(activePath.at(-1),map.width,map.height).some(([next])=>next===index)&&
-   !activePath.includes(index)&&!E.terrainError(map,element,index,'bridge');
   const removePlaced=direct&&!dragStart&&tool==='route'&&placed&&
-   (placed==='bridge'?(lastBridge===index||!canFollowBridge):!element);
+   (placed==='bridge'||!element);
   const bridgeTile=direct&&!dragStart&&tool==='route'&&state.loadout.bridge>(E.placementCounts(state.placements).bridge||0)&&
    E.canPlace(map,state.placements,index,'bridge')&&(!element||Boolean(E.terrainError(map,element,index,null)));
   const linked=toolUnit(tool)===2;
@@ -529,7 +546,6 @@
    heardRoutes.add(element);
    audio.effect('route');
   }
-  lastBridge=bridgeTile?index:null;
   const bridgeRestriction=bridgeTile&&element?E.terrainError(map,element,index,'bridge'):null;
   message(removePlaced?'Tool removed.':bridgeRestriction?'Bridge placed. '+bridgeRestriction:'');
   linkStart=null;
@@ -604,7 +620,7 @@
   if(menu.open)menu.close();
   stopAnimation();
   session.restart(replan);
-  lastBridge=null;
+  heardRoutes.clear();
   linkStart=null;
   $('puzzle-options').open=false;
   tool='route';
@@ -614,15 +630,24 @@
   if(replan)$('start').focus();else focusSource();
   persist();
  }
- $('restart').onclick=()=>reset(false);
- $('replan').onclick=()=>{
+ const restartConfirm=$('restart-confirm');
+ function requestRestart(replan){
   const {placements,routes,drafts}=session.state;
-  const hasWork=Object.keys(placements).length||routes.length||Object.keys(drafts).length;
-  if(hasWork&&!confirm('Restart this stage and choose tools again? This clears routes and placed tools.'))return;
-  reset(true);
- };
+  if(!Object.keys(placements).length&&!routes.length&&!Object.keys(drafts).length){reset(replan);return;}
+  restartConfirm.returnValue='';
+  restartConfirm.dataset.replan=String(replan);
+  $('restart-title').textContent=replan?'Change this stage’s loadout?':'Restart this stage?';
+  $('restart-copy').textContent=replan?'This clears your routes and placed tools so you can choose your loadout again.':
+   'This clears your routes and placed tools. Your selected loadout stays.';
+  restartConfirm.showModal();
+ }
+ restartConfirm.addEventListener('close',()=>{
+  if(restartConfirm.returnValue==='restart')reset(restartConfirm.dataset.replan==='true');
+ });
+ $('restart').onclick=()=>requestRestart(true);
+ $('replan').onclick=()=>requestRestart(false);
  $('replay').onclick=()=>reset(true);
- $('undo').onclick=()=>{if(tool!=='route'){cancelTool();return;}if(session.undo()){lastBridge=null;drawBoard();drawToolBar();message('Last change undone.');persist();}};
+ $('undo').onclick=()=>{if(tool!=='route'){cancelTool();return;}if(session.undo()){drawBoard();drawToolBar();message('Last change undone.');persist();}};
  $('check').onclick=()=>{
   if(session.state.phase!=='build')return;
   const result=session.verify();
@@ -741,20 +766,23 @@
    session.map.cells[index].node?.role==='source'||
    session.state.routes.some(route=>route.path.at(-1)===index);
   if(tool==='route'&&routeStart&&!drag){
-   drag={pointer:event.pointerId,index};
+   const bridge=E.placementKind(session.state.placements[index])==='bridge';
+   drag={pointer:event.pointerId,index,bridge};
    board.setPointerCapture(event.pointerId);
-   act(index,true,true);
+   if(!bridge)act(index,true,true);
   }
  });
  board.addEventListener('pointermove',event=>{
-  if(drag?.pointer!==event.pointerId||!session.state.active)return;
+  if(drag?.pointer!==event.pointerId)return;
   const tile=document.elementFromPoint(event.clientX,event.clientY)?.closest('.tile');
   if(!tile||!board.contains(tile))return;
   const index=Number(tile.dataset.index);
   if(index===drag.index)return;
+  if(drag.bridge&&!drag.moved)act(drag.index,true,true);
   drag.moved=true;
   drag.index=index;
-  const path=session.state.active.path;
+  const path=session.state.active?.path;
+  if(!path)return;
   const tip=path.at(-1);
   const map=session.map;
   const stride=Math.floor(tip/map.width)===Math.floor(index/map.width)?1:tip%map.width===index%map.width?map.width:0;
@@ -783,7 +811,7 @@
   persist();
  });
  document.addEventListener('keydown',event=>{
-  if(event.key==='Escape'&&!menu.open&&!$('mechanic-tip').open&&session?.state.phase==='build'&&tool!=='route'){event.preventDefault();cancelTool();}
+  if(event.key==='Escape'&&!document.querySelector('dialog[open]')&&session?.state.phase==='build'&&tool!=='route'){event.preventDefault();cancelTool();}
  });
  board.addEventListener('keydown',event=>{
   const tile=event.target.closest('.tile');
@@ -796,9 +824,9 @@
  for(const type of ['pointerup','pointercancel','lostpointercapture']){
   board.addEventListener(type,event=>{
    if(drag?.pointer!==event.pointerId)return;
-   const {index,moved}=drag;
+   const {index,moved,bridge:draggedBridge}=drag;
    drag=null;
-   if(type==='pointerup'&&!moved&&E.placementKind(session.state.placements[index])==='bridge')act(index,true);
+   if(type==='pointerup'&&!moved&&draggedBridge)act(index,true);
   });
  }
 
@@ -938,6 +966,79 @@
    try{storage?.setItem(popupKey,skipTutorialPopups?'yes':'no');}catch{}
   };
  }
+ const reference=window.EFReference;
+ function referenceTable(title,entries,fixed=false){
+  const table=document.createElement('table');
+  table.className='quick-reference';
+  table.createCaption().textContent=title;
+  const head=table.createTHead().insertRow();
+  for(const label of [fixed?'Tool':'Element',fixed?'Use and placement':'Can do and restrictions']){
+   const th=document.createElement('th');
+   th.scope='col';
+   th.textContent=label;
+   head.append(th);
+  }
+  const body=table.createTBody();
+  for(const [id,lines] of entries){
+   const row=body.insertRow();
+   const heading=document.createElement('th');
+   heading.scope='row';
+   heading.textContent=fixed?componentSymbols[id]+' '+toolNames[id]:symbols[id]+' '+F.ELEMENTS[id].name;
+   row.append(heading);
+   const cell=row.insertCell();
+   for(const line of lines){
+    const detail=document.createElement('div');
+    detail.textContent=line;
+    cell.append(detail);
+   }
+  }
+  return table;
+ }
+ function renderReference(container,map=null){
+  const elements=map?E.pairs(map).map(({element})=>element):Object.keys(reference.elements);
+  const toolIds=map?new Set([
+   ...Object.entries(map.inventory).filter(([,count])=>count>0).map(([id])=>id),
+   ...map.cells.map(cell=>cell.component).filter(Boolean)
+  ]):new Set([...Object.keys(reference.tools),...reference.reserved]);
+  const blocks=[referenceTable('Elements',elements.map(id=>[id,reference.elements[id]]))];
+  const tools=[...toolIds].map(id=>[id,reference.tools[id]??['Editor component. Reserved for future puzzles.']]);
+  if(tools.length)blocks.push(referenceTable('Tools',tools,true));
+  if(!map){
+   const removal=document.createElement('p');
+   removal.textContent='To take back another tool you placed, open Puzzle options, choose Remove tool and select the tile. Fixed tools stay in place.';
+   blocks.push(removal);
+  }else if(map.cells.some(cell=>cell.terrain==='oneway')){
+   const direction=document.createElement('p');
+   direction.textContent='➜ One-way tiles must be entered and left in the direction of the arrow.';
+   blocks.push(direction);
+  }
+  if(map&&map.rulesVersion<4){
+   const legacy=document.createElement('p');
+   legacy.textContent='This board uses older routing rules. The reference describes the current campaign.';
+   blocks.unshift(legacy);
+  }
+  container.replaceChildren(...blocks);
+ }
+ renderReference($('information-reference'));
+ const stageHelp=$('stage-help');
+ function showStageReference(full){
+  $('toggle-reference').textContent=full?'Back to stage tips':'Full Reference';
+  $('toggle-reference').dataset.full=String(full);
+  $('stage-help-title').textContent=full?'Quick Reference':'Stage tips';
+  renderReference($('stage-reference'),full?null:session.map);
+  stageHelp.scrollTop=0;
+ }
+ $('stage-tip').onclick=()=>{showStageReference(false);stageHelp.showModal();};
+ $('close-stage-help').onclick=()=>stageHelp.close();
+ $('toggle-reference').onclick=event=>{
+  event.preventDefault();
+  showStageReference(event.currentTarget.dataset.full!=='true');
+  $('close-stage-help').focus();
+ };
+ $('story-toggle').onclick=()=>{
+  $('stage-story').hidden=!$('stage-story').hidden;
+  $('story-toggle').setAttribute('aria-expanded',String(!$('stage-story').hidden));
+ };
  const tip=$('mechanic-tip');
  function tipSeen(id){return seenTips.has(id);}
  function dismissTip(){

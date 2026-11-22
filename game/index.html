@@ -29,6 +29,7 @@
  <script defer src="story-data.js"></script>
 <script defer src="story-motion.js"></script>
 <script defer src="story.js"></script>
+<script defer src="reference.js"></script>
 <script defer src="app.js"></script>
 </head>
 <body>
@@ -84,7 +85,8 @@
    <section id="information-panel" aria-labelledby="info-heading" hidden>
     <button id="info-back" class="support-back" type="button">← Back</button>
     <h1 id="info-heading">Information</h1>
-    <p class="support-description">Connect each source to its matching inlet. Practice an element or a tool in the tutorials below.</p>
+    <p class="support-description">Practice an element or a tool in the tutorials below.</p>
+    <details class="disclosure"><summary>Quick Reference</summary><div id="information-reference"></div></details>
     <h2 class="support-subheading">Tutorials</h2>
     <div id="tutorial-list" class="tutorial-groups"></div>
    </section>
@@ -132,9 +134,27 @@
   <button type="button" id="try-lesson">Try a Lesson</button>
   <button type="button" id="continue-stage">Continue to Stage</button>
  </dialog>
+ <dialog id="stage-help" class="play-dialog" aria-labelledby="stage-help-title">
+  <div class="stage-heading"><h2 id="stage-help-title">Stage tips</h2><button id="close-stage-help" type="button">Close</button></div>
+  <div id="stage-reference"></div>
+  <a id="toggle-reference" href="#stage-reference">Full Reference</a>
+ </dialog>
+ <dialog id="restart-confirm" class="play-dialog" aria-labelledby="restart-title">
+  <h2 id="restart-title">Restart this stage?</h2>
+  <p id="restart-copy">This clears your routes and placed tools. Your selected loadout stays.</p>
+  <form method="dialog" class="build-actions">
+   <button value="cancel" autofocus>Cancel</button>
+   <button value="restart" class="primary">Restart Stage</button>
+  </form>
+ </dialog>
  <main id="play-view" class="layout" hidden>
   <section class="field" aria-labelledby="puzzle">
-   <h1 id="puzzle"></h1>
+   <div class="stage-heading">
+    <h1 id="puzzle"></h1>
+    <button id="story-toggle" type="button" aria-expanded="false" aria-controls="stage-story" hidden>Story</button>
+    <button id="stage-tip" type="button" aria-label="Stage tips">ⓘ</button>
+   </div>
+   <p id="stage-story" hidden></p>
    <button type="button" id="return-lesson" hidden>Leave Lesson</button>
    <p id="description"></p>
    <div id="board" role="group" aria-label="Puzzle board"></div>
@@ -149,7 +169,8 @@
     <p id="hint-text"></p>
    </details>
    <form id="plan">
-    <p class="routing-goal">Connect each source to its matching inlet.</p>
+    <p class="routing-goal" id="routing-goal">Connect each source to its matching inlet.</p>
+    <div id="stage-note" hidden></div>
     <p id="tool-availability" hidden>Tools available</p>
     <div id="loadout"></div>
     <p id="budget"></p>
@@ -159,17 +180,17 @@
     <div id="bridge-count" class="inventory-count" role="status" hidden></div>
     <p id="bridge-hint" hidden>Tap an empty water tile to place a bridge, even mid-route.</p>
     <div id="tools" class="tools" role="group" aria-label="Build tools"></div>
-    <button id="remove" hidden>Remove tool</button>
     <p id="projected" role="status" hidden></p>
     <div class="build-actions">
      <button id="check" class="primary">Restore Harmony</button>
      <button id="undo">Undo</button>
     </div>
-    <button id="replan" class="restart-stage" type="button">Restart stage</button>
+    <button id="replan" class="restart-stage" type="button">Restart Stage</button>
     <details id="puzzle-options" class="disclosure">
      <summary>Puzzle options</summary>
      <div class="option-actions">
-      <button id="restart">Restart stage</button>
+      <button id="remove" hidden>Remove tool</button>
+      <button id="restart">Change loadout</button>
      </div>
     </details>
    </div>
