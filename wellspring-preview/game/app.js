@@ -48,7 +48,6 @@
  const terrainSymbols={forest:'♣',mountain:'▲',water:'≈',wall:'▦',void:'◌',ice:'✧',lava:'♨',land:''};
  for(const [id,,glyph] of F.TERRAIN)terrainSymbols[id]??=glyph;
  const terrainNames=Object.fromEntries(F.TERRAIN.map(([id,name])=>[id,name]));
- const arrows={N:'↑',E:'→',S:'↓',W:'←'};
  toolNames.tunnel='Tunnel';
  let session,tiles,tool,linkStart=null,levelIndex,timer=null,drag=null,importTicket=0;
  const phone=matchMedia('(max-width: 600px), (hover: none) and (max-width: 950px)');
@@ -381,6 +380,38 @@
   }
  }
 
+ const badgePaths={
+  arrow:'M3 10h11V5l7 7-7 7v-5H3z',
+  sun:'M12 7a5 5 0 1 0 0 10 5 5 0 1 0 0-10 M11 1h2v4h-2z M11 19h2v4h-2z M1 11h4v2H1z M19 11h4v2h-4z M4 3l3 3-1 1-3-3z M20 3l1 1-3 3-1-1z M3 20l3-3 1 1-3 3z M17 18l1-1 3 3-1 1z',
+  moon:'M16 2A10 10 0 1 0 20 19 9 9 0 0 1 16 2z',
+  checkpoint:'M8 4h2v16H8z M10 5h9l-3 4 3 4h-9z',
+  check:'m4 13 5 5L21 6l-2-2L9 14l-3-3z'
+ };
+ function badgeIcon(kind){
+  const ns='http://www.w3.org/2000/svg';
+  const icon=document.createElementNS(ns,'svg');
+  icon.setAttribute('viewBox','0 0 24 24');
+  const path=document.createElementNS(ns,'path');
+  path.setAttribute('d',badgePaths[kind]);
+  icon.append(path);
+  return icon;
+ }
+ function boardBadge(kind,{direction='E',element,visited}={}){
+  const badge=document.createElement('span');
+  badge.className='board-badge badge-'+kind;
+  badge.setAttribute('aria-hidden','true');
+  badge.append(badgeIcon(kind));
+  if(kind==='arrow')badge.dataset.direction=direction;
+  if(colors[element])badge.style.setProperty('--flag',colors[element]);
+  if(visited){
+   badge.style.setProperty('--rim',colors[visited]);
+   badge.dataset.visited='true';
+   const check=badgeIcon('check');
+   check.classList.add('badge-check');
+   badge.append(check);
+  }
+  return badge;
+ }
  function drawBoard(){
   syncDragHandles();
   const {map,state}=session;
@@ -389,6 +420,7 @@
    for(const [j,i] of path.entries()){
     const line=document.createElement('span');
     line.className='track';
+    line.dataset.element=element;
     line.style.setProperty('--line',colors[element]);
     const dot=document.createElement('i');
     dot.className='dot';
@@ -401,12 +433,12 @@
      arm.className={N:'north',S:'south',W:'west',E:'east'}[neighbor[1]];
      line.append(arm);
     }
-    const arms=[...line.children].slice(1).map(arm=>arm.className);
-    if(E.effective(map,state.placements,i)==='bridge'&&arms.length===2&&
-       arms.some(arm=>arm==='north'||arm==='south')&&arms.some(arm=>arm==='east'||arm==='west')){
+    const structure=E.effective(map,state.placements,i);
+    if(structure==='bridge'||structure==='metalSpan'){
      const deck=line.cloneNode(true);
-     deck.className='bent-bridge';
-     fragments[i].append(deck);
+     deck.className='span-edge span-'+structure;
+     if(line.querySelector('.north,.south')&&line.querySelector('.west,.east'))deck.classList.add('span-bend');
+     fragments[i].prepend(deck);
     }
     fragments[i].append(line);
    }
@@ -429,16 +461,24 @@
     mark.classList.add('endpoint',cell.node.role);
     mark.style.setProperty('--element',colors[cell.node.element]);
     mark.textContent=symbols[cell.node.element];
+   }else if(kind==='checkpoint'){
+    const element=cell.props?.element;
+    const visited=[...fragments[i].querySelectorAll('.track')].find(line=>
+     !element||element==='any'||line.dataset.element===element)?.dataset.element;
+    mark.append(boardBadge('checkpoint',{element,visited}));
+   }else if(kind==='gate'||terrain==='oneway'){
+    mark.append(boardBadge('arrow',{direction:cell.props?.direction}));
+   }else if(terrain==='exposed'||terrain==='covered'){
+    mark.append(boardBadge(terrain==='exposed'?'sun':'moon'));
    }else if(kind&&!window.EFBoardArt.structures.has(kind)){
     mark.classList.add('structure');
-    const element=kind==='checkpoint'?cell.props?.element:null;
-   mark.textContent=(variant?'':componentSymbols[kind]||'')+(symbols[element]||(variant?'':link)||arrows[cell.props?.direction]||'');
-   if(colors[element])mark.style.color=colors[element];
-   }else if(!kind&&!window.EFBoardArt.terrains.has(terrain)){
-    const terrainVariant=window.EFVariants?.resolve(cell.terrainArt,cell.terrain);
-    if(!terrainVariant||['oneway','covered','exposed'].includes(terrain)){
-     mark.textContent=cell.terrain==='oneway'?arrows[cell.props?.direction||'E']:terrainSymbols[terrain]||'';
-     if(terrainVariant)mark.classList.add('terrain-marker');
+    mark.textContent=variant?'':componentSymbols[kind]||'';
+   }else if(!kind&&!window.EFBoardArt.terrains.has(terrain)&&!window.EFVariants?.resolve(cell.terrainArt,cell.terrain)){
+    mark.textContent=terrainSymbols[terrain]||'';
+   }
+   if(kind==='intersection'&&fragments[i].querySelectorAll('.track').length===2){
+    for(const track of fragments[i].querySelectorAll('.track')){
+     track.classList.add(track.querySelector('.north,.south')?'crossing-under':'crossing-over');
     }
    }
    if(variant&&mark.classList.contains('structure'))mark.classList.add('terrain-marker');
@@ -456,7 +496,9 @@
    const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
    const label=`Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, `+
     (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[terrain]||terrain));
-   const tileLabel=pendingOpening?label+' · '+toolNames[pendingOpening]+' opening selected':label;
+   const direction=kind==='gate'||terrain==='oneway'?' '+(cell.props?.direction??'E'):'';
+   const visited=mark.querySelector('[data-visited]')?' · visited':'';
+   const tileLabel=pendingOpening?label+' · '+toolNames[pendingOpening]+' opening selected':label+direction+visited;
    tile.title=tileLabel;
    tile.setAttribute('aria-label',tileLabel);
   }
@@ -990,7 +1032,11 @@
    const row=body.insertRow();
    const heading=document.createElement('th');
    heading.scope='row';
-   if(fixed)heading.textContent=componentSymbols[id]+' '+toolNames[id];
+   if(fixed){
+    const badgeKind={checkpoint:'checkpoint',gate:'arrow'}[id];
+    if(badgeKind)heading.append(boardBadge(badgeKind),' '+toolNames[id]);
+    else heading.textContent=componentSymbols[id]+' '+toolNames[id];
+   }
    else{
     const name=F.ELEMENTS[id].name;
     const symbol=symbols[id];
@@ -1017,7 +1063,19 @@
    ...Object.entries(map.inventory).filter(([,count])=>count>0).map(([id])=>id),
    ...map.cells.map(cell=>cell.component).filter(Boolean)
   ]):new Set([...Object.keys(reference.tools),...reference.reserved]);
-  const blocks=[endpointKey(),referenceTable('Elements',elements.map(id=>[id,reference.elements[id]]))];
+  const markers=endpointKey();
+  for(const [kind,label,applies] of [
+   ['checkpoint','Checkpoint',toolIds.has('checkpoint')],
+   ['arrow','Direction',toolIds.has('gate')||map?.cells.some(cell=>cell.terrain==='oneway')],
+   ['sun','Exposed',map?.cells.some(cell=>cell.terrain==='exposed')],
+   ['moon','Covered',map?.cells.some(cell=>cell.terrain==='covered')]
+  ]){
+   if(map&&!applies)continue;
+   const item=document.createElement('span');
+   item.append(boardBadge(kind),label);
+   markers.append(item);
+  }
+  const blocks=[markers,referenceTable('Elements',elements.map(id=>[id,reference.elements[id]]))];
   const tools=[...toolIds].map(id=>[id,reference.tools[id]??['Editor component. Reserved for future puzzles.']]);
   if(tools.length)blocks.push(referenceTable('Tools',tools,true));
   if(!map){

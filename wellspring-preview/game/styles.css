@@ -302,19 +302,6 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 #puzzle-nav { display:flex; gap:4px; }
 #puzzle-nav button { min-height: 40px; }
 
-#board [data-structure="bridge"]:has(.bent-bridge) .structure-art { visibility: hidden; }
-.bent-bridge { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-.bent-bridge i {
- position: absolute;
- background: repeating-linear-gradient(45deg, #956a3e 0 4px, #674726 4px 5px);
- box-shadow: inset 0 0 0 1px #452e19;
-}
-.bent-bridge .dot { inset: 27%; border-radius: 18%; }
-.bent-bridge .north { inset: 0 27% 50%; }
-.bent-bridge .south { inset: 50% 27% 0; }
-.bent-bridge .west { inset: 27% 50% 27% 0; }
-.bent-bridge .east { inset: 27% 0 27% 50%; }
-
 #title-screen[open] {
  position: fixed;
  inset: 0;
@@ -543,3 +530,72 @@ body:has(#home:not([hidden])) .masthead { display:none; }
  #build .retry-actions { margin-top: 2px; }
  .quick-reference { font-size: .85rem; }
 }
+
+.board-badge {
+ --rim: #fff1d5;
+ display: inline-grid;
+ place-items: center;
+ vertical-align: middle;
+ position: relative;
+ width: 20px;
+ height: 20px;
+ background: #14221e;
+ border: 1px solid var(--rim);
+ border-radius: 50%;
+ color: #fff1d5;
+}
+#board .mark:has(.board-badge) {
+ z-index: 3;
+ width: min(75%, 36px);
+ aspect-ratio: 1;
+}
+#board .board-badge { width: 88%; height: 88%; }
+.board-badge svg { width: 74%; height: 74%; fill: currentColor; }
+.badge-checkpoint {
+ border-radius: 0;
+ border: 0;
+ clip-path: polygon(50% 0,100% 50%,50% 100%,0 50%);
+ background: var(--rim);
+ color: var(--flag, #fff1d5);
+}
+.badge-checkpoint::before {
+ content: '';
+ position: absolute;
+ inset: 2px;
+ clip-path: inherit;
+ background: #14221e;
+}
+.badge-checkpoint svg { position: relative; width: 61%; height: 61%; }
+.badge-checkpoint[data-visited] svg:first-of-type { transform: translate(-9%, -8%); }
+.badge-checkpoint .badge-check {
+ position: absolute;
+ width: 33%;
+ height: 33%;
+ right: 20%;
+ bottom: 17%;
+ color: #fff1d5;
+}
+.badge-arrow { --rim: #cca374; color: #9af5bd; border-radius: 40%; }
+#board .badge-arrow { width: 100%; height: 65%; }
+.badge-arrow[data-direction="N"] { transform: rotate(-90deg); }
+.badge-arrow[data-direction="S"] { transform: rotate(90deg); }
+.badge-arrow[data-direction="W"] { transform: rotate(180deg); }
+.badge-sun { --rim: #c6a35d; color: #ffd058; }
+.badge-moon { --rim: #bcc5da; color: #c2b0ff; }
+
+#board :is([data-structure="portal"], [data-structure="tunnel"]) .structure-art { z-index: 3; }
+#board .track.crossing-under .dot { visibility: hidden; }
+#board .track.crossing-under .north { bottom: 66%; }
+#board .track.crossing-under .south { top: 66%; }
+#board .track.crossing-over { z-index: 3; }
+.span-edge { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.span-edge i { position: absolute; background: #8c5e37; box-shadow: inset 0 0 0 1px #d3a57b; }
+.span-metalSpan i { background: #435665; box-shadow: inset 0 0 0 1px #acc8d8; }
+.span-edge .dot { inset: 29%; border-radius: 16%; }
+.span-edge .north { inset: 0 29% 50%; }
+.span-edge .south { inset: 50% 29% 0; }
+.span-edge .west { inset: 29% 50% 29% 0; }
+.span-edge .east { inset: 29% 0 29% 50%; }
+
+#board .tile:has(.span-bend) .structure-art { visibility: hidden; }
+#board .span-edge { z-index: 2; }
