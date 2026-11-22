@@ -101,7 +101,17 @@
   const bounds=menu.getBoundingClientRect();
   if(event.clientX<bounds.left||event.clientX>bounds.right||event.clientY<bounds.top||event.clientY>bounds.bottom)menu.close();
  });
- const message=value=>{$('status').textContent=value;};
+ function message(value,undoBridge=false){
+  $('status').textContent=value;
+  $('undo-bridge').hidden=!undoBridge;
+ }
+ function bridgeClearsRoute(index){
+  const {routes,drafts}=session.state;
+  return [...routes,...Object.values(drafts)].some(route=>route.path.length>1&&route.path.includes(index));
+ }
+ function bridgeRemoved(clearedRoute){
+  message(clearedRoute?'Bridge removed. Route cleared.':'Bridge removed.',clearedRoute);
+ }
 
  function canOpen(index){
   return index>=campaignSize||index<=progress.reachedIndex();
@@ -141,6 +151,10 @@
   $('custom-level').open=false;
   $('import-error').textContent='';
   $('puzzle').textContent=map.name;
+  const chapter=index<campaignSize?chapterAt(index):null;
+  $('stage-number').hidden=!chapter;
+  $('stage-number').textContent=chapter?`Chapter ${chapters.indexOf(chapter)+1} · Stage ${index-chapter.start+1}`:'';
+
   $('description').textContent=map.description;
   $('stage-story').textContent=window.EFReference.story(map.description);
   $('stage-story').hidden=true;
@@ -553,6 +567,16 @@
   const {map,state}=session;
   const element=state.active?.element;
   const placed=E.placementKind(state.placements[index]);
+  if(direct&&!dragStart){
+   if(map.cells[index].component==='bridge'){
+    message('This bridge is part of the stage.');
+    return false;
+   }
+   if(placed==='bridge'&&tool!=='route'&&tool!=='remove'){
+    message(`${toolNames[tool]} is selected. Select it again to return to routing.`);
+    return false;
+   }
+  }
   const removePlaced=direct&&!dragStart&&tool==='route'&&placed&&
    (placed==='bridge'||!element);
   const bridgeTile=direct&&!dragStart&&tool==='route'&&state.loadout.bridge>(E.placementCounts(state.placements).bridge||0)&&
@@ -571,6 +595,8 @@
    message(tool==='tunnel'?'First opening selected. Tap the opposite end of the ridge.':'First opening selected. Tap the portal exit.');
    return true;
   }
+  const removingBridge=placed==='bridge'&&(removePlaced||tool==='remove');
+  const clearedRoute=removingBridge&&bridgeClearsRoute(index);
   const result=removePlaced?session.remove(index):bridgeTile?session.place(index,'bridge'):tool==='tunnel'?session.placeTunnel(linkStart,index):tool==='portal'?session.placePortal(linkStart,index):
    tool==='route'?session.route(index,direct):tool==='remove'?session.remove(index):session.place(index,tool);
   if(!result.ok){message(explainMove(result,index));return false;}
@@ -581,7 +607,8 @@
    audio.effect('route');
   }
   const bridgeRestriction=bridgeTile&&element?E.terrainError(map,element,index,'bridge'):null;
-  message(removePlaced?'Tool removed.':bridgeRestriction?'Bridge placed. '+bridgeRestriction:'');
+  if(removingBridge)bridgeRemoved(clearedRoute);
+  else message(removePlaced?'Tool removed.':bridgeRestriction?'Bridge placed. '+bridgeRestriction:'');
   linkStart=null;
   drawBoard();
   if(removePlaced||bridgeTile||tool!=='route'){tool='route';drawToolBar();}
@@ -681,7 +708,7 @@
  $('restart').onclick=()=>requestRestart(true);
  $('replan').onclick=()=>requestRestart(false);
  $('replay').onclick=()=>reset(true);
- $('undo').onclick=()=>{if(tool!=='route'){cancelTool();return;}if(session.undo()){drawBoard();drawToolBar();message('Last change undone.');persist();}};
+ $('undo-bridge').onclick=$('undo').onclick=()=>{if(tool!=='route'){cancelTool();return;}if(session.undo()){drawBoard();drawToolBar();message('Last change undone.');persist();}};
  $('check').onclick=()=>{
   if(session.state.phase!=='build')return;
   const result=session.verify();
@@ -800,7 +827,7 @@
    session.map.cells[index].node?.role==='source'||
    session.state.routes.some(route=>route.path.at(-1)===index);
   if(tool==='route'&&routeStart&&!drag){
-   const bridge=E.placementKind(session.state.placements[index])==='bridge';
+   const bridge=E.effective(session.map,session.state.placements,index)==='bridge';
    drag={pointer:event.pointerId,index,bridge};
    board.setPointerCapture(event.pointerId);
    if(!bridge)act(index,true,true);
@@ -834,6 +861,8 @@
   const index=Number(tile.dataset.index);
   if(!Object.hasOwn(session.state.placements,index))return;
   event.preventDefault();
+  const removingBridge=E.placementKind(session.state.placements[index])==='bridge';
+  const clearedRoute=removingBridge&&bridgeClearsRoute(index);
   const result=session.remove(index);
   if(!result.ok){message(result.message);return;}
   tool='route';
@@ -841,7 +870,8 @@
   drawBoard();
   drawToolBar();
   audio.effect('remove');
-  message('Tool removed. Any track using it was cleared.');
+  if(removingBridge)bridgeRemoved(clearedRoute);
+  else message('Tool removed. Any track using it was cleared.');
   persist();
  });
  document.addEventListener('keydown',event=>{

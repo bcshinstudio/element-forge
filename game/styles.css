@@ -599,3 +599,11 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 
 #board .tile:has(.span-bend) .structure-art { visibility: hidden; }
 #board .span-edge { z-index: 2; }
+
+.stage-title { flex: 1; min-width: 0; }
+#stage-number { margin: 0 0 .15rem; color: #d7c096; font-size: .74rem; font-weight: 650; line-height: 1.2; }
+.stage-actions { display: flex; align-items: center; flex: none; }
+#story-toggle { padding: .2rem .3rem; border: 0; background: transparent; color: #ecd3a2; white-space: nowrap; font-size: .85rem; }
+#story-toggle:is(:hover,:focus-visible,[aria-expanded="true"]) { text-decoration: underline; }
+.status-row { display: flex; align-items: baseline; gap: .55rem; }
+#undo-bridge { min-height: 44px; padding: .25rem .4rem; border: 0; background: transparent; color: var(--accent); text-decoration: underline; }
