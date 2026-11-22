@@ -430,3 +430,40 @@ body:has(#home:not([hidden])) .masthead { display:none; }
  font-size:clamp(8px, 1.6vw, 13px); padding:0 2px; z-index:3;
 }
 #board .mark.terrain-marker:empty { display:none; }
+
+.portrait-title, .portrait-enter { display: none; }
+@media (orientation: portrait) {
+ .title-art {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  background: url(../art/wellspring-portrait.webp) center / cover no-repeat;
+ }
+ .portrait-title {
+  display: block;
+  position: absolute;
+  inset: 14% 0 auto;
+  margin: 0;
+  text-align: center;
+  color: #ffe2a0;
+  font: bold clamp(2.65rem, 11vw, 5.5rem)/1 Georgia, serif;
+  text-shadow: 0 2px 2px #382309, 0 4px 14px #101a13;
+ }
+ #title-enter {
+  top: auto;
+  bottom: max(8%, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(65%, 15rem);
+  height: auto;
+  min-height: 48px;
+  padding: .7rem;
+  border: 2px solid #e3bd72;
+  border-radius: 10px;
+  background: #142d1c;
+  color: #fff3d4;
+  font: bold 1.2rem Georgia, serif;
+ }
+ #title-enter:is(:active, .is-pressed) { background: #0e2114; }
+ .portrait-enter { display: inline; }
+}
