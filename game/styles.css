@@ -53,18 +53,43 @@ p { line-height: 1.5; }
  position: relative; z-index: 1; pointer-events: none; display: grid; place-items: center;
  font-weight: 800;
 }
+.tile { container-type: inline-size; }
 .mark.endpoint {
- width: 75%; height: 75%; max-width: 34px; max-height: 34px; border-radius: 50%;
- background: var(--element); color: #121b16; border: 2px solid #fff8;
+ width: 75%; height: 75%; max-width: 36px; max-height: 36px;
+ color: #101d17;
+ font-size: clamp(6px, 52cqi, 22px);
+ line-height: 1;
+ box-shadow: 0 0 0 1px #0a1712, 0 2px 4px #08130d99;
 }
-.mark.destination { border-style: double; border-width: 4px; }
+.mark.source {
+ border-radius: 50%;
+ border: 1px solid #fff2d7;
+ background: linear-gradient(155deg, #fff4 0%, transparent 60%), var(--element);
+}
+.mark.destination {
+ border-radius: 19%;
+ border: 1px solid var(--element);
+ background: #102019;
+ color: var(--element);
+}
+.mark.destination::after {
+ content: '';
+ position: absolute;
+ inset: 2px;
+ border: 1px solid currentColor;
+ border-radius: inherit;
+ opacity: .52;
+}
 .mark.structure { border-radius: 4px; padding: 1px 3px; background: #19271edb; color: #fff4cc; }
 .orb { z-index: 2; position: absolute; inset: 24%; border-radius: 50%; background: var(--line); border: 2px solid white; box-shadow: 0 0 10px var(--line); pointer-events: none; }
 .legend { display: flex; gap: 12px; flex-wrap: wrap; padding-top: 12px; }
 .legend { align-items: center; row-gap: .4rem; }
 .legend-element { display: inline-flex; align-items: center; gap: .3em; color: var(--element); line-height: 1.25; white-space: nowrap; }
 .legend-icon { display: inline-grid; place-items: center; line-height: 1; }
-.legend-key { line-height: 1.25; }
+.legend-key { display: inline-flex; align-items: center; flex-wrap: wrap; gap: .4rem .85rem; line-height: 1.25; }
+.legend-key > span { display: inline-flex; align-items: center; gap: .35rem; }
+.legend-key .endpoint { width: 20px; height: 20px; font-size: 12px; }
+#stage-reference > .legend-key, #information-reference > .legend-key { margin-top: .65rem; }
 @media (max-width: 600px) { .legend-key { flex-basis: 100%; } }
 #instructions:empty { display: none; }
 #tool-availability { color: var(--muted); font-size: .87rem; margin-bottom: .25rem; }
@@ -116,13 +141,6 @@ footer { padding: 0 16px 20px; text-align: center; color: var(--muted); font-siz
 
 .inventory-count { color: var(--accent); font-weight: 700; }
 #bridge-hint { color: var(--muted); margin: 4px 0 10px; font-size: .9rem; }
-.mark.destination { border-radius: 22%; }
-.endpoint-role {
- position: absolute; right: -3px; bottom: -3px; min-width: 1.1em; text-align: center;
- padding: 1px; border-radius: 3px; background: #142219; color: #fff;
- font: 700 clamp(8px, 1vw, 12px)/1.1 system-ui,sans-serif;
-}
-
 .tile.tunnel-preview { outline: 3px dashed #fff3b0; outline-offset: -4px; z-index: 2; }
 .tile.tunnel-preview .mark { font-weight: 900; }
 
@@ -135,7 +153,6 @@ footer { padding: 0 16px 20px; text-align: center; color: var(--muted); font-siz
  #board { padding: 2px; }
  .sidebar button, .sidebar summary, .campaign-picker select { min-height: 44px; }
  .sidebar summary { display: list-item; padding-block: 12px; }
- .endpoint-role { right: -2px; bottom: -2px; font-size: 9px; }
 }
 
 .world-intro { max-width: 48rem; margin: 1rem auto; padding: 1rem; background: #263b2c; border-radius: 12px; }
