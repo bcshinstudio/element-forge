@@ -180,7 +180,7 @@ function paintMotion(kind, frame, progress, ctx, images) {
     glow(data.core,h*.17,'#ffce66',clamp((progress-.26)*2.5)*.8);
     data.colors.forEach((color,i)=>{
       const end=data.exits[i];
-      travel([[color,[data.core,end]]],.24+i*.057,3.4);
+      travel([[color,[data.core,end]]],.24+i*.057,0,3.4);
       glow(end,h*.036,color,clamp((progress-.49-i*.057)*5)*.65);
     });
   }
