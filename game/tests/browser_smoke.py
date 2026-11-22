@@ -80,12 +80,17 @@ def drag_route(page, path, touch=False):
         return box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
 
     if touch:
+        # CDP can batch adjacent moves in a frame. Let the browser deliver each
+        # move and finish its touch sequence before starting another gesture.
+        frame = "new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))"
         cdp = page.context.new_cdp_session(page)
         for step, index in enumerate(path):
             x, y = center(index)
             event = "touchStart" if step == 0 else "touchMove"
             cdp.send("Input.dispatchTouchEvent", {"type": event, "touchPoints": [{"x": x, "y": y}]})
+            page.evaluate(frame)
         cdp.send("Input.dispatchTouchEvent", {"type": "touchEnd", "touchPoints": []})
+        page.evaluate(frame)
         cdp.detach()
     else:
         page.mouse.move(*center(path[0]))
@@ -586,10 +591,8 @@ def test_challenge_pack_offline(browser, offline):
             tile(page, index).tap()
         for route_index, current in enumerate(plan["routes"]):
             def check_resume(step, index):
-                assert tile(page, index).locator(".track").count(), (
-                    pack["stages"][i]["map"]["name"], current["element"], step, index,
-                    page.locator("#status").text_content(),
-                )
+                expect(tile(page, index).locator(".track").first,
+                       f'{pack["stages"][i]["map"]["name"]} {current["element"]} step {step}').to_be_visible()
                 if i == 0 and route_index == 0 and step == 1:
                     page.reload()
                     page.locator("#title-enter").click()

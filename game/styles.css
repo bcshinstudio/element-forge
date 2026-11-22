@@ -486,3 +486,7 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 .quick-reference :is(th,td) { padding: .4rem .35rem; border-bottom: 1px solid var(--border); vertical-align: top; }
 .quick-reference th:first-child { width: 26%; }
 .quick-reference td div + div { margin-top: .2rem; color: var(--muted); }
+
+@media (pointer: coarse) {
+ .controls button, .stage-heading button, .play-dialog button { touch-action: manipulation; }
+}
