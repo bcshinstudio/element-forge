@@ -272,6 +272,10 @@ def test_android_report(browser, offline):
         if index == 44:
             expect(tile(page, index)).to_have_class(re.compile(r"\btunnel-preview\b"))
             expect(page.locator("#status")).to_contain_text("First opening selected")
+            expect(tile(page, index)).to_have_attribute("data-structure", "tunnel")
+            expect(tile(page, index).locator(".structure-art")).to_be_visible()
+            expect(tile(page, 92)).to_have_attribute("data-structure", "")
+            expect(button).to_contain_text("× 1")
     for index in (44, 92):
         expect(tile(page, index)).to_have_attribute("data-structure", "tunnel")
     for index in next(route["path"] for route in plan["routes"] if route["element"] == "earth"):
