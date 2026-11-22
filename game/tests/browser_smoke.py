@@ -72,24 +72,26 @@ def prepare(page, plan, tap=False):
 
 
 def drag_route(page, path, touch=False):
-    points = []
-    for index in path:
-        locator = tile(page, index)
-        locator.scroll_into_view_if_needed()
-        box = locator.bounding_box()
-        points.append((box["x"] + box["width"] / 2, box["y"] + box["height"] / 2))
+    start = tile(page, path[0])
+    start.scroll_into_view_if_needed()
+
+    def center(index):
+        box = tile(page, index).bounding_box()
+        return box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+
     if touch:
         cdp = page.context.new_cdp_session(page)
-        for step, (x, y) in enumerate(points):
+        for step, index in enumerate(path):
+            x, y = center(index)
             event = "touchStart" if step == 0 else "touchMove"
             cdp.send("Input.dispatchTouchEvent", {"type": event, "touchPoints": [{"x": x, "y": y}]})
         cdp.send("Input.dispatchTouchEvent", {"type": "touchEnd", "touchPoints": []})
         cdp.detach()
     else:
-        page.mouse.move(*points[0])
+        page.mouse.move(*center(path[0]))
         page.mouse.down()
-        for x, y in points[1:]:
-            page.mouse.move(x, y)
+        for index in path[1:]:
+            page.mouse.move(*center(index))
         page.mouse.up()
 
 
@@ -571,6 +573,10 @@ def test_challenge_pack_offline(browser, offline):
             tile(page, index).tap()
         for route_index, current in enumerate(plan["routes"]):
             def check_resume(step, index):
+                assert tile(page, index).locator(".track").count(), (
+                    pack["stages"][i]["map"]["name"], current["element"], step, index,
+                    page.locator("#status").text_content(),
+                )
                 if i == 0 and route_index == 0 and step == 1:
                     page.reload()
                     page.locator("#title-enter").click()
@@ -578,6 +584,9 @@ def test_challenge_pack_offline(browser, offline):
                     page.locator("#resume-challenge").tap()
                     expect(tile(page, index).locator(".track")).to_have_count(1)
             trace_route(page, current["path"], tap=True, after_step=check_resume)
+        assert page.locator("#check").evaluate("button => button.classList.contains('ready')"), (
+            pack["stages"][i]["map"]["name"], page.locator("#status").text_content(),
+        )
         page.locator("#check").tap()
         expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
         if i < len(plans)-1:
@@ -630,6 +639,8 @@ if __name__ == "__main__":
                     for touch in (False, True):
                         test_stage_controls(browser, offline, touch)
                     print("PASS stage story, reference, mouse and touch bridge gestures, and restart")
+                    test_challenge_pack_offline(browser, offline)
+                    print("PASS offline challenge pack, resume, next and pack import")
                     test_campaign(browser, url)
                     print("PASS Stages 1–96 clear, finale unlock, replay isolation and new run")
                     test_mobile_resume(browser, offline, 390, 844)
@@ -644,8 +655,6 @@ if __name__ == "__main__":
                     for width, height, touch in [(1280, 650, False), (390, 844, True), (844, 390, True)]:
                         test_import_navigation(browser, offline, width, height, touch)
                     print("PASS exact six-pack navigation on desktop and portrait/landscape touch")
-                    test_challenge_pack_offline(browser, offline)
-                    print("PASS offline challenge pack, resume, next and pack import")
                     browser.close()
             finally:
                 server.shutdown()
