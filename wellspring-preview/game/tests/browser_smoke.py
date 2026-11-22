@@ -71,11 +71,58 @@ def prepare(page, plan, tap=False):
             press(tile(page, index))
 
 
+def drag_route(page, path, touch=False):
+    start = tile(page, path[0])
+    start.scroll_into_view_if_needed()
+
+    def center(index):
+        box = tile(page, index).bounding_box()
+        return box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+
+    if touch:
+        # CDP can batch adjacent moves in a frame. Let the browser deliver each
+        # move and finish its touch sequence before starting another gesture.
+        frame = "new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))"
+        cdp = page.context.new_cdp_session(page)
+        for step, index in enumerate(path):
+            x, y = center(index)
+            event = "touchStart" if step == 0 else "touchMove"
+            cdp.send("Input.dispatchTouchEvent", {"type": event, "touchPoints": [{"x": x, "y": y}]})
+            page.evaluate(frame)
+        cdp.send("Input.dispatchTouchEvent", {"type": "touchEnd", "touchPoints": []})
+        page.evaluate(frame)
+        cdp.detach()
+    else:
+        page.mouse.move(*center(path[0]))
+        page.mouse.down()
+        for index in path[1:]:
+            page.mouse.move(*center(index))
+        page.mouse.up()
+
+
+def trace_route(page, path, tap=False, after_step=None):
+    step = 0
+    while step < len(path):
+        index = path[step]
+        locator = tile(page, index)
+        if step and locator.get_attribute("data-structure") == "bridge":
+            end = step + 1
+            while end < len(path) and tile(page, path[end]).get_attribute("data-structure") == "bridge":
+                end += 1
+            end = min(end + 1, len(path))
+            drag_route(page, path[step - 1:end], tap)
+        else:
+            end = step + 1
+            locator.tap() if tap else locator.click()
+        if after_step:
+            for traced in range(step, end):
+                after_step(traced, path[traced])
+        step = end
+
+
 def finish(page, plan, tap=False):
     for route in plan["routes"]:
-        for index in route["path"]:
-            locator = tile(page, index)
-            locator.tap() if tap else locator.click()
+        trace_route(page, route["path"], tap)
     button = page.locator("#check")
     button.tap() if tap else button.click()
     expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
@@ -116,6 +163,63 @@ def test_terrain_and_bridge(browser, offline):
     for index in [21, 20, 19]:
         tile(page, index).click()
     expect(page.locator("#status")).to_have_text("Fire cannot cross mountains.")
+    page.close()
+
+
+def test_stage_controls(browser, offline, touch):
+    viewport = {"width": 393, "height": 720} if touch else {"width": 1280, "height": 920}
+    page = browser.new_page(viewport=viewport, is_mobile=touch, has_touch=touch, reduced_motion="reduce")
+    press = lambda locator: locator.tap() if touch else locator.click()
+    page.goto(offline.as_uri())
+    press(page.locator("#title-enter"))
+    press(page.locator("#information"))
+    press(page.locator("summary").filter(has_text="Quick Reference"))
+    expect(page.locator("#information-reference table")).to_have_count(2)
+    expect(page.locator("#information-reference tbody tr")).to_have_count(23)
+    press(page.locator("#info-back"))
+    press(page.locator("#new-campaign"))
+    press(page.locator("#intro-next"))
+    press(page.locator("#intro-begin"))
+    press(page.locator("#story-toggle"))
+    expect(page.locator("#stage-story")).to_contain_text("collapsed aqueduct")
+    expect(page.locator("#stage-story")).to_be_visible()
+    press(page.locator("#story-toggle"))
+    expect(page.locator("#stage-story")).to_be_hidden()
+    expect(page.locator("#stage-note")).to_contain_text("P crosses forest")
+    press(page.locator("#stage-tip"))
+    expect(page.locator("#stage-reference tbody tr")).to_have_count(4)
+    press(page.locator("#close-stage-help"))
+    prepare(page, {"placements": {}}, tap=touch)
+    # The approved Ashwood solution carries Plant over a bridge.
+    route = next(r["path"] for r in PLANS[0]["routes"] if r["element"] == "nature")
+    path = route[2:5]
+    bridge = path[1]
+    trace_route(page, route[:3], tap=touch)
+    press(tile(page, bridge))
+    drag_route(page, path, touch)
+    expect(tile(page, bridge)).to_have_attribute("data-structure", "bridge")
+    expect(tile(page, bridge).locator(".track")).to_have_count(1)
+    expect(tile(page, path[2]).locator(".track")).to_have_count(1)
+    def check_plant(step, index):
+        assert tile(page, index).locator(".track").count(), (touch, step, index, page.locator("#status").text_content())
+    trace_route(page, route[5:], tap=touch, after_step=check_plant)
+    expect(tile(page, route[-1]).locator(".track")).to_have_count(1)
+    press(tile(page, bridge))
+    expect(tile(page, bridge)).to_have_attribute("data-structure", "")
+    expect(tile(page, path[2]).locator(".track")).to_have_count(0)
+    expect(page.locator("#bridge-count")).to_have_text("Bridges left: 1")
+    press(page.locator("#undo"))
+    expect(tile(page, bridge)).to_have_attribute("data-structure", "bridge")
+    expect(tile(page, path[2]).locator(".track")).to_have_count(1)
+    press(page.locator("#replan"))
+    expect(page.locator("#restart-confirm")).to_be_visible()
+    press(page.locator('#restart-confirm [value="cancel"]'))
+    expect(tile(page, path[2]).locator(".track")).to_have_count(1)
+    press(page.locator("#replan"))
+    press(page.locator('#restart-confirm [value="restart"]'))
+    expect(tile(page, path[2]).locator(".track")).to_have_count(0)
+    expect(page.locator("#bridge-count")).to_have_text("Bridges left: 1")
+    expect(page.locator("#check")).to_be_visible()
     page.close()
 
 
@@ -276,6 +380,13 @@ def test_android_report(browser, offline):
             expect(tile(page, index).locator(".structure-art")).to_be_visible()
             expect(tile(page, 92)).to_have_attribute("data-structure", "")
             expect(button).to_contain_text("× 1")
+            page.locator("#stage-tip").tap()
+            expect(page.locator("#stage-reference")).to_contain_text("Wind cannot use it")
+            page.locator("#toggle-reference").tap()
+            expect(page.locator("#stage-help-title")).to_have_text("Quick Reference")
+            page.locator("#close-stage-help").tap()
+            expect(button).to_have_attribute("aria-pressed", "true")
+            expect(tile(page, index)).to_have_class(re.compile(r"\btunnel-preview\b"))
     for index in (44, 92):
         expect(tile(page, index)).to_have_attribute("data-structure", "tunnel")
     for index in next(route["path"] for route in plan["routes"] if route["element"] == "earth"):
@@ -320,11 +431,9 @@ def test_mobile_resume(browser, offline, width, height):
     page.locator("#settings-back").tap()
     page.locator("#continue").tap()
     expect(tile(page, path[2]).locator(".track")).to_have_count(1)
-    for index in path[3:]:
-        tile(page, index).tap()
+    trace_route(page, path[2:], tap=True)
     for route in plan["routes"][1:]:
-        for index in route["path"]:
-            tile(page, index).tap()
+        trace_route(page, route["path"], tap=True)
     page.locator("#check").tap()
     expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
     page.locator("#home-button").tap()
@@ -338,6 +447,8 @@ def test_mobile_resume(browser, offline, width, height):
     page.locator("#info-back").tap()
     page.locator("#continue").tap()
     expect(page.locator("#puzzle")).to_have_text("The Sun-Dial Sanctum")
+    expect(page.locator("#stage-note")).to_contain_text("L uses sunlit")
+    expect(page.locator("#stage-note")).to_contain_text("E stays dry")
     prepare(page, current_plan(page, 2), tap=True)
     page.locator("#mobile-menu").tap()
     page.locator("#back-to-game").tap()
@@ -454,6 +565,8 @@ def test_layout_migration(browser, url):
 def test_challenge_pack_offline(browser, offline):
     page = browser.new_page(viewport={"width": 390, "height": 844},
                             is_mobile=True, has_touch=True, reduced_motion="reduce")
+    errors = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
     page.context.set_offline(True)
     page.goto(offline.as_uri())
     page.locator("#title-enter").click()
@@ -477,16 +590,31 @@ def test_challenge_pack_offline(browser, offline):
                 page.locator(f'[data-tool="{tool}"]').tap()
             tile(page, index).tap()
         for route_index, current in enumerate(plan["routes"]):
-            for step, index in enumerate(current["path"]):
-                tile(page, index).tap()
+            def check_resume(step, index):
+                expect(tile(page, index).locator(".track").first,
+                       f'{pack["stages"][i]["map"]["name"]} {current["element"]} step {step}').to_be_visible()
                 if i == 0 and route_index == 0 and step == 1:
                     page.reload()
                     page.locator("#title-enter").click()
                     page.locator("#choose-challenge").tap()
                     page.locator("#resume-challenge").tap()
                     expect(tile(page, index).locator(".track")).to_have_count(1)
-        page.locator("#check").tap()
-        expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
+            trace_route(page, current["path"], tap=True, after_step=check_resume)
+        assert page.locator("#check").evaluate("button => button.classList.contains('ready')"), (
+            pack["stages"][i]["map"]["name"], page.locator("#status").text_content(),
+        )
+        check = page.locator("#check")
+        check.scroll_into_view_if_needed()
+        check.tap()
+        try:
+            expect(page.locator("#phase")).to_have_text("Delivery complete")
+        except AssertionError as failure:
+            raise AssertionError((
+                pack["stages"][i]["map"]["name"],
+                page.locator("#phase").text_content(),
+                page.locator("#status").text_content(),
+                errors,
+            )) from failure
         if i < len(plans)-1:
             page.get_by_role("button", name="Next Stage").tap()
     expect(page.locator("#next")).to_be_disabled()
@@ -533,7 +661,12 @@ if __name__ == "__main__":
                     print("PASS offline opening, restart cancellation and draft resume")
                     test_android_report(browser, offline)
                     print("PASS portrait title, recovery from a locked save, touch tunnel and Stage 2 completion")
+                    test_challenge_pack_offline(browser, offline)
+                    print("PASS offline challenge pack, resume, next and pack import")
                     test_terrain_and_bridge(browser, offline)
+                    for touch in (False, True):
+                        test_stage_controls(browser, offline, touch)
+                    print("PASS stage story, reference, mouse and touch bridge gestures, and restart")
                     test_campaign(browser, url)
                     print("PASS Stages 1–96 clear, finale unlock, replay isolation and new run")
                     test_mobile_resume(browser, offline, 390, 844)
@@ -548,8 +681,6 @@ if __name__ == "__main__":
                     for width, height, touch in [(1280, 650, False), (390, 844, True), (844, 390, True)]:
                         test_import_navigation(browser, offline, width, height, touch)
                     print("PASS exact six-pack navigation on desktop and portrait/landscape touch")
-                    test_challenge_pack_offline(browser, offline)
-                    print("PASS offline challenge pack, resume, next and pack import")
                     browser.close()
             finally:
                 server.shutdown()
