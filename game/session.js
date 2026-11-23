@@ -17,11 +17,12 @@
  function createSession(level){
   const map=F.readLevel(level);
   const multi=E.hasMultiConfluence(map);
+  const shifting=E.hasPhases(map);
   const routeId=r=>E.routeKey(map,r.element,r.path[0]);
-  const state={phase:'inspect',loadout:{},placements:{},routes:[],drafts:{},active:null};
+  const state={phase:'inspect',dayPhase:map.phaseRules?.initial??null,loadout:{},placements:{},routes:[],drafts:{},active:null};
   let history=[];
   const onboard=index=>Number.isInteger(index)&&index>=0&&index<map.cells.length;
-  const remember=(toolChange=false)=>{history.push(copy({toolChange,placements:state.placements,routes:state.routes,drafts:state.drafts,active:state.active?(multi?state.active.id:state.active.element):null}));};
+  const remember=(toolChange=false)=>{history.push(copy({toolChange,dayPhase:state.dayPhase,placements:state.placements,routes:state.routes,drafts:state.drafts,active:state.active?(multi?state.active.id:state.active.element):null}));};
   const activeMap=()=>({...map,inventory:state.loadout});
 
   function start(selection){
@@ -45,6 +46,7 @@
    state.active=null;
    history=[];
    state.drafts={};
+   state.dayPhase=map.phaseRules?.initial??null;
    if(replan)state.phase='inspect';
    else if(state.phase!=='inspect')state.phase='build';
   }
@@ -59,6 +61,7 @@
    const previous=history.pop();
    if(!previous)return false;
    state.placements=previous.placements;
+   state.dayPhase=previous.dayPhase;
    state.routes=previous.routes;
    state.drafts=previous.drafts;
    state.active=state.drafts[previous.active]??null;
@@ -195,6 +198,9 @@
    if(cell.node?.role==='source'||(cell.component==='confluence'&&!state.active)){
     const element=cell.component==='confluence'?E.confluence(map)?.output:cell.node.element;
     if(state.routes.some(route=>route.element===element)){
+     if(shifting&&element===map.cells[E.phasePlateIndex(map)]?.props?.element&&
+        state.routes.some(r=>r.deliveredPhase==='night'))
+      return fail('Undo Night deliveries before changing the route that activated Night.');
      remember();
      state.routes=state.routes.filter(route=>route.element!==element);
     }
@@ -205,6 +211,8 @@
    if((reopen||!state.active)&&cell.node?.role==='destination'){
     const completed=state.routes.find(route=>route.path.at(-1)===index);
     if(completed){
+     if(shifting&&E.phaseTriggerRoute(map,completed)&&state.routes.some(r=>r.deliveredPhase==='night'))
+      return fail('Undo Night deliveries before reopening the Day trigger route.');
      remember();
      state.routes=state.routes.filter(route=>route!==completed);
      state.drafts[completed.element]=completed;
@@ -221,14 +229,17 @@
    const next=[...path,index];
    const complete=next.length>1&&E.pairs(map).some(pair=>pair.element===element&&pair.destination===index);
    const reserved=state.routes.filter(route=>route.element!==element);
-   const error=E.validatePath(map,element,next,reserved,state.placements,!complete);
+   const error=E.validatePath(shifting?E.phaseView(map,state.dayPhase):map,element,next,reserved,state.placements,!complete);
    if(error)return fail(error);
    if(complete){
+    // The snapshot must precede the switch, so Undo restores Day and the route.
+    if(shifting)remember();
     delete state.drafts[element];
     state.active=null;
-    remember();
+    if(!shifting)remember();
     state.routes=state.routes.filter(route=>route.element!==element);
-    state.routes.push({element,path:next});
+    state.routes.push(shifting?{element,path:next,deliveredPhase:state.dayPhase}:{element,path:next});
+    if(shifting&&E.phaseTriggerRoute(map,{element,path:next}))state.dayPhase='night';
    }else state.active.path=next;
    return ok();
   }
@@ -248,7 +259,7 @@
   }
 
   function snapshot(){
-   return copy({version:1,phase:state.phase,loadout:state.loadout,placements:state.placements,
+   return copy({version:1,phase:state.phase,...(shifting?{dayPhase:state.dayPhase}:{}),loadout:state.loadout,placements:state.placements,
     routes:state.routes,drafts:state.drafts,active:state.active?(multi?state.active.id:state.active.element):null});
   }
 
@@ -281,13 +292,15 @@
     const canKeep=route=>saved.phase==='complete'||E.validatePath(map,route.element,route.path,[],saved.placements,true)!==E.portalExitMessage;
     const routes=saved.routes.filter(route=>!Object.hasOwn(saved.drafts,multi?routeId(route):route.element)&&canKeep(route));
     const drafts=Object.fromEntries(Object.entries(saved.drafts).filter(([,route])=>canKeep(route)));
+    if(shifting&&E.phaseValidation(map,routes,saved.placements,false).length)throw Error('Invalid phase route history');
+    if(shifting&&saved.dayPhase!==(routes.some(r=>E.phaseTriggerRoute(map,r))?'night':'day'))throw Error('Mismatched saved Day/Night state');
     for(const route of routes){
-     if(used.has(multi?routeId(route):route.element)||E.validatePath(map,route.element,route.path,routes.filter(r=>r!==route),saved.placements))
+     if(used.has(multi?routeId(route):route.element)||(!shifting&&E.validatePath(map,route.element,route.path,routes.filter(r=>r!==route),saved.placements)))
       throw Error('Invalid route');
      used.add(multi?routeId(route):route.element);
     }
     for(const [element,draft] of Object.entries(drafts)){
-     if(element!==(multi?routeId(draft):draft.element)||E.validatePath(map,draft.element,draft.path,routes,saved.placements,true))
+     if(element!==(multi?routeId(draft):draft.element)||E.validatePath(shifting?E.phaseView(map,saved.dayPhase):map,draft.element,draft.path,routes,saved.placements,true))
       throw Error('Invalid draft');
     }
     if(multi){
@@ -299,7 +312,7 @@
      }
     }
     const restored=copy({...saved,routes,drafts});
-    Object.assign(state,{loadout:restored.loadout,placements:restored.placements,routes:restored.routes,
+    Object.assign(state,{dayPhase:shifting?restored.dayPhase:null,loadout:restored.loadout,placements:restored.placements,routes:restored.routes,
      drafts:restored.drafts,active:restored.drafts[restored.active]||null});
     if(saved.phase==='complete'&&!verify().ok)throw Error('Invalid clear');
     return true;
