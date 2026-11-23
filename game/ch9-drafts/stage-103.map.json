@@ -79,14 +79,14 @@
       }
     },
     {
+      "terrain": "covered"
+    },
+    {
       "terrain": "covered",
       "component": "checkpoint",
       "props": {
         "element": "shadow"
       }
-    },
-    {
-      "terrain": "covered"
     },
     {
       "terrain": "land",
@@ -343,7 +343,7 @@
       "terrain": "water"
     },
     {
-      "terrain": "water"
+      "terrain": "land"
     },
     {
       "terrain": "water"
@@ -521,9 +521,9 @@
   ],
   "constraints": {},
   "inventory": {
-    "bridge": 1,
+    "bridge": 0,
     "metalSpan": 0,
-    "intersection": 0,
+    "intersection": 1,
     "tunnel": 0,
     "portal": 2,
     "junction": 0,
