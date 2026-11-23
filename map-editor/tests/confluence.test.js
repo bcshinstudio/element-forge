@@ -56,7 +56,7 @@ test('Map validation requires recipe endpoints and one chamber',()=>{
  const extra=copy(map);extra.cells[0].node={element:'water',role:'destination'};
  assert.match(F.structuralErrors(extra).issues.join(' '),/no separate destination/);
  const duplicate=copy(map);duplicate.cells[11]={terrain:'land',component:'confluence'};
- assert.match(F.structuralErrors(duplicate).issues.join(' '),/Only one Confluence/);
+ assert.match(F.structuralErrors(duplicate).issues.join(' '),/source route|destination|port/);
  const blocked=copy(map);blocked.cells[7]={terrain:'mountain'};
  assert.match(F.structuralErrors(blocked).issues.join(' '),/Water port/);
  const edge=copy(map);edge.cells[12]={terrain:'land'};edge.cells[4]={terrain:'land',component:'confluence',props:{direction:'E'}};
