@@ -358,6 +358,12 @@
  function update(){
   const phase=session.state.phase;
   $('phase').textContent={inspect:'Plan your route',build:'Build the network',complete:'Delivery complete'}[phase];
+  $('phase-indicator').hidden=!E.hasPhases(session.map);
+  if(E.hasPhases(session.map)){
+   const night=session.state.dayPhase==='night';
+   $('phase-indicator').textContent=night?'☾ Night · Day deliveries preserved':'☀ Day · Complete the plate route to switch';
+   $('phase-indicator').dataset.dayPhase=session.state.dayPhase;
+  }
   $('instructions').textContent={
    inspect:session.map.construction?'Choose tools within the available budget.':'',
    build:'',
@@ -443,6 +449,7 @@
  function drawBoard(){
   syncDragHandles();
   const {map,state}=session;
+  const visible=E.phaseView(map,state.dayPhase);
   const fragments=tiles.map(()=>document.createDocumentFragment());
   for(const {element,path} of [...state.routes.filter(route=>!state.drafts[E.routeKey(map,route.element,route.path[0])]),...Object.values(state.drafts)]){
    for(const [j,i] of path.entries()){
@@ -475,7 +482,11 @@
   for(const [i,cell] of map.cells.entries()){
    const tile=tiles[i];
    const mark=document.createElement('span');
-   const terrain=displayTerrain(map,cell);
+   const displayCell=visible.cells[i];
+   const terrain=displayTerrain(visible,displayCell);
+   tile.classList.toggle('exposed',terrain==='exposed');
+   tile.classList.toggle('covered',terrain==='covered');
+   tile.classList.toggle('phase-shifting',Boolean(cell.props?.phaseShift));
    const kind=E.effective(map,state.placements,i);
    const link=E.pairIdAt(map,state.placements,i);
    const fixed=cell.component===kind;
@@ -511,6 +522,11 @@
     }
     tile.classList.toggle('confluence-ready',inputReady);
     tile.classList.toggle('confluence-pending',!inputReady);
+   }else if(kind==='phasePlate'){
+    mark.classList.add('structure','phase-plate-mark');
+    const triggered=state.routes.some(r=>E.phaseTriggerRoute(map,r));
+    mark.textContent=triggered?'☾':'☀';
+    mark.title='Day/Night pressure plate · '+F.ELEMENTS[cell.props.element].name+' delivery';
    }else if(kind==='checkpoint'){
     const element=cell.props?.element;
     const visited=[...fragments[i].querySelectorAll('.track')].find(line=>
@@ -540,7 +556,7 @@
    if(terrainLayer)tile.replaceChildren(terrainLayer,fragments[i]);
    else{
     tile.replaceChildren(fragments[i]);
-    window.EFBoardArt.setTerrain(tile,cell.terrain,cell.terrainArt);
+    window.EFBoardArt.setTerrain(tile,terrain,cell.props?.phaseShift&&state.dayPhase==='night'?undefined:cell.terrainArt);
    }
    window.EFBoardArt.decorate(tile,pendingOpening??kind,{link,spec:pendingOpening?map.toolArt?.[pendingOpening]:appearance});
    const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
@@ -554,7 +570,7 @@
     ' · '+chamber.inputs.map(el=>F.ELEMENTS[el].name+' enters '+chamber.ports[el]).join(', ')+
     ', '+F.ELEMENTS[chamber.output].name+' exits '+chamber.ports[chamber.output]+
     (tile.classList.contains('confluence-ready')?' · inputs ready':' · inputs pending'):'';
-   const tileLabel=pendingOpening?label+' · '+toolNames[pendingOpening]+' opening selected':label+direction+visited+reaction;
+   const tileLabel=pendingOpening?label+' · '+toolNames[pendingOpening]+' opening selected':label+direction+visited+reaction+(cell.props?.phaseShift?' · Day/Night shifting channel':'');
    tile.title=tileLabel;
    tile.setAttribute('aria-label',tileLabel);
   }
