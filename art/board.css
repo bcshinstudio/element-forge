@@ -72,3 +72,31 @@
  transform: rotate(var(--art-rotation, 0deg));
 }
 #board .direction, #board .glyph, #board .node-shape { z-index: 3; }
+
+/* Confluence Chamber (Chapter 9 prototype): visible recipe ports on editor and game boards. */
+#board :is(.tile,.cell) .confluence-mark {
+ position:absolute; inset:3%; z-index:5; display:block; pointer-events:none;
+ line-height:1; color:#fff;
+}
+#board .confluence-core {
+ position:absolute; inset:23%; display:grid; place-items:center; font:900 clamp(13px,1.7vw,24px)/1 Georgia,serif;
+ border:2px solid #e7f7c9; border-radius:25%; color:#e7f7c9;
+ background:linear-gradient(145deg,#315044,#182d26); box-shadow:0 1px 3px #061009aa;
+}
+#board .confluence-port {
+ position:absolute; width:29%; height:29%; display:grid; place-items:center;
+ font:800 clamp(7px,.9vw,11px)/1 system-ui,sans-serif;
+ border:1px solid #f9f5d0; border-radius:50%; color:white; text-shadow:0 1px 1px #0009;
+ box-shadow:0 1px 2px #0009;
+}
+#board .confluence-water { background:#377fd1; }
+#board .confluence-earth { background:#a7774a; }
+#board .confluence-nature { background:#299657; }
+#board .port-N { left:35.5%; top:-3%; }
+#board .port-E { right:-3%; top:35.5%; }
+#board .port-S { left:35.5%; bottom:-3%; }
+#board .port-W { left:-3%; top:35.5%; }
+#board .tile.confluence-pending .confluence-core { border-style:dashed; }
+#board .tile.confluence-ready .confluence-core {
+ border-color:#75e6aa; box-shadow:0 0 0 1px #317951,0 0 8px #75e6aa77;
+}
