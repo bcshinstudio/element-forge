@@ -64,8 +64,8 @@
   <p id="home-total"></p>
   <nav class="home-links" aria-label="More ways to play">
    <button id="stage-select" type="button" aria-controls="stage-list" aria-expanded="false">Stage Select</button>
-   <button id="choose-challenge" type="button" aria-controls="challenge-menu" aria-expanded="false">Challenge stages</button>
-   <button id="home-custom" type="button" aria-controls="home-custom-panel" aria-expanded="false">Open a custom level</button>
+   <button id="choose-challenge" type="button" aria-controls="challenge-menu" aria-expanded="false" hidden>Challenge stages</button>
+   <button id="home-custom" type="button" aria-controls="home-custom-panel" aria-expanded="false" hidden>Open a custom level</button>
   </nav>
   <div id="home-custom-panel" hidden>
    <label class="import">Choose a level or challenge pack <input type="file" id="home-import" accept=".json,application/json"></label>
@@ -153,13 +153,12 @@
    <div class="stage-heading">
     <p id="stage-number" hidden></p>
     <div class="stage-actions">
-    <button id="story-toggle" type="button" aria-expanded="false" aria-controls="stage-story" hidden><span aria-hidden="true">📖</span> Story</button>
+    <button id="story-toggle" type="button" aria-expanded="false" aria-controls="description" aria-label="Show stage story" title="Show stage story" hidden><span aria-hidden="true">📖</span> Story</button>
     <button id="stage-tip" type="button" aria-label="Stage tips"><span aria-hidden="true">ⓘ</span></button>
     </div>
     <h1 id="puzzle"></h1>
    </div>
-   <p id="stage-story" hidden></p>
-   <button type="button" id="return-lesson" hidden>Leave Lesson</button>
+     <button type="button" id="return-lesson" hidden>Leave Lesson</button>
    <p id="description"></p>
    <div id="board" role="group" aria-label="Puzzle board"></div>
    <div id="elements" class="legend"></div>
@@ -218,13 +217,13 @@
    </div>
    <div class="status-row"><p id="status" role="status" aria-live="polite"></p><button id="undo-bridge" type="button" hidden>Undo</button></div>
   </section>
-  <details id="challenge-library" class="disclosure custom-level">
+  <details id="challenge-library" class="disclosure custom-level" hidden>
    <summary>Challenge stages</summary>
    <button id="curated-pack" type="button">Play curated pack</button>
    <label class="import">Import challenge pack <input type="file" id="pack-file" accept=".json,application/json"></label>
    <p id="pack-import-error" role="alert"></p>
   </details>
-  <details id="custom-level" class="disclosure custom-level">
+  <details id="custom-level" class="disclosure custom-level" hidden>
    <summary>Open a custom level</summary>
    <label class="import">Choose a level or challenge pack <input type="file" id="import" accept=".json,application/json"></label>
    <p id="import-error" role="status"></p>
