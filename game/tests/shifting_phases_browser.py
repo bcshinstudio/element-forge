@@ -14,11 +14,13 @@ ROOT=Path(__file__).resolve().parents[2]
 EXAMPLE=ROOT/"map-editor/examples/phase-first-nightfall.map.json"
 LEVEL=ROOT/"map-editor/examples/phase-first-nightfall.level.json"
 STANDALONE=ROOT/"Wellspring_Shifting_Phases_Preview.html"
+EDITOR_OFFLINE=ROOT/"Wellspring_Shifting_Phases_Map_Editor.html"
 
-def test_editor(browser,base):
-    page=browser.new_page(viewport={"width":1280,"height":930},accept_downloads=True)
+def test_editor(browser,url,mobile=False):
+    page=browser.new_page(viewport={"width":390,"height":844} if mobile else {"width":1280,"height":930},
+        is_mobile=mobile,has_touch=mobile,accept_downloads=True)
     errors=[];page.on("pageerror",lambda err:errors.append(str(err)))
-    page.goto(base+"/map-editor/index.html")
+    page.goto(url)
     expect(page.locator("#phase-enabled")).not_to_be_checked()
     page.locator("#phase-enabled").check()
     expect(page.locator("#phase-preview")).to_be_enabled()
@@ -87,7 +89,10 @@ if __name__=="__main__":
                 executable_path=os.environ.get("CHROMIUM_EXECUTABLE") or None)
             try:
                 base=f"http://127.0.0.1:{server.server_port}"
-                test_editor(browser,base)
+                editors=[base+"/map-editor/index.html"]
+                if EDITOR_OFFLINE.is_file():editors.append(EDITOR_OFFLINE.as_uri())
+                for editor_url in editors:
+                    for mobile in (False,True):test_editor(browser,editor_url,mobile)
                 urls=[base+"/game/index.html"]
                 if STANDALONE.is_file():urls.append(STANDALONE.as_uri())
                 for url in urls:
