@@ -390,7 +390,7 @@
   }
   for(const [i,tile] of tiles.entries()){
    tile.classList.toggle('route-handle',state.phase==='build'&&tool==='route'&&
-    (tips.has(i)||map.cells[i].node?.role==='source'));
+    (tips.has(i)||map.cells[i].node?.role==='source'||map.cells[i].component==='confluence'));
   }
  }
 
@@ -475,6 +475,22 @@
     mark.classList.add('endpoint',cell.node.role);
     mark.style.setProperty('--element',colors[cell.node.element]);
     mark.textContent=symbols[cell.node.element];
+    }else if(kind==='confluence'){
+    const ports=E.confluenceDirections(cell.props?.direction||'E');
+    const inputReady=['water','earth'].every(element=>state.routes.some(route=>route.element===element));
+    mark.classList.add('confluence-mark');
+    const core=document.createElement('span');
+    core.className='confluence-core';
+    core.textContent='◇';
+    mark.append(core);
+    for(const [element,label] of [['water','W'],['earth','E'],['nature','P']]){
+     const port=document.createElement('span');
+     port.className='confluence-port confluence-'+element+' port-'+ports[element];
+     port.textContent=label;
+     mark.append(port);
+    }
+    tile.classList.toggle('confluence-ready',inputReady);
+    tile.classList.toggle('confluence-pending',!inputReady);
    }else if(kind==='checkpoint'){
     const element=cell.props?.element;
     const visited=[...fragments[i].querySelectorAll('.track')].find(line=>
@@ -512,7 +528,12 @@
     (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[terrain]||terrain));
    const direction=kind==='gate'||terrain==='oneway'?' '+(cell.props?.direction??'E'):'';
    const visited=mark.querySelector('[data-visited]')?' · visited':'';
-   const tileLabel=pendingOpening?label+' · '+toolNames[pendingOpening]+' opening selected':label+direction+visited;
+   const reaction=kind==='confluence'?
+     ' · Water enters '+E.confluenceDirections(cell.props?.direction||'E').water+
+     ', Earth enters '+E.confluenceDirections(cell.props?.direction||'E').earth+
+     ', Plant exits '+E.confluenceDirections(cell.props?.direction||'E').nature+
+     (tile.classList.contains('confluence-ready')?' · activated':' · pending Water and Earth'):'';
+   const tileLabel=pendingOpening?label+' · '+toolNames[pendingOpening]+' opening selected':label+direction+visited+reaction;
    tile.title=tileLabel;
    tile.setAttribute('aria-label',tileLabel);
   }
@@ -824,7 +845,7 @@
   if(!tile||!event.isPrimary||event.button!==0||session.state.phase!=='build')return;
   const index=Number(tile.dataset.index);
   const routeStart=Object.values(session.state.drafts).some(({path})=>path.at(-1)===index||E.portalExit(session.map,path,session.state.placements)===index)||
-   session.map.cells[index].node?.role==='source'||
+   (session.map.cells[index].node?.role==='source'||session.map.cells[index].component==='confluence')||
    session.state.routes.some(route=>route.path.at(-1)===index);
   if(tool==='route'&&routeStart&&!drag){
    const bridge=E.effective(session.map,session.state.placements,index)==='bridge';
