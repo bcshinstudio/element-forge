@@ -114,8 +114,8 @@ function cellMarkup(c){
   out+=`<span class="node-shape ${c.node.role}" style="background:${e.color};border-color:${e.color}">${c.node.role==='source'?'S':'D'}</span>`;
  }
  if(c.component==='confluence'){
-  const recipe=reactionEngine.confluenceRecipe(c.props),ports=reactionEngine.confluenceDirections(c.props?.direction||'E');
-  const entries=recipe?[[recipe.inputs[0],ports.input1],[recipe.inputs[1],ports.input2],[recipe.output,ports.exit]]:[];
+  const recipe=reactionEngine.confluenceRecipe(c.props),ports=reactionEngine.confluencePortSides(c.props);
+  const entries=recipe&&ports?[[recipe.inputs[0],ports.input1],[recipe.inputs[1],ports.input2],[recipe.output,ports.output]]:[];
   out+='<span class="confluence-mark" aria-hidden="true"><span class="confluence-core">◇</span>'+
    entries.map(([kind,side])=>`<span class="confluence-port confluence-${kind} port-${side}" style="background:${ELEMENTS[kind].color}">${confluenceSymbol(kind)}</span>`).join('')+'</span>';
  }
