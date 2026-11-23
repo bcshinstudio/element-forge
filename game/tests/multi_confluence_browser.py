@@ -27,7 +27,7 @@ def check_editor(browser, base):
     page.goto(base+"/map-editor/index.html")
     for name in PLANS:
         page.locator("#file").set_input_files(str(ROOT/"map-editor/examples"/(name+".map.json")))
-        expect(page.locator("#mapName")).not_to_be_empty()
+        assert page.locator("#mapName").input_value()
         count = 3 if name=="multi-confluence-cascade" else 2
         expect(page.locator("#board .confluence-core")).to_have_count(count)
         page.locator("#validate").click()
