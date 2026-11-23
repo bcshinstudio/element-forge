@@ -2,13 +2,13 @@
 (function(root){
 const E=typeof module==='undefined'?root.EFEngine:require('./engine.js');
 const TERRAIN=[['land','Land','·'],['mountain','Mountain','▲'],['water','Water','≈'],['wall','Wall','▦'],['forest','Forest','♣'],['lava','Lava','♨'],['ice','Ice','❄'],['void','Void','◼'],['oneway','One-way','➜'],['river','Deep river','∿'],['bank','River bank','⇆'],['shallow','Shallow water','≋'],['scree','Scree','⋰'],['heated','Heated ground','▥'],['abrasive','Abrasive ground','▒'],['exposed','Exposed channel','☀'],['covered','Covered channel','☾']];
-const COMPONENTS=[['bridge','Bridge','═'],['metalSpan','Metal span','▤'],['intersection','Intersection','╋'],['tunnel','Tunnel end','◉'],['portal','Portal','◎'],['junction','Junction','⑂'],['sorter','Sorter','◇'],['converter','Converter','⬡'],['gate','Gate','⊣'],['checkpoint','Checkpoint','⚑'],['remover','Remover','✕'],['booster','Booster','»']];
+const COMPONENTS=[['bridge','Bridge','═'],['metalSpan','Metal span','▤'],['intersection','Intersection','╋'],['tunnel','Tunnel end','◉'],['portal','Portal','◎'],['junction','Junction','⑂'],['sorter','Sorter','◇'],['converter','Converter','⬡'],['gate','Gate','⊣'],['checkpoint','Checkpoint','⚑'],['remover','Remover','✕'],['booster','Booster','»'],['confluence','Confluence Chamber','◇']];
 const ELEMENTS={fire:{name:'Fire',color:'#d55b4e'},water:{name:'Water',color:'#377fd1'},nature:{name:'Plant',icon:'🌿',symbol:'P',color:'#419d66'},electricity:{name:'Electricity',color:'#d5ac29'},arcane:{name:'Arcane',color:'#9368c5'},wind:{name:'Wind',color:'#7dc8bc'},earth:{name:'Earth',color:'#d8a37d',symbol:'R'},ice:{name:'Ice',color:'#b8eaff',symbol:'I'},metal:{name:'Metal',color:'#c3c9db',symbol:'M'},light:{name:'Light',color:'#fff197',symbol:'L'},shadow:{name:'Shadow',color:'#ba9bf6',symbol:'H'}};
 const TIDS=new Set(TERRAIN.map(x=>x[0])),CIDS=new Set(COMPONENTS.map(x=>x[0])),DIRECTIONS=['N','E','S','W'];
 const fresh=(w=12,h=12)=>({format:'element-forge-map',schemaVersion:2,name:'Untitled Map',description:'',width:w,height:h,cells:Array.from({length:w*h},()=>({terrain:'land'})),constraints:{},inventory:Object.fromEntries(COMPONENTS.map(([id])=>[id,['bridge','intersection'].includes(id)?1:0]))});
 const RULES=['forbidTerrain','forbidComponents','requireComponents'];
 const LINKS=['portal','tunnel'];
-const PLAYABLE=['bridge','metalSpan','intersection','portal','tunnel','gate','checkpoint'];
+const PLAYABLE=['bridge','metalSpan','intersection','portal','tunnel','gate','checkpoint','confluence'];
 const PLACEABLE=['bridge','metalSpan','intersection','portal','tunnel'];
 const record=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
 function parseConstraints(value){
@@ -123,10 +123,11 @@ function parseMap(source){
 function mapFindings(map,includePlayability=true){
  const findings=[];
  const report=(message,indices=[])=>findings.push({message,indices});
- const endpoints=new Map(),links=new Map();
+ const endpoints=new Map(),links=new Map(),chambers=[];
  for(const [i,cell] of map.cells.entries()){
   const {node,component,terrain,props}=cell;
   const label=`Cell ${i+1}`;
+   if(component==='confluence')chambers.push(i);
   if(node){
    if(!endpoints.has(node.element))endpoints.set(node.element,{source:[],destination:[]});
    endpoints.get(node.element)[node.role].push(i);
@@ -141,7 +142,7 @@ function mapFindings(map,includePlayability=true){
    if(!PLAYABLE.includes(component))report(`${label}: ${componentLabel} is an editor-only fixture (unsupported game component ${component}).`,[i]);
    else{
     const ground=['land','forest','ice','oneway','bank','exposed','covered'];
-    const allowed=E.spanKinds.includes(component)?['water','river','shallow',...ground]:
+    const allowed=component==='confluence'?['land']:E.spanKinds.includes(component)?['water','river','shallow',...ground]:
      ['gate','checkpoint'].includes(component)&&map.rulesVersion>=4?
       [...ground,'water','river','shallow','lava','scree','heated','abrasive']:ground;
     if(!allowed.includes(terrain))report(`${label}: ${componentLabel} cannot be used on ${terrainLabel}.`,[i]);
@@ -153,8 +154,30 @@ function mapFindings(map,includePlayability=true){
   if(!links.has(key))links.set(key,[]);
   links.get(key).push(i);
  }
+
  let matched=0;
+ if(chambers.length>1)report('Only one Confluence Chamber is supported per map.',chambers);
+ const chamber=chambers.length===1?E.confluence(map):null;
+ if(chamber){
+  for(const element of ['water','earth','nature']){
+   const nodes=endpoints.get(element)??{source:[],destination:[]};
+   const sources=nodes.source.length,destinations=nodes.destination.length;
+   const valid=element==='nature'?sources===0&&destinations===1:sources===1&&destinations===0;
+   if(!valid)report(element==='nature'?
+    'Confluence Plant needs one destination and no separate Plant source.':
+    `Confluence ${ELEMENTS[element].name} needs one source and no separate destination.`,
+    [...nodes.source,...nodes.destination,chamber.index]);
+   else matched++;
+   const side=chamber[element],neighbor=E.confluenceNeighbor(map,chamber.index,side);
+   if(neighbor<0){report(`Confluence ${ELEMENTS[element].name} port (${side}) must face an in-bounds tile.`,[chamber.index]);continue;}
+   const adjoining=map.cells[neighbor];
+   if(E.terrainError(map,element,neighbor,adjoining.component)||
+      adjoining.node&&adjoining.node.element!==element)
+    report(`Confluence ${ELEMENTS[element].name} port (${side}) is blocked.`,[chamber.index,neighbor]);
+  }
+ }
  for(const [element,{source,destination}] of endpoints){
+  if(chamber&&['water','earth','nature'].includes(element))continue;
   const indices=[...source,...destination];
   const name=ELEMENTS[element].name;
   if(source.length!==destination.length)report(`${name}: ${source.length} source(s) vs ${destination.length} inlet(s).`,indices);
