@@ -4,7 +4,51 @@
 const ELEMENTS=['fire','water','nature','electricity','arcane','wind','earth','ice','metal','light','shadow'];
 const neighbors=(i,w,h)=>[[i-w,'N'],[i+1,'E'],[i+w,'S'],[i-1,'W']].filter(([j,d])=>j>=0&&j<w*h&&(d!=='E'||Math.floor(j/w)===Math.floor(i/w))&&(d!=='W'||Math.floor(j/w)===Math.floor(i/w)));
 const axis=(a,b,w)=>Math.floor(a/w)===Math.floor(b/w)?'h':'v';
-const pairs=m=>ELEMENTS.map(element=>({element,source:m.cells.findIndex(c=>c.node?.element===element&&c.node.role==='source'),destination:m.cells.findIndex(c=>c.node?.element===element&&c.node.role==='destination')})).filter(p=>p.source>=0||p.destination>=0);
+
+/* Chapter 9 prototype: one fixed chamber per map.
+   Inputs Water (counterclockwise from output) + Earth (clockwise), output Plant.
+   A route may be planned before the chamber is activated; the whole-map check
+   still requires both inputs and the output. All old maps use ordinary pairs. */
+const confluenceDirections=(output='E')=>{
+ const directions=['N','E','S','W'],i=directions.indexOf(output);
+ if(i<0)return null;
+ return {water:directions[(i+3)%4],earth:directions[(i+1)%4],nature:output};
+};
+const confluence=m=>{
+ const chambers=m.cells.flatMap((c,i)=>c.component==='confluence'?[i]:[]);
+ if(chambers.length!==1)return null;
+ const index=chambers[0];
+ return {index,...confluenceDirections(m.cells[index].props?.direction||'E')};
+};
+const confluenceNeighbor=(m,index,side)=>neighbors(index,m.width,m.height).find(([,d])=>d===side)?.[0]??-1;
+const pairs=m=>{
+ const chamber=confluence(m);
+ return ELEMENTS.map(element=>{
+  let source=m.cells.findIndex(c=>c.node?.element===element&&c.node.role==='source');
+  let destination=m.cells.findIndex(c=>c.node?.element===element&&c.node.role==='destination');
+  if(chamber){
+   if(element==='nature'&&source<0)source=chamber.index;
+   if(['water','earth'].includes(element)&&destination<0)destination=chamber.index;
+  }
+  return {element,source,destination};
+ }).filter(p=>p.source>=0||p.destination>=0);
+};
+function confluenceRouteError(m,element,path){
+ const chamber=confluence(m);
+ if(!chamber||!path.includes(chamber.index))return null;
+ if(!['water','earth','nature'].includes(element))return 'Only Water, Earth, and Plant may use the Confluence Chamber';
+ const k=path.indexOf(chamber.index);
+ if(element==='nature'){
+  if(k!==0)return 'Plant must start at the Confluence Chamber';
+  if(path.length>1&&path[1]!==confluenceNeighbor(m,chamber.index,chamber.nature))
+   return 'Plant must leave through the green output port';
+ }else{
+  if(k!==path.length-1)return element+' must end at the Confluence Chamber';
+  if(path.length>1&&path.at(-2)!==confluenceNeighbor(m,chamber.index,chamber[element]))
+   return (element==='water'?'Water':'Earth')+' must enter through its marked input port';
+ }
+ return null;
+}
 const placementKind=v=>typeof v==='string'?v:v?.kind||null;
 const effective=(m,placements,i)=>placementKind(placements?.[i])||m.cells[i].component||null;
 const pairIdAt=(m,placements,i)=>placements?.[i]?.pairId||m.cells[i]?.props?.pairId||null;
@@ -116,18 +160,19 @@ function validatePath(m,element,path,other=[],placements={},partial=false){
  const seen=new Set();for(let k=0;k<path.length;k++){const i=path[k],c=m.cells[i];if(!Number.isInteger(i)||!c||seen.has(i))return 'Route leaves board or loops';seen.add(i);
  const comp=effective(m,placements,i);if(element==='wind'&&comp==='tunnel')return 'Wind cannot use tunnels';
  const terrain=terrainError(m,element,i,comp);if(terrain)return terrain;
- if(comp&&!['bridge','metalSpan','intersection','checkpoint','portal','tunnel','gate'].includes(comp))return `Unsupported component: ${comp}`;
+ if(comp&&!['bridge','metalSpan','intersection','checkpoint','portal','tunnel','gate','confluence'].includes(comp))return `Unsupported component: ${comp}`;
  if(c.node&&(c.node.element!==element||(k!==0&&(k!==path.length-1||i!==p.destination))))return 'Another endpoint blocks route';
  if(c.component==='checkpoint'&&c.props?.element&&!['any',element].includes(c.props.element))return 'Checkpoint belongs to another element';
  if(k&& !routeNeighbors(m,path[k-1],placements,element).includes(i))return 'Routes must use adjacent cells or valid paired links';
  if(k&&!allowedTransition(m,element,path[k-1],i,placements))return bankError(m,element,path[k-1],i)||'One-way direction violated';
  }
+ const reaction=confluenceRouteError(m,element,path);if(reaction)return reaction;
  const restriction=constraintError(m,element,path,placements,partial);if(restriction)return restriction;
  for(let k=1;k<path.length;k++){
   const exit=portalExit(m,path.slice(Math.max(0,k-2),k),placements);
   if(exit!==null&&path[k]!==exit)return portalExitMessage;
  }
- for(const r of other){if(r.element===element)continue;for(const i of path){if(!r.path.includes(i))continue;if(effective(m,placements,i)!=='intersection')return 'Different elements cannot share a cell';const a=path.indexOf(i),b=r.path.indexOf(i);if(partial&&a===path.length-1&&a>0&&b>0&&b<r.path.length-1)continue;if(a===0||a===path.length-1||b===0||b===r.path.length-1)return 'Crossing cannot be at an endpoint';const a1=axis(path[a-1],i,m.width),a2=axis(i,path[a+1],m.width),b1=axis(r.path[b-1],i,m.width),b2=axis(i,r.path[b+1],m.width);if(!direction(path[a-1],i,m.width)||!direction(i,path[a+1],m.width)||!direction(r.path[b-1],i,m.width)||!direction(i,r.path[b+1],m.width)||a1!==a2||b1!==b2||a1===b1)return 'Intersection needs straight perpendicular routes';}}
+ for(const r of other){if(r.element===element)continue;for(const i of path){if(!r.path.includes(i))continue;if(effective(m,placements,i)==='confluence')continue;if(effective(m,placements,i)!=='intersection')return 'Different elements cannot share a cell';const a=path.indexOf(i),b=r.path.indexOf(i);if(partial&&a===path.length-1&&a>0&&b>0&&b<r.path.length-1)continue;if(a===0||a===path.length-1||b===0||b===r.path.length-1)return 'Crossing cannot be at an endpoint';const a1=axis(path[a-1],i,m.width),a2=axis(i,path[a+1],m.width),b1=axis(r.path[b-1],i,m.width),b2=axis(i,r.path[b+1],m.width);if(!direction(path[a-1],i,m.width)||!direction(i,path[a+1],m.width)||!direction(r.path[b-1],i,m.width)||!direction(i,r.path[b+1],m.width)||a1!==a2||b1!==b2||a1===b1)return 'Intersection needs straight perpendicular routes';}}
  return null;
 }
 function constructionCost(m,counts){
@@ -160,7 +205,7 @@ function score(m,routes,placements={}){const track=routes.reduce((s,r)=>s+r.path
 function solve(m,{limit=120000,maxPairs=8,allowPlacement=true,initialPlacements={}}={}){
  const ps=pairs(m);if(!ps.length||ps.some(p=>p.source<0||p.destination<0))return {status:'invalid',message:'Missing or unmatched endpoints'};
  if(ps.length>maxPairs)return {status:'unsupported',message:`Maximum ${maxPairs} pairs for prototype solver`};
- if(m.cells.some(c=>c.component&&!['bridge','metalSpan','intersection','checkpoint','portal','tunnel','gate'].includes(c.component)))return {status:'unsupported',message:'Map contains advanced components not supported by solver'};
+ if(m.cells.some(c=>c.component&&!['bridge','metalSpan','intersection','checkpoint','portal','tunnel','gate','confluence'].includes(c.component)))return {status:'unsupported',message:'Map contains advanced components not supported by solver'};
  if(m.cells.some(c=>!['land','forest','ice','water','mountain','wall','void','lava','oneway',...newTerrain].includes(c.terrain)))return {status:'unsupported',message:'Unknown terrain'};
 
 
@@ -174,12 +219,18 @@ function solve(m,{limit=120000,maxPairs=8,allowPlacement=true,initialPlacements=
  if(cur===p.destination){if(validatePath(m,p.element,state.path,routes,state.placements))continue;const needed=m.cells.map((c,i)=>c.component==='checkpoint'&&['any',p.element].includes(c.props?.element)?i:-1).filter(i=>i>=0);if(needed.some(i=>!state.seen.has(i)))continue;const found=visitPair(pi+1,[...routes,{element:p.element,path:state.path}],state.placements);if(found)return found;if(exhausted)return null;continue;}
  const exit=portalExit(m,state.path,state.placements);
  const ns=(exit===null?routeNeighbors(m,cur,state.placements,p.element):exit<0?[]:[exit]).filter(i=>!state.seen.has(i));ns.sort((a,b)=>distance(b,p.destination)-distance(a,p.destination));
- for(const i of ns){if(!allowedTransition(m,p.element,cur,i,state.placements))continue;const c=m.cells[i];if(c.node&&!(c.node.element===p.element&&c.node.role==='destination'))continue;let pl=state.placements,comp=effective(m,pl,i);const overlaps=routes.filter(r=>r.path.includes(i));let wanted=null;
+ for(const i of ns){
+   const ch=confluence(m);
+   if(ch){
+    if(cur===ch.index&&p.element==='nature'&&i!==confluenceNeighbor(m,ch.index,ch.nature))continue;
+    if(i===ch.index&&(i!==p.destination||!['water','earth'].includes(p.element)||cur!==confluenceNeighbor(m,ch.index,ch[p.element])))continue;
+   }
+   if(!allowedTransition(m,p.element,cur,i,state.placements))continue;const c=m.cells[i];if(c.node&&!(c.node.element===p.element&&c.node.role==='destination'))continue;let pl=state.placements,comp=effective(m,pl,i);const overlaps=routes.filter(r=>r.path.includes(i));let wanted=null;
  if(terrainError(m,p.element,i,comp)){if(!comp)wanted=spanKinds.find(kind=>budget[kind]&&canPlace(m,pl,i,kind)&&!terrainError(m,p.element,i,kind));if(!wanted)continue;}
- if(comp&&!['bridge','metalSpan','intersection','checkpoint','portal','tunnel','gate'].includes(comp))continue;
- if(overlaps.length){if(overlaps.length>1)continue;if(spanKinds.includes(comp))continue;if(comp!=='intersection')wanted='intersection';}
+ if(comp&&!['bridge','metalSpan','intersection','checkpoint','portal','tunnel','gate','confluence'].includes(comp))continue;
+ if(overlaps.length&&comp!=='confluence'){if(overlaps.length>1)continue;if(spanKinds.includes(comp))continue;if(comp!=='intersection')wanted='intersection';}
  if(wanted){if(!allowPlacement||!canPlace(m,pl,i,wanted))continue;const used=Object.values(pl).filter(x=>placementKind(x)===wanted).length;if(used>=budget[wanted])continue;pl={...pl,[i]:wanted};if(m.construction&&constructionCost(m,placementCounts(pl))>m.construction.budget)continue;}
- const path=[...state.path,i];if(overlaps.length){const r=overlaps[0],j=r.path.indexOf(i);if(j===0||j===r.path.length-1||path.length<3)continue;const b1=axis(r.path[j-1],i,m.width),b2=axis(i,r.path[j+1],m.width);if(b1!==b2)continue;const a1=axis(path[path.length-2],i,m.width);if(a1===b1)continue; /* require straight exit on next step */}
+ const path=[...state.path,i];if(overlaps.length&&comp!=='confluence'){const r=overlaps[0],j=r.path.indexOf(i);if(j===0||j===r.path.length-1||path.length<3)continue;const b1=axis(r.path[j-1],i,m.width),b2=axis(i,r.path[j+1],m.width);if(b1!==b2)continue;const a1=axis(path[path.length-2],i,m.width);if(a1===b1)continue; /* require straight exit on next step */}
  if(path.length>m.width*m.height)continue;
  stack.push({path,seen:new Set([...state.seen,i]),placements:pl});
  }
@@ -219,5 +270,5 @@ function solveConstruction(m,{limit=120000,maxPairs=8,maxCandidates=180}={}){
  }
  return {status:hitLimit||direct.status==='inconclusive'?'inconclusive':'unsolved',message:hitLimit?'Some construction searches exceeded their limits':'No solution found within supported construction candidates',constructionAttempts:attempts};
 }
-const api={portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
+const api={confluence,confluenceDirections,confluenceNeighbor,confluenceRouteError,portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
