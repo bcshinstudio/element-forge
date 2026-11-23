@@ -114,8 +114,10 @@
   message(clearedRoute?'Bridge removed. Route cleared.':'Bridge removed.',clearedRoute);
  }
 
+ // Review access is deliberately transient: no completion or unlock records are written.
+ let developerReviewUnlocked=false;
  function canOpen(index){
-  return index>=campaignSize||index<=progress.reachedIndex();
+  return developerReviewUnlocked||index>=campaignSize||index<=progress.reachedIndex();
  }
  function displayTerrain(map,cell){return map.rulesVersion>=4&&cell.terrain==='bank'?'land':cell.terrain;}
  function openLevel(index,saved=null,playMode='run'){
@@ -742,7 +744,7 @@
   if(session.state.phase!=='build')return;
   const result=session.verify();
   if(!result.ok){message(result.message);return;}
-  if(levelIndex<campaignSize){
+  if(levelIndex<campaignSize&&!(developerReviewUnlocked&&mode==='replay')){
    const snapshot=mode==='run'?campaignSnapshot():null;
    if(snapshot&&isChapterEnd(levelIndex))snapshot.storyPending=true;
    progress.complete(levels[levelIndex].id,result.points,snapshot);
@@ -1051,14 +1053,31 @@
  let skipTutorialPopups=false;
  try{skipTutorialPopups=storage?.getItem(popupKey)==='yes';}catch{}
  const popupControls=[$('skip-tutorial-popups'),$('settings-skip-tutorial-popups')];
+ let reviewChecks=0,reviewCheckArmed=false;
  for(const control of popupControls){
   control.checked=skipTutorialPopups;
   control.onchange=()=>{
+   // Only actual check→uncheck pairs on the Settings control count.
+   if(control.id==='settings-skip-tutorial-popups'&&!developerReviewUnlocked){
+    if(control.checked)reviewCheckArmed=true;
+    else if(reviewCheckArmed){reviewChecks++;reviewCheckArmed=false;}
+   }
    skipTutorialPopups=control.checked;
    for(const input of popupControls)input.checked=skipTutorialPopups;
    try{storage?.setItem(popupKey,skipTutorialPopups?'yes':'no');}catch{}
   };
  }
+ $('settings-studio-credit').onclick=()=>{
+  if(developerReviewUnlocked||reviewChecks<3)return;
+  developerReviewUnlocked=true;
+  reviewChecks=0;
+  reviewCheckArmed=false;
+  updateLevelLabels();
+  renderChoices();
+  $('stage-select').textContent='Stage Select · Review';
+  $('home-total').textContent='Developer review enabled · All '+campaignSize+' stages accessible · Progress unchanged';
+  showPanel('stage-list');
+ };
  const reference=window.EFReference;
  function endpointKey(){
   const key=document.createElement('span');
