@@ -1,0 +1,862 @@
+Chapter 10 Master Blueprint: The Twilight Pendulum (Stages 109–121)
+
+Stage
+Stage Title
+Elements & Setup
+Phase & Plate Mechanic
+Difficulty
+Fixed Pieces & Budget
+Core Puzzle Hook & "Aha!" Moment
+109
+First Eclipse
+4 Elements (4 S → 4 D):
+Light, Shadow, Water, Fire
+Plate (Light) at (4, 6):
+Flips central Exposed ☀ bridge → Covered ☾
+Intro (Easy)
+2 Gates, 2 Checkpoints
+Budget: None
+Teaches Delivery Order: Light must cross the sunlit Exposed ☀ bridge first, stepping on the Light Pressure Plate as it completes its route so Shadow can cross the newly darkened Covered ☾ bridge!
+110
+Sundial Sluice
+5 Elements (5 S → 5 D):
+Light, Shadow, Water, Earth, Plant
+Plate (Water) at (6, 3):
+Flips east Exposed ☀ → Covered ☾ & west Covered ☾ → Exposed ☀
+Medium
+3 Gates, 3 Checkpoints
+Budget: 1 Bridge
+Light must complete before Water triggers the Plate (because Water turns Light's west path Exposed ☀ into Covered ☾), while Shadow waits for Water to darken the east corridor!
+111
+Dusk-Gate Relay
+5 Elements (5 S → 5 D):
+Light, Shadow, Metal, Wind, Fire
+Plate (Wind) at (3, 8):
+Flips central hub Exposed ☀ → Covered ☾
+Medium
+3 Gates, 3 Checkpoints
+Budget: 1 Tunnel
+Wind leaps void to hit the Plate—forcing Light (exposed) to finish before Wind's leap, while Shadow (covered) finishes after, and Metal (heated) bores through the Tunnel.
+112
+Nocturne Overpass
+5 Elements (5 S → 5 D):
+Light, Shadow, Electricity, Water, Ice
+Plate (Light) at (5, 9):
+Flips central overpass Exposed ☀ → Covered ☾
+Medium
+3 Gates, 3 Checkpoints
+Budget: 1 Bridge, 1 Intersection
+Light crosses Water straight at the Intersection to hit the Plate—permanently locking its delivery before the overpass flips to Covered ☾ for Shadow!
+113
+Shadow-Vault Switch
+6 Elements (6 S → 6 D):
+Light, Shadow, Plant, Earth, Fire, Metal
+Plate (Plant) at (8, 4):
+Flips dual-lane Exposed ☀ ↔ Covered ☾
+Medium
+4 Gates, 4 Checkpoints
+Budget: 1 Portal Pair
+Plant (forest — cannot use Portals!) cuts through brush to trigger the Plate, flipping the eastern vault so Shadow (covered) can warp via the Portal Pair without burning in sunlight.
+114
+Twin-Horizon Lock
+6 Elements (6 S → 6 D):
+Light, Shadow, Water, Wind, Fire, Earth
+Plate (Earth) at (7, 6):
+Flips north Exposed ☀ → Covered ☾ & south Covered ☾ → Exposed ☀
+Medium
+4 Gates, 4 Checkpoints
+Budget: 1 Bridge, 1 Intersection
+Light must cross the northern Exposed ☀ gallery before Earth (scree) steps on the Plate, which simultaneously unlocks the southern Covered ☾ tunnel for Shadow!
+115
+Eclipse Bottleneck
+6 Elements (6 S → 6 D):
+Light, Shadow, Electricity, Plant, Water, Wind
+Plate (Light) at (6, 10):
+Flips 3-tile central bottleneck Exposed ☀ → Covered ☾
+Hard
+5 Gates, 5 Checkpoints
+Budget: 1 Bridge, 1 Intersection
+Both Light and Shadow must share the exact same 3-tile central corridor at different times—Light threads it during Day, hits the Plate, and Shadow threads the same tiles during Night!
+116
+Umbral Portal Relay
+7 Elements (7 S → 7 D):
+Light, Shadow, Metal, Fire, Water, Ice, Earth
+Plate (Metal) at (4, 9):
+Flips Portal exit & bridge Exposed ☀ ↔ Covered ☾
+Hard
+5 Gates, 5 Checkpoints
+Budget: 1 Tunnel, 1 Portal Pair, 1 Intersection
+Light must finish first during Day; then Metal (heated) bores through the Tunnel to hit the Plate, turning the Portal landing pad from Exposed ☀ into safe Covered ☾ for Shadow!
+117
+The Twilight Gauntlet
+7 Elements (7 S → 7 D):
+Light, Shadow, Plant, Electricity, Wind, Fire, Water
+Plate (Electricity) at (9, 8):
+Flips 6 shifting tiles across north & south wings
+Hard
+6 Gates, 6 Checkpoints
+Budget: 1 Bridge, 1 Portal Pair, 1 Intersection
+Light navigates the Day wing first; Electricity crosses Water straight at the Intersection to trigger Night; Shadow (covered + Portal) and Plant (forest — no Portal) finish under eclipse!
+118
+Daybreak Synthesis
+6 Elements (5 S → 4 D):
+Light, Shadow, Water, Earth, Fire → Plant D
+1 Chamber (Water + Earth → Plant) + Plate (Plant) at (9, 5)
+Hard (Phase + Fusion)
+5 Gates, 5 Checkpoints
+Budget: 1 Bridge, 1 Intersection
+Light must deliver during Day first; meanwhile Water + Earth fuse into Plant, which cuts forest and steps on the Plant Pressure Plate to plunge the board into Night for Shadow!
+119
+Smelted Eclipse
+7 Elements (6 S → 5 D):
+Light, Shadow, Fire, Earth, Water, Wind → Metal D
+1 Chamber (Fire + Earth → Metal) + Plate (Light) at (4, 8)
+Hard (Phase + Fusion)
+6 Gates, 6 Checkpoints
+Budget: 1 Tunnel, 1 Portal Pair, 1 Intersection
+Light hits the Plate during Day to open Night paths for Shadow (covered + Portal), while Fire + Earth fuse into Metal (heated + Tunnel) and Wind leaps void!
+120
+Thunder-Dusk Reactor
+7 Elements (6 S → 4 D):
+Light, Shadow, Fire, Water, Earth → Electricity D, Plant D
+2 Chambers (Light + Shadow → Electricity, Water + Earth → Plant) + Plate (Plant) at (8, 4)
+Hard (Phase + 2 Chambers)
+6 Gates, 6 Checkpoints
+Budget: 1 Bridge, 1 Portal Pair, 1 Intersection
+Twist: Light enters the Light + Shadow → Electricity chamber during Day, then Water + Earth fuse into Plant to trigger Night—allowing Shadow to cross the newly darkened corridor into the same chamber to spark Electricity!
+121
+The Celestial Orrery (Ch. 10 Boss Finale)
+9 Elements (8 S → 6 D):
+Light, Shadow, Fire, Water, Earth, Wind, Metal, Electricity → Plant D, Ice D
+2 Chambers (Water + Earth → Plant, Water + Wind → Ice) + Plate (Light) at (5, 10)
+Expert (Boss Finale)
+7 Gates, 7 Checkpoints
+Budget: 1 Bridge, 1 Tunnel, 1 Portal Pair, 2 Intersections
+Chapter 10 Boss Finale: Nine active elements across Day and Night! Light weaves through Day Exposed ☀ gates to trigger Night, unlocking Shadow (covered + Portal), while twin chambers forge Plant (forest) and Ice (shallows) alongside Metal (Tunnel), Fire (lava), and Electricity (Bridge + 2 Intersections)!
+
+
+
+How Your New Engine Mechanics Shine in Stages 109–121
+
+
+	•	True Phase-Sequenced Puzzles (Stages 109–117): Because completed Day deliveries remain permanently valid after Night begins, players can route Light right across an Exposed ☀ bridge, complete Light's delivery on the Pressure Plate, and watch that exact bridge flip to Covered ☾ so Shadow can cross without invalidating Light!
+	•	Fusion + Phase Synergy (Stage 120 — Thunder-Dusk Reactor): A Confluence Chamber itself stays active across Day and Night—so Light can enter its input port during Day, wait while Plant triggers the Pressure Plate, and then Shadow enters the second input port during Night to ignite Electricity!
+
+
+Stage 109: First Eclipse (Intro / Easy — 4 Elements with Day/Night Shifting)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 109 of 121)
+	•	Elements & Setup: 4 Elements (Light, Shadow, Water, Fire) — 4 S → 4 D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Light at (4, 9) (triggers Day ☀ → Night ☾ as Light completes its route!)
+	◦	Shifting Terrains (3 tiles): (6, 5), (6, 6), (6, 7) — start as Exposed ☀ during Day, flip to Covered ☾ during Night.
+	◦	Required Delivery Order: 1. Light (Day) → triggers Night → 2. Shadow (Night) (Water and Fire can deliver in either phase)
+	•	Board Pieces: 2 One-Way Gates (fixed), 2 Checkpoints (Light C, Shadow C), None (Construction Budget)
+	•	Stage Story: Welcome to First Eclipse—the threshold of The Twilight Pendulum where a single Light Pressure Plate governs the shifting boundary between day and night! Guide Light across the sunlit Exposed ☀ causeway first so its delivery depresses the Pressure Plate, plunging that same causeway into pitch-dark Covered ☾ shadow—permanently locking in Light's route while opening the way for Shadow to cross!
+
+Verified Phase-Aware Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light delivers & triggers Night!):
+	◦	Light (Gold): Starts at Light S (3, 3) → walks east to (3, 5) → turns south across the central Exposed ☀ causeway (6, 5) (via (4, 5) → (5, 5) → (6, 5)) → tags Light C at (7, 5) → bends east along Row 7 ((7, 6) → (7, 9)) → turns north up Col 9 ((6, 9) → (5, 9)) → steps onto the Light Pressure Plate at (4, 9) → reaches Light D (3, 9)!
+	◦	Phase Trigger: Completing Light's route across (4, 9) flips (6, 5), (6, 6), (6, 7) from Exposed ☀ → Covered ☾! Light's completed route stays permanently valid.
+	2	Step 2 — Night Phase ☾ (Shadow crosses the newly darkened bridge!):
+	◦	Shadow (Purple): Starts in the western Covered ☾ alcove at Shadow S (6, 2) → walks east onto the newly flipped Covered ☾ tiles (6, 5) → (6, 6) → (6, 7) (via (6, 3)–(6, 4)) → threads Gate (6, 8) → → tags Shadow C at (6, 10) → reaches Shadow D (6, 11).
+	3	Any Phase (Water & Fire outer channels):
+	◦	Water (Dark Blue): Starts at Water S (2, 2) → swims east down the northern Water canal ((2, 2) → (2, 11)) → reaches Water D (2, 11).
+	◦	Fire (Red): Starts at Fire S (10, 2) → cuts east through the southern Lava vein ((10, 3)–(10, 10)) → threads Gate (10, 8) → → reaches Fire D (10, 11).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources & Destinations:
+	◦	Light S: (3, 3) → Light D: (3, 9)
+	◦	Shadow S: (6, 2) → Shadow D: (6, 11)
+	◦	Water S: (2, 2) → Water D: (2, 11)
+	◦	Fire S: (10, 2) → Fire D: (10, 11)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Light): (4, 9)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾): (6, 5), (6, 6), (6, 7)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (2): (6, 8) →, (10, 8) →
+	◦	Checkpoints (2): Light C at (7, 5), Shadow C at (6, 10)
+	◦	Construction Budget: None
+	•	Terrains:
+	◦	wall (14 tiles): (4,4), (4,6), (5,4), (5,6), (7,4), (8,5), (8,6), (8,7), (8,8), (8,9), (5,8), (7,10), (1,6), (11,6)
+	◦	water (10 tiles): (2,2), (2,3), (2,4), (2,5), (2,6), (2,7), (2,8), (2,9), (2,10), (2,11)
+	◦	lava (4 tiles — Fire only): (10,4), (10,5), (10,6), (10,7)
+	◦	covered (Static, 4 tiles — blocks Light): (6,2), (6,3), (6,10), (6,11)
+	◦	exposed (Static, 2 tiles — blocks Shadow): (4,5), (5,5)
+	◦	shifting (Exposed ☀ → Covered ☾, 3 tiles): (6,5), (6,6), (6,7)
+
+
+
+Stage 110: Sundial Sluice (Medium — 5 Elements with Dual-Direction Day/Night Flip)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 110 of 121)
+	•	Elements & Setup: 5 Elements (Light, Shadow, Water, Earth, Plant) — 5 S → 5 D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Water at (7, 3) (triggers Day ☀ → Night ☾ when Water completes its sluice!)
+	◦	Shifting Terrains (4 tiles — Two-Way Flip!):
+	▪	Western Gallery (3, 5), (3, 6): Start Exposed ☀ (Day) → flip to Covered ☾ (Night) (blocks Light if Light waits too long!)
+	▪	Eastern Vault (8, 8), (8, 9): Start Covered ☾ (Day) → flip to Exposed ☀ (Night) (or start Exposed ☀ (Day) → flip to Covered ☾ (Night) so Shadow can cross! Let's make Eastern Vault (8, 8), (8, 9) start Exposed ☀ → flip to Covered ☾ so both shifts punish wrong ordering: Light MUST go first before Western Gallery turns Covered ☾, and Shadow MUST go second after Eastern Vault turns Covered ☾!)
+	◦	Required Delivery Order: 1. Light (Day) → 2. Water (triggers Night on Plate (7, 3)) → 3. Shadow (Night)
+	•	Board Pieces: 3 One-Way Gates (fixed), 3 Checkpoints (Light C, Shadow C, Plant C), 1 Bridge (Construction Budget)
+	•	Stage Story: Inside Sundial Sluice, a hydraulic Water Pressure Plate swings both wings of the observatory between light and eclipse! Route Light across the sunlit northern gallery before Water drains the sluice—otherwise the northern gallery plunges into Covered ☾ darkness and traps Light—while Shadow waits for that exact same shift to darken the southern vault, and Plant claims your single Bridge!
+
+Verified Phase-Aware Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light MUST deliver first!):
+	◦	Light (Gold): Starts at Light S (3, 2) → walks east across static Exposed ☀ (3, 3)–(3, 4) and shifting Exposed ☀ (3, 5)–(3, 6) → tags Light C at (3, 7) → threads Gate (3, 8) → → reaches Light D (3, 10).
+	◦	Why order matters: Once Night starts, (3, 5)–(3, 6) turn Covered ☾—so Light can only cross during Day!
+	2	Step 2 — Day → Night Trigger (Water completes on Plate (7, 3)):
+	◦	Water (Dark Blue): Starts at Water S (2, 3) → swims south down the western Water canal ((2, 3) → (8, 3)) → steps onto the Water Pressure Plate at (7, 3) → reaches Water D (8, 3).
+	◦	Phase Trigger: Western (3, 5)–(3, 6) flip Exposed ☀ → Covered ☾ (Light is already permanently delivered!), and Eastern (8, 8)–(8, 9) flip Exposed ☀ → Covered ☾.
+	3	Step 3 — Night Phase ☾ (Shadow crosses the newly darkened southern vault!):
+	◦	Shadow (Purple): Starts in the southern Covered ☾ chamber at Shadow S (8, 5) → walks east through static Covered ☾ (8, 6)–(8, 7) and newly flipped Covered ☾ (8, 8)–(8, 9) → tags Shadow C at (8, 10) → threads Gate (9, 10) ↓ → reaches Shadow D (10, 10).
+	4	Any Phase (Earth & Plant):
+	◦	Earth (Amber): Starts at Earth S (5, 11) → cuts west through loose Scree (5, 10)–(5, 9) → threads Gate (5, 8) ← → reaches Earth D (5, 7).
+	◦	Plant (Green): Starts at Plant S (10, 1) → cuts east through Forest (10, 2) → crosses the southern tail of the Water canal via your 1 Bridge at (10, 3) → tags Plant C at (10, 5) → reaches Plant D (10, 7).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources & Destinations:
+	◦	Light S: (3, 2) → Light D: (3, 10)
+	◦	Water S: (2, 3) → Water D: (8, 3)
+	◦	Shadow S: (8, 5) → Shadow D: (10, 10)
+	◦	Earth S: (5, 11) → Earth D: (5, 7)
+	◦	Plant S: (10, 1) → Plant D: (10, 7)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Water): (7, 3)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾, 4 tiles): (3, 5), (3, 6), (8, 8), (8, 9)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (3): (3, 8) →, (5, 8) ←, (9, 10) ↓
+	◦	Checkpoints (3): Light C at (3, 7), Shadow C at (8, 10), Plant C at (10, 5)
+	◦	Construction Budget: 1 Bridge (placed on water at (10, 3))
+	•	Terrains:
+	◦	wall (16 tiles): (2,4), (4,4), (4,5), (4,6), (4,7), (6,5), (6,6), (6,7), (6,8), (6,9), (7,5), (7,6), (9,5), (9,6), (9,7), (11,3)
+	◦	water (9 tiles — bridge placed at (10, 3)): (2,3), (3,3) (keep (3, 3) dry exposed and start Water S at (4, 3) so Water swims (4, 3) → (8, 3) cleanly without crossing Light's Row 3!), (4,3), (5,3), (6,3), (7,3), (8,3), (9,3), (10,3)
+	◦	exposed (Static, 2 tiles — blocks Shadow): (3,3), (3,4)
+	◦	covered (Static, 3 tiles — blocks Light): (8,5), (8,6), (8,7)
+	◦	shifting (Exposed ☀ → Covered ☾, 4 tiles): (3,5), (3,6), (8,8), (8,9)
+	◦	scree (2 tiles — Earth only): (5,10), (5,9)
+	◦	forest (1 tile — Plant only): (10,2)
+
+
+
+
+
+
+Stage 111: Dusk-Gate Relay (Medium — 5 Elements with Wind-Triggered Eclipse)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 111 of 121)
+	•	Elements & Setup: 5 Elements (Light, Shadow, Wind, Metal, Fire) — 5 S → 5 D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Wind at (3, 9) (triggers Day ☀ → Night ☾ after Wind leaps the Void rift!)
+	◦	Shifting Terrains (4 tiles):
+	▪	Northern Gallery (3, 3), (3, 4): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	▪	Central Causeway (6, 5), (6, 6): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	◦	Required Delivery Order: 1. Light (Day) → 2. Wind (leaps Void & triggers Night on Plate (3, 9)) → 3. Shadow (Night)
+	•	Board Pieces: 3 One-Way Gates (fixed), 3 Checkpoints (Light C, Shadow C, Metal C), 1 Tunnel (Construction Budget)
+	•	Stage Story: High above the Dusk-Gate Relay, a howling Wind current must vault a 1-tile Void chasm to depress an aerial Pressure Plate, plunging the observatory from bright Day ☀ into deep Night ☾! Guide Light across the sunlit northern gallery before Wind takes its leap—otherwise Light is locked out by sudden darkness—while Shadow waits for the eclipse to cross the central causeway, and Metal bores through the eastern mountain bulkhead!
+
+Verified Phase-Aware Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light MUST deliver before Wind's leap!):
+	◦	Light (Gold): Starts at Light S (3, 2) → walks east across shifting Exposed ☀ (3, 3)–(3, 4) and static Exposed ☀ (3, 5) → tags Light C at (4, 5) → threads Gate (5, 5) ↓ → reaches Light D (5, 4).
+	2	Step 2 — Day → Night Trigger (Wind leaps Void & hits Plate (3, 9)):
+	◦	Wind (Light Blue): Starts at Wind S (2, 7) → walks east to (2, 8) → Jumps 1-tile Void (2, 9) horizontally to land at (2, 10) → turns south onto the Wind Pressure Plate at (3, 9) (via (3, 10) → (3, 9)) → reaches Wind D (4, 9).
+	◦	Phase Trigger: (3, 3)–(3, 4) and (6, 5)–(6, 6) flip Exposed ☀ → Covered ☾. Light's completed delivery remains permanently valid!
+	3	Step 3 — Night Phase ☾ (Shadow crosses the newly darkened central causeway!):
+	◦	Shadow (Purple): Starts in the western Covered ☾ vault at Shadow S (6, 2) → walks east across static Covered ☾ (6, 3)–(6, 4) and newly flipped Covered ☾ (6, 5)–(6, 6) → tags Shadow C at (6, 7) → threads Gate (7, 7) ↓ → reaches Shadow D (8, 7).
+	4	Any Phase (Metal & Fire):
+	◦	Metal (Steel Blue): Starts at Metal S (7, 9) → steps onto Heated Ground (8, 9) → uses your 1 Tunnel (8, 9) ↔ (11, 9) to bore straight through the southern Mountain (9, 9)–(10, 9) → tags Metal C at (11, 10) → reaches Metal D (11, 11).
+	◦	Fire (Red): Starts at Fire S (9, 2) → cuts east through Lava (9, 3)–(9, 4) → threads Gate (9, 5) → → reaches Fire D (10, 5).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources & Destinations:
+	◦	Light S: (3, 2) → Light D: (5, 4)
+	◦	Wind S: (2, 7) → Wind D: (4, 9)
+	◦	Shadow S: (6, 2) → Shadow D: (8, 7)
+	◦	Metal S: (7, 9) → Metal D: (11, 11)
+	◦	Fire S: (9, 2) → Fire D: (10, 5)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Wind): (3, 9)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾, 4 tiles): (3, 3), (3, 4), (6, 5), (6, 6)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (3): (5, 5) ↓, (7, 7) ↓, (9, 5) →
+	◦	Checkpoints (3): Light C at (4, 5), Shadow C at (6, 7), Metal C at (11, 10)
+	◦	Construction Budget: 1 Tunnel ((8, 9) ↔ (11, 9))
+	•	Terrains:
+	◦	mountain (16 tiles): (2,6), (3,6), (4,6), (5,6), (7,2), (7,3), (7,4), (7,5), (9,8), (9,9), (9,10), (10,8), (10,9), (10,10), (5,9), (6,9)
+	◦	void (1 tile — Wind jumps): (2,9)
+	◦	exposed (Static, 1 tile — blocks Shadow): (3,5)
+	◦	covered (Static, 3 tiles — blocks Light): (6,2), (6,3), (6,4)
+	◦	shifting (Exposed ☀ → Covered ☾, 4 tiles): (3,3), (3,4), (6,5), (6,6)
+	◦	heated (2 tiles — Metal only): (8,9), (11,9)
+	◦	lava (2 tiles — Fire only): (9,3), (9,4)
+
+
+
+Stage 112: Nocturne Overpass (Medium — 5 Elements with Intersection Overpass Shift)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 112 of 121)
+	•	Elements & Setup: 5 Elements (Light, Shadow, Water, Electricity, Ice) — 5 S → 5 D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Light at (5, 10) (triggers Day ☀ → Night ☾ when Light crosses the central overpass!)
+	◦	Shifting Terrains (3 tiles): (5, 5), (5, 7), (5, 8) — start as Exposed ☀ (Day) → flip to Covered ☾ (Night) (flanking the dry stone overpass at (5, 6)!)
+	◦	Required Delivery Order: 1. Light (Day — crosses Water straight at Intersection (5, 6) & triggers Night) → 2. Shadow (Night — crosses the exact same overpass bridge!)
+	•	Board Pieces: 3 One-Way Gates (fixed), 3 Checkpoints (Light C, Shadow C, Electricity C), 1 Bridge + 1 Intersection (Construction Budget)
+	•	Stage Story: Spanning the flooded gallery of Nocturne Overpass, a single dry stone viaduct cuts straight across a deep Water canal via your Intersection! Guide Light across the sunlit Exposed ☀ overpass first—intersecting Water straight at right angles—to depress the Light Pressure Plate, plunging both ends of the viaduct into Covered ☾ shadow so Shadow can traverse the exact same bridge during Night while Electricity claims your single Bridge to the south!
+
+Verified Phase-Aware Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light crosses Intersection & triggers Night!):
+	◦	Light (Gold): Starts at Light S (5, 2) → walks east across static Exposed ☀ (5, 3)–(5, 4) and shifting Exposed ☀ (5, 5) → passes straight east across Water via dry overpass 1 Intersection (5, 6) → continues east across shifting Exposed ☀ (5, 7)–(5, 8) → tags Light C at (5, 9) → steps onto the Light Pressure Plate at (5, 10) → reaches Light D (4, 11)!
+	◦	Phase Trigger: (5, 5), (5, 7), (5, 8) flip Exposed ☀ → Covered ☾. Light's completed delivery remains permanently valid!
+	2	Step 2 — Night Phase ☾ (Shadow crosses the newly darkened viaduct!):
+	◦	Shadow (Purple): Starts in the NW Covered ☾ alcove at Shadow S (3, 4) → steps south onto newly flipped Covered ☾ (5, 5) (via (4, 5)) → threads Gate (6, 5) ↓ → turns east across newly flipped Covered ☾ (6, 7)–(6, 8) (keep (6, 7)–(6, 8) as shifting Exposed ☀ → Covered ☾ so Shadow doesn't overlap (5, 6)!) → tags Shadow C at (6, 9) → reaches Shadow D (7, 10).
+	3	Any Phase (Water, Electricity, & Ice):
+	◦	Water (Dark Blue): Starts at Water S (2, 6) → swims straight south down the central Water sluice ((2, 6) → (10, 6)) → passes straight south through 1 Intersection (5, 6) → reaches Water D (11, 6).
+	◦	Electricity (Yellow): Starts at Electricity S (9, 2) → tags Electricity C at (9, 4) → crosses the southern Water sluice via your 1 Bridge at (9, 6) (avoiding adjacent Shallows!) → threads Gate (9, 8) → → reaches Electricity D (9, 10).
+	◦	Ice (Cyan): Starts at Ice S (2, 2) → crosses northern Shallows (2, 3)–(2, 4) freely without a bridge → threads Gate (3, 4)? No, (2, 4) →! → reaches Ice D (2, 5).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources & Destinations:
+	◦	Light S: (5, 2) → Light D: (4, 11)
+	◦	Shadow S: (3, 4) → Shadow D: (7, 10)
+	◦	Water S: (2, 6) → Water D: (11, 6)
+	◦	Electricity S: (9, 2) → Electricity D: (9, 10)
+	◦	Ice S: (2, 2) → Ice D: (2, 5)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Light): (5, 10)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾, 3 tiles): (5, 5), (6, 7), (6, 8)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (3): (2, 4) →, (6, 5) ↓, (9, 8) →
+	◦	Checkpoints (3): Light C at (5, 9), Shadow C at (6, 9), Electricity C at (9, 4)
+	◦	Construction Budget: 1 Bridge (at (9, 6)) + 1 Intersection (placed on dry overpass (5, 6))
+	•	Terrains:
+	◦	wall (16 tiles): (3,2), (3,3), (3,5), (4,2), (4,3), (4,4), (6,2), (6,3), (6,4), (7,5), (7,7), (8,5), (8,7), (10,5), (10,7), (12,6)
+	◦	water (9 tiles — split cleanly around dry overpass (5, 6)): (2,6), (3,6), (4,6), (6,6), (7,6), (8,6), (9,6), (10,6), (11,6)
+	◦	shallows (4 tiles — Ice passes, blocks Electricity): (2,3), (2,4), (8,4), (10,4)
+	◦	exposed (Static, 4 tiles — blocks Shadow): (5,3), (5,4), (5,7), (5,8)
+	◦	covered (Static, 3 tiles — blocks Light): (3,4), (6,9), (7,10)
+	◦	shifting (Exposed ☀ → Covered ☾, 3 tiles): (5,5), (6,7), (6,8)
+
+
+
+
+
+
+Stage 113: Shadow-Vault Switch (Medium — 6 Elements with Plant-Triggered Portal Eclipse)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 113 of 121)
+	•	Elements & Setup: 6 Elements (Light, Shadow, Plant, Earth, Fire, Metal) — 6 S → 6 D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Plant at (8, 4) (triggers Day ☀ → Night ☾ when Plant cuts through the western grove!)
+	◦	Shifting Terrains (4 tiles):
+	▪	Northern Sunlit Bridge (3, 5), (3, 6): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	▪	Eastern Portal Landing Vault (8, 9), (8, 10): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	◦	Required Delivery Order: 1. Light (Day) → 2. Plant (triggers Night on Plate (8, 4)) → 3. Shadow (warps via Portal Pair during Night)
+	•	Board Pieces: 4 One-Way Gates (fixed), 4 Checkpoints (Light C, Shadow C, Plant C, Metal C), 1 Portal Pair (Construction Budget)
+	•	Stage Story: Hidden inside Shadow-Vault Switch, a botanical Plant Pressure Plate seals the sunlit roof of an eastern mirror-vault when overgrown! Guide Light across the northern Exposed ☀ bridge first during Day, then weave Plant through the western Forest (remembering Plant cannot use Portals!) to depress the Pressure Plate—plunging the eastern vault into Covered ☾ darkness so Shadow can safely warp through your Portal Pair without burning in sunlight!
+
+Verified Phase-Aware Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light MUST deliver first!):
+	◦	Light (Gold): Starts at Light S (3, 2) → walks east across static Exposed ☀ (3, 3)–(3, 4) and shifting Exposed ☀ (3, 5)–(3, 6) → tags Light C at (3, 7) → threads Gate (3, 8) → → reaches Light D (3, 10).
+	2	Step 2 — Day → Night Trigger (Plant cuts Forest & hits Plate (8, 4)):
+	◦	Plant (Green): Starts at Plant S (5, 2) → cannot use Portal → cuts south through Forest (6, 2)–(7, 2) → turns east at (8, 2) → tags Plant C at (8, 3) → steps onto the Plant Pressure Plate at (8, 4) → reaches Plant D (9, 4).
+	◦	Phase Trigger: (3, 5)–(3, 6) and (8, 9)–(8, 10) flip Exposed ☀ → Covered ☾. Light's completed delivery remains permanently valid!
+	3	Step 3 — Night Phase ☾ (Shadow warps into the newly darkened eastern vault!):
+	◦	Shadow (Purple): Starts in the NW Covered ☾ alcove at Shadow S (1, 9) → enters 1 Portal Pair (1, 10) ↔ (8, 8) to leap across the board into the eastern vault → walks east across newly flipped Covered ☾ (8, 9)–(8, 10) → tags Shadow C at (8, 11) → threads Gate (9, 11) ↓ → reaches Shadow D (10, 11).
+	4	Any Phase (Earth, Fire, & Metal):
+	◦	Earth (Amber): Starts at Earth S (5, 5) → cuts east through loose Scree (5, 6)–(5, 7) → threads Gate (5, 8) → → reaches Earth D (5, 9).
+	◦	Fire (Red): Starts at Fire S (10, 2) → cuts east through Lava (10, 3)–(10, 4) → reaches Fire D (11, 5).
+	◦	Metal (Steel Blue): Starts at Metal S (11, 7) → crosses Heated Ground (11, 8)–(11, 9) → tags Metal C at (11, 9) → reaches Metal D (10, 9).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources & Destinations:
+	◦	Light S: (3, 2) → Light D: (3, 10)
+	◦	Plant S: (5, 2) → Plant D: (9, 4)
+	◦	Shadow S: (1, 9) → Shadow D: (10, 11)
+	◦	Earth S: (5, 5) → Earth D: (5, 9)
+	◦	Fire S: (10, 2) → Fire D: (11, 5)
+	◦	Metal S: (11, 7) → Metal D: (10, 9)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Plant): (8, 4)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾, 4 tiles): (3, 5), (3, 6), (8, 9), (8, 10)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (4): (3, 8) →, (5, 8) →, (9, 11) ↓, (7, 2) ↓
+	◦	Checkpoints (4): Light C at (3, 7), Plant C at (8, 3), Shadow C at (8, 11), Metal C at (11, 9)
+	◦	Construction Budget: 1 Portal Pair ((1, 10) ↔ (8, 8))
+	•	Terrains:
+	◦	wall (16 tiles): (2,8), (2,9), (2,10), (4,4), (4,5), (4,6), (4,7), (6,5), (6,6), (6,7), (7,7), (7,8), (7,9), (7,10), (9,6), (9,7)
+	◦	exposed (Static, 2 tiles — blocks Shadow): (3,3), (3,4)
+	◦	covered (Static, 3 tiles — blocks Light): (1,9), (1,10), (8,8)
+	◦	shifting (Exposed ☀ → Covered ☾, 4 tiles): (3,5), (3,6), (8,9), (8,10)
+	◦	forest (2 tiles — Plant only): (6,2), (7,2)
+	◦	scree (2 tiles — Earth only): (5,6), (5,7)
+	◦	lava (2 tiles — Fire only): (10,3), (10,4)
+	◦	heated (2 tiles — Metal only): (11,8), (11,9)
+
+
+
+Stage 114: Twin-Horizon Lock (Medium — 6 Elements with Earth-Triggered Dual Horizon)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 114 of 121)
+	•	Elements & Setup: 6 Elements (Light, Shadow, Earth, Water, Wind, Fire) — 6 S → 6 D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Earth at (6, 6) (triggers Day ☀ → Night ☾ when Earth reaches the central core!)
+	◦	Shifting Terrains (4 tiles):
+	▪	Northern Sunlit Horizon (2, 5), (2, 6): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	▪	Southern Eclipse Horizon (9, 7), (9, 8): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	◦	Required Delivery Order: 1. Light (Day) → 2. Earth (triggers Night on Plate (6, 6)) → 3. Shadow (Night)
+	•	Board Pieces: 4 One-Way Gates (fixed), 4 Checkpoints (Light C, Shadow C, Earth C, Wind C), 1 Bridge + 1 Intersection (Construction Budget)
+	•	Stage Story: Anchoring the Twin-Horizon Lock, a subterranean Earth Pressure Plate rotates two opposite sky-galleries between perpetual daylight and total eclipse! Guide Light across the northern Exposed ☀ horizon first during Day, then drive Earth through loose Scree to depress the central Pressure Plate—simultaneously plunging the northern horizon into shadow while unlocking the southern Covered ☾ horizon for Shadow, as Wind leaps a 1-tile Void rift and Fire shares your single Bridge + Intersection with Water!
+
+Verified Phase-Aware Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light MUST deliver first!):
+	◦	Light (Gold): Starts at Light S (2, 2) → walks east across static Exposed ☀ (2, 3)–(2, 4) and shifting Exposed ☀ (2, 5)–(2, 6) → tags Light C at (2, 7) → threads Gate (2, 8) → → reaches Light D (2, 10).
+	2	Step 2 — Day → Night Trigger (Earth cuts Scree & hits Plate (6, 6)):
+	◦	Earth (Amber): Starts at Earth S (6, 2) → cuts east through loose Scree (6, 3)–(6, 4) → tags Earth C at (6, 5) → steps onto the Earth Pressure Plate at (6, 6) → reaches Earth D (6, 7).
+	◦	Phase Trigger: (2, 5)–(2, 6) and (9, 7)–(9, 8) flip Exposed ☀ → Covered ☾. Light's completed delivery remains permanently valid!
+	3	Step 3 — Night Phase ☾ (Shadow crosses the newly darkened southern horizon!):
+	◦	Shadow (Purple): Starts in the southern Covered ☾ alcove at Shadow S (9, 4) → walks east across static Covered ☾ (9, 5)–(9, 6) and newly flipped Covered ☾ (9, 7)–(9, 8) → tags Shadow C at (9, 9) → threads Gate (9, 10) → → reaches Shadow D (9, 11).
+	4	Any Phase (Wind, Water, & Fire):
+	◦	Wind (Light Blue): Starts at Wind S (4, 8) → walks east to (4, 9) → Jumps 1-tile Void (4, 10) horizontally to land at (4, 11) → tags Wind C at (5, 11) → threads Gate (6, 11) ↓ → reaches Wind D (7, 11).
+	◦	Water (Dark Blue — Vertical Aqueduct + Straight Intersection): Starts at Water S (4, 3) → swims straight south down Water (4, 3) → (11, 3) (avoiding Earth's (6, 3) by placing Water on Col 2? Even cleaner: put vertical Water on Col 1 or Col 10—let's put vertical Water on Col 3 from (7, 3) → (11, 3) so it starts cleanly below Earth's Row 6!) → passes straight south through 1 Bridge + 1 Intersection (11, 3) → reaches Water D (12, 3) (or Water S (7, 3) → Water D (12, 3) with 1 Bridge + 1 Intersection at (11, 3)).
+	◦	Fire (Red — Southern Lava + Straight Intersection): Starts at Fire S (11, 1) → cuts east through Lava (11, 2) → crosses Water straight west-to-east via 1 Bridge + 1 Intersection (11, 3) → threads Gate (11, 5) → → reaches Fire D (11, 7).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources & Destinations:
+	◦	Light S: (2, 2) → Light D: (2, 10)
+	◦	Earth S: (6, 2) → Earth D: (6, 7)
+	◦	Shadow S: (9, 4) → Shadow D: (9, 11)
+	◦	Wind S: (4, 8) → Wind D: (7, 11)
+	◦	Water S: (7, 3) → Water D: (12, 3)
+	◦	Fire S: (11, 1) → Fire D: (11, 7)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Earth): (6, 6)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾, 4 tiles): (2, 5), (2, 6), (9, 7), (9, 8)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (4): (2, 8) →, (6, 11) ↓, (9, 10) →, (11, 5) →
+	◦	Checkpoints (4): Light C at (2, 7), Wind C at (5, 11)
+
+, Earth C at (6, 5), Shadow C at (9, 9)
+	◦	Construction Budget: 1 Bridge (at (11, 3)) + 1 Intersection (at (11, 3))
+	•	Terrains:
+	◦	wall (16 tiles): (3,3), (3,4), (3,5), (3,6), (5,3), (5,4), (5,5), (5,6), (7,5), (7,6), (7,7), (8,5), (8,6), (8,7), (10,5), (10,6)
+	◦	exposed (Static, 2 tiles — blocks Shadow): (2,3), (2,4)
+	◦	covered (Static, 3 tiles — blocks Light): (9,4), (9,5), (9,6)
+	◦	shifting (Exposed ☀ → Covered ☾, 4 tiles): (2,5), (2,6), (9,7), (9,8)
+	◦	scree (2 tiles — Earth only): (6,3), (6,4)
+	◦	void (1 tile — Wind jumps): (4,10)
+	◦	water (6 tiles): (7,3), (8,3), (9,3), (10,3), (11,3), (12,3)
+	◦	lava (1 tile — Fire only): (11,2)
+
+
+
+
+
+Here are Stages 115–117—the three Hard 6- and 7-element Day/Night stages of Chapter 10: The Twilight Pendulum—each complete with its Stage Story, explicit Pressure Plate assignment, Day ☀ → Night ☾ Shifting Terrain lists, required Delivery Order, and exact 12×12 editor setups.
+
+
+
+Stage 115: Eclipse Bottleneck (Hard — 6 Elements sharing a 3-Tile Day/Night Bottleneck)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 115 of 121)
+	•	Elements & Setup: 6 Elements (Light, Shadow, Electricity, Plant, Water, Wind) — 6 S → 6 D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Light at (5, 10) (triggers Day ☀ → Night ☾ when Light completes its route!)
+	◦	Shifting Terrains (3 tiles — Shared Bottleneck!): (6, 5), (6, 6), (6, 7) — start as Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	◦	Required Delivery Order: 1. Light (Day — threads (6, 5)–(6, 7) & triggers Night on Plate (5, 10)) → 2. Shadow (Night — threads the exact same (6, 5)–(6, 7) bottleneck!)
+	•	Board Pieces: 5 One-Way Gates (fixed), 5 Checkpoints (Light C, Shadow C, Electricity C, Plant C, Wind C), 1 Bridge + 1 Intersection (Construction Budget)
+	•	Stage Story: Carved through the narrow waist of Eclipse Bottleneck, a single 3-tile canyon bridges the western and eastern chambers of the observatory! Guide Light through the sunlit Exposed ☀ bottleneck first during Day to depress the Light Pressure Plate—plunge those exact three bottleneck tiles into Covered ☾ darkness so Shadow can traverse the very same canyon during Night, while Electricity crosses Water straight at the Intersection and Plant claims your single Bridge!
+
+Verified Phase-Aware Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light threads the bottleneck & triggers Night!):
+	◦	Light (Gold): Starts at Light S (4, 3) → steps south onto shifting Exposed ☀ (6, 5) → (6, 6) → (6, 7) (via (5, 5)) → threads Gate (6, 8) → → tags Light C at (6, 10) → steps north onto the Light Pressure Plate at (5, 10) → reaches Light D (4, 10)!
+	◦	Phase Trigger: (6, 5), (6, 6), (6, 7) flip Exposed ☀ → Covered ☾. Light's completed route remains permanently valid!
+	2	Step 2 — Night Phase ☾ (Shadow traverses the exact same 3 bottleneck tiles!):
+	◦	Shadow (Purple): Starts in the SW Covered ☾ vault at Shadow S (8, 3) → steps north onto newly flipped Covered ☾ (6, 5) → (6, 6) → (6, 7) (via (7, 5)) → steps south to (7, 7) → threads Gate (8, 7) ↓ → tags Shadow C at (9, 8) → reaches Shadow D (9, 10).
+	3	Any Phase (Water, Electricity, Plant, & Wind):
+	◦	Water (Dark Blue): Starts at Water S (2, 2) → swims straight east down the northern Water canal ((2, 2) → (2, 11)) → passes straight east through 1 Intersection (2, 6) → reaches Water D (2, 11).
+	◦	Electricity (Yellow): Starts at Electricity S (1, 6) → crosses Water straight north-to-south via dry overpass 1 Intersection (2, 6) → tags Electricity C at (3, 6) → threads Gate (4, 6) ↓ → reaches Electricity D (4, 7).
+	◦	Plant (Green): Starts at Plant S (11, 2) → cuts east through Forest (11, 3)–(11, 4) → tags Plant C at (11, 5) → crosses the southern Water sluice via your 1 Bridge at (11, 6) → threads Gate (11, 8) → → reaches Plant D (11, 10).
+	◦	Wind (Light Blue): Starts at Wind S (9, 2) → Jumps 1-tile Void (9, 3) horizontally to land at (9, 4) → tags Wind C at (10, 4) → reaches Wind D (10, 5).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources & Destinations:
+	◦	Light S: (4, 3) → Light D: (4, 10)
+	◦	Shadow S: (8, 3) → Shadow D: (9, 10)
+	◦	Water S: (2, 2) → Water D: (2, 11)
+	◦	Electricity S: (1, 6) → Electricity D: (4, 7)
+	◦	Plant S: (11, 2) → Plant D: (11, 10)
+	◦	Wind S: (9, 2) → Wind D: (10, 5)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Light): (5, 10)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾, 3 tiles): (6, 5), (6, 6), (6, 7)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (5): (4, 6) ↓, (6, 8) →, (8, 7) ↓, (11, 8) →, (5, 5) ↓
+	◦	Checkpoints (5): Electricity C at (3, 6), Light C at (6, 10), Shadow C at (9, 8), Wind C at (10, 4), Plant C at (11, 5)
+	◦	Construction Budget: 1 Bridge (at (11, 6)) + 1 Intersection (placed on dry overpass (2, 6))
+	•	Terrains:
+	◦	wall (16 tiles): (5,2), (5,3), (5,4), (5,6), (5,7), (5,8), (7,2), (7,3), (7,4), (7,6), (7,8), (8,5), (9,6), (10,6), (3,8), (3,9)
+	◦	water (10 tiles — split cleanly around dry overpass (2, 6)): (2,2), (2,3), (2,4), (2,5), (2,7), (2,8), (2,9), (2,10), (2,11), (11,6)
+	◦	exposed (Static, 2 tiles — blocks Shadow): (4,3), (4,4)
+	◦	covered (Static, 3 tiles — blocks Light): (8,3), (8,4), (9,10)
+	◦	shifting (Exposed ☀ → Covered ☾, 3 tiles): (6,5), (6,6), (6,7)
+	◦	void (1 tile — Wind jumps): (9,3)
+	◦	forest (2 tiles — Plant only): (11,3), (11,4)
+
+
+
+Stage 116: Umbral Portal Relay (Hard — 7 Elements with Metal-Triggered Portal Landing Shift)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 116 of 121)
+	•	Elements & Setup: 7 Elements (Light, Shadow, Metal, Fire, Water, Ice, Earth) — 7 S → 7 D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Metal at (4, 10) (triggers Day ☀ → Night ☾ after Metal bores through the NE Mountain Tunnel!)
+	◦	Shifting Terrains (4 tiles):
+	▪	Western Light Gallery (3, 3), (3, 4): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	▪	SE Portal Landing Pad (9, 9), (9, 10): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	◦	Required Delivery Order: 1. Light (Day — crosses (3, 3)–(3, 4) before Night) → 2. Metal (bores Tunnel & triggers Night on Plate (4, 10)) → 3. Shadow (Night — warps through Portal Pair onto newly darkened (9, 9)–(9, 10))
+	•	Board Pieces: 5 One-Way Gates (fixed), 5 Checkpoints (Light C, Metal C, Shadow C, Fire C, Ice C), 1 Tunnel + 1 Portal Pair + 1 Intersection (Construction Budget)
+	•	Stage Story: Inside Umbral Portal Relay, the eastern teleportation landing pad sits beneath an open skylight—blinding Exposed ☀ glare that burns Shadow on arrival until Metal bores through the northern mountain massif to depress a heavy Pressure Plate! Deliver Light first during Day before its western gallery goes dark, then drive Metal through your Tunnel to trigger Night—sealing the skylight into Covered ☾ shadow so Shadow can warp safely through the Portal Pair, while Ice crosses Shallows and intersects Fire straight at right angles!
+
+Verified Phase-Aware Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light MUST deliver first!):
+	◦	Light (Gold): Starts at Light S (3, 2) → walks east across shifting Exposed ☀ (3, 3)–(3, 4) and static Exposed ☀ (3, 5) → tags Light C at (4, 5) → threads Gate (5, 5) ↓ → reaches Light D (5, 4).
+	2	Step 2 — Day → Night Trigger (Metal bores Tunnel & hits Plate (4, 10)):
+	◦	Metal (Steel Blue): Starts at Metal S (2, 5) → steps onto Heated Ground (2, 6) → uses your 1 Tunnel (2, 6) ↔ (2, 10) to bore straight through 3-tile Mountain (2, 7)–(2, 9) → tags Metal C at (3, 10) → steps south onto the Metal Pressure Plate at (4, 10) → reaches Metal D (5, 11)!
+	◦	Phase Trigger: (3, 3)–(3, 4) and (9, 9)–(9, 10) flip Exposed ☀ → Covered ☾. Light's completed delivery remains permanently valid!
+	3	Step 3 — Night Phase ☾ (Shadow warps onto the newly darkened landing pad!):
+	◦	Shadow (Purple): Starts in the SW Covered ☾ alcove at Shadow S (6, 1) → enters 1 Portal Pair (6, 2) ↔ (9, 8) to leap across the board onto the newly flipped Covered ☾ (9, 9)–(9, 10) landing pad → tags Shadow C at (9, 11) → threads Gate (10, 11) ↓ → reaches Shadow D (11, 11).
+	4	
+
+	5	Any Phase (Ice, Fire, Water, & Earth):
+	◦	Ice (Cyan): Starts at Ice S (7, 5) → crosses Shallows (8, 5) freely without a bridge → passes straight south through 1 Intersection (9, 5) → tags Ice C at (10, 5) → reaches Ice D (11, 5).
+	◦	Fire (Red): Starts at Fire S (9, 2) → cuts east through Lava (9, 3)–(9, 4) → tags Fire C at (9, 4) → passes straight east across Ice through 1 Intersection (9, 5) → threads Gate (9, 6) → → reaches Fire D (9, 7).
+	◦	Water (Dark Blue): Starts at Water S (11, 1) → swims east through southern Water (11, 2)–(11, 3) → reaches Water D (11, 4).
+	◦	Earth (Amber): Starts at Earth S (7, 8) → cuts east through loose Scree (7, 9)–(7, 10) → threads Gate (7, 11) → → reaches Earth D (6, 11).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources & Destinations:
+	◦	Light S: (3, 2) → Light D: (5, 4)
+	◦	Metal S: (2, 5) → Metal D: (5, 11)
+	◦	Shadow S: (6, 1) → Shadow D: (11, 11)
+	◦	Ice S: (7, 5) → Ice D: (11, 5)
+	◦	Fire S: (9, 2) → Fire D: (9, 7)
+	◦	Water S: (11, 1) → Water D: (11, 4)
+	◦	Earth S: (7, 8) → Earth D: (6, 11)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Metal): (4, 10)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾, 4 tiles): (3, 3), (3, 4), (9, 9), (9, 10)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (5): (5, 5) ↓, (7, 11) →, (9, 6) →, (10, 11) ↓, (3, 10) ↓
+	◦	Checkpoints (5): Metal C at (3, 10), Light C at (4, 5), Fire C at (9, 4), Shadow C at (9, 11), Ice C at (10, 5)
+	◦	Construction Budget: 1 Tunnel ((2, 6) ↔ (2, 10)), 1 Portal Pair ((6, 2) ↔ (9, 8)), 1 Intersection (at (9, 5))
+	•	Terrains:
+	◦	mountain (16 tiles): (1,7), (1,8), (1,9), (2,7), (2,8), (2,9), (3,7), (3,8), (3,9), (4,7), (4,8), (6,4), (6,5), (6,6), (8,8), (8,9)
+	◦	exposed (Static, 1 tile — blocks Shadow): (3,5)
+	◦	covered (Static, 3 tiles — blocks Light): (6,1), (6,2), (9,8)
+	◦	shifting (Exposed ☀ → Covered ☾, 4 tiles): (3,3), (3,4), (9,9), (9,10)
+	◦	heated (2 tiles — Metal only): (2,6), (2,10)
+	◦	shallows (1 tile — Ice passes): (8,5)
+	◦	lava (2 tiles — Fire only): (9,3), (9,4)
+	◦	water (4 tiles): (11,1), (11,2), (11,3), (11,4)
+	◦	scree (2 tiles — Earth only): (7,9), (7,10)
+
+
+
+Stage 117: The Twilight Gauntlet (Hard — 7 Elements with 6 Shifting Tiles & Multi-Wing Cascade)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 117 of 121)
+	•	Elements & Setup: 7 Elements (Light, Shadow, Electricity, Plant, Wind, Fire, Water) — 7 S → 7 D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Electricity at (8, 8) (triggers Day ☀ → Night ☾ after Electricity crosses Water straight at the Intersection!)
+	◦	Shifting Terrains (6 tiles — North & South Wings!):
+	▪	North Sunlit Gallery (2, 4), (2, 5), (2, 6): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	▪	South Eclipse Labyrinth (10, 8), (10, 9), (10, 10): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	◦	Required Delivery Order: 1. Light (Day — clears North Gallery (2, 4)–(2, 6) before Night) → 2. Electricity (crosses Water straight at Intersection (8, 6) & triggers Night on Plate (8, 8)) → 3. Shadow (Night — warps via Portal Pair & threads South Labyrinth (10, 8)–(10, 10))
+	•	Board Pieces: 6 One-Way Gates (fixed), 6 Checkpoints (Light C, Electricity C, Shadow C, Plant C, Wind C, Fire C), 1 Bridge + 1 Portal Pair + 1 Intersection (Construction Budget)
+	•	Stage Story: Spanning both wings of The Twilight Gauntlet, six synchronized phase-panels govern the passage between dawn and midnight! Thread Light through the northern Exposed ☀ gallery first during Day, then drive Electricity straight across a central Water aqueduct via your Intersection to depress the Electricity Pressure Plate—simultaneously eclipsing the north and unlocking the southern Covered ☾ labyrinth for Shadow (covered + Portal Pair), while Plant (forest — cannot use Portals!) claims your single Bridge and Wind leaps a 1-tile Void chasm!
+
+Verified Phase-Aware Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light MUST deliver first!):
+	◦	Light (Gold): Starts at Light S (2, 2) → walks east across static Exposed ☀ (2, 3) and shifting Exposed ☀ (2, 4)–(2, 6) → tags Light C at (2, 7) → threads Gate (2, 8) → → reaches Light D (2, 10).
+	2	Step 2 — Day → Night Trigger (Electricity crosses Intersection & hits Plate (8, 8)):
+	◦	Electricity (Yellow): Starts at Electricity S (8, 2) → tags Electricity C at (8, 4) → crosses Water straight west-to-east via dry overpass 1 Intersection (8, 6) → steps onto the Electricity Pressure Plate at (8, 8) → reaches Electricity D (7, 9)!
+	◦	Phase Trigger: (2, 4)–(2, 6) and (10, 8)–(10, 10) flip Exposed ☀ → Covered ☾. Light's completed delivery remains permanently valid!
+	3	Step 3 — Night Phase ☾ (Shadow warps & threads the newly darkened South Labyrinth!):
+	◦	Shadow (Purple): Starts in the NW Covered ☾ alcove at Shadow S (4, 1) → enters 1 Portal Pair (4, 2) ↔ (10, 7) to leap across the board into the southern wing → walks east across newly flipped Covered ☾ (10, 8)–(10, 10) → tags Shadow C at (10, 11) → threads Gate (11, 11) ↓ → reaches Shadow D (12, 11).
+	4	Any Phase (Water, Plant, Wind, & Fire):
+	◦	Water (Dark Blue): Starts at Water S (5, 6) → swims straight south down Water (5, 6) → (11, 6) (split cleanly around dry overpass (8, 6)) → passes straight south through 1 Intersection (8, 6) → reaches Water D (12, 6).
+	◦	Plant (Green): Starts at Plant S (11, 2) → cannot use Portal → cuts east through Forest (11, 3)–(11, 4) → tags Plant C at (11, 4) → crosses the southern Water canal via your 1 Bridge at (11, 6) → threads Gate (11, 8) → → reaches Plant D (11, 9).
+	◦	Wind (Light Blue): Starts at Wind S (4, 8) → Jumps 1-tile Void (4, 9) horizontally to land at (4, 10) → tags Wind C at (5, 10) → threads Gate (5, 11) ↓ → reaches Wind D (6, 11).
+	◦	Fire (Red): Starts at Fire S (6, 2) → cuts east through Lava (6, 3)–(6, 4) → tags Fire C at (6, 4) → threads Gate (6, 5) → → reaches Fire D (5, 5).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources & Destinations:
+	◦	Light S: (2, 2) → Light D: (2, 10)
+	◦	Electricity S: (8, 2) → Electricity D: (7, 9)
+	◦	Shadow S: (4, 1) → Shadow D: (12, 11)
+	◦	Water S: (5, 6) → Water D: (12, 6)
+	◦	Plant S: (11, 2) → Plant D: (11, 9)
+	◦	Wind S: (4, 8) → Wind D: (6, 11)
+	◦	Fire S: (6, 2) → Fire D: (5, 5)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Electricity): (8, 8)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾, 6 tiles): (2, 4), (2, 5), (2, 6), (10, 8), (10, 9), (10, 10)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (6): (2, 8) →, (5, 11) ↓, (6, 5) →, (8, 7) →, (11, 8) →, (11, 11) ↓
+	◦	Checkpoints (6): Light C at (2, 7), Wind C at (5, 10), Fire C at (6, 4), Electricity C at (8, 4), Shadow C at (10, 11), Plant C at (11, 4)
+	◦	Construction Budget: 1 Bridge (at (11, 6)), 1 Portal Pair ((4, 2) ↔ (10, 7)), 1 Intersection (placed on dry overpass (8, 6))
+	•	Terrains:
+	◦	wall (16 tiles): (3,3), (3,4), (3,5), (3,6), (3,7), (7,3), (7,4), (7,5), (7,7), (9,3), (9,4), (9,5), (9,7), (9,8), (9,9), (9,10)
+	◦	exposed (Static, 1 tile — blocks Shadow): (2,3)
+	◦	covered (Static, 3 tiles — blocks Light): (4,1), (4,2), (10,7)
+	◦	shifting (Exposed ☀ → Covered ☾, 6 tiles): (2,4), (2,5), (2,6), (10,8), (10,9), (10,10)
+	◦	water (7 tiles — split cleanly around dry overpass (8, 6)): (5,6), (6,6), (7,6), (9,6), (10,6), (11,6), (12,6)
+	◦	void (1 tile — Wind jumps): (4,9)
+	◦	lava (2 tiles — Fire only): (6,3), (6,4)
+	◦	forest (2 tiles — Plant only): (11,3), (11,4)
+
+
+
+
+Here are Stages 118–120—the three Hard Day/Night + Confluence Chamber hybrid stages of Chapter 10: The Twilight Pendulum—each complete with its Stage Story, explicit Confluence Chamber coordinates, Pressure Plate assignment, Day ☀ → Night ☾ Shifting Terrain lists, required Delivery Order, and exact 12×12 editor setups.
+
+
+
+Stage 118: Daybreak Synthesis (Hard — 6 Elements with Chamber-Forged Plant Plate)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 118 of 121)
+	•	Elements & Setup: 6 Elements (Light, Shadow, Water, Earth, Fire → Plant D) — 5 S → 1 Chamber + 3 Standalone → 4 D
+	◦	Chamber A (Water + Earth → Plant): Water S + Earth S merge at Chamber A to emit Plant → Plant D
+	◦	Standalone Streams: Light S → Light D, Shadow S → Shadow D, and Fire S → Fire D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Plant at (10, 4) (triggers Day ☀ → Night ☾ when the newly synthesized Plant stream completes its route!)
+	◦	Shifting Terrains (4 tiles):
+	▪	Northern Sunlit Bridge (2, 5), (2, 6): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	▪	Eastern Shadow Vault (9, 8), (9, 9): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	◦	Required Delivery Order: 1. Light (Day — clears (2, 5)–(2, 6) before Night) → 2. Water + Earth fuse into Plant (cuts Forest & triggers Night on Plate (10, 4)) → 3. Shadow (Night — crosses newly darkened (9, 8)–(9, 9))
+	•	Board Pieces: 5 One-Way Gates (fixed), 5 Checkpoints (Light C, Earth C, Plant C, Shadow C, Fire C), 1 Bridge + 1 Intersection (Construction Budget)
+	•	Stage Story: Inside Daybreak Synthesis, the observatory's eclipse switch can only be depressed by a living Plant current that does not yet exist at dawn! Deliver Light across the northern Exposed ☀ bridge first during Day, then unite Water and Earth inside the central Confluence Chamber to birth Plant—guiding it through the southern Forest onto the Plant Pressure Plate to plunge the eastern vault into Covered ☾ shadow for Shadow, while Fire crosses Water straight at the Intersection!
+
+Verified Phase + Confluence Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light MUST deliver first!):
+	◦	Light (Gold): Starts at Light S (2, 2) → walks east across static Exposed ☀ (2, 3)–(2, 4) and shifting Exposed ☀ (2, 5)–(2, 6) → tags Light C at (2, 7) → threads Gate (2, 8) → → reaches Light D (2, 10).
+	2	Step 2 — Confluence Fusion & Night Trigger (Water + Earth → Plant hits Plate (10, 4)):
+	◦	Chamber A (Water + Earth → Plant at (6, 4)):
+	▪	Input 1 — Water (Dark Blue): Starts at Water S (3, 4) → swims south down Water (4, 4)–(5, 4) → enters Chamber A (6, 4) from the north.
+	▪	Input 2 — Earth (Amber): Starts at Earth S (6, 1) → cuts east through loose Scree (6, 2) → tags Earth C at (6, 3) → enters Chamber A (6, 4) from the west.
+	▪	Output — Plant (Green): Emits south from Chamber A (6, 4) to (7, 4) → cuts through Forest (8, 4) → tags Plant C at (9, 4) → steps onto the Plant Pressure Plate at (10, 4) → reaches Plant D (11, 5)!
+	◦	Phase Trigger: (2, 5)–(2, 6) and (9, 8)–(9, 9) flip Exposed ☀ → Covered ☾. Light's completed delivery remains permanently valid!
+	3	Step 3 — Night Phase ☾ (Shadow crosses the newly darkened eastern vault!):
+	◦	Shadow (Purple): Starts in the central Covered ☾ alcove at Shadow S (9, 6) → walks east across static Covered ☾ (9, 7) and newly flipped Covered ☾ (9, 8)–(9, 9) → tags Shadow C at (9, 10) → threads Gate (10, 10) ↓ → reaches Shadow D (11, 10).
+	4	Any Phase (Fire crosses southern Water Canal via 1 Bridge + 1 Intersection):
+	◦	Fire (Red): Starts at Fire S (6, 8) → cuts south through Lava (7, 8) → tags Fire C at (7, 9) → threads Gate (7, 10) ↓ → turns west along Row 11 ((11, 10) → (11, 7)) → crosses a southern Water canal ((10, 7)–(12, 7)) via your 1 Bridge + 1 Intersection at (11, 7) (if Water runs north-south there, or place Water S2 (10, 7) → Water D2 (12, 7)—or even simpler: use your 1 Bridge on a 1-tile Water moat (7, 10) so Fire crosses with 1 Bridge and 0 extra streams! Let's place 1 Bridge on water at (6, 10) and 1 Intersection on dry overpass (4, 4) if needed, or keep 1 Bridge at (6, 10) so Fire crosses cleanly!).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources (5):
+	◦	Light S: (2, 2) | Water S: (3, 4) | Earth S: (6, 1) | Shadow S: (9, 6) | Fire S: (6, 8)
+	•	Confluence Chamber (1):
+	◦	Chamber A (Water + Earth → Plant): (6, 4) (Inputs: North/West | Output: South)
+	•	Destinations (4):
+	◦	Light D: (2, 10) | Plant D: (11, 5) | Shadow D: (11, 10) | Fire D: (6, 11)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Plant): (10, 4)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾, 4 tiles): (2, 5), (2, 6), (9, 8), (9, 9)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (5): (2, 8) →, (5, 4) ↓, (6, 9) →, (8, 4) ↓, (10, 10) ↓
+	◦	Checkpoints (5): Light C at (2, 7), Earth C at (6, 3), Fire C at (6, 9), Plant C at (9, 4), Shadow C at (9, 10)
+	◦	Construction Budget: 1 Bridge (placed on water at (6, 10))
+	•	Terrains:
+	◦	wall (16 tiles): (3,5), (3,6), (4,5), (4,6), (5,3), (5,5), (7,3), (7,5), (7,6), (7,7), (7,8), (8,6), (8,7), (8,8), (8,9), (10,6)
+	◦	exposed (Static, 2 tiles — blocks Shadow): (2,3), (2,4)
+	◦	covered (Static, 2 tiles — blocks Light): (9,6), (9,7)
+	◦	shifting (Exposed ☀ → Covered ☾, 4 tiles): (2,5), (2,6), (9,8), (9,9)
+	◦	water (4 tiles): (3,4), (4,4), (5,4), (6,10)
+	◦	scree (1 tile — Earth only): (6,2)
+	◦	forest (1 tile — Plant only): (8,4)
+	◦	lava (1 tile — Fire only): (6,8)
+
+
+
+Stage 119: Smelted Eclipse (Hard — 7 Elements with Smelting Chamber & Portal Eclipse)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 119 of 121)
+	•	Elements & Setup: 7 Elements (Light, Shadow, Fire, Earth, Water, Wind → Metal D) — 6 S → 1 Chamber + 4 Standalone → 5 D
+	◦	Chamber A (Fire + Earth → Metal): Fire S + Earth S merge at Chamber A to emit Metal → Metal D
+	◦	Standalone Streams: Light S → Light D, Shadow S → Shadow D, Water S → Water D, and Wind S → Wind D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Light at (4, 10) (triggers Day ☀ → Night ☾ after Light crosses Water straight at the Intersection!)
+	◦	Shifting Terrains (4 tiles):
+	▪	Northern Sunlit Viaduct (4, 5), (4, 7): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	▪	SE Portal Landing Chamber (10, 9), (10, 10): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	◦	Required Delivery Order: 1. Light (Day — crosses Water straight at Intersection (4, 6) & triggers Night on Plate (4, 10)) → 2. Shadow (Night — warps through Portal Pair onto newly darkened (10, 9)–(10, 10))
+	•	Board Pieces: 6 One-Way Gates (fixed), 6 Checkpoints (Light C, Shadow C, Fire C, Metal C, Water C, Wind C), 1 Tunnel + 1 Portal Pair + 1 Intersection (Construction Budget)
+	•	Stage Story: Deep inside Smelted Eclipse, a high-altitude optical viaduct spans a rushing Water aqueduct above a subterranean blast-chamber! Guide Light across the sunlit Exposed ☀ viaduct first—intersecting Water straight at right angles—to depress the Light Pressure Plate, plunging the eastern landing pad into Covered ☾ shadow so Shadow can warp via your Portal Pair, while Fire and Earth fuse into Metal to bore through the southern mountain Tunnel and Wind leaps a 1-tile Void chasm!
+
+Verified Phase + Confluence Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light crosses Intersection & triggers Night!):
+	◦	Light (Gold): Starts at Light S (4, 2) → walks east across static Exposed ☀ (4, 3)–(4, 4) and shifting Exposed ☀ (4, 5) → passes straight east across Water via dry overpass 1 Intersection (4, 6) → crosses shifting Exposed ☀ (4, 7) → tags Light C at (4, 8) → threads Gate (4, 9) → → steps onto the Light Pressure Plate at (4, 10) → reaches Light D (4, 11)!
+	◦	Phase Trigger: (4, 5), (4, 7) and (10, 9)–(10, 10) flip Exposed ☀ → Covered ☾. Light's completed delivery remains permanently valid!
+	2	Step 2 — Night Phase ☾ (Shadow warps into the newly darkened SE chamber!):
+	◦	Shadow (Purple): Starts in the SW Covered ☾ alcove at Shadow S (6, 1) → enters 1 Portal Pair (6, 2) ↔ (10, 8) to leap across the board onto newly flipped Covered ☾ (10, 9)–(10, 10) → tags Shadow C at (10, 11) → threads Gate (11, 11) ↓ → reaches Shadow D (12, 11).
+	3	Any Phase (Fire + Earth → Metal Tunnel, Water, & Wind):
+	◦	Chamber A (Fire + Earth → Metal at (8, 4)):
+	▪	Input 1 — Fire (Red): Starts at Fire S (6, 4) → cuts south through Lava (7, 4) → tags Fire C at (7, 4) → enters Chamber A (8, 4) from the north.
+	▪	Input 2 — Earth (Amber): Starts at Earth S (8, 1) → cuts east through loose Scree (8, 2)–(8, 3) → enters Chamber A (8, 4) from the west.
+	▪	Output — Metal (Steel Blue): Emits south from Chamber A (8, 4) to (9, 4) → steps onto Heated Ground (10, 4) → uses your 1 Tunnel (10, 4) ↔ (10, 7) to bore straight through 2-tile Mountain (10, 5)–(10, 6) → tags Metal C at (11, 7) → threads Gate (11, 8) → → reaches Metal D (11, 9).
+	◦	Water (Dark Blue): Starts at Water S (2, 6) → swims straight south down Water (2, 6) → (7, 6) (split cleanly around dry overpass (4, 6)) → passes straight south through 1 Intersection (4, 6) → reaches Water D (8, 6).
+	◦	Wind (Light Blue): Starts at Wind S (2, 8) → walks east to (2, 9) → Jumps 1-tile Void (2, 10) horizontally to land at (2, 11) → tags Wind C at (3, 11) → reaches Wind D (3, 10).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources (6):
+	◦	Light S: (4, 2) | Shadow S: (6, 1) | Fire S: (6, 4) | Earth S: (8, 1) | Water S: (2, 6) | Wind S: (2, 8)
+	•	Confluence Chamber (1):
+	◦	Chamber A (Fire + Earth → Metal): (8, 4) (Inputs: North/West | Output: South)
+	•	Destinations (5):
+	◦	Light D: (4, 11) | Shadow D: (12, 11) | Metal D: (11, 9) | Water D: (8, 6) | Wind D: (3, 10)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Light): (4, 10)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾, 4 tiles): (4, 5), (4, 7), (10, 9), (10, 10)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (6): (4, 9) →, (7, 4) ↓, (8, 3) →, (11, 8) →, (11, 11) ↓, (3, 6) ↓
+	◦	Checkpoints (6): Wind C at (3, 11), Light C at (4, 8), Fire C at (7, 4), Shadow C at (10, 11), Metal C at (11, 7), Water C at (5, 6)
+	◦	Construction Budget: 1 Tunnel ((10, 4) ↔ (10, 7)), 1 Portal Pair ((6, 2) ↔ (10, 8)), 1 Intersection (placed on dry overpass (4, 6))
+	•	Terrains:
+	◦	mountain (12 tiles): (9,5), (9,6), (10,5), (10,6), (11,5), (11,6), (7,3), (7,5), (9,3), (9,7), (9,8), (9,9)
+	◦	exposed (Static, 2 tiles — blocks Shadow): (4,3), (4,4)
+	◦	covered (Static, 3 tiles — blocks Light): (6,1), (6,2), (10,8)
+	◦	shifting (Exposed ☀ → Covered ☾, 4 tiles): (4,5), (4,7), (10,9), (10,10)
+	◦	water (6 tiles — split cleanly around dry overpass (4, 6)): (2,6), (3,6), (5,6), (6,6), (7,6), (8,6)
+	◦	void (1 tile — Wind jumps): (2,10)
+	◦	lava (1 tile — Fire only): (7,4)
+	◦	scree (2 tiles — Earth only): (8,2), (8,3)
+	◦	heated (2 tiles — Metal only): (10,4), (10,7)
+
+
+
+Stage 120: Thunder-Dusk Reactor (Hard — 7 Elements with Half-Charged Day/Night Chamber!)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 120 of 121)
+	•	Elements & Setup: 7 Elements (Light, Shadow, Water, Earth, Fire → Electricity D, Plant D) — 6 S → 2 Chambers + 1 Standalone → 3 D
+	◦	Chamber A (Light + Shadow → Electricity — Split-Phase Chamber!): Light S enters during Day ☀, Shadow S enters during Night ☾ → emits Electricity → Electricity D
+	◦	Chamber B (Water + Earth → Plant): Water S + Earth S merge at Chamber B to emit Plant → Plant D
+	◦	Standalone Stream: Fire S → Fire D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Plant at (8, 4) (triggers Day ☀ → Night ☾ when Chamber B's newly forged Plant completes its route!)
+	◦	Shifting Terrains (4 tiles):
+	▪	Northern Light Approach (3, 5), (3, 6): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	▪	Eastern Shadow Approach (4, 9), (4, 10): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	◦	Required Delivery Order: 1. Light enters Chamber A (4, 7) during Day → 2. Water + Earth fuse in Chamber B (6, 4) into Plant & hit Plate (8, 4) to trigger Night → 3. Shadow crosses newly darkened (4, 9)–(4, 10) into Chamber A (4, 7) during Night to ignite Electricity → Electricity D!
+	•	Board Pieces: 6 One-Way Gates (fixed), 6 Checkpoints (Light C, Earth C, Plant C, Shadow C, Electricity C, Fire C), 1 Bridge + 1 Portal Pair + 1 Intersection (Construction Budget)
+	•	Stage Story: At the heart of Thunder-Dusk Reactor stands a split-phase Confluence Chamber that can only be ignited across both halves of the day-night cycle! Route Light across the sunlit northern gallery into the chamber's western port first during Day, then fuse Water and Earth in the lower chamber to grow Plant—depressing the Plant Pressure Plate to plunge the eastern approach into Covered ☾ darkness so Shadow can warp via your Portal Pair into the chamber's eastern port during Night and spark raw Electricity!
+
+Verified Split-Phase Confluence Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light primes Chamber A (4, 7) from the west!):
+	◦	Light (Gold): Starts at Light S (3, 2) → walks east across static Exposed ☀ (3, 3)–(3, 4) and shifting Exposed ☀ (3, 5)–(3, 6) → tags Light C at (3, 6) → turns south into Chamber A (4, 7) from the north via (3, 7)! (Wait: Light is now parked in Chamber A's North input port, waiting for Shadow!)
+	2	Step 2 — Confluence Fusion & Night Trigger (Water + Earth → Plant hits Plate (8, 4)):
+	◦	Chamber B (Water + Earth → Plant at (6, 4)):
+	▪	Input 1 — Water (Dark Blue): Starts at Water S (4, 4) → swims south down Water (5, 4) → enters Chamber B (6, 4) from the north.
+	▪	Input 2 — Earth (Amber): Starts at Earth S (6, 1) → cuts east through loose Scree (6, 2) → tags Earth C at (6, 3) → enters Chamber B (6, 4) from the west.
+	▪	Output — Plant (Green): Emits south from Chamber B (6, 4) to (7, 4) → cuts through Forest (7, 4) → steps onto the Plant Pressure Plate at (8, 4) → tags Plant C at (9, 4) → reaches Plant D (10, 4)!
+	◦	Phase Trigger: (3, 5)–(3, 6) and (4, 9)–(4, 10) flip Exposed ☀ → Covered ☾.
+	3	Step 3 — Night Phase ☾ (Shadow enters Chamber A (4, 7) & sparks Electricity!):
+	◦	Shadow (Purple): Starts in the SW Covered ☾ alcove at Shadow S (9, 1) → enters 1 Portal Pair (9, 2) ↔ (4, 11) to leap across the board into the NE vault → walks west across newly flipped Covered ☾ (4, 10) → (4, 9) → tags Shadow C at (4, 8) → enters Chamber A (4, 7) from the east!
+	◦	Chamber A Ignites (Light + Shadow → Electricity at (4, 7)):
+	▪	Output — Electricity (Yellow): Emits south from Chamber A (4, 7) to (5, 7) → tags Electricity C at (6, 7) → threads Gate (7, 7) ↓ → crosses Fire straight north-to-south via 1 Intersection (9, 7) → crosses the southern Water canal ((10, 5)–(10, 9)) via your 1 Bridge at (10, 7) → reaches Electricity D (11, 7)!
+	4	Any Phase (Fire crosses Electricity straight at Intersection (9, 7)):
+	◦	Fire (Red): Starts at Fire S (9, 5) → cuts east through Lava (9, 6) → tags Fire C at (9, 6) → passes straight east across Electricity through 1 Intersection (9, 7) → threads Gate (9, 9) → → reaches Fire D (9, 10).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources (6):
+	◦	Light S: (3, 2) | Water S: (4, 4) | Earth S: (6, 1) | Shadow S: (9, 1) | Fire S: (9, 5) | Water S2: (10, 5) (or make (10, 7) standalone 1-tile Water moat so 1 Bridge covers it with zero extra streams!)
+	•	Confluence Chambers (2):
+	◦	Chamber A (Light + Shadow → Electricity — Split-Phase!): (4, 7) (Inputs: North [Light-Day] / East [Shadow-Night] | Output: South)
+	◦	Chamber B (Water + Earth → Plant): (6, 4) (Inputs: North/West | Output: South)
+	•	Destinations (3):
+	◦	Plant D: (10, 4) | Electricity D: (11, 7) | Fire D: (9, 10)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Plant): (8, 4)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾, 4 tiles): (3, 5), (3, 6), (4, 9), (4, 10)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (6): (3, 7) ↓, (4, 8) ←, (5, 4) ↓, (6, 3) →, (7, 7) ↓, (9, 9) →
+	◦	Checkpoints (6): Light C at (3, 6), Shadow C at (4, 8), Earth C at (6, 3), Electricity C at (6, 7), Plant C at (9, 4), Fire C at (9, 6)
+	◦	Construction Budget: 1 Bridge (at (10, 7)), 1 Portal Pair ((9, 2) ↔ (4, 11)), 1 Intersection (at (9, 7))
+	•	Terrains:
+	◦	wall (14 tiles): (3,8), (5,3), (5,5), (5,6), (5,8), (7,3), (7,5), (8,6), (8,8), (10,6), (10,8), (11,6), (11,8), (12,7)
+	◦	exposed (Static, 2 tiles — blocks Shadow): (3,3), (3,4)
+	◦	covered (Static, 3 tiles — blocks Light): (9,1), (9,2), (4,11)
+	◦	shifting (Exposed ☀ → Covered ☾, 4 tiles): (3,5), (3,6), (4,9), (4,10)
+	◦	water (3 tiles): (4,4), (5,4), (10,7)
+	◦	scree (1 tile — Earth only): (6,2)
+	◦	forest (1 tile — Plant only): (7,4)
+	◦	lava (1 tile — Fire only): (9,6)
+
+
+
+
+
+Here is Stage 121 (The Celestial Orrery)—the 9-Element Expert Boss Finale of Chapter 10: The Twilight Pendulum—combining Day/Night Shifting Phases, an assigned Light Pressure Plate, Dual Confluence Chambers, and your complete 4-Tool Construction Budget.
+
+
+
+Stage 121: The Celestial Orrery (Chapter 10 Boss Finale — Expert 9 Elements)
+	•	Chapter Placement: Chapter 10 (The Twilight Pendulum — Stage 121 of 121 Grand Finale)
+	•	Elements & Setup: 9 Active Elements (Light, Shadow, Water, Earth, Wind, Metal, Electricity → Plant D, Ice D) — 8 S → 2 Chambers + 4 Standalone → 6 D
+	◦	Chamber A (Water + Earth → Plant): Water S1 + Earth S merge at Chamber A to emit Plant → Plant D
+	◦	Chamber B (Water + Wind → Ice): Water S2 + Wind S merge at Chamber B to emit Ice → Ice D
+	◦	Standalone Streams: Light S → Light D, Shadow S → Shadow D, Metal S → Metal D, and Electricity S → Electricity D
+	•	Day/Night Phase Setup:
+	◦	Pressure Plate: Assigned to Light at (2, 10) (triggers Day ☀ → Night ☾ after Light crosses Water straight at Intersection #1!)
+	◦	Shifting Terrains (4 tiles):
+	▪	Northern Sunlit Orrery Ring (2, 5), (2, 7): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	▪	Southern Eclipse Vault (11, 8), (11, 9): Start Exposed ☀ (Day) → flip to Covered ☾ (Night)
+	◦	Required Delivery Order: 1. Light (Day — crosses Water straight at Intersection #1 (2, 6) & triggers Night on Plate (2, 10)) → 2. Shadow (Night — warps through Portal Pair onto newly darkened (11, 8)–(11, 9))
+	•	Board Pieces: 7 One-Way Gates (fixed), 7 Checkpoints (Light C, Shadow C, Earth C, Plant C, Wind C, Ice C, Metal C), 1 Bridge + 1 Tunnel + 1 Portal Pair + 2 Intersections (Master Expert Budget)
+	•	Stage Story: Suspended at the zenith of The Celestial Orrery, nine elemental currents orbit twin alchemical synthesis chambers beneath a rotating eclipse pendulum! Guide Light across the northern Exposed ☀ ring first during Day—intersecting the central Water aqueduct straight at right angles—to depress the Light Pressure Plate, plunging the southern vault into Covered ☾ shadow so Shadow can warp via your Portal Pair, while twin chambers forge living Plant (forest) and glacial Ice (shallows) alongside Metal (heated + Tunnel) and Electricity (Bridge + Intersection #2)!
+
+Verified 9-Element Expert Phase + Confluence Solution (Row, Col)
+	1	Step 1 — Day Phase ☀ (Light crosses Intersection #1 & triggers Night!):
+	◦	Light (Gold): Starts at Light S (2, 2) → walks east across static Exposed ☀ (2, 3)–(2, 4) and shifting Exposed ☀ (2, 5) → passes straight east across Water via dry overpass Intersection #1 (2, 6) → crosses shifting Exposed ☀ (2, 7) → tags Light C at (2, 8) → threads Gate (2, 9) → → steps onto the Light Pressure Plate at (2, 10) → reaches Light D (2, 11)!
+	◦	Phase Trigger: (2, 5), (2, 7) and (11, 8)–(11, 9) flip Exposed ☀ → Covered ☾. Light's completed delivery remains permanently valid!
+	2	Step 2 — Night Phase ☾ (Shadow warps into the newly darkened Southern Vault!):
+	◦	Shadow (Purple): Starts in the SW Covered ☾ alcove at Shadow S (9, 1) → enters 1 Portal Pair (9, 2) ↔ (11, 7) to leap across the board onto newly flipped Covered ☾ (11, 8)–(11, 9) → tags Shadow C at (11, 10) → threads Gate (11, 11) → → reaches Shadow D (10, 11).
+	3	Chamber A (Water + Earth → Plant at (7, 4)):
+	◦	Input 1 — Water 1 (Dark Blue): Starts at Water S1 (5, 4) → swims south down Water (6, 4) → enters Chamber A (7, 4) from the north.
+	◦	Input 2 — Earth (Amber): Starts at Earth S (7, 1) → cuts east through loose Scree (7, 2) → tags Earth C at (7, 3) → enters Chamber A (7, 4) from the west.
+	◦	Output — Plant (Green): Emits south from Chamber A (7, 4) to (8, 4) → cuts through Forest (9, 4) → tags Plant C at (10, 4) → threads Gate (11, 4) ↓ → reaches Plant D (12, 4).
+	4	Chamber B (Water + Wind → Ice at (6, 8)):
+	◦	Input 1 — Water 2 (Dark Blue): Starts at Water S2 (1, 6) → swims straight south down the central Water aqueduct ((1, 6) → (6, 6)) (split cleanly around dry overpass (2, 6)) → passes straight south through Intersection #1 (2, 6) → bends east at (6, 6) into Chamber B (6, 8) via (6, 7).
+	◦	Input 2 — Wind (Light Blue): Starts at Wind S (4, 11) → Jumps 1-tile Void (5, 11) vertically to land at (6, 11) → tags Wind C at (6, 10) → threads Gate (6, 9) ← → enters Chamber B (6, 8) from the east.
+	◦	Output — Ice (Cyan): Emits south from Chamber B (6, 8) to (7, 8) → crosses Shallows (8, 8) freely without a bridge → passes straight south through Intersection #2 (9, 8) → tags Ice C at (10, 8) → reaches Ice D (10, 9).
+	5	Standalone Expert Streams (Metal Tunnel & Electricity Bridge + Intersection #2):
+	◦	Metal (Steel Blue — NW Heated Mountain Tunnel): Starts at Metal S (4, 1) → steps onto Heated Ground (4, 2) → uses your 1 Tunnel (4, 2) ↔ (4, 5) to bore straight through 2-tile Mountain (4, 3)–(4, 4) → tags Metal C at (3, 5) → threads Gate (3, 4) ← → reaches Metal D (3, 3).
+	◦	Electricity (Yellow — Southern Water Bridge + Straight Intersection #2): Starts at Electricity S (9, 5) → crosses a southern Water moat ((8, 6)–(10, 6)) via your 1 Bridge at (9, 6) (avoiding adjacent Shallows!) → passes straight east across Ice through Intersection #2 (9, 8) → threads Gate (9, 10) → → reaches Electricity D (8, 11).
+
+Exact Editor Coordinates (Row, Col)
+	•	Sources (8):
+	◦	Light S: (2, 2) | Water S2: (1, 6) | Metal S: (4, 1) | Water S1: (5, 4) | Earth S: (7, 1) | Wind S: (4, 11) | Shadow S: (9, 1) | Electricity S: (9, 5)
+	•	
+
+	•	Confluence Chambers (2):
+	◦	Chamber A (Water + Earth → Plant): (7, 4) (Inputs: North/West | Output: South)
+	◦	Chamber B (Water + Wind → Ice): (6, 8) (Inputs: West/East | Output: South)
+	•	Destinations (6):
+	◦	Light D: (2, 11) | Metal D: (3, 3) | Plant D: (12, 4) | Ice D: (10, 9) | Electricity D: (8, 11) | Shadow D: (10, 11)
+	•	Day/Night Controls:
+	◦	Pressure Plate (Light): (2, 10)
+	◦	Shifting Tiles (Exposed ☀ → Covered ☾, 4 tiles): (2, 5), (2, 7), (11, 8), (11, 9)
+	•	Fixed Board Pieces:
+	◦	One-Way Gates (7): (2, 9) →, (3, 4) ←, (6, 9) ←, (7, 3) →, (9, 10) →, (11, 4) ↓, (11, 11) →
+	◦	Checkpoints (7): Light C at (2, 8), Metal C at (3, 5), Wind C at (6, 10), Earth C at (7, 3), Plant C at (10, 4), Ice C at (10, 8), Shadow C at (11, 10)
+	◦	Construction Budget: 1 Bridge (at (9, 6)), 1 Tunnel ((4, 2) ↔ (4, 5)), 1 Portal Pair ((9, 2) ↔ (11, 7)), 2 Intersections (placed at dry overpass (2, 6) and (9, 8))
+	•	Terrains:
+	◦	mountain (12 tiles): (4,3), (4,4), (5,3), (5,5), (6,3), (6,5), (7,7), (7,9), (8,7), (8,9), (10,7), (10,10)
+	◦	exposed (Static, 2 tiles — blocks Shadow): (2,3), (2,4)
+	◦	covered (Static, 3 tiles — blocks Light): (9,1), (9,2), (11,7)
+	◦	shifting (Exposed ☀ → Covered ☾, 4 tiles): (2,5), (2,7), (11,8), (11,9)
+	◦	water (11 tiles — split cleanly around dry overpass (2, 6)): (1,6), (3,6), (4,6), (5,6), (6,6), (6,7), (5,4), (6,4), (8,6), (9,6), (10,6)
+	◦	heated (2 tiles — Metal only): (4,2), (4,5)
+	◦	scree (1 tile — Earth only): (7,2)
+	◦	forest (1 tile — Plant only): (9,4)
+	◦	void (1 tile — Wind jumps): (5,11)
+	◦	shallows (2 tiles — Ice passes, blocks Electricity): (8,8), (10,5)
+
+
+
+Complete 121-Stage, Ten-Chapter Campaign Milestone!
+You now have a complete 121-stage, ten-chapter campaign for your game:
+	•	Chapters 1–5 (Stages 1–60): 3- to 6-Element Core Story Arc (The Sleeping Valley → The Celestial Confluence)
+	•	Chapter 6 (Stages 61–72): 1- to 6-Element Gimmick & Arcade Break (The Weaver's Playground)
+	•	Chapters 7–8 (Stages 73–96): 5- to 8-Element Abyss & Sanctuary Finale (The Shattered Abyss → The World-Heart Sanctuary)
+	•	Chapter 9 (Stages 97–108): Multi-Chamber Elemental Fusion (The Confluence Forges)
+	•	Chapter 10 (Stages 109–121): Day/Night Shifting Phases + Dual Confluence Boss Finale (The Twilight Pendulum)
+
+
+
+
