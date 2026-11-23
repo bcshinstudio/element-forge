@@ -53,7 +53,7 @@ def run():
                 expect(page.locator("#stage-list")).to_be_visible()
                 expect(page.locator("#stage-select")).to_contain_text("Review")
                 choices=page.locator("#stage-list button")
-                expect(choices).to_have_count(108)
+                expect(choices).to_have_count(121)
                 assert choices.evaluate_all("buttons=>buttons.every(button=>!button.disabled)")
                 assert not any("✓" in choices.nth(i).inner_text() for i in range(108))
 
