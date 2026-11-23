@@ -56,7 +56,7 @@ function buildPalette(){
  document.querySelector('[data-element="fire"]').classList.add('active');
  setTool(tool);
 }
-function updateProperties(){const type=tool.split(':')[1];let html='';if(['oneway','junction','sorter','gate','booster'].includes(type))html+=`<label>Orientation<select id="propDirection">${DIRECTIONS.map(d=>`<option value="${d}" ${direction===d?'selected':''}>${{N:'North ↑',E:'East →',S:'South ↓',W:'West ←'}[d]}</option>`).join('')}</select></label>`;if(['portal','tunnel'].includes(type))html+=`<label>Connection ID (two matching endpoints)<input id="propPair" maxlength="12" value="${escapeHtml(pairId)}"></label><p class="property-note">Place exactly two ${type} endpoints with the same ID. Tunnel travel between ends is intended to pass under intervening terrain; paired links work in Playtest. Tunnel ends must align horizontally or vertically with blocked terrain between them.</p>`;if(type==='checkpoint')html+=`<label>Required element<select id="propCheckpoint"><option value="any">Any element</option>${Object.entries(ELEMENTS).map(([id,e])=>`<option value="${id}" ${checkpointElement===id?'selected':''}>${e.name}</option>`).join('')}</select></label>`;if(tool==='art'||tool==='pick')html='';if(tool==='inspect')html='<p class="property-note">Click any cell to inspect its terrain, fixed component, orientation, connection ID, or node.</p>';if(tool==='copy')html='<p class="property-note">Select a cell to copy its terrain, fixture or endpoint, gameplay properties, and artwork.</p>';
+function updateProperties(){const type=tool.split(':')[1];let html='';if(['oneway','junction','sorter','gate','booster','confluence'].includes(type))html+=`<label>Orientation<select id="propDirection">${DIRECTIONS.map(d=>`<option value="${d}" ${direction===d?'selected':''}>${{N:'North ↑',E:'East →',S:'South ↓',W:'West ←'}[d]}</option>`).join('')}</select></label>`;if(['portal','tunnel'].includes(type))html+=`<label>Connection ID (two matching endpoints)<input id="propPair" maxlength="12" value="${escapeHtml(pairId)}"></label><p class="property-note">Place exactly two ${type} endpoints with the same ID. Tunnel travel between ends is intended to pass under intervening terrain; paired links work in Playtest. Tunnel ends must align horizontally or vertically with blocked terrain between them.</p>`;if(type==='confluence')html+='<p class="property-note">One fixed chamber per map. Output points in the selected direction; Water enters from its left, Earth from its right. Place one Water source, one Earth source, and one Plant inlet. The chamber provides the Plant source automatically.</p>';if(type==='checkpoint')html+=`<label>Required element<select id="propCheckpoint"><option value="any">Any element</option>${Object.entries(ELEMENTS).map(([id,e])=>`<option value="${id}" ${checkpointElement===id?'selected':''}>${e.name}</option>`).join('')}</select></label>`;if(tool==='art'||tool==='pick')html='';if(tool==='inspect')html='<p class="property-note">Click any cell to inspect its terrain, fixed component, orientation, connection ID, or node.</p>';if(tool==='copy')html='<p class="property-note">Select a cell to copy its terrain, fixture or endpoint, gameplay properties, and artwork.</p>';
 if(tool==='stamp')html='<p class="property-note">Tap or drag to stamp the copied cell. Check any pasted endpoints or paired links for duplicates.</p>';
 if(!html&&!['art','pick'].includes(tool))html='<p class="property-note">No extra properties for this tool. Painting terrain preserves nothing above it; painting a fixed component preserves its terrain when compatible.</p>';$('properties').innerHTML=html;$('art-brush').hidden=!['art','pick'].includes(tool);if($('propDirection'))$('propDirection').onchange=e=>direction=e.target.value;if($('propPair'))$('propPair').oninput=e=>pairId=e.target.value.replace(/[^a-zA-Z0-9_-]/g,'').slice(0,12);if($('propCheckpoint'))$('propCheckpoint').onchange=e=>checkpointElement=e.target.value}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
@@ -66,15 +66,21 @@ function cellMarkup(c){
  const illustrated=Boolean(variant)||window.EFBoardArt.structures.has(c.component);
  const url=c.component?assets.components?.[c.component]:assets.terrain?.[c.terrain];
  if(url)out+=`<img class="asset" src="${escapeHtml(url)}" alt="">`;
- else if(!illustrated&&!c.node&&(c.component||(!window.EFBoardArt.terrains.has(c.terrain)&&!window.EFVariants.resolve(c.terrainArt,c.terrain)))){
+ else if(!illustrated&&!c.node&&c.component!=='confluence'&&(c.component||(!window.EFBoardArt.terrains.has(c.terrain)&&!window.EFVariants.resolve(c.terrainArt,c.terrain)))){
   out+=`<span class="glyph">${c.component?glyph('component',c.component):glyph('terrain',c.terrain)}</span>`;
  }
  if(c.node){
   const e=ELEMENTS[c.node.element];
   out+=`<span class="node-shape ${c.node.role}" style="background:${e.color};border-color:${e.color}">${c.node.role==='source'?'S':'D'}</span>`;
  }
- if(c.component&&c.props?.pairId&&(!illustrated||url))out+=`<span class="overlay">${escapeHtml(c.props.pairId)}</span>`;
- if((c.terrain==='oneway'||c.props?.direction)&&!c.node)out+=`<span class="direction">${{N:'↑',E:'→',S:'↓',W:'←'}[c.props?.direction||'E']}</span>`;
+ if(c.component==='confluence'){
+   const ports=window.EFEngine.confluenceDirections(c.props?.direction||'E');
+   out+='<span class="confluence-mark" aria-hidden="true"><span class="confluence-core">◇</span>'+
+    [['water','W'],['earth','E'],['nature','P']].map(([kind,label])=>
+     `<span class="confluence-port confluence-${kind} port-${ports[kind]}">${label}</span>`).join('')+'</span>';
+  }
+  if(c.component&&c.props?.pairId&&(!illustrated||url))out+=`<span class="overlay">${escapeHtml(c.props.pairId)}</span>`;
+ if((c.terrain==='oneway'||c.props?.direction)&&!c.node&&c.component!=='confluence')out+=`<span class="direction">${{N:'↑',E:'→',S:'↓',W:'←'}[c.props?.direction||'E']}</span>`;
  return out;
 }
 function decorateCell(element,cell){
@@ -83,7 +89,7 @@ function decorateCell(element,cell){
 }
 function cellClass(c){return `cell ${c.terrain} ${c.component?'has-component':''} ${c.node?'node':''}`}
 function cellLabel(c,i){
- return `Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, ${c.node?ELEMENTS[c.node.element].name.toLowerCase()+' '+c.node.role:c.component||c.terrain}`;
+ return `Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, ${c.node?ELEMENTS[c.node.element].name.toLowerCase()+' '+c.node.role:c.component==='confluence'?'Confluence: Water + Earth to Plant, output '+(c.props?.direction||'E'):c.component||c.terrain}`;
 }
 function render(){const b=$('board');b.style.setProperty('--cols',map.width);b.style.setProperty('--rows',map.height);b.innerHTML=map.cells.map((c,i)=>`<div class="${cellClass(c)}" data-i="${i}" role="gridcell" aria-label="${cellLabel(c,i)}">${cellMarkup(c)}</div>`).join('');map.cells.forEach((cell,i)=>decorateCell(b.children[i],cell));$('count').textContent=`${map.width} × ${map.height} · ${map.width*map.height} cells`;$('width').value=map.width;$('height').value=map.height;updateHistory();window.EFEditorArt?.boardChanged()}
 function refreshCell(i){
@@ -116,7 +122,7 @@ function paint(i){
  else if(kind==='component'){
   next={terrain:prev.terrain,component:id,...(prev.terrainArt?{terrainArt:prev.terrainArt}:{})};
   if(['portal','tunnel'].includes(id))next.props={pairId:pairId.trim()||'A'};
-  else if(['junction','sorter','gate','booster'].includes(id))next.props={direction};
+  else if(['junction','sorter','gate','booster','confluence'].includes(id))next.props={direction};
   else if(id==='checkpoint')next.props={element:checkpointElement};
  }
  if(kind==='terrain'||kind==='component'){
