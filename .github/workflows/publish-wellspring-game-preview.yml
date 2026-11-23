@@ -29,10 +29,10 @@ jobs:
           ref: phone-playtest
           path: site
           persist-credentials: true
-      - name: Checkout exact Chapter 9 revision that passed browser QA
+      - name: Checkout verified 120-stage Chapter 10 revision
         uses: actions/checkout@v4
         with:
-          ref: e3460f32a0cce5c8a6083ca7084359e8daacc3f8
+          ref: 75e7373710b48bb4646b528070e1b6e367c5aaaf
           path: source
           persist-credentials: false
       - name: Set up Node.js for regression tests
@@ -46,11 +46,20 @@ jobs:
           node --check game/app.js
       - name: Build the single-file game and update only the preview game path
         run: |
-          python3 source/game/build.py Wellspring_Pause_Menu_Preview.html
-          test -s Wellspring_Pause_Menu_Preview.html
-          cp Wellspring_Pause_Menu_Preview.html site/wellspring-preview/game/index.html
+          python3 source/game/build.py Wellspring_Chapter10_120_Stages.html
+          test -s Wellspring_Chapter10_120_Stages.html
+          cp Wellspring_Chapter10_120_Stages.html site/wellspring-preview/game/index.html
           grep -q 'class="pause-menu-header"' site/wellspring-preview/game/index.html
           grep -q 'confluence-forges-108' site/wellspring-preview/game/index.html
+          grep -q 'twilight-pendulum-120' site/wellspring-preview/game/index.html
+          if grep -q 'twilight-pendulum-121' site/wellspring-preview/game/index.html; then
+            echo 'Unexpected 121st stage in 120-stage preview'
+            exit 1
+          fi
+          if grep -q 'Sundial Sluice' site/wellspring-preview/game/index.html; then
+            echo 'Retired Sundial Sluice map unexpectedly present'
+            exit 1
+          fi
       - name: Commit the updated game to the existing phone-playtest Pages branch
         working-directory: site
         run: |
@@ -58,7 +67,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add wellspring-preview/game/index.html
           if ! git diff --cached --quiet; then
-            git commit -m "Update Wellspring Chapter 9 preview with polished game menus"
+            git commit -m "Publish Wellspring Chapter 10 preview with 120 verified stages"
             git push origin HEAD:phone-playtest
           fi
       - name: Assemble existing Pages site without changing other preview assets
@@ -83,14 +92,16 @@ jobs:
           url="https://bcshinstudio.github.io/element-forge/wellspring-preview/game/"
           for attempt in range(15):
               try:
-                  with urllib.request.urlopen(url+"?verified-menu="+str(attempt),timeout=12) as response:
+                  with urllib.request.urlopen(url+"?verified-ch10="+str(attempt),timeout=12) as response:
                       html=response.read().decode("utf-8")
-                  if all(fragment in html for fragment in ('class="pause-menu-header"','id="menu-lessons-back"','confluence-forges-108')):
-                      print("PASS: Preview page serves polished menus and all 108 stages")
+                  if all(fragment in html for fragment in ('class="pause-menu-header"','id="menu-lessons-back"','confluence-forges-108','twilight-pendulum-120')):
+                      if 'twilight-pendulum-121' in html or 'Sundial Sluice' in html:
+                          raise RuntimeError('Live page contains retired Chapter 10 content')
+                      print("PASS: Live preview serves Chapter 10 with exactly 120 total stages")
                       break
               except Exception as error:
                   print("Attempt",attempt+1,type(error).__name__,str(error)[:150])
               time.sleep(3)
           else:
-              raise SystemExit("New game not yet visible at requested Pages preview URL")
+              raise SystemExit("Chapter 10 (120 stages) not yet visible at requested Pages preview URL")
           PY
