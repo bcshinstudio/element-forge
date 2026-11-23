@@ -80,7 +80,7 @@ def check(browser,url,width,height,touch):
     expect(page.locator("#game-menu")).to_be_hidden()
     expect(page.locator("#play-view")).to_be_visible()
     # The information panel must return to its home container after close.
-    assert page.locator("#information-panel").evaluate("e=>e.parentElement.id==='home-support'")
+    page.wait_for_function("document.getElementById('information-panel').parentElement.id === 'home-support'")
     if touch:
         press(page.locator("#mobile-menu"))
         expect(page.locator("#game-menu-title")).to_have_text("Game menu")
