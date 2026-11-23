@@ -63,3 +63,17 @@
 #art-picker { width:min(650px,calc(100% - 2rem)); color:inherit; background:#1b2735; border:1px solid #546a81; border-radius:12px; padding:1rem; }
 #art-picker::backdrop { background:#080d15b3; }
 #art-picker .art-gallery { max-height:55dvh; margin-bottom:.6rem; }
+
+
+/* Optional Chapter 10 phase design controls. */
+.phase-editor-toggle { display:flex; align-items:center; gap:.6rem; line-height:1.4; }
+.phase-editor-toggle input { flex:none; width:1.2rem; height:1.2rem; }
+#phase-preview:disabled { opacity:.55; }
+#board .phase-mark { position:absolute; right:1px; bottom:0; color:#f8de83;
+ font-weight:900; font-size:.7rem; text-shadow:0 1px 3px #161616; z-index:4; }
+#board .phase-plate-editor { position:absolute; inset:0; display:grid; place-items:center;
+ color:#f3cd78; font-size:1.45em; font-weight:900; z-index:2; text-shadow:0 1px 4px #101510; }
+@media (max-width:760px) {
+ .phase-editor-toggle { min-height:44px; }
+ #board .phase-mark { font-size:.63rem; }
+}
