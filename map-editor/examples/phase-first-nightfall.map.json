@@ -1,0 +1,204 @@
+{
+  "format": "element-forge-map",
+  "schemaVersion": 2,
+  "name": "First Nightfall",
+  "description": "Guide Light across the sunlit channel and pressure plate before delivering Shadow. The completed Light route stays delivered even when Night covers the marked channels.",
+  "width": 7,
+  "height": 7,
+  "cells": [
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "light",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "exposed",
+      "props": {
+        "phaseShift": true
+      }
+    },
+    {
+      "terrain": "land",
+      "component": "phasePlate",
+      "props": {
+        "element": "light"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "light",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "shadow",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "exposed",
+      "props": {
+        "phaseShift": true
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "shadow",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    }
+  ],
+  "constraints": {},
+  "inventory": {
+    "bridge": 0,
+    "metalSpan": 0,
+    "intersection": 0,
+    "tunnel": 0,
+    "portal": 0,
+    "junction": 0,
+    "sorter": 0,
+    "converter": 0,
+    "gate": 0,
+    "checkpoint": 0,
+    "remover": 0,
+    "booster": 0,
+    "confluence": 0,
+    "phasePlate": 0
+  },
+  "rulesVersion": 4,
+  "phaseRules": {
+    "initial": "day"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "placements": {
+    "53": "intersection"
+  },
+  "routes": [
+    {
+      "element": "light",
+      "path": [
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        45,
+        46
+      ],
+      "deliveredPhase": "day"
+    },
+    {
+      "element": "shadow",
+      "path": [
+        27,
+        28,
+        40,
+        41,
+        42,
+        54,
+        66,
+        67,
+        68,
+        69,
+        81
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "water",
+      "path": [
+        17,
+        29,
+        41,
+        53,
+        65,
+        77,
+        89,
+        101,
+        113,
+        125
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "electricity",
+      "path": [
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "ice",
+      "path": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "deliveredPhase": "night"
+    }
+  ]
+}

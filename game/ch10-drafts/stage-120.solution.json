@@ -1,0 +1,150 @@
+{
+  "placements": {
+    "17": "intersection",
+    "37": {
+      "kind": "tunnel",
+      "pairId": "T1"
+    },
+    "40": {
+      "kind": "tunnel",
+      "pairId": "T1"
+    },
+    "97": {
+      "kind": "portal",
+      "pairId": "P1"
+    },
+    "103": "intersection",
+    "126": {
+      "kind": "portal",
+      "pairId": "P1"
+    }
+  },
+  "routes": [
+    {
+      "element": "light",
+      "path": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "deliveredPhase": "day"
+    },
+    {
+      "element": "shadow",
+      "path": [
+        96,
+        97,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        119,
+        118
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "water",
+      "path": [
+        51,
+        63,
+        75
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "earth",
+      "path": [
+        72,
+        73,
+        74,
+        75
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "nature",
+      "path": [
+        75,
+        87,
+        99,
+        111,
+        123,
+        135
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "wind",
+      "path": [
+        46,
+        70,
+        69,
+        68,
+        67
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "water",
+      "path": [
+        5,
+        17,
+        29,
+        41,
+        53,
+        65,
+        66,
+        67
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "ice",
+      "path": [
+        67,
+        79,
+        91,
+        103,
+        115,
+        116
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "metal",
+      "path": [
+        36,
+        37,
+        40,
+        28,
+        27,
+        26
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "electricity",
+      "path": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        94
+      ],
+      "deliveredPhase": "night"
+    }
+  ]
+}

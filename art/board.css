@@ -1,0 +1,102 @@
+/* Shared illustrated terrain. Cell data and accessibility labels stay in the renderers. */
+:is(#board, .art-original) :is(.tile, .cell).land { background-image: url(tiles/land.webp); }
+:is(#board, .art-original) :is(.tile, .cell).forest { background-image: url(tiles/forest.webp); }
+:is(#board, .art-original) :is(.tile, .cell).mountain { background-image: url(tiles/mountain.webp); }
+:is(#board, .art-original) :is(.tile, .cell).scree { background-image: url(tiles/scree.webp); }
+:is(#board, .art-original) :is(.tile, .cell).void { background-image: url(tiles/void.webp); }
+:is(#board, .art-original) :is(.tile, .cell).water { background-image: url(tiles/water.webp); }
+:is(#board, .art-original) :is(.tile, .cell).river { background-image: url(tiles/river.webp); }
+:is(#board, .art-original) :is(.tile, .cell).shallow { background-image: url(tiles/shallow.webp); }
+:is(#board, .art-original) :is(.tile, .cell).heated { background-image: url(tiles/heated.webp); }
+:is(#board, .art-original) :is(.tile, .cell).lava { background-image: url(tiles/lava.webp); }
+
+:is(#board, .art-original) :is(.tile, .cell) {
+ background-size: 100% 100%;
+ background-repeat: no-repeat;
+}
+
+:is(#board, .art-original) [data-structure="bridge"] { --structure-art: url(tiles/bridge.webp); }
+:is(#board, .art-original) [data-structure="intersection"] { --structure-art: url(tiles/intersection.webp); }
+:is(#board, .art-original) [data-structure="tunnel"] { --structure-art: url(tiles/tunnel.webp); }
+:is(#board, .art-original) [data-structure="portal"] { --structure-art: url(tiles/portal.webp); }
+
+:is(#board, .art-original) .structure-art {
+ position: absolute;
+ inset: 8%;
+ background: var(--structure-art) center / contain no-repeat;
+ pointer-events: none;
+ z-index: 1;
+}
+:is(#board, .art-original) [data-structure="bridge"] .structure-art { inset: 0; }
+#board .track { z-index: 2; }
+#board .mark.endpoint, #board .mark.structure, #board .overlay { z-index: 3; }
+#board .orb { z-index: 4; }
+
+#board .art-structure-label {
+ position: absolute;
+ right: 1px;
+ bottom: 1px;
+ max-width: calc(100% - 2px);
+ overflow: hidden;
+ text-overflow: ellipsis;
+ background: #14231c;
+ color: #fff7db;
+ font: 700 clamp(9px, 1.4vw, 14px)/1.15 system-ui, sans-serif;
+ padding: 1px 2px;
+ border-radius: 3px;
+ z-index: 4;
+ pointer-events: none;
+}
+
+#board [data-structure="bridge"]:has(.track .north, .track .south, .vertical-route) .structure-art {
+ transform: rotate(90deg);
+}
+#board .cell.node .node-shape.destination {
+ background: #26382c !important;
+ color: white;
+ z-index: 4;
+}
+
+#board .terrain-variant {
+ position: absolute;
+ inset: 0;
+ background-size: 100% 100%;
+ pointer-events: none;
+ transform: rotate(var(--art-rotation, 0deg));
+}
+#board .structure-art.structure-variant {
+ inset: 0;
+ transform: rotate(var(--art-rotation, 0deg));
+}
+#board [data-structure="bridge"]:has(.track .north, .track .south) .structure-variant {
+ transform: rotate(var(--art-rotation, 0deg));
+}
+#board .direction, #board .glyph, #board .node-shape { z-index: 3; }
+
+/* Confluence Chamber (Chapter 9 prototype): visible recipe ports on editor and game boards. */
+#board :is(.tile,.cell) .confluence-mark {
+ position:absolute; inset:3%; z-index:5; display:block; pointer-events:none;
+ line-height:1; color:#fff;
+}
+#board .confluence-core {
+ position:absolute; inset:23%; display:grid; place-items:center; font:900 clamp(13px,1.7vw,24px)/1 Georgia,serif;
+ border:2px solid #e7f7c9; border-radius:25%; color:#e7f7c9;
+ background:linear-gradient(145deg,#315044,#182d26); box-shadow:0 1px 3px #061009aa;
+}
+#board .confluence-port {
+ position:absolute; width:29%; height:29%; display:grid; place-items:center;
+ font:800 clamp(7px,.9vw,11px)/1 system-ui,sans-serif;
+ border:1px solid #f9f5d0; border-radius:50%; color:white; text-shadow:0 1px 1px #0009;
+ box-shadow:0 1px 2px #0009;
+}
+#board .confluence-water { background:#377fd1; }
+#board .confluence-earth { background:#a7774a; }
+#board .confluence-nature { background:#299657; }
+#board .port-N { left:35.5%; top:-3%; }
+#board .port-E { right:-3%; top:35.5%; }
+#board .port-S { left:35.5%; bottom:-3%; }
+#board .port-W { left:-3%; top:35.5%; }
+#board .tile.confluence-pending .confluence-core { border-style:dashed; }
+#board .tile.confluence-ready .confluence-core {
+ border-color:#75e6aa; box-shadow:0 0 0 1px #317951,0 0 8px #75e6aa77;
+}

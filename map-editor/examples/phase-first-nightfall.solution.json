@@ -1,0 +1,29 @@
+{
+  "status": "solved",
+  "nodes": 10,
+  "routes": [
+    {
+      "element": "light",
+      "path": [
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "deliveredPhase": "day"
+    },
+    {
+      "element": "shadow",
+      "path": [
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "deliveredPhase": "night"
+    }
+  ],
+  "placements": {}
+}

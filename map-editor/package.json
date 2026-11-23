@@ -1,0 +1,9 @@
+{
+  "name": "element-forge-map-editor",
+  "version": "2.1.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.js && node tests/legacy-regression.js && node tests/legacy-links.js",
+    "check": "node --check engine.js && node --check app.js && node --check play.js && node --check artwork.js && node --check generator.js && node --check map-format.js"
+  }
+}

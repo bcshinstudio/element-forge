@@ -1,0 +1,107 @@
+{
+  "placements": {
+    "17": {
+      "kind": "tunnel",
+      "pairId": "T1"
+    },
+    "21": {
+      "kind": "tunnel",
+      "pairId": "T1"
+    },
+    "61": {
+      "kind": "portal",
+      "pairId": "P1"
+    },
+    "100": "intersection",
+    "103": {
+      "kind": "portal",
+      "pairId": "P1"
+    }
+  },
+  "routes": [
+    {
+      "element": "light",
+      "path": [
+        25,
+        26,
+        27,
+        28,
+        40,
+        39,
+        51
+      ],
+      "deliveredPhase": "day"
+    },
+    {
+      "element": "metal",
+      "path": [
+        16,
+        17,
+        21,
+        33,
+        45,
+        46,
+        58
+      ],
+      "deliveredPhase": "day"
+    },
+    {
+      "element": "shadow",
+      "path": [
+        60,
+        61,
+        103,
+        104,
+        105,
+        106,
+        118,
+        130
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "ice",
+      "path": [
+        76,
+        88,
+        100,
+        112,
+        124
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "fire",
+      "path": [
+        97,
+        98,
+        99,
+        100,
+        101,
+        102
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "water",
+      "path": [
+        120,
+        121,
+        122,
+        123
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "earth",
+      "path": [
+        79,
+        80,
+        68,
+        69,
+        70
+      ],
+      "deliveredPhase": "night"
+    }
+  ]
+}

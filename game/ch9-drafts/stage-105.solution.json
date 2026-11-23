@@ -1,0 +1,93 @@
+{
+  "stage": 105,
+  "verifiedBy": "EFEngine.checkAll and EFSession.createSession",
+  "routes": [
+    {
+      "element": "fire",
+      "path": [
+        12,
+        13,
+        14,
+        2,
+        3,
+        15,
+        27
+      ]
+    },
+    {
+      "element": "water",
+      "path": [
+        24,
+        25,
+        26,
+        27
+      ]
+    },
+    {
+      "element": "wind",
+      "path": [
+        27,
+        28,
+        29,
+        31,
+        43,
+        55
+      ]
+    },
+    {
+      "element": "water",
+      "path": [
+        58,
+        57,
+        56,
+        55
+      ]
+    },
+    {
+      "element": "ice",
+      "path": [
+        55,
+        67,
+        79,
+        91,
+        103,
+        115,
+        127
+      ]
+    },
+    {
+      "element": "water",
+      "path": [
+        63,
+        75,
+        87
+      ]
+    },
+    {
+      "element": "earth",
+      "path": [
+        84,
+        85,
+        86,
+        87
+      ]
+    },
+    {
+      "element": "nature",
+      "path": [
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94
+      ]
+    }
+  ],
+  "placements": {
+    "91": "intersection",
+    "93": "bridge"
+  }
+}

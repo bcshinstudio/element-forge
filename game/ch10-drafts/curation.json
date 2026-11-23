@@ -1,0 +1,74 @@
+{
+  "chapter": "The Twilight Pendulum",
+  "version": 1,
+  "removed": {
+    "original_stage": 110,
+    "name": "Sundial Sluice",
+    "reason": "Overlaps Twin-Horizon Lock's Light-before-trigger-before-Shadow sequence but has fewer mechanics and less varied routing."
+  },
+  "stages": [
+    {
+      "stage": 109,
+      "title": "First Eclipse",
+      "originalStage": 109
+    },
+    {
+      "stage": 110,
+      "title": "Dusk-Gate Relay",
+      "originalStage": 111
+    },
+    {
+      "stage": 111,
+      "title": "Nocturne Overpass",
+      "originalStage": 112
+    },
+    {
+      "stage": 112,
+      "title": "Shadow-Vault Switch",
+      "originalStage": 113
+    },
+    {
+      "stage": 113,
+      "title": "Twin-Horizon Lock",
+      "originalStage": 114
+    },
+    {
+      "stage": 114,
+      "title": "Eclipse Bottleneck",
+      "originalStage": 115
+    },
+    {
+      "stage": 115,
+      "title": "Umbral Portal Relay",
+      "originalStage": 116
+    },
+    {
+      "stage": 116,
+      "title": "The Twilight Gauntlet",
+      "originalStage": 117
+    },
+    {
+      "stage": 117,
+      "title": "Daybreak Synthesis",
+      "originalStage": 118
+    },
+    {
+      "stage": 118,
+      "title": "Smelted Eclipse",
+      "originalStage": 119
+    },
+    {
+      "stage": 119,
+      "title": "Thunder-Dusk Reactor",
+      "originalStage": 120
+    },
+    {
+      "stage": 120,
+      "title": "The Celestial Orrery",
+      "originalStage": 121
+    }
+  ],
+  "finalStage": 120,
+  "archivedOriginalSource": "game/ch10-drafts/verified-maps.zlib.b64",
+  "note": "The build script intentionally excludes original Stage 110; regenerated maps contain only 12 levels."
+}

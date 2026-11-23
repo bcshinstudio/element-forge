@@ -1,0 +1,129 @@
+{
+  "stage": 108,
+  "verifiedBy": "EFEngine.checkAll and EFSession.createSession",
+  "routes": [
+    {
+      "element": "fire",
+      "path": [
+        12,
+        13,
+        14,
+        2,
+        3,
+        4,
+        16,
+        28
+      ]
+    },
+    {
+      "element": "water",
+      "path": [
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "element": "wind",
+      "path": [
+        28,
+        29,
+        31,
+        32,
+        33,
+        45,
+        57,
+        69
+      ]
+    },
+    {
+      "element": "water",
+      "path": [
+        51,
+        63,
+        75
+      ]
+    },
+    {
+      "element": "earth",
+      "path": [
+        72,
+        73,
+        74,
+        75
+      ]
+    },
+    {
+      "element": "nature",
+      "path": [
+        75,
+        87,
+        99,
+        111,
+        112,
+        100,
+        101,
+        102,
+        114,
+        126,
+        127
+      ]
+    },
+    {
+      "element": "light",
+      "path": [
+        54,
+        55,
+        56,
+        57,
+        58,
+        70,
+        82,
+        94,
+        93,
+        92,
+        91
+      ]
+    },
+    {
+      "element": "shadow",
+      "path": [
+        36,
+        48,
+        49,
+        89,
+        90,
+        91
+      ]
+    },
+    {
+      "element": "electricity",
+      "path": [
+        91,
+        103,
+        104,
+        105,
+        117,
+        116,
+        115,
+        114,
+        113
+      ]
+    }
+  ],
+  "placements": {
+    "49": {
+      "kind": "portal",
+      "pairId": "P1"
+    },
+    "57": "intersection",
+    "89": {
+      "kind": "portal",
+      "pairId": "P1"
+    },
+    "114": "intersection",
+    "126": "bridge"
+  }
+}

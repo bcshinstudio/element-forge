@@ -1,0 +1,522 @@
+{
+  "format": "element-forge-map",
+  "schemaVersion": 2,
+  "name": "Gale-Steam Condenser",
+  "description": "Perched inside the Gale-Steam Condenser, scorching Lava sluices meet cold reservoir tides to boil into pressurized Wind currents, while blinding Exposed light-shafts and pitch-dark Covered vaults guard the eastern wing. Unite Fire and Water inside the condenser chamber to generate Wind (which leaps a 1-tile Void rift to reach its goal), while Light (exposed) and Shadow (covered + Portal) thread the optical locks!",
+  "width": 12,
+  "height": 12,
+  "cells": [
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "shadow",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "water",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "light",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "exposed"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "covered",
+      "component": "checkpoint",
+      "props": {
+        "element": "shadow"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "fire",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "water"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "exposed",
+      "component": "checkpoint",
+      "props": {
+        "element": "light"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "covered"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "lava"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "water"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "lava"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "water"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "exposed"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "gate",
+      "props": {
+        "direction": "E"
+      }
+    },
+    {
+      "terrain": "land",
+      "component": "confluence",
+      "props": {
+        "direction": "S",
+        "ports": {
+          "input1": "W",
+          "input2": "N",
+          "output": "S"
+        },
+        "recipe": "fire-water-wind"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "light",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land",
+      "component": "gate",
+      "props": {
+        "direction": "W"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "void"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "covered"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "gate",
+      "props": {
+        "direction": "W"
+      }
+    },
+    {
+      "terrain": "land",
+      "component": "checkpoint",
+      "props": {
+        "element": "wind"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "covered"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "wind",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "covered"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "shadow",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    }
+  ],
+  "constraints": {},
+  "inventory": {
+    "bridge": 0,
+    "metalSpan": 0,
+    "intersection": 0,
+    "tunnel": 0,
+    "portal": 2,
+    "junction": 0,
+    "sorter": 0,
+    "converter": 0,
+    "gate": 0,
+    "checkpoint": 0,
+    "remover": 0,
+    "booster": 0,
+    "confluence": 0
+  },
+  "rulesVersion": 4,
+  "artPalette": 8
+}

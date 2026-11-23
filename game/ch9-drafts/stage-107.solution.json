@@ -1,0 +1,129 @@
+{
+  "stage": 107,
+  "verifiedBy": "EFEngine.checkAll and EFSession.createSession",
+  "routes": [
+    {
+      "element": "water",
+      "path": [
+        51,
+        63,
+        75
+      ]
+    },
+    {
+      "element": "earth",
+      "path": [
+        72,
+        73,
+        74,
+        75
+      ]
+    },
+    {
+      "element": "nature",
+      "path": [
+        75,
+        87,
+        99,
+        111,
+        123,
+        124,
+        125
+      ]
+    },
+    {
+      "element": "water",
+      "path": [
+        66,
+        67,
+        68
+      ]
+    },
+    {
+      "element": "wind",
+      "path": [
+        46,
+        70,
+        69,
+        68
+      ]
+    },
+    {
+      "element": "ice",
+      "path": [
+        68,
+        80,
+        92,
+        104,
+        116,
+        128
+      ]
+    },
+    {
+      "element": "fire",
+      "path": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106
+      ]
+    },
+    {
+      "element": "metal",
+      "path": [
+        1,
+        13,
+        17,
+        29,
+        41,
+        53,
+        65
+      ]
+    },
+    {
+      "element": "light",
+      "path": [
+        52,
+        53,
+        54,
+        55,
+        56
+      ]
+    },
+    {
+      "element": "shadow",
+      "path": [
+        36,
+        48,
+        49,
+        107,
+        119,
+        131,
+        130
+      ]
+    }
+  ],
+  "placements": {
+    "13": {
+      "kind": "tunnel",
+      "pairId": "T1"
+    },
+    "17": {
+      "kind": "tunnel",
+      "pairId": "T1"
+    },
+    "49": {
+      "kind": "portal",
+      "pairId": "P1"
+    },
+    "53": "intersection",
+    "54": "bridge",
+    "104": "intersection",
+    "107": {
+      "kind": "portal",
+      "pairId": "P1"
+    }
+  }
+}

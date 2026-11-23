@@ -1,0 +1,90 @@
+{
+  "stage": 103,
+  "verifiedBy": "EFEngine.checkAll and EFSession.createSession",
+  "routes": [
+    {
+      "element": "light",
+      "path": [
+        13,
+        14,
+        15,
+        27,
+        28,
+        40,
+        52
+      ]
+    },
+    {
+      "element": "shadow",
+      "path": [
+        22,
+        21,
+        33,
+        49,
+        50,
+        51,
+        52
+      ]
+    },
+    {
+      "element": "electricity",
+      "path": [
+        52,
+        64,
+        76,
+        88,
+        100,
+        112,
+        124
+      ]
+    },
+    {
+      "element": "fire",
+      "path": [
+        46,
+        58,
+        70,
+        82,
+        81,
+        80
+      ]
+    },
+    {
+      "element": "water",
+      "path": [
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        79,
+        80
+      ]
+    },
+    {
+      "element": "wind",
+      "path": [
+        80,
+        68,
+        56,
+        32,
+        20,
+        19,
+        18
+      ]
+    }
+  ],
+  "placements": {
+    "33": {
+      "kind": "portal",
+      "pairId": "P1"
+    },
+    "49": {
+      "kind": "portal",
+      "pairId": "P1"
+    },
+    "88": "intersection"
+  }
+}

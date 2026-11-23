@@ -1,0 +1,637 @@
+[
+  {
+    "stage": 97,
+    "title": "The Alchemical Primer",
+    "issues": [],
+    "warnings": [],
+    "changes": [
+      {
+        "kind": "overlapping terrain",
+        "at": [
+          4,
+          7
+        ],
+        "from": "wall",
+        "to": "water"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          2,
+          4
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          2,
+          7
+        ],
+        "oldTerrain": "water"
+      }
+    ],
+    "routeCount": 6
+  },
+  {
+    "stage": 98,
+    "title": "Root-Soil Synthesis",
+    "issues": [],
+    "warnings": [],
+    "changes": [
+      {
+        "kind": "terrain design correction",
+        "at": [
+          3,
+          7
+        ],
+        "from": "heated",
+        "to": "land"
+      },
+      {
+        "kind": "terrain design correction",
+        "at": [
+          3,
+          11
+        ],
+        "from": "heated",
+        "to": "land"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          2,
+          6
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "source moved to open tunnel approach",
+        "element": "metal",
+        "from": [
+          3,
+          7
+        ],
+        "to": [
+          2,
+          7
+        ]
+      }
+    ],
+    "routeCount": 5
+  },
+  {
+    "stage": 99,
+    "title": "The Smelting Crucible",
+    "issues": [],
+    "warnings": [],
+    "changes": [
+      {
+        "kind": "terrain design correction",
+        "at": [
+          6,
+          8
+        ],
+        "from": "water",
+        "to": "land"
+      },
+      {
+        "kind": "terrain design correction",
+        "at": [
+          6,
+          7
+        ],
+        "from": "land",
+        "to": "water"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          2,
+          8
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "destination",
+        "at": [
+          11,
+          8
+        ],
+        "oldTerrain": "water"
+      }
+    ],
+    "routeCount": 5
+  },
+  {
+    "stage": 100,
+    "title": "Gale-Steam Condenser",
+    "issues": [],
+    "warnings": [],
+    "changes": [
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          2,
+          5
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "shadow",
+        "role": "source",
+        "at": [
+          1,
+          11
+        ],
+        "oldTerrain": "covered"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "light",
+        "role": "destination",
+        "at": [
+          6,
+          7
+        ],
+        "oldTerrain": "exposed"
+      }
+    ],
+    "routeCount": 5
+  },
+  {
+    "stage": 101,
+    "title": "Permafrost Cascade",
+    "issues": [],
+    "warnings": [],
+    "changes": [
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          5,
+          1
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "port assignment corrected",
+        "chamber": "A",
+        "inputs": [
+          "water",
+          "wind"
+        ],
+        "sides": [
+          "W",
+          "N"
+        ]
+      }
+    ],
+    "routeCount": 5
+  },
+  {
+    "stage": 102,
+    "title": "Twin-Chamber Foundry",
+    "issues": [],
+    "warnings": [],
+    "changes": [
+      {
+        "kind": "terrain design correction",
+        "at": [
+          5,
+          5
+        ],
+        "from": "heated",
+        "to": "land"
+      },
+      {
+        "kind": "terrain design correction",
+        "at": [
+          5,
+          9
+        ],
+        "from": "heated",
+        "to": "land"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          8,
+          4
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "port assignment corrected",
+        "chamber": "B",
+        "inputs": [
+          "water",
+          "wind"
+        ],
+        "sides": [
+          "W",
+          "S"
+        ]
+      }
+    ],
+    "routeCount": 6
+  },
+  {
+    "stage": 103,
+    "title": "Lightning Prism",
+    "issues": [],
+    "warnings": [],
+    "changes": [
+      {
+        "kind": "endpoint must be Land",
+        "element": "shadow",
+        "role": "source",
+        "at": [
+          2,
+          11
+        ],
+        "oldTerrain": "covered"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          8,
+          2
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "port assignment corrected",
+        "chamber": "B",
+        "inputs": [
+          "fire",
+          "water"
+        ],
+        "sides": [
+          "E",
+          "W"
+        ]
+      }
+    ],
+    "routeCount": 6
+  },
+  {
+    "stage": 104,
+    "title": "The Living Alloy",
+    "issues": [],
+    "warnings": [],
+    "changes": [
+      {
+        "kind": "terrain design correction",
+        "at": [
+          6,
+          7
+        ],
+        "from": "heated",
+        "to": "land"
+      },
+      {
+        "kind": "terrain design correction",
+        "at": [
+          6,
+          11
+        ],
+        "from": "heated",
+        "to": "land"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "shadow",
+        "role": "source",
+        "at": [
+          2,
+          1
+        ],
+        "oldTerrain": "covered"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "shadow",
+        "role": "destination",
+        "at": [
+          11,
+          10
+        ],
+        "oldTerrain": "covered"
+      },
+      {
+        "kind": "port assignment corrected",
+        "chamber": "B",
+        "inputs": [
+          "fire",
+          "earth"
+        ],
+        "sides": [
+          "E",
+          "N"
+        ]
+      }
+    ],
+    "routeCount": 8
+  },
+  {
+    "stage": 105,
+    "title": "Cascade Chain-Reaction",
+    "issues": [],
+    "warnings": [],
+    "changes": [
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          3,
+          1
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          5,
+          11
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          6,
+          4
+        ],
+        "oldTerrain": "water"
+      }
+    ],
+    "routeCount": 8
+  },
+  {
+    "stage": 106,
+    "title": "The Six-Stream Reactor",
+    "issues": [],
+    "warnings": [],
+    "changes": [
+      {
+        "kind": "terrain design correction",
+        "at": [
+          3,
+          5
+        ],
+        "from": "heated",
+        "to": "land"
+      },
+      {
+        "kind": "terrain design correction",
+        "at": [
+          3,
+          9
+        ],
+        "from": "heated",
+        "to": "land"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "light",
+        "role": "source",
+        "at": [
+          5,
+          4
+        ],
+        "oldTerrain": "exposed"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "shadow",
+        "role": "source",
+        "at": [
+          2,
+          11
+        ],
+        "oldTerrain": "covered"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          5,
+          8
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "destination",
+        "at": [
+          11,
+          8
+        ],
+        "oldTerrain": "water"
+      }
+    ],
+    "routeCount": 8
+  },
+  {
+    "stage": 107,
+    "title": "Octa-Confluence Core",
+    "issues": [],
+    "warnings": [],
+    "changes": [
+      {
+        "kind": "overlapping terrain",
+        "at": [
+          5,
+          7
+        ],
+        "from": "water",
+        "to": "exposed"
+      },
+      {
+        "kind": "terrain design correction",
+        "at": [
+          2,
+          2
+        ],
+        "from": "heated",
+        "to": "land"
+      },
+      {
+        "kind": "terrain design correction",
+        "at": [
+          2,
+          6
+        ],
+        "from": "heated",
+        "to": "land"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          5,
+          4
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          2,
+          7
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "source moved to open tunnel approach",
+        "element": "metal",
+        "from": [
+          2,
+          2
+        ],
+        "to": [
+          1,
+          2
+        ]
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "light",
+        "role": "source",
+        "at": [
+          5,
+          5
+        ],
+        "oldTerrain": "exposed"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "shadow",
+        "role": "source",
+        "at": [
+          4,
+          1
+        ],
+        "oldTerrain": "covered"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "shadow",
+        "role": "destination",
+        "at": [
+          11,
+          11
+        ],
+        "oldTerrain": "covered"
+      },
+      {
+        "kind": "port assignment corrected",
+        "chamber": "B",
+        "inputs": [
+          "water",
+          "wind"
+        ],
+        "sides": [
+          "W",
+          "E"
+        ]
+      }
+    ],
+    "routeCount": 10
+  },
+  {
+    "stage": 108,
+    "title": "The Grand Philosopher's Engine",
+    "issues": [],
+    "warnings": [],
+    "changes": [
+      {
+        "kind": "overlapping terrain",
+        "at": [
+          9,
+          7
+        ],
+        "from": "mountain",
+        "to": "water"
+      },
+      {
+        "kind": "overlapping terrain",
+        "at": [
+          8,
+          7
+        ],
+        "from": "water",
+        "to": "covered"
+      },
+      {
+        "kind": "terrain design correction",
+        "at": [
+          9,
+          7
+        ],
+        "from": "water",
+        "to": "mountain"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          3,
+          1
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "water",
+        "role": "source",
+        "at": [
+          5,
+          4
+        ],
+        "oldTerrain": "water"
+      },
+      {
+        "kind": "endpoint must be Land",
+        "element": "shadow",
+        "role": "source",
+        "at": [
+          4,
+          1
+        ],
+        "oldTerrain": "covered"
+      }
+    ],
+    "routeCount": 9
+  }
+]

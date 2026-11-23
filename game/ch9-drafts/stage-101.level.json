@@ -1,0 +1,536 @@
+{
+  "format": "element-forge-level",
+  "schemaVersion": 1,
+  "rulesVersion": 4,
+  "map": {
+    "format": "element-forge-map",
+    "schemaVersion": 2,
+    "name": "Permafrost Cascade",
+    "description": "Cascading down the Permafrost Cascade, freezing gale-winds sweep across a bottomless Void rift to collide with glacial reservoir tides inside an alchemical freeze-chamber. Unite Water and Wind to crystallize Ice (which walks across Shallows without a bridge to meet Electricity straight at the Intersection), while Electricity claims your single Bridge over deep water and Plant cuts through an overgrown Forest barrier!",
+    "width": 12,
+    "height": 12,
+    "cells": [
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "wind",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "void"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "nature",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "wind"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land",
+        "component": "gate",
+        "props": {
+          "direction": "S"
+        }
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "forest"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "water",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "land",
+        "component": "confluence",
+        "props": {
+          "direction": "S",
+          "ports": {
+            "input1": "W",
+            "input2": "N",
+            "output": "S"
+          },
+          "recipe": "water-wind-ice"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "forest"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "nature"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "shallow"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "gate",
+        "props": {
+          "direction": "S"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "electricity",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "electricity"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "gate",
+        "props": {
+          "direction": "E"
+        }
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "electricity",
+          "role": "destination"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "ice"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "gate",
+        "props": {
+          "direction": "E"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "ice",
+          "role": "destination"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "nature",
+          "role": "destination"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      }
+    ],
+    "constraints": {},
+    "inventory": {
+      "bridge": 1,
+      "metalSpan": 0,
+      "intersection": 1,
+      "tunnel": 0,
+      "portal": 0,
+      "junction": 0,
+      "sorter": 0,
+      "converter": 0,
+      "gate": 0,
+      "checkpoint": 0,
+      "remover": 0,
+      "booster": 0,
+      "confluence": 0
+    },
+    "rulesVersion": 4,
+    "artPalette": 8
+  },
+  "id": "confluence-forges-101"
+}
