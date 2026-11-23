@@ -1,0 +1,553 @@
+{
+  "format": "element-forge-level",
+  "schemaVersion": 1,
+  "rulesVersion": 4,
+  "map": {
+    "format": "element-forge-map",
+    "schemaVersion": 2,
+    "rulesVersion": 4,
+    "name": "Nocturne Overpass",
+    "description": "Spanning the flooded gallery of Nocturne Overpass, a single dry stone viaduct cuts straight across a deep Water canal via your Intersection! Guide Light across the sunlit Exposed ☀ overpass first—intersecting Water straight at right angles—to depress the Light Pressure Plate, plunging both ends of the viaduct into Covered ☾ shadow so Shadow can traverse the exact same bridge during Night while Electricity claims your single Bridge to the south!",
+    "width": 12,
+    "height": 12,
+    "phaseRules": {
+      "initial": "day"
+    },
+    "inventory": {
+      "bridge": 1,
+      "metalSpan": 0,
+      "intersection": 1,
+      "tunnel": 0,
+      "portal": 0,
+      "junction": 0,
+      "sorter": 0,
+      "converter": 0,
+      "gate": 0,
+      "checkpoint": 0,
+      "remover": 0,
+      "booster": 0,
+      "confluence": 0,
+      "phasePlate": 0
+    },
+    "constraints": {},
+    "cells": [
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "ice",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "shallow"
+      },
+      {
+        "terrain": "land",
+        "component": "gate",
+        "props": {
+          "direction": "E"
+        }
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "ice",
+          "role": "destination"
+        }
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "water",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "shadow",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "covered"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "intersection"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "light",
+          "role": "destination"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "light",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "exposed"
+      },
+      {
+        "terrain": "exposed"
+      },
+      {
+        "terrain": "exposed",
+        "props": {
+          "phaseShift": true
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "exposed",
+        "props": {
+          "phaseShift": true
+        }
+      },
+      {
+        "terrain": "exposed"
+      },
+      {
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "light"
+        }
+      },
+      {
+        "terrain": "land",
+        "component": "phasePlate",
+        "props": {
+          "element": "light"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land",
+        "component": "gate",
+        "props": {
+          "direction": "S"
+        }
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "exposed",
+        "props": {
+          "phaseShift": true
+        }
+      },
+      {
+        "terrain": "exposed",
+        "props": {
+          "phaseShift": true
+        }
+      },
+      {
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "shadow"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "shadow",
+          "role": "destination"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "shallow"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "electricity",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "electricity"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "intersection"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "gate",
+        "props": {
+          "direction": "E"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "electricity",
+          "role": "destination"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "shallow"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "water",
+          "role": "destination"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "wall"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      }
+    ]
+  },
+  "id": "twilight-pendulum-112",
+  "layout": 1,
+  "hint": "Plan Day deliveries before the pressure plate activates Night. Earlier deliveries remain valid after switching phases."
+}

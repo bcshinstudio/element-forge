@@ -1,0 +1,74 @@
+{
+  "placements": {
+    "92": {
+      "kind": "tunnel",
+      "pairId": "T1"
+    },
+    "128": {
+      "kind": "tunnel",
+      "pairId": "T1"
+    }
+  },
+  "routes": [
+    {
+      "element": "light",
+      "path": [
+        25,
+        26,
+        27,
+        28,
+        40,
+        39,
+        51
+      ],
+      "deliveredPhase": "day"
+    },
+    {
+      "element": "wind",
+      "path": [
+        18,
+        19,
+        31,
+        32,
+        44
+      ],
+      "deliveredPhase": "day"
+    },
+    {
+      "element": "shadow",
+      "path": [
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        78,
+        90
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "metal",
+      "path": [
+        80,
+        92,
+        128,
+        129,
+        130
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "fire",
+      "path": [
+        97,
+        98,
+        99,
+        111,
+        112
+      ],
+      "deliveredPhase": "night"
+    }
+  ]
+}

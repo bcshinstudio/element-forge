@@ -1,0 +1,1250 @@
+{
+  "twilight-pendulum-109": {
+    "placements": {},
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          26,
+          27,
+          28,
+          40,
+          52,
+          64,
+          76,
+          77,
+          65,
+          66,
+          54,
+          42,
+          43,
+          44,
+          32
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "water",
+        "path": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "fire",
+        "path": [
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  },
+  "twilight-pendulum-110": {
+    "placements": {
+      "110": "bridge"
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "water",
+        "path": [
+          14,
+          13,
+          12,
+          24,
+          36,
+          37,
+          38,
+          50,
+          62,
+          74,
+          86
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          105,
+          117
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "earth",
+        "path": [
+          58,
+          57,
+          56,
+          55,
+          54
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "nature",
+        "path": [
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  },
+  "twilight-pendulum-111": {
+    "placements": {
+      "92": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "128": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      }
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          25,
+          26,
+          27,
+          28,
+          40,
+          39,
+          51
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "wind",
+        "path": [
+          18,
+          19,
+          31,
+          32,
+          44
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          78,
+          90
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "metal",
+        "path": [
+          80,
+          92,
+          128,
+          129,
+          130
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "fire",
+        "path": [
+          97,
+          98,
+          99,
+          111,
+          112
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  },
+  "twilight-pendulum-112": {
+    "placements": {
+      "53": "intersection"
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          45,
+          46
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          27,
+          28,
+          40,
+          41,
+          42,
+          54,
+          66,
+          67,
+          68,
+          69,
+          81
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "water",
+        "path": [
+          17,
+          29,
+          41,
+          53,
+          65,
+          77,
+          89,
+          101,
+          113,
+          125
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "electricity",
+        "path": [
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "ice",
+        "path": [
+          13,
+          14,
+          15,
+          16
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  },
+  "twilight-pendulum-113": {
+    "placements": {
+      "9": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "91": {
+        "kind": "portal",
+        "pairId": "P1"
+      }
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "nature",
+        "path": [
+          49,
+          61,
+          62,
+          74,
+          86,
+          87,
+          99
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          8,
+          9,
+          91,
+          92,
+          93,
+          94,
+          106,
+          118
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "earth",
+        "path": [
+          52,
+          53,
+          54,
+          55,
+          56
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "fire",
+        "path": [
+          109,
+          110,
+          111,
+          112,
+          124
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "metal",
+        "path": [
+          126,
+          127,
+          128,
+          116
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  },
+  "twilight-pendulum-114": {
+    "placements": {
+      "110": "bridge",
+      "122": "intersection"
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "earth",
+        "path": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "wind",
+        "path": [
+          43,
+          44,
+          46,
+          58,
+          70,
+          82
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "water",
+        "path": [
+          74,
+          86,
+          98,
+          110,
+          122,
+          134
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "fire",
+        "path": [
+          120,
+          121,
+          122,
+          123,
+          124,
+          125,
+          126
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  },
+  "twilight-pendulum-115": {
+    "placements": {
+      "17": "intersection",
+      "125": "bridge"
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          38,
+          39,
+          40,
+          52,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          57,
+          45
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          86,
+          85,
+          84,
+          72,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          78,
+          90,
+          102,
+          103,
+          104,
+          105
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "water",
+        "path": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "electricity",
+        "path": [
+          5,
+          17,
+          29,
+          30,
+          42
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "nature",
+        "path": [
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "wind",
+        "path": [
+          97,
+          99,
+          111,
+          112
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  },
+  "twilight-pendulum-116": {
+    "placements": {
+      "17": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "21": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "61": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "100": "intersection",
+      "103": {
+        "kind": "portal",
+        "pairId": "P1"
+      }
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          25,
+          26,
+          27,
+          28,
+          40,
+          39,
+          51
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "metal",
+        "path": [
+          16,
+          17,
+          21,
+          33,
+          45,
+          46,
+          58
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          60,
+          61,
+          103,
+          104,
+          105,
+          106,
+          118,
+          130
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "ice",
+        "path": [
+          76,
+          88,
+          100,
+          112,
+          124
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "fire",
+        "path": [
+          97,
+          98,
+          99,
+          100,
+          101,
+          102
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "water",
+        "path": [
+          120,
+          121,
+          122,
+          123
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "earth",
+        "path": [
+          79,
+          80,
+          68,
+          69,
+          70
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  },
+  "twilight-pendulum-117": {
+    "placements": {
+      "37": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "89": "intersection",
+      "114": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "125": "bridge"
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "electricity",
+        "path": [
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          79,
+          80
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          36,
+          37,
+          114,
+          115,
+          116,
+          117,
+          118,
+          130,
+          142
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "nature",
+        "path": [
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "water",
+        "path": [
+          53,
+          65,
+          77,
+          89,
+          101,
+          113,
+          112,
+          111,
+          110,
+          109,
+          108,
+          120,
+          132,
+          133,
+          134,
+          135,
+          136,
+          137
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "wind",
+        "path": [
+          43,
+          45,
+          57,
+          69,
+          70
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "fire",
+        "path": [
+          61,
+          62,
+          63,
+          51,
+          52
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  },
+  "twilight-pendulum-118": {
+    "placements": {
+      "39": "intersection"
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "water",
+        "path": [
+          27,
+          39,
+          51,
+          63
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "earth",
+        "path": [
+          60,
+          61,
+          62,
+          63
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "nature",
+        "path": [
+          63,
+          75,
+          87,
+          99,
+          111,
+          112,
+          124
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          101,
+          102,
+          103,
+          104,
+          105,
+          117,
+          129
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "fire",
+        "path": [
+          67,
+          68,
+          56,
+          57,
+          58,
+          70
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  },
+  "twilight-pendulum-119": {
+    "placements": {
+      "41": "intersection",
+      "61": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "111": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "114": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "115": {
+        "kind": "portal",
+        "pairId": "P1"
+      }
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          60,
+          61,
+          115,
+          116,
+          117,
+          118,
+          130,
+          142
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "fire",
+        "path": [
+          63,
+          75,
+          87
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "earth",
+        "path": [
+          84,
+          85,
+          86,
+          87
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "metal",
+        "path": [
+          87,
+          99,
+          111,
+          114,
+          126,
+          127,
+          128
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "water",
+        "path": [
+          17,
+          29,
+          41,
+          53,
+          65,
+          77,
+          89
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "wind",
+        "path": [
+          19,
+          20,
+          22,
+          34,
+          33
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  },
+  "twilight-pendulum-120": {
+    "placements": {
+      "46": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "97": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "102": "intersection"
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          25,
+          26,
+          27,
+          28,
+          29,
+          17,
+          18,
+          30,
+          42
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "water",
+        "path": [
+          39,
+          51,
+          63
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "earth",
+        "path": [
+          60,
+          61,
+          62,
+          63
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "nature",
+        "path": [
+          63,
+          75,
+          87,
+          99,
+          111
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          96,
+          97,
+          46,
+          45,
+          44,
+          43,
+          42
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "electricity",
+        "path": [
+          42,
+          54,
+          66,
+          78,
+          90,
+          102,
+          114,
+          126
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "fire",
+        "path": [
+          100,
+          101,
+          102,
+          103,
+          104,
+          105
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  },
+  "twilight-pendulum-121": {
+    "placements": {
+      "17": "intersection",
+      "37": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "40": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "97": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "103": "intersection",
+      "126": {
+        "kind": "portal",
+        "pairId": "P1"
+      }
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          96,
+          97,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131,
+          119,
+          118
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "water",
+        "path": [
+          51,
+          63,
+          75
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "earth",
+        "path": [
+          72,
+          73,
+          74,
+          75
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "nature",
+        "path": [
+          75,
+          87,
+          99,
+          111,
+          123,
+          135
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "wind",
+        "path": [
+          46,
+          70,
+          69,
+          68,
+          67
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "water",
+        "path": [
+          5,
+          17,
+          29,
+          41,
+          53,
+          65,
+          66,
+          67
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "ice",
+        "path": [
+          67,
+          79,
+          91,
+          103,
+          115,
+          116
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "metal",
+        "path": [
+          36,
+          37,
+          40,
+          28,
+          27,
+          26
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "electricity",
+        "path": [
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          94
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  }
+}

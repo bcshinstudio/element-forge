@@ -1,0 +1,620 @@
+{
+  "format": "element-forge-map",
+  "schemaVersion": 2,
+  "rulesVersion": 4,
+  "name": "Sundial Sluice",
+  "description": "Inside Sundial Sluice, a hydraulic Water Pressure Plate swings both wings of the observatory between light and eclipse! Route Light across the sunlit northern gallery before Water drains the sluice—otherwise the northern gallery plunges into Covered ☾ darkness and traps Light—while Shadow waits for that exact same shift to darken the southern vault, and Plant claims your single Bridge!",
+  "width": 12,
+  "height": 12,
+  "phaseRules": {
+    "initial": "day"
+  },
+  "inventory": {
+    "bridge": 1,
+    "metalSpan": 0,
+    "intersection": 0,
+    "tunnel": 0,
+    "portal": 0,
+    "junction": 0,
+    "sorter": 0,
+    "converter": 0,
+    "gate": 0,
+    "checkpoint": 0,
+    "remover": 0,
+    "booster": 0,
+    "confluence": 0,
+    "phasePlate": 0
+  },
+  "constraints": {},
+  "cells": [
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "water",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "light",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "exposed"
+    },
+    {
+      "terrain": "exposed"
+    },
+    {
+      "terrain": "exposed",
+      "props": {
+        "phaseShift": true
+      }
+    },
+    {
+      "terrain": "exposed",
+      "props": {
+        "phaseShift": true
+      }
+    },
+    {
+      "terrain": "land",
+      "component": "checkpoint",
+      "props": {
+        "element": "light"
+      }
+    },
+    {
+      "terrain": "land",
+      "component": "gate",
+      "props": {
+        "direction": "E"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "light",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "water"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "water"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "earth",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land",
+      "component": "gate",
+      "props": {
+        "direction": "W"
+      }
+    },
+    {
+      "terrain": "scree"
+    },
+    {
+      "terrain": "scree"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "earth",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "water"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "phasePlate",
+      "props": {
+        "element": "water"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "water",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "shadow",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "covered"
+    },
+    {
+      "terrain": "covered"
+    },
+    {
+      "terrain": "exposed",
+      "props": {
+        "phaseShift": true
+      }
+    },
+    {
+      "terrain": "exposed",
+      "props": {
+        "phaseShift": true
+      }
+    },
+    {
+      "terrain": "land",
+      "component": "checkpoint",
+      "props": {
+        "element": "shadow"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "water"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "gate",
+      "props": {
+        "direction": "S"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "nature",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "forest"
+    },
+    {
+      "terrain": "water"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "checkpoint",
+      "props": {
+        "element": "nature"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "nature",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "shadow",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "wall"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    }
+  ],
+  "phaseWitness": {
+    "placements": {
+      "110": "bridge"
+    },
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "water",
+        "path": [
+          14,
+          13,
+          12,
+          24,
+          36,
+          37,
+          38,
+          50,
+          62,
+          74,
+          86
+        ],
+        "deliveredPhase": "day"
+      },
+      {
+        "element": "shadow",
+        "path": [
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          105,
+          117
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "earth",
+        "path": [
+          58,
+          57,
+          56,
+          55,
+          54
+        ],
+        "deliveredPhase": "night"
+      },
+      {
+        "element": "nature",
+        "path": [
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114
+        ],
+        "deliveredPhase": "night"
+      }
+    ]
+  }
+}

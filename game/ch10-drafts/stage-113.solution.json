@@ -1,0 +1,88 @@
+{
+  "placements": {
+    "9": {
+      "kind": "portal",
+      "pairId": "P1"
+    },
+    "91": {
+      "kind": "portal",
+      "pairId": "P1"
+    }
+  },
+  "routes": [
+    {
+      "element": "light",
+      "path": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "deliveredPhase": "day"
+    },
+    {
+      "element": "nature",
+      "path": [
+        49,
+        61,
+        62,
+        74,
+        86,
+        87,
+        99
+      ],
+      "deliveredPhase": "day"
+    },
+    {
+      "element": "shadow",
+      "path": [
+        8,
+        9,
+        91,
+        92,
+        93,
+        94,
+        106,
+        118
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "earth",
+      "path": [
+        52,
+        53,
+        54,
+        55,
+        56
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "fire",
+      "path": [
+        109,
+        110,
+        111,
+        112,
+        124
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "metal",
+      "path": [
+        126,
+        127,
+        128,
+        116
+      ],
+      "deliveredPhase": "night"
+    }
+  ]
+}
