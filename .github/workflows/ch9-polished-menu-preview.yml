@@ -1,0 +1,54 @@
+name: Wellspring Pause Menu QA
+
+on:
+  push:
+    branches:
+      - feature/ch9-polish-pause-menu
+  workflow_dispatch:
+
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run regression tests and syntax checks
+        run: |
+          node --test map-editor/tests/*.test.js game/tests/*.test.js
+          node --check game/app.js
+          node --check game/chapter.js
+          node --check map-editor/engine.js
+          node --check map-editor/map-format.js
+      - name: Install Chromium browser automation
+        run: |
+          python3 -m pip install playwright==1.51.0
+          if command -v google-chrome >/dev/null; then
+            echo "CHROMIUM_EXECUTABLE=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            python3 -m playwright install --with-deps chromium
+          fi
+      - name: Build offline Wellspring preview
+        run: |
+          python3 game/build.py Wellspring_Pause_Menu_Preview.html
+          test -s Wellspring_Pause_Menu_Preview.html
+      - name: Test two-level menu desktop and phones (source and packaged HTML)
+        run: python3 game/tests/pause_menu_browser.py
+      - name: Verify existing clean stage UI
+        run: python3 game/tests/clean_stage_ui_browser.py
+      - name: Verify all twelve Chapter 9 levels and preserved progress
+        run: python3 game/tests/ch9_browser.py
+      - name: Verify hidden developer review gesture
+        run: python3 game/tests/developer_review_browser.py
+      - name: Upload offline game and visual QA screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: Wellspring-Polished-Pause-Menu
+          path: |
+            Wellspring_Pause_Menu_Preview.html
+            pause-menu-screenshots/*.png
+          retention-days: 14
+          if-no-files-found: error
