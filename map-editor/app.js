@@ -1,10 +1,14 @@
 'use strict';
 // Editor data is renderer-independent. Future generator/solver should use this schema.
 const {TERRAIN,COMPONENTS,ELEMENTS,DIRECTIONS,fresh,parseConstraints,parseMap,structuralErrors}=window.EFMap;
+const reactionEngine=window.EFEngine;
+const reactionLabel=r=>r.inputs.map(e=>ELEMENTS[e].name).join(' + ')+' → '+ELEMENTS[r.output].name;
+const confluenceProps=()=>reactionId==='custom'?{recipe:'custom',inputs:[...customInputs],output:customOutput}:{recipe:reactionId};
+const confluenceSymbol=id=>id==='wind'?'V':ELEMENTS[id]?.symbol||ELEMENTS[id]?.name?.[0]||'?';
 const $=id=>document.getElementById(id),clone=o=>JSON.parse(JSON.stringify(o));
 const newBoard=()=>({...fresh(),rulesVersion:4});
 let copiedCell=null;
-let map=newBoard(),tool='terrain:mountain',element='fire',direction='E',pairId='A',checkpointElement='any',history=[],future=[],drawing=false,changedStroke=false,lastIndex=-1,dirty=false,assets={terrain:{},components:{}};
+let map=newBoard(),tool='terrain:mountain',element='fire',direction='E',pairId='A',checkpointElement='any',reactionId='water-earth-nature',customInputs=['water','earth'],customOutput='nature',history=[],future=[],drawing=false,changedStroke=false,lastIndex=-1,dirty=false,assets={terrain:{},components:{}};
 function snapshot(){history.push(clone(map));if(history.length>100)history.shift();future=[];updateHistory()}
 function updateHistory(){
  const inPlay=window.EFPlay?.isActive();
@@ -56,9 +60,45 @@ function buildPalette(){
  document.querySelector('[data-element="fire"]').classList.add('active');
  setTool(tool);
 }
-function updateProperties(){const type=tool.split(':')[1];let html='';if(['oneway','junction','sorter','gate','booster','confluence'].includes(type))html+=`<label>Orientation<select id="propDirection">${DIRECTIONS.map(d=>`<option value="${d}" ${direction===d?'selected':''}>${{N:'North ↑',E:'East →',S:'South ↓',W:'West ←'}[d]}</option>`).join('')}</select></label>`;if(['portal','tunnel'].includes(type))html+=`<label>Connection ID (two matching endpoints)<input id="propPair" maxlength="12" value="${escapeHtml(pairId)}"></label><p class="property-note">Place exactly two ${type} endpoints with the same ID. Tunnel travel between ends is intended to pass under intervening terrain; paired links work in Playtest. Tunnel ends must align horizontally or vertically with blocked terrain between them.</p>`;if(type==='confluence')html+='<p class="property-note">One fixed chamber per map. Output points in the selected direction; Water enters from its left, Earth from its right. Place one Water source, one Earth source, and one Plant inlet. The chamber provides the Plant source automatically.</p>';if(type==='checkpoint')html+=`<label>Required element<select id="propCheckpoint"><option value="any">Any element</option>${Object.entries(ELEMENTS).map(([id,e])=>`<option value="${id}" ${checkpointElement===id?'selected':''}>${e.name}</option>`).join('')}</select></label>`;if(tool==='art'||tool==='pick')html='';if(tool==='inspect')html='<p class="property-note">Click any cell to inspect its terrain, fixed component, orientation, connection ID, or node.</p>';if(tool==='copy')html='<p class="property-note">Select a cell to copy its terrain, fixture or endpoint, gameplay properties, and artwork.</p>';
-if(tool==='stamp')html='<p class="property-note">Tap or drag to stamp the copied cell. Check any pasted endpoints or paired links for duplicates.</p>';
-if(!html&&!['art','pick'].includes(tool))html='<p class="property-note">No extra properties for this tool. Painting terrain preserves nothing above it; painting a fixed component preserves its terrain when compatible.</p>';$('properties').innerHTML=html;$('art-brush').hidden=!['art','pick'].includes(tool);if($('propDirection'))$('propDirection').onchange=e=>direction=e.target.value;if($('propPair'))$('propPair').oninput=e=>pairId=e.target.value.replace(/[^a-zA-Z0-9_-]/g,'').slice(0,12);if($('propCheckpoint'))$('propCheckpoint').onchange=e=>checkpointElement=e.target.value}
+function updateProperties(){
+ const type=tool.split(':')[1];
+ let html='';
+ if(['oneway','junction','sorter','gate','booster','confluence'].includes(type))
+  html+=`<label>${type==='confluence'?'Output direction':'Orientation'}<select id="propDirection">${DIRECTIONS.map(d=>`<option value="${d}" ${direction===d?'selected':''}>${{N:'North ↑',E:'East →',S:'South ↓',W:'West ←'}[d]}</option>`).join('')}</select></label>`;
+ if(['portal','tunnel'].includes(type))
+  html+=`<label>Connection ID (two matching endpoints)<input id="propPair" maxlength="12" value="${escapeHtml(pairId)}"></label><p class="property-note">Place exactly two ${type} endpoints with the same ID. Tunnel ends must align horizontally or vertically with blocked terrain between them.</p>`;
+ if(type==='confluence'){
+  const options=reactionEngine.CONFLUENCE_RECIPES.map(r=>
+   `<option value="${r.id}" ${reactionId===r.id?'selected':''}>${reactionLabel(r)}</option>`).join('');
+  html+=`<label>Reaction recipe<select id="propReaction">${options}<option value="custom" ${reactionId==='custom'?'selected':''}>Custom: choose elements</option></select></label>`;
+  if(reactionId==='custom'){
+   const field=(label,id,value)=>`<label>${label}<select id="${id}">${Object.entries(ELEMENTS).map(([key,e])=>`<option value="${key}" ${value===key?'selected':''}>${e.name}</option>`).join('')}</select></label>`;
+   html+=field('Input 1 (blue port)','propReactionInput1',customInputs[0]);
+   html+=field('Input 2 (amber port)','propReactionInput2',customInputs[1]);
+   html+=field('Output (green port)','propReactionOutput',customOutput);
+   if(!reactionEngine.confluenceRecipe(confluenceProps()))html+='<p class="warning-text">Select three different elements.</p>';
+  }
+  html+='<p class="property-note">One chamber per map. Place one Source for each input, and one Destination for the output. Rotate all three ports with Output direction.</p>';
+ }
+ if(type==='checkpoint')
+  html+=`<label>Required element<select id="propCheckpoint"><option value="any">Any element</option>${Object.entries(ELEMENTS).map(([id,e])=>`<option value="${id}" ${checkpointElement===id?'selected':''}>${e.name}</option>`).join('')}</select></label>`;
+ if(tool==='art'||tool==='pick')html='';
+ if(tool==='inspect')html='<p class="property-note">Click any cell to inspect its terrain, fixture, reaction, direction, connection ID or node.</p>';
+ if(tool==='copy')html='<p class="property-note">Select a cell to copy its terrain, fixture or endpoint, gameplay properties, and artwork.</p>';
+ if(tool==='stamp')html='<p class="property-note">Tap or drag to stamp the copied cell. Check any pasted endpoints or links for duplicates.</p>';
+ if(!html&&!['art','pick'].includes(tool))html='<p class="property-note">No extra properties for this tool. Painting terrain preserves nothing above it; painting a fixed component preserves its terrain when compatible.</p>';
+ $('properties').innerHTML=html;
+ $('art-brush').hidden=!['art','pick'].includes(tool);
+ if($('propDirection'))$('propDirection').onchange=e=>direction=e.target.value;
+ if($('propPair'))$('propPair').oninput=e=>pairId=e.target.value.replace(/[^a-zA-Z0-9_-]/g,'').slice(0,12);
+ if($('propCheckpoint'))$('propCheckpoint').onchange=e=>checkpointElement=e.target.value;
+ if($('propReaction'))$('propReaction').onchange=e=>{reactionId=e.target.value;updateProperties();};
+ for(const [id,update] of [
+  ['propReactionInput1',v=>customInputs[0]=v],
+  ['propReactionInput2',v=>customInputs[1]=v],
+  ['propReactionOutput',v=>customOutput=v]
+ ])if($(id))$(id).onchange=e=>{update(e.target.value);updateProperties();};
+}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 function cellMarkup(c){
  let out='';
@@ -74,11 +114,11 @@ function cellMarkup(c){
   out+=`<span class="node-shape ${c.node.role}" style="background:${e.color};border-color:${e.color}">${c.node.role==='source'?'S':'D'}</span>`;
  }
  if(c.component==='confluence'){
-   const ports=window.EFEngine.confluenceDirections(c.props?.direction||'E');
-   out+='<span class="confluence-mark" aria-hidden="true"><span class="confluence-core">◇</span>'+
-    [['water','W'],['earth','E'],['nature','P']].map(([kind,label])=>
-     `<span class="confluence-port confluence-${kind} port-${ports[kind]}">${label}</span>`).join('')+'</span>';
-  }
+  const recipe=reactionEngine.confluenceRecipe(c.props),ports=reactionEngine.confluenceDirections(c.props?.direction||'E');
+  const entries=recipe?[[recipe.inputs[0],ports.input1],[recipe.inputs[1],ports.input2],[recipe.output,ports.exit]]:[];
+  out+='<span class="confluence-mark" aria-hidden="true"><span class="confluence-core">◇</span>'+
+   entries.map(([kind,side])=>`<span class="confluence-port confluence-${kind} port-${side}" style="background:${ELEMENTS[kind].color}">${confluenceSymbol(kind)}</span>`).join('')+'</span>';
+ }
   if(c.component&&c.props?.pairId&&(!illustrated||url))out+=`<span class="overlay">${escapeHtml(c.props.pairId)}</span>`;
  if((c.terrain==='oneway'||c.props?.direction)&&!c.node&&c.component!=='confluence')out+=`<span class="direction">${{N:'↑',E:'→',S:'↓',W:'←'}[c.props?.direction||'E']}</span>`;
  return out;
@@ -89,7 +129,7 @@ function decorateCell(element,cell){
 }
 function cellClass(c){return `cell ${c.terrain} ${c.component?'has-component':''} ${c.node?'node':''}`}
 function cellLabel(c,i){
- return `Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, ${c.node?ELEMENTS[c.node.element].name.toLowerCase()+' '+c.node.role:c.component==='confluence'?'Confluence: Water + Earth to Plant, output '+(c.props?.direction||'E'):c.component||c.terrain}`;
+ return `Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, ${c.node?ELEMENTS[c.node.element].name.toLowerCase()+' '+c.node.role:c.component==='confluence'?'Confluence: '+(reactionEngine.confluenceRecipe(c.props)?reactionLabel(reactionEngine.confluenceRecipe(c.props)):'invalid recipe')+', output '+(c.props?.direction||'E'):c.component||c.terrain}`;
 }
 function render(){const b=$('board');b.style.setProperty('--cols',map.width);b.style.setProperty('--rows',map.height);b.innerHTML=map.cells.map((c,i)=>`<div class="${cellClass(c)}" data-i="${i}" role="gridcell" aria-label="${cellLabel(c,i)}">${cellMarkup(c)}</div>`).join('');map.cells.forEach((cell,i)=>decorateCell(b.children[i],cell));$('count').textContent=`${map.width} × ${map.height} · ${map.width*map.height} cells`;$('width').value=map.width;$('height').value=map.height;updateHistory();window.EFEditorArt?.boardChanged()}
 function refreshCell(i){
@@ -120,9 +160,12 @@ function paint(i){
  else if(kind==='terrain')next={terrain:id,...(id==='oneway'?{props:{direction}}:{})};
  else if(kind==='node')next={terrain:'land',node:{element,role:id},...(prev.terrain==='land'&&prev.terrainArt?{terrainArt:prev.terrainArt}:{})};
  else if(kind==='component'){
+  if(id==='confluence'&&!reactionEngine.confluenceRecipe(confluenceProps())){
+   showMessage('Select three different elements for the custom reaction.',false);return;
+  }
   next={terrain:prev.terrain,component:id,...(prev.terrainArt?{terrainArt:prev.terrainArt}:{})};
   if(['portal','tunnel'].includes(id))next.props={pairId:pairId.trim()||'A'};
-  else if(['junction','sorter','gate','booster','confluence'].includes(id))next.props={direction};
+  else if(['junction','sorter','gate','booster','confluence'].includes(id))next.props=id==='confluence'?{direction,...confluenceProps()}:{direction};
   else if(id==='checkpoint')next.props={element:checkpointElement};
  }
  if(kind==='terrain'||kind==='component'){
