@@ -1,0 +1,73 @@
+{
+  "stage": 99,
+  "verifiedBy": "EFEngine.checkAll and EFSession.createSession",
+  "routes": [
+    {
+      "element": "fire",
+      "path": [
+        25,
+        37,
+        49,
+        61,
+        62,
+        63
+      ]
+    },
+    {
+      "element": "earth",
+      "path": [
+        99,
+        87,
+        75,
+        63
+      ]
+    },
+    {
+      "element": "metal",
+      "path": [
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        58
+      ]
+    },
+    {
+      "element": "water",
+      "path": [
+        19,
+        31,
+        43,
+        55,
+        67,
+        79,
+        91,
+        103,
+        115,
+        127
+      ]
+    },
+    {
+      "element": "wind",
+      "path": [
+        13,
+        14,
+        15,
+        17,
+        29,
+        41,
+        53,
+        52,
+        40
+      ]
+    }
+  ],
+  "placements": {
+    "66": "metalSpan",
+    "67": "intersection"
+  }
+}
