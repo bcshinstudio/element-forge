@@ -1,0 +1,74 @@
+{
+  "stage": 101,
+  "verifiedBy": "EFEngine.checkAll and EFSession.createSession",
+  "routes": [
+    {
+      "element": "wind",
+      "path": [
+        13,
+        14,
+        16,
+        28,
+        40,
+        52
+      ]
+    },
+    {
+      "element": "water",
+      "path": [
+        48,
+        49,
+        50,
+        51,
+        52
+      ]
+    },
+    {
+      "element": "ice",
+      "path": [
+        52,
+        64,
+        76,
+        88,
+        100,
+        112,
+        113,
+        114,
+        126
+      ]
+    },
+    {
+      "element": "electricity",
+      "path": [
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91
+      ]
+    },
+    {
+      "element": "nature",
+      "path": [
+        21,
+        33,
+        45,
+        57,
+        69,
+        81,
+        93,
+        105,
+        117,
+        129,
+        128
+      ]
+    }
+  ],
+  "placements": {
+    "88": "intersection",
+    "117": "bridge"
+  }
+}
