@@ -60,6 +60,16 @@ function parseCell(cell,index,version){
    if(props.element!=='any'&&!Object.hasOwn(ELEMENTS,props.element))fail('invalid checkpoint element.');
    next.props.element=props.element;
   }
+  if(props.recipe!==undefined||props.inputs!==undefined||props.output!==undefined){
+   if(component!=='confluence')fail('reaction properties require a Confluence Chamber.');
+   const recipe=E.confluenceRecipe(props);
+   if(!recipe)fail('invalid Confluence recipe or duplicate element.');
+   next.props.recipe=recipe.id;
+   if(recipe.id==='custom'){
+    next.props.inputs=[...recipe.inputs];
+    next.props.output=recipe.output;
+   }
+  }
  }
  for(const field of ['terrainArt','componentArt']){
   if(cell[field]===undefined)continue;
@@ -158,17 +168,19 @@ function mapFindings(map,includePlayability=true){
  let matched=0;
  if(chambers.length>1)report('Only one Confluence Chamber is supported per map.',chambers);
  const chamber=chambers.length===1?E.confluence(map):null;
+ if(chambers.length===1&&!chamber)report('Confluence Chamber needs a valid reaction recipe.',chambers);
  if(chamber){
-  for(const element of ['water','earth','nature']){
+  for(const element of [...chamber.inputs,chamber.output]){
    const nodes=endpoints.get(element)??{source:[],destination:[]};
    const sources=nodes.source.length,destinations=nodes.destination.length;
-   const valid=element==='nature'?sources===0&&destinations===1:sources===1&&destinations===0;
-   if(!valid)report(element==='nature'?
-    'Confluence Plant needs one destination and no separate Plant source.':
+   const isOutput=element===chamber.output;
+   const valid=isOutput?sources===0&&destinations===1:sources===1&&destinations===0;
+   if(!valid)report(isOutput?
+    `Confluence ${ELEMENTS[element].name} needs one destination and no separate ${ELEMENTS[element].name} source.`:
     `Confluence ${ELEMENTS[element].name} needs one source and no separate destination.`,
     [...nodes.source,...nodes.destination,chamber.index]);
    else matched++;
-   const side=chamber[element],neighbor=E.confluenceNeighbor(map,chamber.index,side);
+   const side=chamber.ports[element],neighbor=E.confluenceNeighbor(map,chamber.index,side);
    if(neighbor<0){report(`Confluence ${ELEMENTS[element].name} port (${side}) must face an in-bounds tile.`,[chamber.index]);continue;}
    const adjoining=map.cells[neighbor];
    if(E.terrainError(map,element,neighbor,adjoining.component)||
@@ -177,7 +189,7 @@ function mapFindings(map,includePlayability=true){
   }
  }
  for(const [element,{source,destination}] of endpoints){
-  if(chamber&&['water','earth','nature'].includes(element))continue;
+  if(chamber&&[...chamber.inputs,chamber.output].includes(element))continue;
   const indices=[...source,...destination];
   const name=ELEMENTS[element].name;
   if(source.length!==destination.length)report(`${name}: ${source.length} source(s) vs ${destination.length} inlet(s).`,indices);
