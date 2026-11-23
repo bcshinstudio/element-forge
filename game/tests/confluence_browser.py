@@ -27,7 +27,7 @@ def test_game(browser, base):
     chamber = page.locator('#board [data-index="24"]')
     expect(chamber.locator(".confluence-port")).to_have_count(3)
     assert chamber.locator(".port-N").inner_text() == "W"
-    assert chamber.locator(".port-S").inner_text() == "E"
+    assert chamber.locator(".port-S").inner_text() == "R"
     assert chamber.locator(".port-E").inner_text() == "P"
     page.locator("#start").click()
     trace(page, [24, 25, 26, 27])  # Plant may be planned before either input.
