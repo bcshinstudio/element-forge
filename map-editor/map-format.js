@@ -187,11 +187,9 @@ function mapFindings(map,includePlayability=true){
   if(map.rulesVersion!==4)report('Day/Night maps require rules version 4.');
   if(phasePlates.length!==1)report('Day/Night maps require exactly one pressure plate.',phasePlates);
   if(!shiftingCount)report('Mark at least one Exposed/Covered tile as phase-shifting.');
-  if(chambers.length)report('Confluence + phase combinations will be introduced later.',chambers);
   const trigger=phasePlates.length===1?map.cells[phasePlates[0]].props?.element:null;
   if(!trigger||trigger==='any'||!ELEMENTS[trigger])report('Select a triggering element for the phase plate.',phasePlates);
-  if(trigger&&!endpoints.get(trigger)?.source?.length)report('The phase plate needs a matching Source.',phasePlates);
-  if(Object.values(map.inventory).some(value=>value>0))report('Day/Night prototype requires zero player construction inventory.');
+  if(trigger&&!endpoints.get(trigger)?.source?.length&&!E.confluences(map).some(ch=>ch.output===trigger))report('The phase plate needs a matching Source or Confluence output.',phasePlates);
  }
  let matched=0;
  if(chambers.length>1){
@@ -266,7 +264,7 @@ function mapFindings(map,includePlayability=true){
   else if(E.linkPartner(map,indices[0])<0)report(`${key}: tunnel ends must align and cross blocked terrain.`,indices);
  }
  if(includePlayability){
-  if(matched>(chambers.length>1?16:8))report('Game levels currently support up to '+(chambers.length>1?16:8)+' route segments.');
+  if(matched>(chambers.length>1||map.phaseRules?16:8))report('Game levels currently support up to '+(chambers.length>1||map.phaseRules?16:8)+' route segments.');
   for(const [kind,count] of Object.entries(map.inventory)){
    if(count&&!PLACEABLE.includes(kind))report(`Unsupported player inventory: ${kind}.`);
   }
