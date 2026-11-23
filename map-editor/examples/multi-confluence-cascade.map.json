@@ -1,0 +1,509 @@
+{
+  "format": "element-forge-map",
+  "schemaVersion": 2,
+  "name": "Three-Chamber Cascade",
+  "description": "Water + Earth makes Plant; Plant + Fire makes Wind; Wind + Light makes Electricity.",
+  "width": 12,
+  "height": 12,
+  "cells": [
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "water",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "confluence",
+      "props": {
+        "direction": "E",
+        "recipe": "custom",
+        "inputs": [
+          "water",
+          "earth"
+        ],
+        "output": "nature"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "confluence",
+      "props": {
+        "direction": "E",
+        "recipe": "custom",
+        "inputs": [
+          "nature",
+          "fire"
+        ],
+        "output": "wind"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "earth",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "fire",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "confluence",
+      "props": {
+        "direction": "E",
+        "recipe": "custom",
+        "inputs": [
+          "wind",
+          "light"
+        ],
+        "output": "electricity"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "electricity",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "light",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    }
+  ],
+  "constraints": {},
+  "inventory": {
+    "bridge": 0,
+    "metalSpan": 0,
+    "intersection": 0,
+    "tunnel": 0,
+    "portal": 0,
+    "junction": 0,
+    "sorter": 0,
+    "converter": 0,
+    "gate": 0,
+    "checkpoint": 0,
+    "remover": 0,
+    "booster": 0,
+    "confluence": 0
+  },
+  "rulesVersion": 4
+}
