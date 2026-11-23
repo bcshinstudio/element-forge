@@ -201,6 +201,35 @@ window.EFStoryChapters = [
         "line": "Now the currents can change as they travel. The old builders left more than pathways—they left a way to transform the world."
       }
     ]
+  },
+  {
+    "chapter": "The Twilight Pendulum",
+    "opening": [
+      {
+        "art": "loom",
+        "caption": "The first eclipse",
+        "line": "The Confluence Forges are awake, but the old skyward mechanism still holds the world in perpetual Day. I found a pressure plate that may wake it."
+      },
+      {
+        "art": "star",
+        "caption": "The Pendulum of Day and Night",
+        "line": "Complete a delivery through the assigned plate to turn Day into Night. Already delivered currents stay complete, and marked sunlit channels become shadowed paths."
+      }
+    ],
+    "ending": [
+      {
+        "art": "star",
+        "caption": "The Celestial Orrery · Stage 121",
+        "motion": "relief",
+        "duration": 5200,
+        "line": "The final currents arrive in their inlets. The Orrery turns, and Day and Night fall into rhythm across the World-Heart."
+      },
+      {
+        "art": "world-heart",
+        "caption": "The Twilight Pendulum restored",
+        "line": "The elements have learned to travel not only through space, but through time. The pathways of the world are yours to weave."
+      }
+    ]
   }
 ];
 window.EFStoryArt = {
