@@ -1,0 +1,64 @@
+name: Chapter 9 Wellspring Campaign Preview
+
+on:
+  push:
+    branches:
+      - feature/ch9-confluence-forges-campaign
+  workflow_dispatch:
+
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run Chapter 9 and existing Node regression tests
+        run: |
+          node --test map-editor/tests/*.test.js game/tests/*.test.js
+          node --check game/confluence-forges.js
+          node --check game/chapter.js
+          node --check game/app.js
+          node --check game/story-data.js
+          node --check game/audio.js
+          node --check art/variants.js
+          node --check map-editor/engine.js
+          node --check map-editor/map-format.js
+      - name: Install browser tests
+        run: |
+          python3 -m pip install playwright==1.51.0
+          if command -v google-chrome >/dev/null; then
+            echo "CHROMIUM_EXECUTABLE=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            python3 -m playwright install --with-deps chromium
+          fi
+      - name: Verify all 12 chapter stages and earlier saved progress
+        run: python3 game/tests/ch9_browser.py
+      - name: Verify flexible Confluence maps in Chromium
+        run: |
+          python3 game/tests/confluence_browser.py
+          python3 game/tests/multi_confluence_browser.py
+      - name: Build standalone editor and 108-stage game
+        run: |
+          python3 game/build.py --editor Wellspring_Chapter9_Map_Editor.html
+          python3 game/build.py Wellspring_Chapter9_Game.html
+          test -s Wellspring_Chapter9_Map_Editor.html
+          test -s Wellspring_Chapter9_Game.html
+      - name: Test offline built game/editor
+        run: |
+          WELLSPRING_EDITOR=Wellspring_Chapter9_Map_Editor.html WELLSPRING_GAME=Wellspring_Chapter9_Game.html python3 game/tests/multi_confluence_offline.py
+      - name: Upload Chapter 9 testing package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Wellspring-Chapter9-Preview
+          path: |
+            Wellspring_Chapter9_Map_Editor.html
+            Wellspring_Chapter9_Game.html
+            game/ch9-drafts/*.map.json
+            game/ch9-drafts/*.level.json
+            game/ch9-drafts/design-audit.json
+          retention-days: 14
+          if-no-files-found: error
