@@ -12,10 +12,24 @@ global.EFArtCatalog=catalog;
 const Art=require('../../art/variants');
 delete global.EFArtCatalog;
 const campaign=require('../chapter');
-const chapterKeys=['chapter','chapterTwo','chapterThree','chapterFour','chapterFive','chapterSix','chapterSeven','chapterEight','chapterNine'];
-const chapterFiles=['sleeping-valley','gatekeepers','primeval-crucible','astral-loom','celestial-confluence','weavers-playground','shattered-abyss','world-heart-sanctuary','confluence-forges'];
+const chapterKeys=['chapter','chapterTwo','chapterThree','chapterFour','chapterFive','chapterSix','chapterSeven','chapterEight','chapterNine','chapterTen'];
+const chapterFiles=['sleeping-valley','gatekeepers','primeval-crucible','astral-loom','celestial-confluence','weavers-playground','shattered-abyss','world-heart-sanctuary','confluence-forges','twilight-pendulum'];
 
 function replay(level,plan){
+ if(level.map.phaseRules){
+  const session=createSession(level);
+  assert.equal(session.start().ok,true,level.id);
+  for(const [i,value] of Object.entries(plan.placements)){
+   const r=session.place(+i,E.placementKind(value),value.pairId??'A');
+   assert.equal(r.ok,true,level.id+' tool at '+i+': '+r.message);
+  }
+  for(const route of plan.routes)for(const cell of route.path){
+   const r=session.route(cell);
+   assert.equal(r.ok,true,level.id+' '+route.element+' at '+cell+': '+r.message);
+  }
+  assert.equal(session.evaluate().ok,true,level.id);
+  return session.snapshot();
+ }
  const session=createSession(level);
  const save={...session.snapshot(),phase:'build',loadout:E.placementCounts(plan.placements),
   routes:plan.routes,placements:plan.placements};
@@ -49,7 +63,7 @@ test('all approved art is cataloged, placed in its gameplay family, and present 
  }
 });
 
-test('all 108 campaign maps keep the original solution and rule data after applying and exporting their chapter palette',()=>{
+test('all 121 campaign maps keep rule data and remain solvable after chapter artwork is applied',()=>{
  for(const [chapter,key] of chapterKeys.entries()){
   const plans=require('./fixtures/'+chapterFiles[chapter]+'-solutions.json');
   for(const [i,level] of campaign[key].entries()){
