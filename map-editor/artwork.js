@@ -105,7 +105,7 @@
    box.append(row);
   }
   const props=cell.props??{};
-  if(cell.terrain==='oneway'||['gate','junction','sorter','booster'].includes(cell.component)||props.direction){
+  if(cell.terrain==='oneway'||['gate','junction','sorter','booster','confluence'].includes(cell.component)||props.direction){
    addProperty('Gameplay direction',DIRECTIONS.map(d=>[d,d]),props.direction??'E',value=>setProp('direction',value));
   }
   if(['portal','tunnel'].includes(cell.component)){
