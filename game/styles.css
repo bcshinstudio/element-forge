@@ -215,6 +215,9 @@ button.brand { background: transparent; border: 0; text-align: left; }
  .build-actions { margin-top: 4px; gap: 4px; }
  #bridge-count { font-size: .85rem; }
  footer { display: none; }
+ /* Keep the original BC Shin Studio footer reachable in Settings on phones.
+    It stays hidden during play to preserve vertical board space. */
+ body:has(#audio-settings:not([hidden])) footer { display: block; }
  .controls .restoration p, #score, #totals { margin: 3px 0; }
  #score-details { margin-top: 3px; }
 }
