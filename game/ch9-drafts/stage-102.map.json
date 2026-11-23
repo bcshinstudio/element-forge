@@ -1,0 +1,536 @@
+{
+  "format": "element-forge-map",
+  "schemaVersion": 2,
+  "name": "Twin-Chamber Foundry",
+  "description": "Inside the Twin-Chamber Foundry, there are no standalone currents—every single source must enter one of two parallel synthesis chambers! Unite Fire and Earth to smelt Metal (which bores through a 3-tile Mountain bulkhead via your Tunnel), while uniting Water and Wind (void jump) to crystallize Ice (which crosses Shallows and intersects Metal straight at right angles)!",
+  "width": 12,
+  "height": 12,
+  "cells": [
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "fire",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "lava"
+    },
+    {
+      "terrain": "land",
+      "component": "gate",
+      "props": {
+        "direction": "S"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "lava",
+      "component": "checkpoint",
+      "props": {
+        "element": "fire"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "land",
+      "component": "confluence",
+      "props": {
+        "direction": "E",
+        "ports": {
+          "input1": "N",
+          "input2": "S",
+          "output": "E"
+        },
+        "recipe": "fire-earth-metal"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "checkpoint",
+      "props": {
+        "element": "metal"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "scree"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "gate",
+      "props": {
+        "direction": "S"
+      }
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "ice",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "scree"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "gate",
+      "props": {
+        "direction": "N"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "earth",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "water",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "water"
+    },
+    {
+      "terrain": "land",
+      "component": "confluence",
+      "props": {
+        "direction": "E",
+        "ports": {
+          "input1": "W",
+          "input2": "S",
+          "output": "E"
+        },
+        "recipe": "water-wind-ice"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "shallow"
+    },
+    {
+      "terrain": "shallow"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "checkpoint",
+      "props": {
+        "element": "ice"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "land",
+      "component": "gate",
+      "props": {
+        "direction": "N"
+      }
+    },
+    {
+      "terrain": "mountain"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "component": "checkpoint",
+      "props": {
+        "element": "wind"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "metal",
+        "role": "destination"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land",
+      "node": {
+        "element": "wind",
+        "role": "source"
+      }
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "void"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    },
+    {
+      "terrain": "land"
+    }
+  ],
+  "constraints": {},
+  "inventory": {
+    "bridge": 0,
+    "metalSpan": 0,
+    "intersection": 1,
+    "tunnel": 2,
+    "portal": 0,
+    "junction": 0,
+    "sorter": 0,
+    "converter": 0,
+    "gate": 0,
+    "checkpoint": 0,
+    "remover": 0,
+    "booster": 0,
+    "confluence": 0
+  },
+  "rulesVersion": 4,
+  "artPalette": 8
+}
