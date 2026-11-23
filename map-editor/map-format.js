@@ -166,7 +166,42 @@ function mapFindings(map,includePlayability=true){
  }
 
  let matched=0;
- if(chambers.length>1)report('Only one Confluence Chamber is supported per map.',chambers);
+ if(chambers.length>1){
+  const fixtures=E.confluences(map);
+  if(fixtures.length!==chambers.length)report('Every Confluence Chamber requires a valid recipe and direction.',chambers);
+  for(const chamber of fixtures){
+   for(const element of [...chamber.inputs,chamber.output]){
+    const side=chamber.ports[element],neighbor=E.confluenceNeighbor(map,chamber.index,side);
+    if(neighbor<0){
+     report('Confluence at cell '+(chamber.index+1)+': '+ELEMENTS[element].name+' port ('+side+') must be within the board.',[chamber.index]);
+     continue;
+    }
+    const adjacent=map.cells[neighbor];
+    if(E.terrainError(map,element,neighbor,adjacent.component)||
+       (adjacent.node&&adjacent.node.element!==element)){
+     report('Confluence at cell '+(chamber.index+1)+': '+ELEMENTS[element].name+' port ('+side+') is blocked.',[chamber.index,neighbor]);
+    }
+   }
+  }
+  const sourceCount=Object.fromEntries(Object.keys(ELEMENTS).map(e=>[e,0]));
+  const targetCount=Object.fromEntries(Object.keys(ELEMENTS).map(e=>[e,0]));
+  for(const [element,{source,destination}] of endpoints){
+   sourceCount[element]+=source.length;targetCount[element]+=destination.length;
+  }
+  for(const chamber of fixtures){
+   sourceCount[chamber.output]++;
+   for(const element of chamber.inputs)targetCount[element]++;
+  }
+  for(const element of Object.keys(ELEMENTS)){
+   const sources=sourceCount[element],destinations=targetCount[element];
+   if(sources!==destinations)report(
+    ELEMENTS[element].name+': '+sources+' available source route(s) vs '+destinations+
+    ' required destination(s). Add a separate Source or upstream chamber for every additional route.',
+    [...(endpoints.get(element)?.source??[]),...(endpoints.get(element)?.destination??[])]);
+   matched+=sources;
+  }
+  if(!matched)report('Add at least one route Source.');
+ }else{
  const chamber=chambers.length===1?E.confluence(map):null;
  if(chambers.length===1&&!chamber)report('Confluence Chamber needs a valid reaction recipe.',chambers);
  if(chamber){
@@ -197,12 +232,13 @@ function mapFindings(map,includePlayability=true){
   if(source.length===1&&destination.length===1)matched++;
  }
  if(!matched)report('Add at least one source/inlet pair.');
+ }
  for(const [key,indices] of links){
   if(indices.length!==2)report(`${key}: expected 2 endpoints, found ${indices.length}.`,indices);
   else if(E.linkPartner(map,indices[0])<0)report(`${key}: tunnel ends must align and cross blocked terrain.`,indices);
  }
  if(includePlayability){
-  if(matched>8)report('Game levels currently support up to eight element pairs.');
+  if(matched>(chambers.length>1?16:8))report('Game levels currently support up to '+(chambers.length>1?16:8)+' route segments.');
   for(const [kind,count] of Object.entries(map.inventory)){
    if(count&&!PLACEABLE.includes(kind))report(`Unsupported player inventory: ${kind}.`);
   }
