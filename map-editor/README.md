@@ -106,3 +106,36 @@ a Confluence cell with no `props.recipe` defaults to Water + Earth → Plant.
 New maps keep their preset ID or explicit custom inputs/output in the
 same version-2 map schema. The game, map editor, and solver share one
 reaction definition and reject invalid custom combinations.
+
+## Chapter 10 prototype: Shifting Phases (Day / Night)
+
+**This feature is opt-in** and does not change any Chapters 1–9 maps or rules.
+It adds a single event-driven change (Day → Night), not an internal clock.
+
+### Build in the Map Editor
+
+1. Under **Chapter 10 · Shifting Phases**, enable **Day/Night puzzle**. The first prototype sets construction inventory to zero.
+2. Paint Exposed (☀) or Covered (☾) terrain, then choose **Mark shifting channel ↔** and click each tile that should reverse when Night begins.
+3. Select the triggering element (typically Light) in **Element**, then place one **Day/Night Pressure Plate** on Land.
+4. Add Sources and Destinations; the triggering route must pass the plate and reach its Destination.
+5. Use **Preview board** to inspect Day and Night. This does not modify map data.
+6. **Check Map**, **Enter playtest**, and **Export verified level** to validate the route order.
+
+### Delivery rules
+
+- Initial phase: **Day**. No automatic timer; only a completed designated delivery activates Night.
+- Completed Day deliveries remain valid even when old route terrain changes at Night.
+- Completed routes still occupy their tiles; no corridor reuse.
+- Undo restores the previous delivery and phase; Restart returns to Day; saves remember the phase of each delivery.
+- Map settings use `phaseRules: {"initial":"day"}`, marked tiles use `props.phaseShift: true`, and the plate uses `component: "phasePlate", props: {"element":"light"}`.
+- Existing maps without phase metadata are unchanged.
+
+### Prototype scope
+
+Supports two to four routes, one fixed pressure plate and a single Day→Night transition.
+Combining phases with Confluence Chambers, player construction, multiple plates, tides,
+automatic clocks or Night→Day transitions is reserved for later playtesting.
+Solver search limit means **inconclusive**, not proof that a puzzle is impossible.
+
+Editable sample: `examples/phase-first-nightfall.map.json` with corresponding
+`.level.json` and `.solution.json` fixtures.
