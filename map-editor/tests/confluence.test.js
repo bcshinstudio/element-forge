@@ -43,7 +43,7 @@ test('Confluence exports and solves in all four orientations',()=>{
 test('Port orientation, other elements, and missing input are rejected',()=>{
  const map=mapFor('E');
  assert.match(E.validatePath(map,'water',[2,1,6,11,12]),/input port/);
- assert.match(E.validatePath(map,'nature',[12,11,10]),/output port/);
+ assert.match(E.validatePath(map,'nature',[12,11,10],[],{},true),/output port/);
  assert.match(E.validatePath(map,'earth',[22,17,12,7],[],{},true),/end at/);
  assert.match(E.validatePath(map,'fire',[12,13],[],{},true),/Missing endpoints|Only Water/);
  const incomplete=paths(map).filter(r=>r.element!=='earth');
