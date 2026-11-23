@@ -118,6 +118,40 @@
    label.append(input);
    box.append(label);
   }
+  if(cell.component==='confluence'){
+   const engine=window.EFEngine;
+   const reaction=cell.props?.recipe==='custom'?
+    {id:'custom',inputs:cell.props.inputs??['water','earth'],output:cell.props.output??'nature'}:
+    engine.confluenceRecipe(cell.props);
+   const selectedRecipe=reaction?.id??'water-earth-nature';
+   const options=engine.CONFLUENCE_RECIPES.map(item=>[
+    item.id,item.inputs.map(e=>F.ELEMENTS[e].name).join(' + ')+' → '+F.ELEMENTS[item.output].name
+   ]);
+   addProperty('Reaction recipe',[...options,['custom','Custom: choose elements']],selectedRecipe,
+    value=>editCell(next=>{
+     next.props??={};
+     next.props.recipe=value;
+     if(value==='custom'){
+      next.props.inputs=[...(reaction?.inputs??['water','earth'])];
+      next.props.output=reaction?.output??'nature';
+     }else{
+      delete next.props.inputs;delete next.props.output;
+     }
+    }));
+   if(selectedRecipe==='custom'){
+    const elementOptions=Object.entries(F.ELEMENTS).map(([key,el])=>[key,el.name]);
+    for(let i=0;i<2;i++)addProperty('Input '+(i+1),elementOptions,reaction.inputs[i],value=>
+     editCell(next=>{next.props.inputs[i]=value;}));
+    addProperty('Output element',elementOptions,reaction.output,value=>
+     editCell(next=>{next.props.output=value;}));
+    if(!engine.confluenceRecipe(cell.props)){
+     const warning=document.createElement('p');
+     warning.className='warning-text';
+     warning.textContent='A reaction requires three different elements.';
+     box.append(warning);
+    }
+   }
+  }
   if(cell.component==='checkpoint')addProperty('Required element',
    [['any','Any element'],...Object.entries(ELEMENTS).map(([id,e])=>[id,e.name])],
    props.element??'any',value=>setProp('element',value));
