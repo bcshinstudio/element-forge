@@ -138,6 +138,19 @@
       delete next.props.inputs;delete next.props.output;
      }
     }));
+   const sides=engine.confluencePortSides(cell.props)??engine.confluencePortSides({direction:cell.props?.direction||'E'});
+   const directionChoices=[['N','North'],['E','East'],['S','South'],['W','West']];
+   for(const [part,description] of [['input1','Input 1 port'],['input2','Input 2 port'],['output','Output port']]){
+    addProperty(description,directionChoices,sides[part],value=>{
+     const nextSides={...sides,[part]:value};
+     // Move any displaced port to the side just vacated. The three
+     // ports therefore remain distinct as the designer edits them.
+     for(const key of ['input1','input2','output']){
+      if(key!==part&&nextSides[key]===value)nextSides[key]=sides[part];
+     }
+     editCell(next=>{next.props??={};next.props.ports=nextSides;});
+    });
+   }
    if(selectedRecipe==='custom'){
     const elementOptions=Object.entries(F.ELEMENTS).map(([key,el])=>[key,el.name]);
     for(let i=0;i<2;i++)addProperty('Input '+(i+1),elementOptions,reaction.inputs[i],value=>
