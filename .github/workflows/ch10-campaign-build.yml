@@ -30,6 +30,7 @@ jobs:
           python3 scripts/build_ch10_campaign.py
           test -s game/twilight-pendulum.js
           test -s game/ch10-drafts/stage-121.solution.json
+          test -s game/tests/fixtures/twilight-pendulum-solutions.json
       - name: Verify source and advanced campaign logic
         run: |
           node --check game/twilight-pendulum.js
