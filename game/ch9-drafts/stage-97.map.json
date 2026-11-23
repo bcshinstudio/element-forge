@@ -73,11 +73,7 @@
       }
     },
     {
-      "terrain": "land",
-      "node": {
-        "element": "water",
-        "role": "source"
-      }
+      "terrain": "land"
     },
     {
       "terrain": "land"
@@ -117,7 +113,7 @@
       "terrain": "land"
     },
     {
-      "terrain": "water"
+      "terrain": "land"
     },
     {
       "terrain": "void"
@@ -193,7 +189,11 @@
       "terrain": "land"
     },
     {
-      "terrain": "land"
+      "terrain": "land",
+      "node": {
+        "element": "water",
+        "role": "source"
+      }
     },
     {
       "terrain": "wall"
@@ -369,7 +369,7 @@
       "terrain": "land"
     },
     {
-      "terrain": "land"
+      "terrain": "water"
     },
     {
       "terrain": "land"
