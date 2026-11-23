@@ -12,8 +12,8 @@ global.EFArtCatalog=catalog;
 const Art=require('../../art/variants');
 delete global.EFArtCatalog;
 const campaign=require('../chapter');
-const chapterKeys=['chapter','chapterTwo','chapterThree','chapterFour','chapterFive','chapterSix','chapterSeven','chapterEight'];
-const chapterFiles=['sleeping-valley','gatekeepers','primeval-crucible','astral-loom','celestial-confluence','weavers-playground','shattered-abyss','world-heart-sanctuary'];
+const chapterKeys=['chapter','chapterTwo','chapterThree','chapterFour','chapterFive','chapterSix','chapterSeven','chapterEight','chapterNine'];
+const chapterFiles=['sleeping-valley','gatekeepers','primeval-crucible','astral-loom','celestial-confluence','weavers-playground','shattered-abyss','world-heart-sanctuary','confluence-forges'];
 
 function replay(level,plan){
  const session=createSession(level);
@@ -48,7 +48,7 @@ test('all approved art is cataloged, placed in its gameplay family, and present 
  }
 });
 
-test('all 96 campaign maps keep the original solution and rule data after applying and exporting their chapter palette',()=>{
+test('all 108 campaign maps keep the original solution and rule data after applying and exporting their chapter palette',()=>{
  for(const [chapter,key] of chapterKeys.entries()){
   const plans=require('./fixtures/'+chapterFiles[chapter]+'-solutions.json');
   for(const [i,level] of campaign[key].entries()){
