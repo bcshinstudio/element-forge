@@ -1,0 +1,195 @@
+{
+  "format": "element-forge-level",
+  "schemaVersion": 1,
+  "rulesVersion": 4,
+  "map": {
+    "format": "element-forge-map",
+    "schemaVersion": 2,
+    "name": "Root Chamber – Confluence Introduction",
+    "description": "Awaken the Root Chamber: guide Water into the blue north port and Earth into the amber south port, then carry the new Plant current east to its inlet.",
+    "width": 7,
+    "height": 7,
+    "cells": [
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "water",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "river"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "river"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "confluence",
+        "props": {
+          "direction": "E"
+        }
+      },
+      {
+        "terrain": "forest"
+      },
+      {
+        "terrain": "forest"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "nature",
+          "role": "destination"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "scree"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "scree"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "earth",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "mountain"
+      }
+    ],
+    "constraints": {},
+    "inventory": {
+      "bridge": 0,
+      "metalSpan": 0,
+      "intersection": 0,
+      "tunnel": 0,
+      "portal": 0,
+      "junction": 0,
+      "sorter": 0,
+      "converter": 0,
+      "gate": 0,
+      "checkpoint": 0,
+      "remover": 0,
+      "booster": 0,
+      "confluence": 0
+    },
+    "rulesVersion": 4
+  }
+}
