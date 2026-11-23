@@ -172,6 +172,35 @@ window.EFStoryChapters = [
         "line": "I think I’ll stay a few days. I’d like to see the valley when nobody needs rescuing."
       }
     ]
+  },
+  {
+    "chapter": "The Confluence Forges",
+    "opening": [
+      {
+        "art": "world-heart",
+        "caption": "The pulse beyond the Sanctuary",
+        "line": "The World-Heart is awake. Its pulse has stirred the ancient Confluence Forges—where two elemental streams can become something entirely new."
+      },
+      {
+        "art": "forge",
+        "caption": "The crystalline reaction chambers",
+        "line": "Water and Earth can awaken Plant. Fire can forge Metal or Wind. We'll need both inputs at each chamber, and some outputs will power another reaction."
+      }
+    ],
+    "ending": [
+      {
+        "art": "forge",
+        "caption": "The Grand Philosopher's Engine · Stage 108",
+        "motion": "relief",
+        "duration": 5200,
+        "line": "Wind, Plant, and Electricity reach the final inlets. The three Confluence Chambers resonate as one, and the outer World-Engines stir."
+      },
+      {
+        "art": "relief",
+        "caption": "The Confluence Forges restored",
+        "line": "Now the currents can change as they travel. The old builders left more than pathways—they left a way to transform the world."
+      }
+    ]
   }
 ];
 window.EFStoryArt = {
