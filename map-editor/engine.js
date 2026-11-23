@@ -35,15 +35,26 @@ const confluenceDirections=(output='E')=>{
  const input1=directions[(i+3)%4],input2=directions[(i+1)%4];
  return {input1,input2,exit:output,water:input1,earth:input2,nature:output};
 };
+function confluencePortSides(props={}){
+ const defaults=confluenceDirections(props?.direction||'E');
+ if(!defaults)return null;
+ const sides=props?.ports;
+ if(sides===undefined)return {input1:defaults.input1,input2:defaults.input2,output:defaults.exit};
+ if(!sides||typeof sides!=='object'||Array.isArray(sides)||
+    Object.keys(sides).sort().join(',')!=='input1,input2,output'||
+    [sides.input1,sides.input2,sides.output].some(s=>!['N','E','S','W'].includes(s))||
+    new Set([sides.input1,sides.input2,sides.output]).size!==3)return null;
+ return {input1:sides.input1,input2:sides.input2,output:sides.output};
+}
 const confluence=m=>{
  const chambers=m.cells.flatMap((c,i)=>c.component==='confluence'?[i]:[]);
  if(chambers.length!==1)return null;
  const index=chambers[0],cell=m.cells[index],recipe=confluenceRecipe(cell.props);
  if(!recipe)return null;
- const directions=confluenceDirections(cell.props?.direction||'E');
- if(!directions)return null;
+ const directions=confluenceDirections(cell.props?.direction||'E'),sides=confluencePortSides(cell.props);
+ if(!directions||!sides)return null;
  return {index,recipe:recipe.id,inputs:[...recipe.inputs],output:recipe.output,
-  ports:{[recipe.inputs[0]]:directions.input1,[recipe.inputs[1]]:directions.input2,[recipe.output]:directions.exit},
+  ports:{[recipe.inputs[0]]:sides.input1,[recipe.inputs[1]]:sides.input2,[recipe.output]:sides.output},
   ...directions};
 };
 const confluenceNeighbor=(m,index,side)=>neighbors(index,m.width,m.height).find(([,d])=>d===side)?.[0]??-1;
@@ -54,10 +65,10 @@ const confluenceNeighbor=(m,index,side)=>neighbors(index,m.width,m.height).find(
 const hasMultiConfluence=m=>m.cells.filter(c=>c.component==='confluence').length>1;
 const confluences=m=>m.cells.flatMap((cell,index)=>{
  if(cell.component!=='confluence')return [];
- const recipe=confluenceRecipe(cell.props),d=confluenceDirections(cell.props?.direction||'E');
- if(!recipe||!d)return [];
+ const recipe=confluenceRecipe(cell.props),d=confluenceDirections(cell.props?.direction||'E'),sides=confluencePortSides(cell.props);
+ if(!recipe||!d||!sides)return [];
  return [{index,recipe:recipe.id,inputs:[...recipe.inputs],output:recipe.output,
-  ports:{[recipe.inputs[0]]:d.input1,[recipe.inputs[1]]:d.input2,[recipe.output]:d.exit},...d}];
+  ports:{[recipe.inputs[0]]:sides.input1,[recipe.inputs[1]]:sides.input2,[recipe.output]:sides.output},...d}];
 });
 const confluenceAt=(m,index)=>confluences(m).find(ch=>ch.index===index)??null;
 const routeKey=(m,element,source)=>hasMultiConfluence(m)?element+'@'+source:element;
@@ -563,5 +574,5 @@ function solveConstruction(m,{limit=120000,maxPairs=8,maxCandidates=180}={}){
  }
  return {status:hitLimit||direct.status==='inconclusive'?'inconclusive':'unsolved',message:hitLimit?'Some construction searches exceeded their limits':'No solution found within supported construction candidates',constructionAttempts:attempts};
 }
-const api={hasMultiConfluence,confluences,confluenceAt,routeKey,CONFLUENCE_RECIPES,confluenceRecipe,displayElement,confluence,confluenceDirections,confluenceNeighbor,confluenceRouteError,portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
+const api={hasMultiConfluence,confluences,confluenceAt,routeKey,CONFLUENCE_RECIPES,confluenceRecipe,confluencePortSides,displayElement,confluence,confluenceDirections,confluenceNeighbor,confluenceRouteError,portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
