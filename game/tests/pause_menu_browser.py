@@ -51,6 +51,10 @@ def check(browser,url,width,height,touch):
         expect(page.locator(selector)).to_be_visible()
         assert page.locator(selector).evaluate("e=>e.getBoundingClientRect().height>=44")
     assert_fits_viewport(page,"#game-menu")
+    if "Wellspring_Pause_Menu_Preview.html" in url and (width,height) in ((390,844),(1280,900)):
+        folder=ROOT/"pause-menu-screenshots"
+        folder.mkdir(exist_ok=True)
+        page.locator("#game-menu").screenshot(path=str(folder/f"pause-{width}.png"))
     # Both actions are stacked, not irregularly wrapped as before.
     first=page.locator("#menu-home").bounding_box()
     second=page.locator("#menu-information").bounding_box()
@@ -65,6 +69,8 @@ def check(browser,url,width,height,touch):
     expect(page.locator("#menu-lessons #tutorial-list button")).to_have_count(29)
     expect(page.locator("#menu-lessons #information-reference table")).to_have_count(2)
     assert_fits_viewport(page,"#game-menu")
+    if "Wellspring_Pause_Menu_Preview.html" in url and (width,height) in ((390,844),(1280,900)):
+        page.locator("#game-menu").screenshot(path=str((ROOT/"pause-menu-screenshots")/f"information-{width}.png"))
     press(page.locator("#menu-lessons-back"))
     expect(page.locator("#menu-main")).to_be_visible()
     expect(page.locator("#menu-lessons")).to_be_hidden()
