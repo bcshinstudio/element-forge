@@ -174,7 +174,7 @@
    return tile;
   });
   board.replaceChildren(...tiles);
-  const legend=E.pairs(map).map(({element})=>{
+  const legend=[...new Set(E.pairs(map).map(pair=>pair.element))].map(element=>{
    const item=document.createElement('b');
    item.style.setProperty('--element',colors[element]);
    item.className='legend-element';
@@ -430,7 +430,7 @@
   syncDragHandles();
   const {map,state}=session;
   const fragments=tiles.map(()=>document.createDocumentFragment());
-  for(const {element,path} of [...state.routes.filter(route=>!state.drafts[route.element]),...Object.values(state.drafts)]){
+  for(const {element,path} of [...state.routes.filter(route=>!state.drafts[E.routeKey(map,route.element,route.path[0])]),...Object.values(state.drafts)]){
    for(const [j,i] of path.entries()){
     const line=document.createElement('span');
     line.className='track';
@@ -476,9 +476,9 @@
     mark.style.setProperty('--element',colors[cell.node.element]);
     mark.textContent=symbols[cell.node.element];
     }else if(kind==='confluence'){
-    const chamber=E.confluence(map),recipe=chamber&&E.confluenceRecipe(cell.props);
+    const chamber=E.confluenceAt(map,i),recipe=chamber&&E.confluenceRecipe(cell.props);
     const inputReady=Boolean(chamber&&chamber.inputs.every(element=>
-     state.routes.some(route=>route.element===element)));
+     state.routes.some(route=>route.element===element&&route.path.at(-1)===i)));
     mark.classList.add('confluence-mark');
     const core=document.createElement('span');
     core.className='confluence-core';
@@ -535,7 +535,7 @@
     (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[terrain]||terrain));
    const direction=kind==='gate'||terrain==='oneway'?' '+(cell.props?.direction??'E'):'';
    const visited=mark.querySelector('[data-visited]')?' · visited':'';
-   const chamber=kind==='confluence'?E.confluence(map):null;
+   const chamber=kind==='confluence'?E.confluenceAt(map,i):null;
    const reaction=chamber?
     ' · '+chamber.inputs.map(el=>F.ELEMENTS[el].name).join(' + ')+' → '+F.ELEMENTS[chamber.output].name+
     ' · '+chamber.inputs.map(el=>F.ELEMENTS[el].name+' enters '+chamber.ports[el]).join(', ')+
@@ -561,7 +561,7 @@
    return F.ELEMENTS[element].name+' cannot use '+toolNames[E.effective(map,state.placements,index)].toLowerCase()+' on this level.';
   }
   if(result.message==='Different elements cannot share a cell'){
-   const occupying=state.routes.find(route=>route.element!==element&&route.path.includes(index));
+   const occupying=state.routes.find(route=>route.path.includes(index)&&route.element!==element);
    if(occupying)return F.ELEMENTS[occupying.element].name+' already uses this tile.';
   }
   if(element&&E.canPlace(map,state.placements,index,'bridge')&&
