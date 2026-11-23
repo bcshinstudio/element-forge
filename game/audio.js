@@ -38,7 +38,13 @@
   if(theme.minor)chords[1]=[8,15,20];
   for(let bar=0;bar<16;bar++){
    const start=bar*4*beat, chord=chords[bar%4];
-   chord.forEach((offset,i)=>add(start+i*.12,beat*5.6,theme.root-12+offset,.032,theme.color,beat*.8));
+   // Provisional Valley mix: replace low chord tones with a quiet, sustained upper-register pad.
+   // Keep the original arrangement in Git history for a later listening comparison.
+   if(name==='valley'){
+    chord.forEach((offset,i)=>add(start+i*.12,beat*5.6,theme.root+offset,.009,.12,beat*1.35));
+   }else{
+    chord.forEach((offset,i)=>add(start+i*.12,beat*5.6,theme.root-12+offset,.032,theme.color,beat*.8));
+   }
    if(theme.rhythm)for(const [i,offset] of chord.entries()){
     add(start+(i+1)*beat,beat*.78,theme.root+offset,theme.rhythm*.105,.18,.032);
    }
