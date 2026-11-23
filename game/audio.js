@@ -8,7 +8,7 @@
   valley:{title:'Chapters 1–2 · Valley', bpm:64, root:55, color:.18, rhythm:0},
   loom:{title:'Chapters 3–6 · Loom', bpm:82, root:57, color:.28, rhythm:.32},
   abyss:{title:'Chapter 7 · Abyss', bpm:58, root:48, color:.09, rhythm:.10, minor:true},
-  heart:{title:'Chapter 8 · Heart', bpm:72, root:60, color:.30, rhythm:.14},
+  heart:{title:'Chapters 8–9 · Heart / Forges', bpm:72, root:60, color:.30, rhythm:.14},
  };
  const effects={build:'Tool placed',remove:'Tool removed',route:'Route connected',harmony:'Restore Harmony',
   heart:'Awakening Heart',gate:'Gatekeeper',relief:'Primeval Forge',loom:'Astral Loom',star:'Star-Heart',
