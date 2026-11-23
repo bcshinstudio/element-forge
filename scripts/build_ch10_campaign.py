@@ -45,7 +45,10 @@ def build():
         routes = row["routes"]
         if not isinstance(placements, dict) or not (4 <= len(routes) <= 16):
             raise ValueError(f"Stage {stage} missing construction witness or route sequence.")
-        write_json(DRAFTS / f"stage-{stage}.map.json", m)
+        # Editable drafts carry a proof that the editor verifies against every
+        # tile and rule. The shipped levels omit the solution to avoid spoilers.
+        editable = {**m, "phaseWitness": {"placements": placements, "routes": routes}}
+        write_json(DRAFTS / f"stage-{stage}.map.json", editable)
         write_json(DRAFTS / f"stage-{stage}.level.json", level)
         write_json(DRAFTS / f"stage-{stage}.solution.json", {"placements": placements, "routes": routes})
         levels.append(level)
