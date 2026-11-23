@@ -55,7 +55,7 @@ def run():
                 choices=page.locator("#stage-list button")
                 expect(choices).to_have_count(121)
                 assert choices.evaluate_all("buttons=>buttons.every(button=>!button.disabled)")
-                assert not any("✓" in choices.nth(i).inner_text() for i in range(108))
+                assert not any("✓" in choices.nth(i).inner_text() for i in range(121))
 
                 choices.nth(96).click()
                 expect(page.locator("#stage-number")).to_have_text("Chapter 9 · Stage 1")
