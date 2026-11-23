@@ -434,7 +434,13 @@ function solveMulti(m,{limit=120000,maxPairs=16,allowPlacement=true,initialPlace
    }
    const exit=portalExit(m,state.path,state.placements);
    const ns=(exit===null?routeNeighbors(m,cur,state.placements,p.element):exit<0?[]:[exit]).filter(i=>!state.seen.has(i));
-   const closest=i=>Math.min(...targets.map(t=>distance(i,t)));
+   // Aim for the correct input port, breaking ties in favor of entering
+   // the chamber rather than wandering away from an adjacent open port.
+   const closest=i=>Math.min(...targets.map(t=>{
+    const ch=confluenceAt(m,t);
+    const port=ch?confluenceNeighbor(m,t,ch.ports[p.element]):t;
+    return distance(i,port)*2+distance(i,t);
+   }));
    ns.sort((a,b)=>closest(b)-closest(a));
    for(const i of ns){
     const fromCh=confluenceAt(m,cur),toCh=confluenceAt(m,i);
