@@ -30,7 +30,7 @@ def test_chapter(browser,base):
     }""", KEY)
     page.reload()
     page.locator("#title-enter").click()
-    expect(page.locator("#home-total")).to_contain_text("Stage 97 of 108")
+    expect(page.locator("#home-total")).to_contain_text("Stage 97 of 121")
     page.locator("#continue").click()
     expect(page.locator("#world-intro-title")).to_contain_text("Chapter 9")
     expect(page.locator("#story-caption")).to_have_text("The pulse beyond the Sanctuary")
