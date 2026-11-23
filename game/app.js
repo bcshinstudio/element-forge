@@ -476,18 +476,25 @@
     mark.style.setProperty('--element',colors[cell.node.element]);
     mark.textContent=symbols[cell.node.element];
     }else if(kind==='confluence'){
-    const ports=E.confluenceDirections(cell.props?.direction||'E');
-    const inputReady=['water','earth'].every(element=>state.routes.some(route=>route.element===element));
+    const chamber=E.confluence(map),recipe=chamber&&E.confluenceRecipe(cell.props);
+    const inputReady=Boolean(chamber&&chamber.inputs.every(element=>
+     state.routes.some(route=>route.element===element)));
     mark.classList.add('confluence-mark');
     const core=document.createElement('span');
     core.className='confluence-core';
     core.textContent='◇';
     mark.append(core);
-    for(const [element,label] of [['water','W'],['earth','E'],['nature','P']]){
-     const port=document.createElement('span');
-     port.className='confluence-port confluence-'+element+' port-'+ports[element];
-     port.textContent=label;
-     mark.append(port);
+    if(chamber&&recipe){
+     const directions=E.confluenceDirections(cell.props?.direction||'E');
+     const ports=[[recipe.inputs[0],directions.input1],[recipe.inputs[1],directions.input2],[recipe.output,directions.exit]];
+     for(const [element,side] of ports){
+      const port=document.createElement('span');
+      port.className='confluence-port confluence-'+element+' port-'+side;
+      port.style.background=colors[element];
+      port.textContent=symbols[element];
+      port.title=F.ELEMENTS[element].name;
+      mark.append(port);
+     }
     }
     tile.classList.toggle('confluence-ready',inputReady);
     tile.classList.toggle('confluence-pending',!inputReady);
@@ -528,11 +535,12 @@
     (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[terrain]||terrain));
    const direction=kind==='gate'||terrain==='oneway'?' '+(cell.props?.direction??'E'):'';
    const visited=mark.querySelector('[data-visited]')?' · visited':'';
-   const reaction=kind==='confluence'?
-     ' · Water enters '+E.confluenceDirections(cell.props?.direction||'E').water+
-     ', Earth enters '+E.confluenceDirections(cell.props?.direction||'E').earth+
-     ', Plant exits '+E.confluenceDirections(cell.props?.direction||'E').nature+
-     (tile.classList.contains('confluence-ready')?' · activated':' · pending Water and Earth'):'';
+   const chamber=kind==='confluence'?E.confluence(map):null;
+   const reaction=chamber?
+    ' · '+chamber.inputs.map(el=>F.ELEMENTS[el].name).join(' + ')+' → '+F.ELEMENTS[chamber.output].name+
+    ' · '+chamber.inputs.map(el=>F.ELEMENTS[el].name+' enters '+chamber.ports[el]).join(', ')+
+    ', '+F.ELEMENTS[chamber.output].name+' exits '+chamber.ports[chamber.output]+
+    (tile.classList.contains('confluence-ready')?' · inputs ready':' · inputs pending'):'';
    const tileLabel=pendingOpening?label+' · '+toolNames[pendingOpening]+' opening selected':label+direction+visited+reaction;
    tile.title=tileLabel;
    tile.setAttribute('aria-label',tileLabel);
