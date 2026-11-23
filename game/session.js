@@ -139,9 +139,9 @@
     }
    }
    const existing=Object.values(state.drafts).find(draft=>draft.path.at(-1)===index);
-   if(existing&&!(state.active&&cell.component==='confluence'&&['water','earth'].includes(state.active.element))){state.active=existing;return ok();}
+   if(existing&&!(state.active&&cell.component==='confluence'&&E.confluence(map)?.inputs.includes(state.active.element))){state.active=existing;return ok();}
    if(cell.node?.role==='source'||(cell.component==='confluence'&&!state.active)){
-    const element=cell.component==='confluence'?'nature':cell.node.element;
+    const element=cell.component==='confluence'?E.confluence(map)?.output:cell.node.element;
     if(state.routes.some(route=>route.element===element)){
      remember();
      state.routes=state.routes.filter(route=>route.element!==element);
