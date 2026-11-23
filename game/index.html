@@ -230,13 +230,32 @@
   </details>
   </div>
  </main>
- <dialog id="game-menu" aria-label="Puzzle menu">
-  <button type="button" id="back-to-game" autofocus>Back to Game</button>
-  <button type="button" id="menu-tip" hidden>Mechanic tip</button>
-  <button type="button" id="menu-home">Main menu</button>
-  <button type="button" id="menu-information">Information / Tutorials</button>
-  <div id="menu-content"></div>
-  <div id="menu-lessons" hidden></div>
+ <dialog id="game-menu" aria-labelledby="game-menu-title">
+  <div class="pause-menu-header">
+   <div class="pause-menu-brand">
+    <span class="pause-menu-eyebrow">Wellspring</span>
+    <h2 id="game-menu-title">Game menu</h2>
+   </div>
+   <button type="button" id="back-to-game" class="pause-menu-close" autofocus aria-label="Back to game">✕ <span>Back to game</span></button>
+  </div>
+  <div id="menu-main">
+   <p class="pause-menu-intro">Your puzzle is paused. Pick up where you left off or explore the game guide.</p>
+   <div class="pause-menu-actions">
+    <button type="button" id="menu-home" class="pause-menu-action">
+     <span class="pause-menu-action-title">Main menu <span aria-hidden="true">›</span></span>
+     <span class="pause-menu-action-detail">Return to the Wellspring home screen</span>
+    </button>
+    <button type="button" id="menu-information" class="pause-menu-action" aria-expanded="false" aria-controls="menu-lessons">
+     <span class="pause-menu-action-title">Information &amp; Tutorials <span aria-hidden="true">›</span></span>
+     <span class="pause-menu-action-detail">Element rules, tools and practice lessons</span>
+    </button>
+   </div>
+   <button type="button" id="menu-tip" hidden>Mechanic tip</button>
+   <div id="menu-content"></div>
+  </div>
+  <section id="menu-lessons" aria-label="Information and tutorials" hidden>
+   <button type="button" id="menu-lessons-back">← Back to menu</button>
+  </section>
  </dialog>
  <footer><span id="studio-credit" tabindex="0" role="button" aria-label="BC Shin Studio">BC Shin Studio</span></footer>
 </body>
