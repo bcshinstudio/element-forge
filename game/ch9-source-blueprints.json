@@ -1,0 +1,3868 @@
+{
+  "chapter": 9,
+  "name": "The Confluence Forges",
+  "narrative": "With the World-Heart reignited, its radiant pulse awakens the Confluence Forges—an ancient ring of alchemical reaction chambers.",
+  "stages": [
+    {
+      "stage": 97,
+      "title": "The Alchemical Primer",
+      "story": "Welcome to The Alchemical Primer—the outer proving ground of the Confluence Forges where raw elemental streams merge inside crystalline reaction chambers! Guide Water and Earth into the western chamber to synthesize living Plant, and unite Fire and Water in the eastern chamber to boil into rising Wind—remembering that the newly born Plant stream must claim your single Bridge over deep water, while Wind leaps across a 1-tile Void chasm!",
+      "sources": [
+        {
+          "element": "water",
+          "at": [
+            2,
+            4
+          ],
+          "label": "◦\tWater S"
+        },
+        {
+          "element": "earth",
+          "at": [
+            6,
+            1
+          ],
+          "label": "Earth S"
+        },
+        {
+          "element": "fire",
+          "at": [
+            2,
+            11
+          ],
+          "label": "Fire S"
+        },
+        {
+          "element": "water",
+          "at": [
+            2,
+            7
+          ],
+          "label": "Water S2"
+        }
+      ],
+      "destinations": [
+        {
+          "element": "nature",
+          "at": [
+            9,
+            9
+          ],
+          "label": "◦\tPlant D"
+        },
+        {
+          "element": "wind",
+          "at": [
+            2,
+            5
+          ],
+          "label": "Wind D"
+        }
+      ],
+      "chambers": [
+        {
+          "name": "A",
+          "inputs": [
+            "water",
+            "earth"
+          ],
+          "output": "nature",
+          "at": [
+            6,
+            4
+          ],
+          "inputSides": [
+            "N",
+            "W"
+          ],
+          "outputSide": "S"
+        },
+        {
+          "name": "B",
+          "inputs": [
+            "fire",
+            "water"
+          ],
+          "output": "wind",
+          "at": [
+            6,
+            9
+          ],
+          "inputSides": [
+            "E",
+            "W"
+          ],
+          "outputSide": "N"
+        }
+      ],
+      "gates": [
+        {
+          "at": [
+            4,
+            9
+          ],
+          "direction": "N"
+        },
+        {
+          "at": [
+            6,
+            10
+          ],
+          "direction": "W"
+        }
+      ],
+      "checkpoints": [
+        {
+          "element": "wind",
+          "at": [
+            2,
+            6
+          ]
+        },
+        {
+          "element": "nature",
+          "at": [
+            9,
+            4
+          ]
+        }
+      ],
+      "inventory": {
+        "bridge": 1,
+        "metalSpan": 0,
+        "tunnel": 0,
+        "portal": 0,
+        "intersection": 0
+      },
+      "terrain": {
+        "wall": [
+          [
+            5,
+            3
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            7,
+            3
+          ],
+          [
+            7,
+            5
+          ],
+          [
+            5,
+            8
+          ],
+          [
+            5,
+            10
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            3,
+            10
+          ],
+          [
+            4,
+            10
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            11,
+            7
+          ]
+        ],
+        "water": [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            2,
+            7
+          ],
+          [
+            3,
+            7
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "scree": [
+          [
+            6,
+            2
+          ],
+          [
+            6,
+            3
+          ]
+        ],
+        "forest": [
+          [
+            8,
+            4
+          ]
+        ],
+        "lava": [
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            11
+          ]
+        ],
+        "void": [
+          [
+            3,
+            8
+          ]
+        ]
+      },
+      "budgetDescription": "1 Bridge (placed on water at (9, 7))",
+      "blueprint": "User-provided November 23, 2026; unverified geometry, review required"
+    },
+    {
+      "stage": 98,
+      "title": "Root-Soil Synthesis",
+      "story": "Inside Root-Soil Synthesis, a single Confluence Chamber anchors a terraced botanical forge surrounded by molten slag veins and a 3-tile Mountain bulkhead. Unite Water and Earth inside the chamber to generate living Plant (which must cut through an overgrown Forest barrier to reach its goal), while guiding standalone Fire (lava) and Metal (heated + Tunnel) around the perimeter!",
+      "sources": [
+        {
+          "element": "water",
+          "at": [
+            2,
+            6
+          ],
+          "label": "◦\tWater S"
+        },
+        {
+          "element": "earth",
+          "at": [
+            6,
+            2
+          ],
+          "label": "Earth S"
+        },
+        {
+          "element": "metal",
+          "at": [
+            3,
+            7
+          ],
+          "label": "Metal S"
+        },
+        {
+          "element": "fire",
+          "at": [
+            8,
+            2
+          ],
+          "label": "Fire S"
+        }
+      ],
+      "destinations": [
+        {
+          "element": "nature",
+          "at": [
+            11,
+            8
+          ],
+          "label": "◦\tPlant D"
+        },
+        {
+          "element": "metal",
+          "at": [
+            7,
+            11
+          ],
+          "label": "Metal D"
+        },
+        {
+          "element": "fire",
+          "at": [
+            11,
+            5
+          ],
+          "label": "Fire D"
+        }
+      ],
+      "chambers": [
+        {
+          "name": "A",
+          "inputs": [
+            "water",
+            "earth"
+          ],
+          "output": "nature",
+          "at": [
+            6,
+            6
+          ],
+          "inputSides": [
+            "N",
+            "W"
+          ],
+          "outputSide": "S"
+        }
+      ],
+      "gates": [
+        {
+          "at": [
+            5,
+            11
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            6,
+            5
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            10,
+            7
+          ],
+          "direction": "E"
+        }
+      ],
+      "checkpoints": [
+        {
+          "element": "metal",
+          "at": [
+            4,
+            11
+          ]
+        },
+        {
+          "element": "nature",
+          "at": [
+            10,
+            6
+          ]
+        },
+        {
+          "element": "fire",
+          "at": [
+            11,
+            2
+          ]
+        }
+      ],
+      "inventory": {
+        "bridge": 0,
+        "metalSpan": 0,
+        "tunnel": 2,
+        "portal": 0,
+        "intersection": 0
+      },
+      "terrain": {
+        "mountain": [
+          [
+            2,
+            8
+          ],
+          [
+            2,
+            9
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            3,
+            8
+          ],
+          [
+            3,
+            9
+          ],
+          [
+            3,
+            10
+          ],
+          [
+            4,
+            8
+          ],
+          [
+            4,
+            9
+          ],
+          [
+            4,
+            10
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            7,
+            5
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            7,
+            3
+          ],
+          [
+            12,
+            6
+          ]
+        ],
+        "water": [
+          [
+            2,
+            6
+          ],
+          [
+            3,
+            6
+          ],
+          [
+            4,
+            6
+          ],
+          [
+            5,
+            6
+          ]
+        ],
+        "scree": [
+          [
+            6,
+            3
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "forest": [
+          [
+            8,
+            6
+          ],
+          [
+            9,
+            6
+          ]
+        ],
+        "heated": [
+          [
+            3,
+            7
+          ],
+          [
+            3,
+            11
+          ]
+        ],
+        "lava": [
+          [
+            9,
+            2
+          ],
+          [
+            10,
+            2
+          ]
+        ]
+      },
+      "budgetDescription": "1 Tunnel (placed across NE Mountain (3, 7) ↔ (3, 11))",
+      "blueprint": "User-provided November 23, 2026; unverified geometry, review required"
+    },
+    {
+      "stage": 99,
+      "title": "The Smelting Crucible",
+      "story": "Inside The Smelting Crucible, molten magma veins and loose mineral scree converge on an ancient blast-chamber suspended beside a deep subterranean aqueduct. Unite Fire and Earth on dry stone to forge white-hot Metal, then guide the newly smelted Metal across Heated Ground and your single Bridge + Intersection over Water, while Wind leaps a 1-tile Void chasm along the northern ridge!",
+      "sources": [
+        {
+          "element": "fire",
+          "at": [
+            3,
+            2
+          ],
+          "label": "◦\tFire S"
+        },
+        {
+          "element": "earth",
+          "at": [
+            9,
+            4
+          ],
+          "label": "Earth S"
+        },
+        {
+          "element": "water",
+          "at": [
+            2,
+            8
+          ],
+          "label": "Water S"
+        },
+        {
+          "element": "wind",
+          "at": [
+            2,
+            2
+          ],
+          "label": "Wind S"
+        }
+      ],
+      "destinations": [
+        {
+          "element": "metal",
+          "at": [
+            5,
+            11
+          ],
+          "label": "◦\tMetal D"
+        },
+        {
+          "element": "water",
+          "at": [
+            11,
+            8
+          ],
+          "label": "Water D"
+        },
+        {
+          "element": "wind",
+          "at": [
+            4,
+            5
+          ],
+          "label": "Wind D"
+        }
+      ],
+      "chambers": [
+        {
+          "name": "A",
+          "inputs": [
+            "fire",
+            "earth"
+          ],
+          "output": "metal",
+          "at": [
+            6,
+            4
+          ],
+          "inputSides": [
+            "W",
+            "S"
+          ],
+          "outputSide": "E"
+        }
+      ],
+      "gates": [
+        {
+          "at": [
+            4,
+            6
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            6,
+            3
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            6,
+            10
+          ],
+          "direction": "E"
+        }
+      ],
+      "checkpoints": [
+        {
+          "element": "wind",
+          "at": [
+            3,
+            6
+          ]
+        },
+        {
+          "element": "water",
+          "at": [
+            4,
+            8
+          ]
+        },
+        {
+          "element": "metal",
+          "at": [
+            6,
+            9
+          ]
+        }
+      ],
+      "inventory": {
+        "bridge": 1,
+        "metalSpan": 0,
+        "tunnel": 0,
+        "portal": 0,
+        "intersection": 1
+      },
+      "terrain": {
+        "wall": [
+          [
+            5,
+            3
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            7,
+            3
+          ],
+          [
+            7,
+            5
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            2,
+            7
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            7
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            9,
+            2
+          ],
+          [
+            10,
+            2
+          ],
+          [
+            11,
+            3
+          ],
+          [
+            12,
+            8
+          ]
+        ],
+        "lava": [
+          [
+            4,
+            2
+          ],
+          [
+            5,
+            2
+          ]
+        ],
+        "scree": [
+          [
+            8,
+            4
+          ],
+          [
+            7,
+            4
+          ]
+        ],
+        "heated": [
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            9
+          ]
+        ],
+        "water": [
+          [
+            2,
+            8
+          ],
+          [
+            3,
+            8
+          ],
+          [
+            4,
+            8
+          ],
+          [
+            5,
+            8
+          ],
+          [
+            6,
+            8
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            8
+          ],
+          [
+            10,
+            8
+          ],
+          [
+            11,
+            8
+          ]
+        ],
+        "void": [
+          [
+            2,
+            5
+          ]
+        ]
+      },
+      "budgetDescription": "1 Bridge (at (6, 8)) + 1 Intersection (at (6, 8))",
+      "blueprint": "User-provided November 23, 2026; unverified geometry, review required"
+    },
+    {
+      "stage": 100,
+      "title": "Gale-Steam Condenser",
+      "story": "Perched inside the Gale-Steam Condenser, scorching Lava sluices meet cold reservoir tides to boil into pressurized Wind currents, while blinding Exposed light-shafts and pitch-dark Covered vaults guard the eastern wing. Unite Fire and Water inside the condenser chamber to generate Wind (which leaps a 1-tile Void rift to reach its goal), while Light (exposed) and Shadow (covered + Portal) thread the optical locks!",
+      "sources": [
+        {
+          "element": "fire",
+          "at": [
+            3,
+            2
+          ],
+          "label": "◦\tFire S"
+        },
+        {
+          "element": "water",
+          "at": [
+            2,
+            5
+          ],
+          "label": "Water S"
+        },
+        {
+          "element": "light",
+          "at": [
+            2,
+            8
+          ],
+          "label": "Light S"
+        },
+        {
+          "element": "shadow",
+          "at": [
+            1,
+            11
+          ],
+          "label": "Shadow S"
+        }
+      ],
+      "destinations": [
+        {
+          "element": "wind",
+          "at": [
+            11,
+            2
+          ],
+          "label": "◦\tWind D"
+        },
+        {
+          "element": "light",
+          "at": [
+            6,
+            7
+          ],
+          "label": "Light D"
+        },
+        {
+          "element": "shadow",
+          "at": [
+            11,
+            11
+          ],
+          "label": "Shadow D"
+        }
+      ],
+      "chambers": [
+        {
+          "name": "A",
+          "inputs": [
+            "fire",
+            "water"
+          ],
+          "output": "wind",
+          "at": [
+            6,
+            5
+          ],
+          "inputSides": [
+            "W",
+            "N"
+          ],
+          "outputSide": "S"
+        }
+      ],
+      "gates": [
+        {
+          "at": [
+            6,
+            4
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            6,
+            8
+          ],
+          "direction": "W"
+        },
+        {
+          "at": [
+            10,
+            3
+          ],
+          "direction": "W"
+        }
+      ],
+      "checkpoints": [
+        {
+          "element": "shadow",
+          "at": [
+            2,
+            11
+          ]
+        },
+        {
+          "element": "light",
+          "at": [
+            3,
+            9
+          ]
+        },
+        {
+          "element": "wind",
+          "at": [
+            10,
+            4
+          ]
+        }
+      ],
+      "inventory": {
+        "bridge": 0,
+        "metalSpan": 0,
+        "tunnel": 0,
+        "portal": 2,
+        "intersection": 0
+      },
+      "terrain": {
+        "wall": [
+          [
+            5,
+            4
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            7,
+            4
+          ],
+          [
+            7,
+            6
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            2,
+            7
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            8,
+            7
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            8,
+            10
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            8,
+            12
+          ],
+          [
+            11,
+            4
+          ]
+        ],
+        "lava": [
+          [
+            4,
+            2
+          ],
+          [
+            5,
+            2
+          ]
+        ],
+        "water": [
+          [
+            2,
+            5
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            5,
+            5
+          ]
+        ],
+        "void": [
+          [
+            9,
+            5
+          ]
+        ],
+        "exposed": [
+          [
+            2,
+            9
+          ],
+          [
+            3,
+            9
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "covered": [
+          [
+            1,
+            11
+          ],
+          [
+            2,
+            11
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            10,
+            9
+          ],
+          [
+            11,
+            10
+          ]
+        ]
+      },
+      "budgetDescription": "1 Portal Pair ((3, 11) ↔ (9, 9))",
+      "blueprint": "User-provided November 23, 2026; unverified geometry, review required"
+    },
+    {
+      "stage": 101,
+      "title": "Permafrost Cascade",
+      "story": "Cascading down the Permafrost Cascade, freezing gale-winds sweep across a bottomless Void rift to collide with glacial reservoir tides inside an alchemical freeze-chamber. Unite Water and Wind to crystallize Ice (which walks across Shallows without a bridge to meet Electricity straight at the Intersection), while Electricity claims your single Bridge over deep water and Plant cuts through an overgrown Forest barrier!",
+      "sources": [
+        {
+          "element": "wind",
+          "at": [
+            2,
+            2
+          ],
+          "label": "◦\tWind S"
+        },
+        {
+          "element": "water",
+          "at": [
+            5,
+            1
+          ],
+          "label": "Water S"
+        },
+        {
+          "element": "electricity",
+          "at": [
+            8,
+            1
+          ],
+          "label": "Electricity S"
+        },
+        {
+          "element": "nature",
+          "at": [
+            2,
+            10
+          ],
+          "label": "Plant S"
+        }
+      ],
+      "destinations": [
+        {
+          "element": "ice",
+          "at": [
+            11,
+            7
+          ],
+          "label": "◦\tIce D"
+        },
+        {
+          "element": "electricity",
+          "at": [
+            8,
+            8
+          ],
+          "label": "Electricity D"
+        },
+        {
+          "element": "nature",
+          "at": [
+            11,
+            9
+          ],
+          "label": "Plant D"
+        }
+      ],
+      "chambers": [
+        {
+          "name": "A",
+          "inputs": [
+            "water",
+            "wind"
+          ],
+          "output": "ice",
+          "at": [
+            5,
+            5
+          ],
+          "inputSides": [
+            "N",
+            "W"
+          ],
+          "outputSide": "S"
+        }
+      ],
+      "gates": [
+        {
+          "at": [
+            4,
+            5
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            7,
+            10
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            8,
+            7
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            10,
+            6
+          ],
+          "direction": "E"
+        }
+      ],
+      "checkpoints": [
+        {
+          "element": "wind",
+          "at": [
+            3,
+            5
+          ]
+        },
+        {
+          "element": "nature",
+          "at": [
+            6,
+            10
+          ]
+        },
+        {
+          "element": "electricity",
+          "at": [
+            8,
+            3
+          ]
+        },
+        {
+          "element": "ice",
+          "at": [
+            9,
+            5
+          ]
+        }
+      ],
+      "inventory": {
+        "bridge": 1,
+        "metalSpan": 0,
+        "tunnel": 0,
+        "portal": 0,
+        "intersection": 1
+      },
+      "terrain": {
+        "wall": [
+          [
+            4,
+            4
+          ],
+          [
+            4,
+            6
+          ],
+          [
+            6,
+            4
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            2,
+            8
+          ],
+          [
+            3,
+            8
+          ],
+          [
+            4,
+            8
+          ],
+          [
+            5,
+            8
+          ],
+          [
+            6,
+            8
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            9,
+            8
+          ],
+          [
+            10,
+            8
+          ],
+          [
+            12,
+            8
+          ],
+          [
+            7,
+            4
+          ],
+          [
+            7,
+            6
+          ]
+        ],
+        "void": [
+          [
+            2,
+            4
+          ]
+        ],
+        "water": [
+          [
+            5,
+            1
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            7,
+            2
+          ],
+          [
+            8,
+            2
+          ],
+          [
+            9,
+            2
+          ],
+          [
+            10,
+            2
+          ]
+        ],
+        "shallow": [
+          [
+            7,
+            5
+          ]
+        ],
+        "forest": [
+          [
+            4,
+            10
+          ],
+          [
+            5,
+            10
+          ]
+        ]
+      },
+      "budgetDescription": "1 Bridge (at (8, 2)) + 1 Intersection (at (8, 5))",
+      "blueprint": "User-provided November 23, 2026; unverified geometry, review required"
+    },
+    {
+      "stage": 102,
+      "title": "Twin-Chamber Foundry",
+      "story": "Inside the Twin-Chamber Foundry, there are no standalone currents—every single source must enter one of two parallel synthesis chambers! Unite Fire and Earth to smelt Metal (which bores through a 3-tile Mountain bulkhead via your Tunnel), while uniting Water and Wind (void jump) to crystallize Ice (which crosses Shallows and intersects Metal straight at right angles)!",
+      "sources": [
+        {
+          "element": "fire",
+          "at": [
+            2,
+            2
+          ],
+          "label": "◦\tFire S"
+        },
+        {
+          "element": "earth",
+          "at": [
+            8,
+            3
+          ],
+          "label": "Earth S"
+        },
+        {
+          "element": "wind",
+          "at": [
+            11,
+            2
+          ],
+          "label": "Wind S"
+        },
+        {
+          "element": "water",
+          "at": [
+            8,
+            4
+          ],
+          "label": "Water S"
+        }
+      ],
+      "destinations": [
+        {
+          "element": "metal",
+          "at": [
+            10,
+            10
+          ],
+          "label": "◦\tMetal D"
+        },
+        {
+          "element": "ice",
+          "at": [
+            6,
+            11
+          ],
+          "label": "Ice D"
+        }
+      ],
+      "chambers": [
+        {
+          "name": "A",
+          "inputs": [
+            "fire",
+            "earth"
+          ],
+          "output": "metal",
+          "at": [
+            5,
+            3
+          ],
+          "inputSides": [
+            "N",
+            "S"
+          ],
+          "outputSide": "E"
+        },
+        {
+          "name": "B",
+          "inputs": [
+            "water",
+            "wind"
+          ],
+          "output": "ice",
+          "at": [
+            8,
+            6
+          ],
+          "inputSides": [
+            "S",
+            "W"
+          ],
+          "outputSide": "E"
+        }
+      ],
+      "gates": [
+        {
+          "at": [
+            6,
+            10
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            7,
+            11
+          ],
+          "direction": "N"
+        },
+        {
+          "at": [
+            9,
+            6
+          ],
+          "direction": "N"
+        },
+        {
+          "at": [
+            3,
+            3
+          ],
+          "direction": "S"
+        }
+      ],
+      "checkpoints": [
+        {
+          "element": "fire",
+          "at": [
+            4,
+            2
+          ]
+        },
+        {
+          "element": "metal",
+          "at": [
+            5,
+            10
+          ]
+        },
+        {
+          "element": "ice",
+          "at": [
+            8,
+            11
+          ]
+        },
+        {
+          "element": "wind",
+          "at": [
+            10,
+            6
+          ]
+        }
+      ],
+      "inventory": {
+        "bridge": 0,
+        "metalSpan": 0,
+        "tunnel": 2,
+        "portal": 0,
+        "intersection": 1
+      },
+      "terrain": {
+        "mountain": [
+          [
+            4,
+            6
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            4,
+            8
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            5,
+            8
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            6,
+            8
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            7,
+            5
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            9,
+            7
+          ]
+        ],
+        "lava": [
+          [
+            3,
+            2
+          ],
+          [
+            4,
+            2
+          ]
+        ],
+        "scree": [
+          [
+            7,
+            3
+          ],
+          [
+            6,
+            3
+          ]
+        ],
+        "heated": [
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            9
+          ]
+        ],
+        "void": [
+          [
+            11,
+            4
+          ]
+        ],
+        "water": [
+          [
+            8,
+            4
+          ],
+          [
+            8,
+            5
+          ]
+        ],
+        "shallow": [
+          [
+            8,
+            8
+          ],
+          [
+            8,
+            9
+          ]
+        ]
+      },
+      "budgetDescription": "1 Tunnel ((5, 5) ↔ (5, 9)) + 1 Intersection (at (8, 10))",
+      "blueprint": "User-provided November 23, 2026; unverified geometry, review required"
+    },
+    {
+      "stage": 103,
+      "title": "Lightning Prism",
+      "story": "Suspended inside the Lightning Prism, dazzling Exposed sunbeams and pitch-dark Covered vaults clash inside an optical chamber to spark raw Electricity, while molten Lava and cold reservoir tides boil into rising Wind. Unite Light and Shadow (covered + Portal) to generate Electricity (which must stay on dry stone and claim your single Bridge over water), while Fire and Water fuse into Wind to leap a 1-tile Void chasm!",
+      "sources": [
+        {
+          "element": "light",
+          "at": [
+            2,
+            2
+          ],
+          "label": "◦\tLight S"
+        },
+        {
+          "element": "shadow",
+          "at": [
+            2,
+            11
+          ],
+          "label": "Shadow S"
+        },
+        {
+          "element": "water",
+          "at": [
+            8,
+            2
+          ],
+          "label": "Water S"
+        },
+        {
+          "element": "fire",
+          "at": [
+            4,
+            11
+          ],
+          "label": "Fire S"
+        }
+      ],
+      "destinations": [
+        {
+          "element": "electricity",
+          "at": [
+            11,
+            5
+          ],
+          "label": "◦\tElectricity D"
+        },
+        {
+          "element": "wind",
+          "at": [
+            2,
+            7
+          ],
+          "label": "Wind D"
+        }
+      ],
+      "chambers": [
+        {
+          "name": "A",
+          "inputs": [
+            "light",
+            "shadow"
+          ],
+          "output": "electricity",
+          "at": [
+            5,
+            5
+          ],
+          "inputSides": [
+            "N",
+            "W"
+          ],
+          "outputSide": "S"
+        },
+        {
+          "name": "B",
+          "inputs": [
+            "fire",
+            "water"
+          ],
+          "output": "wind",
+          "at": [
+            7,
+            9
+          ],
+          "inputSides": [
+            "W",
+            "E"
+          ],
+          "outputSide": "N"
+        }
+      ],
+      "gates": [
+        {
+          "at": [
+            4,
+            5
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            5,
+            4
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            7,
+            10
+          ],
+          "direction": "W"
+        },
+        {
+          "at": [
+            9,
+            5
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            3,
+            3
+          ],
+          "direction": "E"
+        }
+      ],
+      "checkpoints": [
+        {
+          "element": "wind",
+          "at": [
+            2,
+            8
+          ]
+        },
+        {
+          "element": "shadow",
+          "at": [
+            2,
+            9
+          ]
+        },
+        {
+          "element": "light",
+          "at": [
+            3,
+            4
+          ]
+        },
+        {
+          "element": "electricity",
+          "at": [
+            7,
+            5
+          ]
+        }
+      ],
+      "inventory": {
+        "bridge": 1,
+        "metalSpan": 0,
+        "tunnel": 0,
+        "portal": 2,
+        "intersection": 0
+      },
+      "terrain": {
+        "wall": [
+          [
+            4,
+            4
+          ],
+          [
+            4,
+            6
+          ],
+          [
+            6,
+            4
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            3,
+            6
+          ],
+          [
+            6,
+            8
+          ],
+          [
+            6,
+            10
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            8,
+            10
+          ],
+          [
+            10,
+            4
+          ],
+          [
+            10,
+            6
+          ],
+          [
+            11,
+            4
+          ],
+          [
+            11,
+            6
+          ],
+          [
+            12,
+            5
+          ]
+        ],
+        "exposed": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            3
+          ]
+        ],
+        "covered": [
+          [
+            2,
+            9
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            2,
+            11
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            5,
+            3
+          ]
+        ],
+        "water": [
+          [
+            8,
+            2
+          ],
+          [
+            8,
+            3
+          ],
+          [
+            8,
+            4
+          ],
+          [
+            8,
+            5
+          ],
+          [
+            8,
+            6
+          ],
+          [
+            8,
+            7
+          ],
+          [
+            8,
+            8
+          ]
+        ],
+        "shallow": [
+          [
+            9,
+            4
+          ],
+          [
+            9,
+            6
+          ]
+        ],
+        "lava": [
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            11
+          ]
+        ],
+        "void": [
+          [
+            4,
+            9
+          ]
+        ]
+      },
+      "budgetDescription": "1 Portal Pair ((3, 10) ↔ (5, 2)) + 1 Bridge (at (8, 5))",
+      "blueprint": "User-provided November 23, 2026; unverified geometry, review required"
+    },
+    {
+      "stage": 104,
+      "title": "The Living Alloy",
+      "story": "Inside The Living Alloy, twin mineral synthesis chambers operate side-by-side—one nurturing living roots from soil and tide, the other smelting white-hot iron from earth and flame—surrounded by blinding Exposed light-shafts and pitch-dark Covered vaults. Unite both chambers to generate Plant (forest — cannot use Portals) and Metal (heated — claims the Tunnel), while Light (exposed) crosses Plant straight at the Intersection and Shadow (covered) warps via the Portal Pair!",
+      "sources": [
+        {
+          "element": "water",
+          "at": [
+            2,
+            4
+          ],
+          "label": "◦\tWater S"
+        },
+        {
+          "element": "earth",
+          "at": [
+            5,
+            1
+          ],
+          "label": "Earth S1"
+        },
+        {
+          "element": "earth",
+          "at": [
+            2,
+            7
+          ],
+          "label": "Earth S2"
+        },
+        {
+          "element": "fire",
+          "at": [
+            2,
+            10
+          ],
+          "label": "Fire S"
+        },
+        {
+          "element": "light",
+          "at": [
+            8,
+            1
+          ],
+          "label": "Light S"
+        },
+        {
+          "element": "shadow",
+          "at": [
+            2,
+            1
+          ],
+          "label": "Shadow S"
+        }
+      ],
+      "destinations": [
+        {
+          "element": "nature",
+          "at": [
+            11,
+            4
+          ],
+          "label": "◦\tPlant D"
+        },
+        {
+          "element": "metal",
+          "at": [
+            10,
+            11
+          ],
+          "label": "Metal D"
+        },
+        {
+          "element": "light",
+          "at": [
+            8,
+            8
+          ],
+          "label": "Light D"
+        },
+        {
+          "element": "shadow",
+          "at": [
+            11,
+            10
+          ],
+          "label": "Shadow D"
+        }
+      ],
+      "chambers": [
+        {
+          "name": "A",
+          "inputs": [
+            "water",
+            "earth"
+          ],
+          "output": "nature",
+          "at": [
+            5,
+            4
+          ],
+          "inputSides": [
+            "N",
+            "W"
+          ],
+          "outputSide": "S"
+        },
+        {
+          "name": "B",
+          "inputs": [
+            "fire",
+            "earth"
+          ],
+          "output": "metal",
+          "at": [
+            4,
+            7
+          ],
+          "inputSides": [
+            "N",
+            "E"
+          ],
+          "outputSide": "S"
+        }
+      ],
+      "gates": [
+        {
+          "at": [
+            4,
+            8
+          ],
+          "direction": "W"
+        },
+        {
+          "at": [
+            8,
+            7
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            8,
+            11
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            10,
+            4
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            10,
+            9
+          ],
+          "direction": "E"
+        }
+      ],
+      "checkpoints": [
+        {
+          "element": "shadow",
+          "at": [
+            3,
+            1
+          ]
+        },
+        {
+          "element": "earth",
+          "at": [
+            5,
+            3
+          ]
+        },
+        {
+          "element": "metal",
+          "at": [
+            7,
+            11
+          ]
+        },
+        {
+          "element": "light",
+          "at": [
+            8,
+            6
+          ]
+        },
+        {
+          "element": "nature",
+          "at": [
+            9,
+            4
+          ]
+        }
+      ],
+      "inventory": {
+        "bridge": 0,
+        "metalSpan": 0,
+        "tunnel": 2,
+        "portal": 2,
+        "intersection": 1
+      },
+      "terrain": {
+        "mountain": [
+          [
+            5,
+            8
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            5,
+            10
+          ],
+          [
+            6,
+            8
+          ],
+          [
+            6,
+            9
+          ],
+          [
+            6,
+            10
+          ],
+          [
+            7,
+            8
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            6,
+            3
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            7,
+            3
+          ],
+          [
+            7,
+            5
+          ],
+          [
+            9,
+            8
+          ]
+        ],
+        "water": [
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            4
+          ]
+        ],
+        "scree": [
+          [
+            5,
+            2
+          ],
+          [
+            3,
+            7
+          ]
+        ],
+        "forest": [
+          [
+            7,
+            4
+          ]
+        ],
+        "lava": [
+          [
+            3,
+            10
+          ]
+        ],
+        "heated": [
+          [
+            6,
+            7
+          ],
+          [
+            6,
+            11
+          ]
+        ],
+        "exposed": [
+          [
+            8,
+            2
+          ],
+          [
+            8,
+            3
+          ],
+          [
+            8,
+            5
+          ],
+          [
+            8,
+            6
+          ]
+        ],
+        "covered": [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            10,
+            8
+          ],
+          [
+            11,
+            10
+          ]
+        ]
+      },
+      "budgetDescription": "1 Tunnel ((6, 7) ↔ (6, 11)), 1 Portal Pair ((3, 2) ↔ (10, 8)), 1 Intersection (at (8, 4))",
+      "blueprint": "User-provided November 23, 2026; unverified geometry, review required"
+    },
+    {
+      "stage": 105,
+      "title": "Cascade Chain-Reaction",
+      "story": "Behold Cascade Chain-Reaction—a multi-stage alchemical reactor where the output of one Confluence Chamber feeds directly into the next! Boil Fire and Water together in the upper chamber to synthesize Wind, vault that newborn Wind across a 1-tile Void chasm into the middle freeze-chamber with fresh Water to crystallize Ice, and unite Water and Earth in the southern chamber to grow Plant!",
+      "sources": [
+        {
+          "element": "fire",
+          "at": [
+            2,
+            1
+          ],
+          "label": "◦\tFire S"
+        },
+        {
+          "element": "water",
+          "at": [
+            3,
+            1
+          ],
+          "label": "Water S1"
+        },
+        {
+          "element": "water",
+          "at": [
+            5,
+            11
+          ],
+          "label": "Water S2"
+        },
+        {
+          "element": "water",
+          "at": [
+            6,
+            4
+          ],
+          "label": "Water S3"
+        },
+        {
+          "element": "earth",
+          "at": [
+            8,
+            1
+          ],
+          "label": "Earth S"
+        }
+      ],
+      "destinations": [
+        {
+          "element": "ice",
+          "at": [
+            11,
+            8
+          ],
+          "label": "◦\tIce D"
+        },
+        {
+          "element": "nature",
+          "at": [
+            8,
+            11
+          ],
+          "label": "Plant D"
+        }
+      ],
+      "chambers": [
+        {
+          "name": "A",
+          "inputs": [
+            "fire",
+            "water"
+          ],
+          "output": "wind",
+          "at": [
+            3,
+            4
+          ],
+          "inputSides": [
+            "N",
+            "W"
+          ],
+          "outputSide": "E"
+        },
+        {
+          "name": "B",
+          "inputs": [
+            "wind",
+            "water"
+          ],
+          "output": "ice",
+          "at": [
+            5,
+            8
+          ],
+          "inputSides": [
+            "N",
+            "E"
+          ],
+          "outputSide": "S"
+        },
+        {
+          "name": "C",
+          "inputs": [
+            "water",
+            "earth"
+          ],
+          "output": "nature",
+          "at": [
+            8,
+            4
+          ],
+          "inputSides": [
+            "N",
+            "W"
+          ],
+          "outputSide": "E"
+        }
+      ],
+      "gates": [
+        {
+          "at": [
+            4,
+            8
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            8,
+            9
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            10,
+            8
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            2,
+            4
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            7,
+            4
+          ],
+          "direction": "S"
+        }
+      ],
+      "checkpoints": [
+        {
+          "element": "fire",
+          "at": [
+            2,
+            3
+          ]
+        },
+        {
+          "element": "wind",
+          "at": [
+            3,
+            6
+          ]
+        },
+        {
+          "element": "earth",
+          "at": [
+            8,
+            3
+          ]
+        },
+        {
+          "element": "nature",
+          "at": [
+            8,
+            7
+          ]
+        },
+        {
+          "element": "ice",
+          "at": [
+            9,
+            8
+          ]
+        }
+      ],
+      "inventory": {
+        "bridge": 1,
+        "metalSpan": 0,
+        "tunnel": 0,
+        "portal": 0,
+        "intersection": 1
+      },
+      "terrain": {
+        "wall": [
+          [
+            2,
+            5
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            4,
+            9
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            6,
+            9
+          ],
+          [
+            7,
+            3
+          ],
+          [
+            7,
+            5
+          ],
+          [
+            9,
+            3
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            9,
+            7
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            11,
+            10
+          ]
+        ],
+        "lava": [
+          [
+            2,
+            2
+          ]
+        ],
+        "water": [
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            5,
+            10
+          ],
+          [
+            5,
+            11
+          ],
+          [
+            6,
+            4
+          ],
+          [
+            7,
+            4
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            8,
+            10
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "void": [
+          [
+            3,
+            7
+          ]
+        ],
+        "shallow": [
+          [
+            7,
+            8
+          ]
+        ],
+        "scree": [
+          [
+            8,
+            2
+          ]
+        ],
+        "forest": [
+          [
+            8,
+            6
+          ]
+        ]
+      },
+      "budgetDescription": "1 Bridge (at (8, 10)) + 1 Intersection (at (8, 8))",
+      "blueprint": "User-provided November 23, 2026; unverified geometry, review required"
+    },
+    {
+      "stage": 106,
+      "title": "The Six-Stream Reactor",
+      "story": "Deep inside The Six-Stream Reactor, twin synthesis chambers temper white-hot Metal from flame and stone while sparking raw Electricity from clashing sunbeams and shadows, flanked by a rushing Water aqueduct and overgrown Plant arches. Unite both chambers and guide all seven active elements through all six one-way locks—remembering that Plant cannot use Portals (and must claim the Bridge), Metal (heated) claims the Tunnel, Shadow (covered) uses the Portal Pair, and Electricity crosses Water straight at the Intersection!",
+      "sources": [
+        {
+          "element": "fire",
+          "at": [
+            2,
+            1
+          ],
+          "label": "◦\tFire S"
+        },
+        {
+          "element": "earth",
+          "at": [
+            3,
+            1
+          ],
+          "label": "Earth S"
+        },
+        {
+          "element": "light",
+          "at": [
+            5,
+            4
+          ],
+          "label": "Light S"
+        },
+        {
+          "element": "shadow",
+          "at": [
+            2,
+            11
+          ],
+          "label": "Shadow S"
+        },
+        {
+          "element": "water",
+          "at": [
+            5,
+            8
+          ],
+          "label": "Water S"
+        },
+        {
+          "element": "nature",
+          "at": [
+            9,
+            2
+          ],
+          "label": "Plant S"
+        }
+      ],
+      "destinations": [
+        {
+          "element": "metal",
+          "at": [
+            5,
+            11
+          ],
+          "label": "◦\tMetal D"
+        },
+        {
+          "element": "electricity",
+          "at": [
+            7,
+            11
+          ],
+          "label": "Electricity D"
+        },
+        {
+          "element": "water",
+          "at": [
+            11,
+            8
+          ],
+          "label": "Water D"
+        },
+        {
+          "element": "nature",
+          "at": [
+            11,
+            7
+          ],
+          "label": "Plant D"
+        }
+      ],
+      "chambers": [
+        {
+          "name": "A",
+          "inputs": [
+            "fire",
+            "earth"
+          ],
+          "output": "metal",
+          "at": [
+            3,
+            3
+          ],
+          "inputSides": [
+            "N",
+            "W"
+          ],
+          "outputSide": "E"
+        },
+        {
+          "name": "B",
+          "inputs": [
+            "light",
+            "shadow"
+          ],
+          "output": "electricity",
+          "at": [
+            7,
+            4
+          ],
+          "inputSides": [
+            "N",
+            "W"
+          ],
+          "outputSide": "E"
+        }
+      ],
+      "gates": [
+        {
+          "at": [
+            4,
+            11
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            7,
+            3
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            7,
+            10
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            9,
+            8
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            11,
+            4
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            6,
+            4
+          ],
+          "direction": "S"
+        }
+      ],
+      "checkpoints": [
+        {
+          "element": "fire",
+          "at": [
+            2,
+            3
+          ]
+        },
+        {
+          "element": "shadow",
+          "at": [
+            2,
+            9
+          ]
+        },
+        {
+          "element": "metal",
+          "at": [
+            3,
+            10
+          ]
+        },
+        {
+          "element": "water",
+          "at": [
+            6,
+            8
+          ]
+        },
+        {
+          "element": "electricity",
+          "at": [
+            7,
+            6
+          ]
+        },
+        {
+          "element": "nature",
+          "at": [
+            11,
+            2
+          ]
+        }
+      ],
+      "inventory": {
+        "bridge": 1,
+        "metalSpan": 0,
+        "tunnel": 2,
+        "portal": 2,
+        "intersection": 1
+      },
+      "terrain": {
+        "mountain": [
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ],
+          [
+            2,
+            8
+          ],
+          [
+            3,
+            6
+          ],
+          [
+            3,
+            7
+          ],
+          [
+            3,
+            8
+          ],
+          [
+            4,
+            6
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            4,
+            8
+          ],
+          [
+            6,
+            3
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            8,
+            3
+          ],
+          [
+            8,
+            5
+          ],
+          [
+            12,
+            8
+          ]
+        ],
+        "lava": [
+          [
+            2,
+            2
+          ]
+        ],
+        "scree": [
+          [
+            3,
+            2
+          ]
+        ],
+        "heated": [
+          [
+            3,
+            5
+          ],
+          [
+            3,
+            9
+          ]
+        ],
+        "exposed": [
+          [
+            5,
+            4
+          ],
+          [
+            6,
+            4
+          ]
+        ],
+        "covered": [
+          [
+            2,
+            9
+          ],
+          [
+            2,
+            10
+          ],
+          [
+            2,
+            11
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            7,
+            2
+          ]
+        ],
+        "water": [
+          [
+            5,
+            8
+          ],
+          [
+            6,
+            8
+          ],
+          [
+            8,
+            8
+          ],
+          [
+            9,
+            8
+          ],
+          [
+            10,
+            8
+          ],
+          [
+            11,
+            8
+          ],
+          [
+            10,
+            6
+          ],
+          [
+            11,
+            6
+          ]
+        ],
+        "forest": [
+          [
+            10,
+            2
+          ],
+          [
+            11,
+            2
+          ]
+        ]
+      },
+      "budgetDescription": "1 Bridge (at (11, 6)), 1 Tunnel ((3, 5) ↔ (3, 9)), 1 Portal Pair ((2, 10) ↔ (7, 1)), 1 Intersection (placed on dry overpass (7, 8))",
+      "blueprint": "User-provided November 23, 2026; unverified geometry, review required"
+    },
+    {
+      "stage": 107,
+      "title": "Octa-Confluence Core",
+      "story": "Revolving around the Octa-Confluence Core, eight elemental currents converge on twin synthesis chambers that forge living Plant and glacial Ice while surrounding streams of Fire, Metal, Water, and Shadow weave through two perpendicular overpasses. Unite all eight currents across six one-way locks and every terrain channel in Element Forge!",
+      "sources": [
+        {
+          "element": "water",
+          "at": [
+            5,
+            4
+          ],
+          "label": "◦\tWater S1"
+        },
+        {
+          "element": "earth",
+          "at": [
+            7,
+            1
+          ],
+          "label": "Earth S"
+        },
+        {
+          "element": "wind",
+          "at": [
+            4,
+            11
+          ],
+          "label": "Wind S"
+        },
+        {
+          "element": "water",
+          "at": [
+            2,
+            7
+          ],
+          "label": "Water S2"
+        },
+        {
+          "element": "fire",
+          "at": [
+            9,
+            6
+          ],
+          "label": "Fire S"
+        },
+        {
+          "element": "metal",
+          "at": [
+            2,
+            2
+          ],
+          "label": "Metal S"
+        },
+        {
+          "element": "light",
+          "at": [
+            5,
+            5
+          ],
+          "label": "Light S"
+        },
+        {
+          "element": "shadow",
+          "at": [
+            4,
+            1
+          ],
+          "label": "Shadow S"
+        }
+      ],
+      "destinations": [
+        {
+          "element": "nature",
+          "at": [
+            11,
+            6
+          ],
+          "label": "◦\tPlant D"
+        },
+        {
+          "element": "ice",
+          "at": [
+            11,
+            9
+          ],
+          "label": "Ice D"
+        },
+        {
+          "element": "fire",
+          "at": [
+            9,
+            11
+          ],
+          "label": "Fire D"
+        },
+        {
+          "element": "metal",
+          "at": [
+            6,
+            6
+          ],
+          "label": "Metal D"
+        },
+        {
+          "element": "light",
+          "at": [
+            5,
+            9
+          ],
+          "label": "Light D"
+        },
+        {
+          "element": "shadow",
+          "at": [
+            11,
+            11
+          ],
+          "label": "Shadow D"
+        }
+      ],
+      "chambers": [
+        {
+          "name": "A",
+          "inputs": [
+            "water",
+            "earth"
+          ],
+          "output": "nature",
+          "at": [
+            7,
+            4
+          ],
+          "inputSides": [
+            "N",
+            "W"
+          ],
+          "outputSide": "S"
+        },
+        {
+          "name": "B",
+          "inputs": [
+            "water",
+            "wind"
+          ],
+          "output": "ice",
+          "at": [
+            6,
+            9
+          ],
+          "inputSides": [
+            "E",
+            "W"
+          ],
+          "outputSide": "S"
+        }
+      ],
+      "gates": [
+        {
+          "at": [
+            4,
+            6
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            5,
+            8
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            6,
+            10
+          ],
+          "direction": "W"
+        },
+        {
+          "at": [
+            9,
+            10
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            10,
+            11
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            11,
+            5
+          ],
+          "direction": "E"
+        }
+      ],
+      "checkpoints": [
+        {
+          "element": "metal",
+          "at": [
+            3,
+            6
+          ]
+        },
+        {
+          "element": "water",
+          "at": [
+            4,
+            7
+          ]
+        },
+        {
+          "element": "shadow",
+          "at": [
+            5,
+            1
+          ]
+        },
+        {
+          "element": "fire",
+          "at": [
+            9,
+            8
+          ]
+        },
+        {
+          "element": "nature",
+          "at": [
+            10,
+            4
+          ]
+        },
+        {
+          "element": "ice",
+          "at": [
+            10,
+            9
+          ]
+        }
+      ],
+      "inventory": {
+        "bridge": 1,
+        "metalSpan": 0,
+        "tunnel": 2,
+        "portal": 2,
+        "intersection": 2
+      },
+      "terrain": {
+        "mountain": [
+          [
+            1,
+            3
+          ],
+          [
+            1,
+            4
+          ],
+          [
+            1,
+            5
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            3,
+            5
+          ],
+          [
+            8,
+            8
+          ]
+        ],
+        "water": [
+          [
+            5,
+            4
+          ],
+          [
+            6,
+            4
+          ],
+          [
+            2,
+            7
+          ],
+          [
+            3,
+            7
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            6,
+            8
+          ]
+        ],
+        "scree": [
+          [
+            7,
+            2
+          ],
+          [
+            7,
+            3
+          ]
+        ],
+        "forest": [
+          [
+            9,
+            4
+          ]
+        ],
+        "void": [
+          [
+            5,
+            11
+          ]
+        ],
+        "shallow": [
+          [
+            8,
+            9
+          ]
+        ],
+        "lava": [
+          [
+            9,
+            7
+          ],
+          [
+            9,
+            8
+          ]
+        ],
+        "heated": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            6
+          ]
+        ],
+        "exposed": [
+          [
+            5,
+            5
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            5,
+            8
+          ]
+        ],
+        "covered": [
+          [
+            4,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            11,
+            11
+          ]
+        ]
+      },
+      "budgetDescription": "1 Tunnel ((2, 2) ↔ (2, 6)), 1 Portal Pair ((5, 2) ↔ (10, 10)), 2 Intersections (placed at (5, 6) and (9, 9)) + 1 Bridge (at (6, 8))",
+      "blueprint": "User-provided November 23, 2026; unverified geometry, review required"
+    },
+    {
+      "stage": 108,
+      "title": "The Grand Philosopher's Engine",
+      "story": "At the apex of The Confluence Forges spins The Grand Philosopher's Engine—a monumental three-chamber alchemical core where not a single raw element can reach its goal directly! Every starting current must fuse inside one of three interlocking reaction chambers to synthesize Wind, Plant, and Electricity, which then braid across seven one-way locks and two perpendicular overpasses to complete the Philosopher's Great Work!",
+      "sources": [
+        {
+          "element": "fire",
+          "at": [
+            2,
+            1
+          ],
+          "label": "◦\tFire S"
+        },
+        {
+          "element": "water",
+          "at": [
+            3,
+            1
+          ],
+          "label": "Water S1"
+        },
+        {
+          "element": "water",
+          "at": [
+            5,
+            4
+          ],
+          "label": "Water S2"
+        },
+        {
+          "element": "earth",
+          "at": [
+            7,
+            1
+          ],
+          "label": "Earth S"
+        },
+        {
+          "element": "light",
+          "at": [
+            5,
+            7
+          ],
+          "label": "Light S"
+        },
+        {
+          "element": "shadow",
+          "at": [
+            4,
+            1
+          ],
+          "label": "Shadow S"
+        }
+      ],
+      "destinations": [
+        {
+          "element": "wind",
+          "at": [
+            6,
+            10
+          ],
+          "label": "◦\tWind D"
+        },
+        {
+          "element": "nature",
+          "at": [
+            11,
+            8
+          ],
+          "label": "Plant D"
+        },
+        {
+          "element": "electricity",
+          "at": [
+            10,
+            6
+          ],
+          "label": "Electricity D"
+        }
+      ],
+      "chambers": [
+        {
+          "name": "A",
+          "inputs": [
+            "fire",
+            "water"
+          ],
+          "output": "wind",
+          "at": [
+            3,
+            5
+          ],
+          "inputSides": [
+            "N",
+            "W"
+          ],
+          "outputSide": "E"
+        },
+        {
+          "name": "B",
+          "inputs": [
+            "water",
+            "earth"
+          ],
+          "output": "nature",
+          "at": [
+            7,
+            4
+          ],
+          "inputSides": [
+            "N",
+            "W"
+          ],
+          "outputSide": "S"
+        },
+        {
+          "name": "C",
+          "inputs": [
+            "light",
+            "shadow"
+          ],
+          "output": "electricity",
+          "at": [
+            8,
+            8
+          ],
+          "inputSides": [
+            "E",
+            "W"
+          ],
+          "outputSide": "S"
+        }
+      ],
+      "gates": [
+        {
+          "at": [
+            2,
+            5
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            4,
+            10
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            6,
+            4
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            8,
+            7
+          ],
+          "direction": "E"
+        },
+        {
+          "at": [
+            8,
+            9
+          ],
+          "direction": "W"
+        },
+        {
+          "at": [
+            10,
+            9
+          ],
+          "direction": "S"
+        },
+        {
+          "at": [
+            11,
+            5
+          ],
+          "direction": "E"
+        }
+      ],
+      "checkpoints": [
+        {
+          "element": "fire",
+          "at": [
+            2,
+            3
+          ]
+        },
+        {
+          "element": "wind",
+          "at": [
+            3,
+            9
+          ]
+        },
+        {
+          "element": "shadow",
+          "at": [
+            5,
+            1
+          ]
+        },
+        {
+          "element": "light",
+          "at": [
+            5,
+            9
+          ]
+        },
+        {
+          "element": "earth",
+          "at": [
+            7,
+            3
+          ]
+        },
+        {
+          "element": "electricity",
+          "at": [
+            9,
+            9
+          ]
+        },
+        {
+          "element": "nature",
+          "at": [
+            10,
+            4
+          ]
+        }
+      ],
+      "inventory": {
+        "bridge": 1,
+        "metalSpan": 0,
+        "tunnel": 2,
+        "portal": 2,
+        "intersection": 2
+      },
+      "terrain": {
+        "mountain": [
+          [
+            2,
+            6
+          ],
+          [
+            4,
+            4
+          ],
+          [
+            4,
+            6
+          ],
+          [
+            6,
+            3
+          ],
+          [
+            6,
+            5
+          ],
+          [
+            7,
+            7
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            9,
+            7
+          ],
+          [
+            12,
+            7
+          ],
+          [
+            1,
+            8
+          ],
+          [
+            1,
+            9
+          ],
+          [
+            1,
+            10
+          ]
+        ],
+        "lava": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        "water": [
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            6,
+            4
+          ],
+          [
+            8,
+            7
+          ],
+          [
+            9,
+            7
+          ]
+        ],
+        "void": [
+          [
+            3,
+            7
+          ]
+        ],
+        "scree": [
+          [
+            7,
+            2
+          ],
+          [
+            7,
+            3
+          ]
+        ],
+        "forest": [
+          [
+            9,
+            4
+          ]
+        ],
+        "exposed": [
+          [
+            5,
+            8
+          ],
+          [
+            5,
+            9
+          ]
+        ],
+        "covered": [
+          [
+            4,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            8,
+            6
+          ],
+          [
+            8,
+            7
+          ]
+        ]
+      },
+      "budgetDescription": "1 Bridge (at (11, 7)), 1 Portal Pair ((5, 2) ↔ (8, 6)), 2 Intersections (placed at (5, 10) and dry overpass (10, 7)) + 1 Tunnel (available if routing around (9, 7) wall)",
+      "blueprint": "User-provided November 23, 2026; unverified geometry, review required"
+    }
+  ]
+}
