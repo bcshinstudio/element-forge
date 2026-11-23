@@ -21,7 +21,7 @@
   portal:['Carries a current directly to its paired exit. Plant cannot use it.','Select Portal and tap two open ground tiles. Continue from the paired exit. Removing one end removes the pair.'],
   gate:['Passes currents in the direction of its arrow.','Enter and leave in the marked direction. Permanently built into the board.'],
   checkpoint:['Marks a required waypoint for its assigned current.','Route through it before reaching the inlet. A checkpoint marked for any element must be visited by each route. Built into the board.'],
-  confluence:['Combines Water + Earth into a Plant output.','Water and Earth enter their marked W/E ports, and Plant leaves the green P port. All three routes must be complete to restore harmony. This is a fixed map fixture.']
+  confluence:['Merges any two selected input currents into a third output current.','Choose one of five preset recipes or configure three distinct elements in the Map Editor. The two inputs end at their marked ports; the output begins at the chamber. All three routes must be complete. This is a fixed map fixture.']
  };
  const reserved=['junction','sorter','converter','remover','booster'];
  const notes={
