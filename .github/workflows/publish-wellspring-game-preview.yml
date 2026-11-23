@@ -1,0 +1,96 @@
+name: Publish Tested Wellspring Game Preview
+
+on:
+  push:
+    branches: [phone-playtest]
+    paths:
+      - .github/workflows/publish-wellspring-game-preview.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: wellspring-preview-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: https://bcshinstudio.github.io/element-forge/wellspring-preview/game/
+    steps:
+      - name: Checkout existing Pages branch and preserve all published assets
+        uses: actions/checkout@v4
+        with:
+          ref: phone-playtest
+          path: site
+          persist-credentials: true
+      - name: Checkout exact Chapter 9 revision that passed browser QA
+        uses: actions/checkout@v4
+        with:
+          ref: e3460f32a0cce5c8a6083ca7084359e8daacc3f8
+          path: source
+          persist-credentials: false
+      - name: Set up Node.js for regression tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run puzzle and editor regression tests before publication
+        working-directory: source
+        run: |
+          node --test map-editor/tests/*.test.js game/tests/*.test.js
+          node --check game/app.js
+      - name: Build the single-file game and update only the preview game path
+        run: |
+          python3 source/game/build.py Wellspring_Pause_Menu_Preview.html
+          test -s Wellspring_Pause_Menu_Preview.html
+          cp Wellspring_Pause_Menu_Preview.html site/wellspring-preview/game/index.html
+          grep -q 'class="pause-menu-header"' site/wellspring-preview/game/index.html
+          grep -q 'confluence-forges-108' site/wellspring-preview/game/index.html
+      - name: Commit the updated game to the existing phone-playtest Pages branch
+        working-directory: site
+        run: |
+          git config user.name "BC Shin Studio Preview Publisher"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add wellspring-preview/game/index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Update Wellspring Chapter 9 preview with polished game menus"
+            git push origin HEAD:phone-playtest
+          fi
+      - name: Assemble existing Pages site without changing other preview assets
+        run: |
+          mkdir -p _site
+          cp site/index.html site/.nojekyll _site/
+          cp -a site/wellspring-preview _site/
+          test -s _site/wellspring-preview/game/index.html
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload complete Pages site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Deploy updated Wellspring preview
+        uses: actions/deploy-pages@v4
+        id: deployment
+      - name: Verify exact live preview URL contains the tested game
+        run: |
+          python3 - <<'PY'
+          import time,urllib.request
+          url="https://bcshinstudio.github.io/element-forge/wellspring-preview/game/"
+          for attempt in range(15):
+              try:
+                  with urllib.request.urlopen(url+"?verified-menu="+str(attempt),timeout=12) as response:
+                      html=response.read().decode("utf-8")
+                  if all(fragment in html for fragment in ('class="pause-menu-header"','id="menu-lessons-back"','confluence-forges-108')):
+                      print("PASS: Preview page serves polished menus and all 108 stages")
+                      break
+              except Exception as error:
+                  print("Attempt",attempt+1,type(error).__name__,str(error)[:150])
+              time.sleep(3)
+          else:
+              raise SystemExit("New game not yet visible at requested Pages preview URL")
+          PY
