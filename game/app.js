@@ -450,6 +450,12 @@
   syncDragHandles();
   const {map,state}=session;
   const visible=E.phaseView(map,state.dayPhase);
+  // Routes update the board without calling update(); refresh the phase badge here.
+  if(E.hasPhases(map)){
+   const night=state.dayPhase==='night';
+   $('phase-indicator').textContent=night?'☾ Night · Day deliveries preserved':'☀ Day · Complete the plate route to switch';
+   $('phase-indicator').dataset.dayPhase=state.dayPhase;
+  }
   const fragments=tiles.map(()=>document.createDocumentFragment());
   for(const {element,path} of [...state.routes.filter(route=>!state.drafts[E.routeKey(map,route.element,route.path[0])]),...Object.values(state.drafts)]){
    for(const [j,i] of path.entries()){
