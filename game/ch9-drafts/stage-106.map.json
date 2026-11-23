@@ -37,7 +37,11 @@
       "terrain": "land"
     },
     {
-      "terrain": "land"
+      "terrain": "land",
+      "component": "checkpoint",
+      "props": {
+        "element": "shadow"
+      }
     },
     {
       "terrain": "land"
@@ -75,11 +79,7 @@
       "terrain": "mountain"
     },
     {
-      "terrain": "covered",
-      "component": "checkpoint",
-      "props": {
-        "element": "shadow"
-      }
+      "terrain": "covered"
     },
     {
       "terrain": "covered"
