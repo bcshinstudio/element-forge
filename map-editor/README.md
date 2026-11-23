@@ -23,7 +23,7 @@ A `.level.json` file contains these required fields.
 | `rulesVersion` | `1` |
 | `map` | The complete `element-forge-map` schema 2 object |
 
-The nested map contains dimensions, row-major cells, inventory, element restrictions, name, and description. Indices are zero-based. The current rules support up to eight element pairs and board dimensions from 4 to 24. The official board standard is 12 × 12. Fixed components supported by this rules version are bridges, intersections, portals, tunnels, gates, and checkpoints. Players can place bridges, intersections, portals and tunnel ends. Solution routes and placements are omitted from the file.
+The nested map contains dimensions, row-major cells, inventory, element restrictions, name, and description. Indices are zero-based. The current rules support up to eight traditional element pairs (or sixteen route segments in multi-chamber prototype maps) and board dimensions from 4 to 24. The official board standard is 12 × 12. Fixed components supported by this rules version are bridges, intersections, portals, tunnels, gates, and checkpoints. Players can place bridges, intersections, portals and tunnel ends. Solution routes and placements are omitted from the file.
 
 A future game client can call `EFMap.readLevel(document)` or import `readLevel` from `map-format.js`. It checks the package versions and playable structure and returns the normalized map. Call `createLevel(map)` to independently verify solvability before distributing a third-party map. The editor also accepts level files through **Import JSON**.
 
@@ -39,8 +39,9 @@ A future game client can call `EFMap.readLevel(document)` or import `readLevel` 
 A **Confluence Chamber** is one fixed, directional cell that accepts two
 different input elements and creates one distinct output element. Players must
 connect all three routes. It is not a construction tool; place it in the map
-editor. The current shared engine supports **one chamber per map**, and does
-not add Chapter 9 to the released campaign.
+editor. The shared engine supports **multiple chambers per map**, including
+sequential reactions and several independent routes of the same element.
+It does not add Chapter 9 to the released campaign.
 
 ### Built-in recipes
 
@@ -62,10 +63,15 @@ do **not** introduce any additional element types.
 1. Under **Tools & Fixtures**, select **Confluence Chamber**.
 2. Under **Paint settings**, select a **Reaction recipe**, or **Custom** and
    three distinct elements. Set the **Output direction**. Paint the fixture on
-   Land. One fixture is supported per map.
-3. Place **one Source for each input element** and **one Destination for the
-   output element**. Do **not** place input destinations or an output source:
-   the chamber is the inputs' destination and the output's source.
+   Land. You may place multiple chambers, each with its own recipe and direction.
+3. For a single chamber, place one **Source for each input element** and one
+   **Destination for its output**. The chamber itself provides the input
+   Destinations and output Source. With several chambers, you may connect one
+   chamber's output directly to a later chamber's matching input (a chain).
+   Every route must have exactly one source and one destination.
+   If two chambers both consume Fire, provide **two independent Fire sources**
+   (or one additional chamber producing Fire); one Source cannot split into
+   two routes in this version.
 4. The first input approaches from the counterclockwise side relative to
    the output direction, the second input from the clockwise side.
    With output **East**, input 1 is **North**, input 2 **South**, and output
@@ -74,7 +80,10 @@ do **not** introduce any additional element types.
    elements, or direction in the **Selected cell** inspector. If you change
    a recipe, also update the Sources and Destination to match.
 6. Use **Check Map**, **Enter playtest**, and **Export verified level**.
-   The output route can be planned first, but harmony requires both inputs.
+   Output routes can be planned before their inputs, but every chamber must
+   ultimately receive two powered inputs. A circular reaction chain with no
+   external source cannot activate. The verifier checks matching source/target
+   counts, port direction, overlaps, and upstream dependencies.
 
 ### Importable examples
 
@@ -84,6 +93,13 @@ do **not** introduce any additional element types.
 - `examples/confluence-water-wind-ice.map.json`
 - `examples/confluence-light-shadow-electricity.map.json`
 - `examples/confluence-custom.map.json` — example custom: Ice + Metal → Arcane
+- `examples/multi-confluence-twin-chambers.map.json` — two independent chambers
+- `examples/multi-confluence-repeated-input.map.json` — two Fire sources
+- `examples/multi-confluence-cascade.map.json` — three chained chambers
+
+Each multi-chamber sample also has a matching `.level.json` game import.
+The multi-chamber solver is bounded and supports up to **16 route segments**;
+a search-limit result is *inconclusive*, not proof that a puzzle is impossible.
 
 Maps saved by the previous single-recipe prototype remain compatible:
 a Confluence cell with no `props.recipe` defaults to Water + Earth → Plant.
