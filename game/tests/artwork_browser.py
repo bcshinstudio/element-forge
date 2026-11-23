@@ -94,6 +94,7 @@ def run(browser):
     game.locator('#continue').click()
     expect(game.locator('#board .track')).to_have_count(1)
     game.locator('#puzzle-home').click()
+    game.evaluate("document.getElementById('home-custom').hidden = false")
     game.locator('#home-custom').click()
     load_file(game, '#home-import', before)
     expect(game.locator('#puzzle')).to_have_text(before['name'])
