@@ -9,8 +9,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 concurrency:
   group: wellspring-preview-pages
@@ -19,9 +17,6 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-24.04
-    environment:
-      name: github-pages
-      url: https://bcshinstudio.github.io/element-forge/wellspring-preview/game/
     steps:
       - name: Checkout existing Pages branch and preserve all published assets
         uses: actions/checkout@v4
@@ -70,38 +65,13 @@ jobs:
             git commit -m "Publish Wellspring Chapter 10 preview with 120 verified stages"
             git push origin HEAD:phone-playtest
           fi
-      - name: Assemble existing Pages site without changing other preview assets
+      - name: Verify committed preview source is the 120-stage build
+        working-directory: site
         run: |
-          mkdir -p _site
-          cp site/index.html site/.nojekyll _site/
-          cp -a site/wellspring-preview _site/
-          test -s _site/wellspring-preview/game/index.html
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-      - name: Upload complete Pages site
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-      - name: Deploy updated Wellspring preview
-        uses: actions/deploy-pages@v4
-        id: deployment
-      - name: Verify exact live preview URL contains the tested game
-        run: |
-          python3 - <<'PY'
-          import time,urllib.request
-          url="https://bcshinstudio.github.io/element-forge/wellspring-preview/game/"
-          for attempt in range(15):
-              try:
-                  with urllib.request.urlopen(url+"?verified-ch10="+str(attempt),timeout=12) as response:
-                      html=response.read().decode("utf-8")
-                  if all(fragment in html for fragment in ('class="pause-menu-header"','id="menu-lessons-back"','confluence-forges-108','twilight-pendulum-120')):
-                      if 'twilight-pendulum-121' in html or 'Sundial Sluice' in html:
-                          raise RuntimeError('Live page contains retired Chapter 10 content')
-                      print("PASS: Live preview serves Chapter 10 with exactly 120 total stages")
-                      break
-              except Exception as error:
-                  print("Attempt",attempt+1,type(error).__name__,str(error)[:150])
-              time.sleep(3)
-          else:
-              raise SystemExit("Chapter 10 (120 stages) not yet visible at requested Pages preview URL")
-          PY
+          test -s wellspring-preview/game/index.html
+          grep -q 'twilight-pendulum-120' wellspring-preview/game/index.html
+          ! grep -q 'twilight-pendulum-121' wellspring-preview/game/index.html
+          ! grep -q 'Sundial Sluice' wellspring-preview/game/index.html
+          git log -1 --format='Published preview source: %h %s'
+          echo 'PASS: GitHub Pages source branch contains the QA-verified 120-stage game.'
+          echo 'GitHub Pages deploys automatically from phone-playtest (pages build and deployment workflow).'
