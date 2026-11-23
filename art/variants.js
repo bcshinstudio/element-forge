@@ -2,7 +2,7 @@
 (function(root){
  const catalog=root.EFArtCatalog??{};
  const chapters=['The Sleeping Valley','The Gatekeepers','The Primeval Crucible','The Astral Loom',
-  'The Celestial Confluence',"The Weaver’s Playground",'The Shattered Abyss','The World-Heart Sanctuary','The Confluence Forges'];
+  'The Celestial Confluence',"The Weaver’s Playground",'The Shattered Abyss','The World-Heart Sanctuary','The Confluence Forges','The Twilight Pendulum'];
  const themes=[
   {land:0,forest:1,bridge:0,portal:0}, {land:2,wall:1,bridge:1,gate:0},
   {land:3,mountain:0,lava:1,heated:2,bridge:2,tunnel:2}, {land:2,mountain:2,exposed:1,portal:1},
