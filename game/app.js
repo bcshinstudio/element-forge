@@ -51,9 +51,10 @@
  const terrainNames=Object.fromEntries(F.TERRAIN.map(([id,name])=>[id,name]));
  toolNames.tunnel='Tunnel';
  let session,tiles,tool,linkStart=null,levelIndex,timer=null,drag=null,importTicket=0;
+ let storyExpanded=false;
  const phone=matchMedia('(max-width: 600px), (hover: none) and (max-width: 950px)');
  const menu=$('game-menu');
- const menuItems=[document.querySelector('.campaign-picker'),$('description'),$('elements'),$('instructions'),
+ const menuItems=[document.querySelector('.campaign-picker'),$('elements'),$('instructions'),
   $('puzzle-hint'),$('puzzle-options'),$('challenge-library'),$('custom-level')];
  const menuHomes=menuItems.map(item=>{
   const marker=document.createComment('desktop location');
@@ -70,13 +71,13 @@
  }
  function fitBoard(){
   if($('play-view').hidden)return;
-  const height=['.masthead','.field .stage-heading','#stage-story','.controls'].reduce((total,selector)=>
+  const height=['.masthead','.field .stage-heading','#description','.controls'].reduce((total,selector)=>
    total+document.querySelector(selector).getBoundingClientRect().height,24);
   board.style.setProperty('--mobile-chrome',height+'px');
  }
  phone.addEventListener('change',()=>{adjustPhone();if(session)drawPlan();fitBoard();});
  const fitObserver=new ResizeObserver(fitBoard);
- for(const selector of ['.masthead','.field .stage-heading','#stage-story','.controls'])fitObserver.observe(document.querySelector(selector));
+ for(const selector of ['.masthead','.field .stage-heading','#description','.controls'])fitObserver.observe(document.querySelector(selector));
  $('mobile-menu').onclick=()=>{
   if(drag&&board.hasPointerCapture(drag.pointer))board.releasePointerCapture(drag.pointer);
   drag=null;
@@ -159,9 +160,11 @@
   $('stage-number').textContent=chapter?`Chapter ${chapters.indexOf(chapter)+1} · Stage ${index-chapter.start+1}`:'';
 
   $('description').textContent=map.description;
-  $('stage-story').textContent=window.EFReference.story(map.description);
-  $('stage-story').hidden=true;
+  storyExpanded=false;
+  $('description').hidden=session.state.phase!=='inspect';
   $('story-toggle').setAttribute('aria-expanded','false');
+  $('story-toggle').setAttribute('aria-label','Show stage story');
+  $('story-toggle').title='Show stage story';
   $('puzzle-hint').open=false;
   $('puzzle-hint').hidden=!levels[index].hint;
   $('hint-text').textContent=levels[index].hint??'';
@@ -356,12 +359,13 @@
   $('plan').hidden=phase!=='inspect';
   $('puzzle-options').hidden=phase!=='build'||!session.map.construction;
   $('routing-goal').hidden=mode!=='tutorial';
-  $('description').hidden=phase==='inspect'&&mode!=='tutorial';
-  $('story-toggle').hidden=phase!=='inspect'||!$('stage-story').textContent;
-  if(phase!=='inspect'){
-   $('stage-story').hidden=true;
-   $('story-toggle').setAttribute('aria-expanded','false');
-  }
+  // The complete stage description is shown while planning, with no book button.
+  // During actual routing it stays collapsed unless the player opens it.
+  $('description').hidden=phase!=='inspect'&&!storyExpanded;
+  $('story-toggle').hidden=phase==='inspect'||!$('description').textContent.trim();
+  $('story-toggle').setAttribute('aria-expanded',String(phase!=='inspect'&&storyExpanded));
+  $('story-toggle').setAttribute('aria-label',storyExpanded?'Hide stage story':'Show stage story');
+  $('story-toggle').title=storyExpanded?'Hide stage story':'Show stage story';
   const note=window.EFReference.notes[levels[levelIndex].id];
   $('stage-note').replaceChildren(...(note??[]).map(([label,copy])=>{
    const line=document.createElement('p');
@@ -684,6 +688,7 @@
   const result=session.start(selection());
   if(!result.ok){message(result.message);return;}
   tool='route';
+  storyExpanded=false;
   update();
   message('');
   focusSource();
@@ -712,6 +717,7 @@
   if(menu.open)menu.close();
   stopAnimation();
   session.restart(replan);
+  storyExpanded=false;
   heardRoutes.clear();
   linkStart=null;
   $('puzzle-options').open=false;
@@ -1198,8 +1204,13 @@
   $('close-stage-help').focus();
  };
  $('story-toggle').onclick=()=>{
-  $('stage-story').hidden=!$('stage-story').hidden;
-  $('story-toggle').setAttribute('aria-expanded',String(!$('stage-story').hidden));
+  if(session?.state.phase==='inspect')return;
+  storyExpanded=!storyExpanded;
+  $('description').hidden=!storyExpanded;
+  $('story-toggle').setAttribute('aria-expanded',String(storyExpanded));
+  $('story-toggle').setAttribute('aria-label',storyExpanded?'Hide stage story':'Show stage story');
+  $('story-toggle').title=storyExpanded?'Hide stage story':'Show stage story';
+  fitBoard();
  };
  const tip=$('mechanic-tip');
  function tipSeen(id){return seenTips.has(id);}
