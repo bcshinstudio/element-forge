@@ -165,6 +165,17 @@
     }
    }
   }
+  if(cell.component==='phasePlate')addProperty('Delivery that activates Night',
+   Object.entries(F.ELEMENTS).map(([key,e])=>[key,e.name]),
+   props.element??'light',value=>setProp('element',value));
+  if(map.phaseRules&&['exposed','covered'].includes(cell.terrain)&&!cell.component&&!cell.node){
+   addProperty('Changes when Night begins',[['no','No · always '+cell.terrain],['yes','Yes · switches terrain']],
+    props.phaseShift?'yes':'no',value=>editCell(next=>{
+     next.props??={};
+     if(value==='yes')next.props.phaseShift=true;
+     else{delete next.props.phaseShift;if(!Object.keys(next.props).length)delete next.props;}
+    }));
+  }
   if(cell.component==='checkpoint')addProperty('Required element',
    [['any','Any element'],...Object.entries(ELEMENTS).map(([id,e])=>[id,e.name])],
    props.element??'any',value=>setProp('element',value));
