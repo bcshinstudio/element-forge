@@ -8,6 +8,8 @@ const confluenceSymbol=id=>id==='wind'?'V':ELEMENTS[id]?.symbol||ELEMENTS[id]?.n
 const $=id=>document.getElementById(id),clone=o=>JSON.parse(JSON.stringify(o));
 const newBoard=()=>({...fresh(),rulesVersion:4});
 let copiedCell=null;
+let phasePreview='day';
+const previewCell=c=>map.phaseRules&&phasePreview==='night'&&c.props?.phaseShift?{...c,terrain:c.terrain==='exposed'?'covered':'exposed'}:c;
 let map=newBoard(),tool='terrain:mountain',element='fire',direction='E',pairId='A',checkpointElement='any',reactionId='water-earth-nature',customInputs=['water','earth'],customOutput='nature',history=[],future=[],drawing=false,changedStroke=false,lastIndex=-1,dirty=false,assets={terrain:{},components:{}};
 function snapshot(){history.push(clone(map));if(history.length>100)history.shift();future=[];updateHistory()}
 function updateHistory(){
@@ -21,7 +23,7 @@ function glyph(type,id){const item=(type==='terrain'?TERRAIN:COMPONENTS).find(x=
 function setTool(value){
  tool=value;
  document.querySelectorAll('[data-tool]').forEach(button=>button.classList.toggle('active',button.dataset.tool===value));
- const labels={erase:'Eraser',inspect:'Inspect',art:'Paint artwork',pick:'Copy artwork',copy:'Copy cell',stamp:'Stamp cell'};
+ const labels={erase:'Eraser',inspect:'Inspect',art:'Paint artwork',pick:'Copy artwork',copy:'Copy cell',stamp:'Stamp cell','phase:toggle':'Mark shifting channel'};
  const [kind,id]=value.split(':');
  $('selected').textContent=labels[value]??(kind==='node'?`${ELEMENTS[element].name} ${id==='source'?'source':'inlet'}`:id);
  updateProperties();
@@ -43,7 +45,7 @@ function buildPalette(){
  brushes.className='palette-grid';
  brushes.innerHTML='<button class="tool" data-tool="inspect">Inspect</button><button class="tool" data-tool="erase">Erase</button>'+
   '<button class="tool" data-tool="art">Paint artwork</button><button class="tool" data-tool="pick">Copy artwork</button>'+
-  '<button class="tool" data-tool="copy">Copy cell</button>';
+  '<button class="tool" data-tool="copy">Copy cell</button><button class="tool" data-tool="phase:toggle">Mark shifting channel ↔</button>';
  palette.append(brushes);
  document.querySelectorAll('[data-tool]').forEach(button=>button.onclick=()=>{
   setTool(button.dataset.tool);
@@ -86,6 +88,8 @@ function updateProperties(){
  if(tool==='inspect')html='<p class="property-note">Click any cell to inspect its terrain, fixture, reaction, direction, connection ID or node.</p>';
  if(tool==='copy')html='<p class="property-note">Select a cell to copy its terrain, fixture or endpoint, gameplay properties, and artwork.</p>';
  if(tool==='stamp')html='<p class="property-note">Tap or drag to stamp the copied cell. Check any pasted endpoints or links for duplicates.</p>';
+ if(tool==='phase:toggle')html='<p class="property-note">Only available when Day/Night is enabled. Click an Exposed or Covered terrain tile to mark/unmark it as a shifting channel. Its terrain swaps on Night.</p>';
+ if(type==='phasePlate')html='<p class="property-note">First select the triggering element in the Element palette (usually Light), then place this plate on Land. The phase changes only when that element completes a route through the plate.</p>';
  if(!html&&!['art','pick'].includes(tool))html='<p class="property-note">No extra properties for this tool. Painting terrain preserves nothing above it; painting a fixed component preserves its terrain when compatible.</p>';
  $('properties').innerHTML=html;
  $('art-brush').hidden=!['art','pick'].includes(tool);
@@ -113,6 +117,8 @@ function cellMarkup(c){
   const e=ELEMENTS[c.node.element];
   out+=`<span class="node-shape ${c.node.role}" style="background:${e.color};border-color:${e.color}">${c.node.role==='source'?'S':'D'}</span>`;
  }
+ if(c.component==='phasePlate')out+='<span class="phase-plate-editor" aria-label="Day and Night pressure plate">◈</span>';
+ if(c.props?.phaseShift)out+='<span class="phase-mark" aria-label="Shifts between Day and Night">↔</span>';
  if(c.component==='confluence'){
   const recipe=reactionEngine.confluenceRecipe(c.props),ports=reactionEngine.confluencePortSides(c.props);
   const entries=recipe&&ports?[[recipe.inputs[0],ports.input1],[recipe.inputs[1],ports.input2],[recipe.output,ports.output]]:[];
@@ -131,12 +137,12 @@ function cellClass(c){return `cell ${c.terrain} ${c.component?'has-component':''
 function cellLabel(c,i){
  return `Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, ${c.node?ELEMENTS[c.node.element].name.toLowerCase()+' '+c.node.role:c.component==='confluence'?'Confluence: '+(reactionEngine.confluenceRecipe(c.props)?reactionLabel(reactionEngine.confluenceRecipe(c.props)):'invalid recipe')+', output '+(c.props?.direction||'E'):c.component||c.terrain}`;
 }
-function render(){const b=$('board');b.style.setProperty('--cols',map.width);b.style.setProperty('--rows',map.height);b.innerHTML=map.cells.map((c,i)=>`<div class="${cellClass(c)}" data-i="${i}" role="gridcell" aria-label="${cellLabel(c,i)}">${cellMarkup(c)}</div>`).join('');map.cells.forEach((cell,i)=>decorateCell(b.children[i],cell));$('count').textContent=`${map.width} × ${map.height} · ${map.width*map.height} cells`;$('width').value=map.width;$('height').value=map.height;updateHistory();window.EFEditorArt?.boardChanged()}
+function render(){const b=$('board');b.style.setProperty('--cols',map.width);b.style.setProperty('--rows',map.height);b.innerHTML=map.cells.map((c,i)=>`<div class="${cellClass(previewCell(c))}" data-i="${i}" role="gridcell" aria-label="${cellLabel(c,i)}">${cellMarkup(previewCell(c))}</div>`).join('');map.cells.forEach((cell,i)=>decorateCell(b.children[i],previewCell(cell)));$('count').textContent=`${map.width} × ${map.height} · ${map.width*map.height} cells`;$('width').value=map.width;$('height').value=map.height;updateHistory();window.EFEditorArt?.boardChanged()}
 function refreshCell(i){
  const cell=map.cells[i],el=$('board').children[i];
- el.className=cellClass(cell);
- el.innerHTML=cellMarkup(cell);
- decorateCell(el,cell);
+ el.className=cellClass(previewCell(cell));
+ el.innerHTML=cellMarkup(previewCell(cell));
+ decorateCell(el,previewCell(cell));
  el.setAttribute('aria-label',cellLabel(cell,i));
 }
 function paint(i){
@@ -156,6 +162,13 @@ function paint(i){
  const [kind,id]=tool.split(':');
  if(tool==='art')next=window.EFEditorArt.paintArt(prev);
  else if(tool==='stamp')next=clone(copiedCell);
+ else if(tool==='phase:toggle'){
+  if(!map.phaseRules||!['exposed','covered'].includes(prev.terrain)||prev.component||prev.node){
+   showMessage('Enable Day/Night first, then mark an Exposed or Covered tile without a fixture.',false);return;
+  }
+  if(next.props?.phaseShift){delete next.props.phaseShift;if(!Object.keys(next.props).length)delete next.props;}
+  else next.props={...next.props,phaseShift:true};
+ }
  else if(tool==='erase'||tool==='terrain:land')next={terrain:'land'};
  else if(kind==='terrain')next={terrain:id,...(id==='oneway'?{props:{direction}}:{})};
  else if(kind==='node')next={terrain:'land',node:{element,role:id},...(prev.terrain==='land'&&prev.terrainArt?{terrainArt:prev.terrainArt}:{})};
@@ -167,6 +180,7 @@ function paint(i){
   if(['portal','tunnel'].includes(id))next.props={pairId:pairId.trim()||'A'};
   else if(['junction','sorter','gate','booster','confluence'].includes(id))next.props=id==='confluence'?{direction,...confluenceProps()}:{direction};
   else if(id==='checkpoint')next.props={element:checkpointElement};
+  else if(id==='phasePlate')next.props={element};
  }
  if(kind==='terrain'||kind==='component'){
   const spec=window.EFEditorArt?.placementArt(kind,id);
@@ -231,7 +245,28 @@ for(const type of ['pointerup','pointercancel','lostpointercapture'])paintBoard.
 paintBoard.addEventListener('contextmenu',event=>event.preventDefault());
 function resize(){const w=Number($('width').value),h=Number($('height').value);if(!Number.isInteger(w)||!Number.isInteger(h)||w<4||h<4||w>24||h>24){alert('Width and height must be whole numbers from 4 to 24.');return}if(w===map.width&&h===map.height)return;snapshot();const old=map;map={...old,width:w,height:h,cells:Array.from({length:w*h},(_,i)=>{const x=i%w,y=Math.floor(i/w);return x<old.width&&y<old.height?clone(old.cells[y*old.width+x]):{terrain:'land'}})};render();markDirty()}
 $('resize').onclick=resize;$('newMap').onclick=()=>{if(!confirm('Start a new map? Unsaved changes will be lost.'))return;map=newBoard();history=[];future=[];syncMeta();render();markDirty();$('messages').textContent='New blank map created.'};$('clear').onclick=()=>{if(!confirm('Clear all cells?'))return;snapshot();map.cells=map.cells.map(()=>({terrain:'land'}));render();markDirty()};$('undo').onclick=()=>{if(!history.length)return;future.push(clone(map));map=history.pop();syncMeta();render();markDirty()};$('redo').onclick=()=>{if(!future.length)return;history.push(clone(map));map=future.pop();syncMeta();render();markDirty()};
-function syncMeta(){$('constraints').value=JSON.stringify(map.constraints||{},null,2);$('mapName').value=map.name;$('description').value=map.description;for(const [id,n] of Object.entries(map.inventory))if($('inv-'+id))$('inv-'+id).value=n}
+function syncMeta(){
+ $('phase-enabled').checked=Boolean(map.phaseRules);
+ $('phase-preview').disabled=!map.phaseRules;
+ if(!map.phaseRules)phasePreview='day';
+ $('phase-preview').value=phasePreview;
+ $('constraints').value=JSON.stringify(map.constraints||{},null,2);$('mapName').value=map.name;$('description').value=map.description;for(const [id,n] of Object.entries(map.inventory))if($('inv-'+id))$('inv-'+id).value=n}
+$('phase-enabled').onchange=e=>{
+ if(!e.target.checked&&map.cells.some(c=>c.component==='phasePlate'||c.props?.phaseShift)){
+  e.target.checked=true;
+  showMessage('Remove the phase plate and shifting channels before disabling Day/Night.',false);
+  return;
+ }
+ snapshot();
+ if(e.target.checked){
+  map.phaseRules={initial:'day'};
+  // The first phase prototype uses a fixed-map route puzzle with no loadout.
+  for(const kind of Object.keys(map.inventory))map.inventory[kind]=0;
+ }else delete map.phaseRules;
+ phasePreview='day';
+ syncMeta();render();markDirty();
+};
+$('phase-preview').onchange=e=>{phasePreview=e.target.value;render();};
 $('mapName').onchange=e=>{const name=e.target.value.trim()||'Untitled Map';if(name!==map.name){snapshot();map.name=name;markDirty()}};$('description').onchange=e=>{if(e.target.value!==map.description){snapshot();map.description=e.target.value;markDirty()}};
 $('inventory').innerHTML=COMPONENTS.map(([id,label])=>`<label class="inventory-row">${label}<input id="inv-${id}" type="number" min="0" max="99" value="${map.inventory[id]}"></label>`).join('');for(const [id] of COMPONENTS)$('inv-'+id).onchange=e=>{const n=Number(e.target.value);if(!Number.isInteger(n)||n<0||n>99){e.target.value=map.inventory[id];return}if(n!==map.inventory[id]){snapshot();map.inventory[id]=n;markDirty()}};
 $('validate').onclick=()=>{const {issues,matched}=structuralErrors(map),box=$('messages');box.className='messages '+(issues.length?'warn':'ok');box.textContent=issues.length?'Structure needs attention:\n• '+issues.join('\n• '):`Structure valid: ${matched} matched element pair(s).\nSolvability and component transport rules have NOT been checked.`};
