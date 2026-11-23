@@ -58,6 +58,7 @@ jobs:
           python game/tests/multi_confluence_browser.py
           python map-editor/tests/browser_smoke.py
           python game/tests/browser_smoke.py
+          python game/tests/ch10_browser.py
           python game/tests/clean_stage_ui_browser.py
           python game/build.py Wellspring.html
           python game/build.py --editor Wellspring_Map_Editor.html
