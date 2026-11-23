@@ -159,33 +159,68 @@ const phaseView=(m,dayPhase='day')=>{
 };
 const phaseTriggerRoute=(m,r)=>r.element===m.cells[phasePlateIndex(m)]?.props?.element&&
  r.path.includes(phasePlateIndex(m));
+function phasePrior(m,routes,currentPhase){
+ // A finished route remains delivered. Only tiles explicitly marked to shift
+ // can be reused by a delivery in another phase. Keep full path geometry
+ // intact so existing Intersection crossing rules still work.
+ return routes.map(r=>r.deliveredPhase&&r.deliveredPhase!==currentPhase?
+  {...r,phaseIgnoreShift:true}:r);
+}
 function phaseValidation(m,routes,placements={},requireComplete=true){
- const issues=[];
- const plate=phasePlateIndex(m),trigger=m.cells[plate]?.props?.element;
- if(plate<0||!trigger)return ['Phase puzzle needs a phase plate and triggering element.'];
- if(Object.keys(placements).length)issues.push('Phase pilot does not support player-placed construction tools.');
- const ps=pairs(m),found=new Set(),usedDest=new Set();
+ const issues=[],plate=phasePlateIndex(m),trigger=m.cells[plate]?.props?.element;
+ if(plate<0||!trigger)return ['Phase puzzle needs one pressure plate and an assigned element.'];
+ const counts=placementCounts(placements);
+ for(const [kind,count] of Object.entries(counts))if(count>(m.inventory?.[kind]||0))issues.push('Inventory exceeded: '+kind);
+ for(const [i,v] of Object.entries(placements)){
+  const k=placementKind(v),rest=Object.fromEntries(Object.entries(placements).filter(([j])=>j!==i));
+  if(!canPlace(m,rest,+i,k))issues.push('Invalid '+k+' placement at '+(+i+1));
+ }
+ if(m.construction&&constructionCost(m,counts)>m.construction.budget)issues.push('Construction budget exceeded');
+ for(let i=0;i<m.cells.length;i++)if(['portal','tunnel'].includes(effective(m,placements,i))&&linkPartner(m,i,placements)<0)
+  issues.push('Invalid or unpaired '+effective(m,placements,i)+' at cell '+(i+1));
+ const ps=pairs(m),sources=new Set(),targets=new Set();
  let phase=m.phaseRules.initial,switched=false;
  const completed=[];
  for(const r of routes){
-  const key=r.element+'@'+r.path?.[0],end=r.path?.at(-1),target=r.element+'@'+end;
-  const p=ps.find(q=>q.element===r.element&&q.source===r.path?.[0]&&q.destination===end);
+  const start=r.path?.[0],end=r.path?.at(-1),key=r.element+'@'+start,target=r.element+'@'+end;
+  const p=ps.find(q=>q.element===r.element&&q.source===start&&
+   (q.targets?q.targets.includes(end):q.destination===end));
   if(!p){issues.push(r.element+': invalid phase route endpoints');continue;}
-  if(found.has(key)||usedDest.has(target))issues.push(r.element+': duplicate source or destination');
-  found.add(key);usedDest.add(target);
+  if(sources.has(key)||targets.has(target))issues.push(r.element+': duplicate source or destination');
+  sources.add(key);targets.add(target);
   if(r.deliveredPhase!==undefined&&r.deliveredPhase!==phase)issues.push('Incorrect stored delivery phase for '+r.element);
-  const err=validatePath(phaseView(m,phase),r.element,r.path,completed,placements);
+  if(r.path.includes(plate)&&r.element!==trigger)issues.push('The phase plate belongs to '+displayElement(trigger));
+  const prior=phasePrior(m,completed,phase);
+  const err=validatePath(phaseView(m,phase),r.element,r.path,prior,placements);
   if(err)issues.push(r.element+': '+err);
-  if(r.path.includes(plate)&&r.element!==trigger)issues.push('Phase plate belongs to '+displayElement(trigger));
+  const chamber=confluenceAt(m,start);
+  if(chamber&&chamber.output===r.element&&
+     !chamber.inputs.every(el=>completed.some(input=>input.element===el&&input.path?.at(-1)===start)))
+   issues.push('Confluence output '+displayElement(r.element)+' at cell '+(start+1)+' requires completed input deliveries first');
   completed.push(r);
   if(phaseTriggerRoute(m,r)){
-   if(switched)issues.push('Phase plate already activated');
+   if(switched)issues.push('Phase pressure plate has already activated');
    switched=true;phase='night';
   }
  }
  if(requireComplete){
-  if(!switched)issues.push('Complete the '+displayElement(trigger)+' route through the phase plate to switch to Night');
-  for(const p of ps)if(!found.has(p.element+'@'+p.source))issues.push(p.element+': missing route');
+  if(!switched)issues.push('Complete the '+displayElement(trigger)+' route through the phase plate to activate Night');
+  for(const p of ps){
+   const key=p.element+'@'+p.source;
+   if(p.source<0||!(p.targets?p.targets.length:p.destination>=0))issues.push(p.element+': unmatched endpoints');
+   else if(!sources.has(key))issues.push(p.element+': missing route from cell '+(p.source+1));
+  }
+  for(let i=0;i<m.cells.length;i++){
+   const c=m.cells[i];
+   if(c.component==='checkpoint'&&!routes.some(r=>['any',r.element].includes(c.props?.element)&&r.path.includes(i)))
+    issues.push((c.props?.element||'any')+': checkpoint at cell '+(i+1)+' not visited');
+  }
+  for(const ch of confluences(m)){
+   for(const el of ch.inputs)if(!routes.some(r=>r.element===el&&r.path?.at(-1)===ch.index))
+    issues.push('Confluence at cell '+(ch.index+1)+': missing '+displayElement(el)+' input');
+   if(!routes.some(r=>r.element===ch.output&&r.path?.[0]===ch.index))
+    issues.push('Confluence at cell '+(ch.index+1)+': missing '+displayElement(ch.output)+' output');
+  }
  }
  return issues;
 }
@@ -373,7 +408,7 @@ function validateMultiPath(m,element,path,other=[],placements={},partial=false){
  }
  for(const r of other){
   for(const i of path){
-   if(!r.path.includes(i))continue;
+   if(!r.path.includes(i)||r.phaseIgnoreShift&&m.cells[i]?.props?.phaseShift)continue;
    if(effective(m,placements,i)==='confluence'){
     if((i===path[0]||i===path.at(-1))&&(i===r.path[0]||i===r.path.at(-1)))continue;
     return 'Confluence can only be shared at a route endpoint';
@@ -471,7 +506,7 @@ function validatePath(m,element,path,other=[],placements={},partial=false){
   const exit=portalExit(m,path.slice(Math.max(0,k-2),k),placements);
   if(exit!==null&&path[k]!==exit)return portalExitMessage;
  }
- for(const r of other){if(r.element===element)continue;for(const i of path){if(!r.path.includes(i))continue;if(effective(m,placements,i)==='confluence')continue;if(effective(m,placements,i)!=='intersection')return 'Different elements cannot share a cell';const a=path.indexOf(i),b=r.path.indexOf(i);if(partial&&a===path.length-1&&a>0&&b>0&&b<r.path.length-1)continue;if(a===0||a===path.length-1||b===0||b===r.path.length-1)return 'Crossing cannot be at an endpoint';const a1=axis(path[a-1],i,m.width),a2=axis(i,path[a+1],m.width),b1=axis(r.path[b-1],i,m.width),b2=axis(i,r.path[b+1],m.width);if(!direction(path[a-1],i,m.width)||!direction(i,path[a+1],m.width)||!direction(r.path[b-1],i,m.width)||!direction(i,r.path[b+1],m.width)||a1!==a2||b1!==b2||a1===b1)return 'Intersection needs straight perpendicular routes';}}
+ for(const r of other){if(r.element===element)continue;for(const i of path){if(!r.path.includes(i)||r.phaseIgnoreShift&&m.cells[i]?.props?.phaseShift)continue;if(effective(m,placements,i)==='confluence')continue;if(effective(m,placements,i)!=='intersection')return 'Different elements cannot share a cell';const a=path.indexOf(i),b=r.path.indexOf(i);if(partial&&a===path.length-1&&a>0&&b>0&&b<r.path.length-1)continue;if(a===0||a===path.length-1||b===0||b===r.path.length-1)return 'Crossing cannot be at an endpoint';const a1=axis(path[a-1],i,m.width),a2=axis(i,path[a+1],m.width),b1=axis(r.path[b-1],i,m.width),b2=axis(i,r.path[b+1],m.width);if(!direction(path[a-1],i,m.width)||!direction(i,path[a+1],m.width)||!direction(r.path[b-1],i,m.width)||!direction(i,r.path[b+1],m.width)||a1!==a2||b1!==b2||a1===b1)return 'Intersection needs straight perpendicular routes';}}
  return null;
 }
 function constructionCost(m,counts){
@@ -679,5 +714,5 @@ function solveConstruction(m,{limit=120000,maxPairs=8,maxCandidates=180}={}){
  }
  return {status:hitLimit||direct.status==='inconclusive'?'inconclusive':'unsolved',message:hitLimit?'Some construction searches exceeded their limits':'No solution found within supported construction candidates',constructionAttempts:attempts};
 }
-const api={hasPhases,phaseView,phasePlateIndex,phaseTriggerRoute,phaseValidation,solvePhases,hasMultiConfluence,confluences,confluenceAt,routeKey,CONFLUENCE_RECIPES,confluenceRecipe,confluencePortSides,displayElement,confluence,confluenceDirections,confluenceNeighbor,confluenceRouteError,portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
+const api={hasPhases,phasePrior,phaseView,phasePlateIndex,phaseTriggerRoute,phaseValidation,solvePhases,hasMultiConfluence,confluences,confluenceAt,routeKey,CONFLUENCE_RECIPES,confluenceRecipe,confluencePortSides,displayElement,confluence,confluenceDirections,confluenceNeighbor,confluenceRouteError,portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
