@@ -14,7 +14,7 @@ CAMPAIGN_KEY = "element-forge.sleeping-valley.v1"
 PLANS = [
     plan
     for filename in ("sleeping-valley-solutions.json", "gatekeepers-solutions.json", "primeval-crucible-solutions.json", "astral-loom-solutions.json", "celestial-confluence-solutions.json", "weavers-playground-solutions.json", "shattered-abyss-solutions.json", "world-heart-sanctuary-solutions.json", "confluence-forges-solutions.json", "twilight-pendulum-solutions.json")
-    for plan in json.loads((ROOT / "game/tests/fixtures" / filename).read_text())
+    for plan in (lambda value: list(value.values()) if isinstance(value, dict) else value)(json.loads((ROOT / "game/tests/fixtures" / filename).read_text()))
 ]
 
 
