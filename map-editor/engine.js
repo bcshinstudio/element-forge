@@ -385,6 +385,107 @@ function checkAll(m,routes,placements={}){if(hasMultiConfluence(m))return checkM
  for(const p of boardPairs){if(p.source<0||p.destination<0){errors.push(`${p.element}: unmatched endpoints`);continue;}const r=routes.find(r=>r.element===p.element);if(!r){errors.push(`${p.element}: missing route`);continue;}const err=validatePath(m,p.element,r.path,routes.filter(x=>x!==r),placements);if(err)errors.push(`${p.element}: ${err}`);for(let i=0;i<m.cells.length;i++){const c=m.cells[i];if(c.component==='checkpoint'&&['any',p.element].includes(c.props?.element)&&!r.path.includes(i))errors.push(`${p.element}: required checkpoint not visited`);}}
  return errors;}
 function score(m,routes,placements={}){const track=routes.reduce((s,r)=>s+r.path.length-1,0),components=Object.values(placements).length,cost=track+components*5;return {track,components,cost};}
+/* Multi-chamber bounded search. Each physical source and chamber output
+   supplies one route, to any unclaimed endpoint of the matching element.
+   All port orientations and power dependencies are checked by checkMulti. */
+function solveMulti(m,{limit=120000,maxPairs=16,allowPlacement=true,initialPlacements={}}={}){
+ const ps=multiPairs(m);
+ if(!ps.length||ps.some(p=>p.source<0||!p.targets.length))return {status:'invalid',message:'Missing or unmatched Confluence endpoints'};
+ const expected=new Map();
+ for(const p of ps)expected.set(p.element,(expected.get(p.element)||0)+1);
+ for(const [element,n] of expected){
+  const targets=m.cells.filter(c=>c.node?.role==='destination'&&c.node.element===element).length+
+   confluences(m).filter(ch=>ch.inputs.includes(element)).length;
+  if(targets!==n)return {status:'invalid',message:displayElement(element)+': '+n+' sources and '+targets+' destinations'};
+ }
+ if(ps.length>maxPairs)return {status:'unsupported',message:'Maximum '+maxPairs+' route segments for multi-chamber solver'};
+ if(m.cells.some(c=>c.component&&!['bridge','metalSpan','intersection','checkpoint','portal','tunnel','gate','confluence'].includes(c.component)))
+  return {status:'unsupported',message:'Unsupported advanced fixture'};
+ for(let i=0;i<m.cells.length;i++)if(['portal','tunnel'].includes(m.cells[i].component)&&linkPartner(m,i)<0)
+  return {status:'invalid',message:'Invalid or unpaired link at cell '+(i+1)};
+ let nodes=0,exhausted=false;
+ const budget={bridge:allowPlacement?(m.inventory?.bridge||0):0,intersection:allowPlacement?(m.inventory?.intersection||0):0,metalSpan:allowPlacement?(m.inventory?.metalSpan||0):0};
+ const distance=(i,d)=>Math.abs(i%m.width-d%m.width)+Math.abs(Math.floor(i/m.width)-Math.floor(d/m.width));
+ const ordered=[...ps].sort((a,b)=>{
+  const x=m.cells[a.source]?.node?.role==='source'?0:1,y=m.cells[b.source]?.node?.role==='source'?0:1;
+  return x-y||Math.min(...a.targets.map(t=>distance(a.source,t)))-Math.min(...b.targets.map(t=>distance(b.source,t)));
+ });
+ function visitPair(pi,routes,placements){
+  if(pi===ordered.length){
+   const errors=checkMulti(m,routes,placements);
+   return errors.length?null:{routes,placements};
+  }
+  const p=ordered[pi],usedDest=new Set(routes.map(r=>r.element+'@'+r.path.at(-1)));
+  const targets=p.targets.filter(dest=>!usedDest.has(p.element+'@'+dest));
+  if(!targets.length)return null;
+  const stack=[{path:[p.source],seen:new Set([p.source]),placements}];
+  while(stack.length){
+   if(++nodes>limit){exhausted=true;return null;}
+   const state=stack.pop(),cur=state.path.at(-1);
+   if(targets.includes(cur)&&state.path.length>1){
+    const problem=validateMultiPath(m,p.element,state.path,routes,state.placements);
+    const needed=m.cells.flatMap((c,i)=>c.component==='checkpoint'&&['any',p.element].includes(c.props?.element)?[i]:[]);
+    if(!problem&&needed.every(i=>state.seen.has(i))){
+     const found=visitPair(pi+1,[...routes,{element:p.element,path:state.path}],state.placements);
+     if(found)return found;
+     if(exhausted)return null;
+    }
+    continue;
+   }
+   const exit=portalExit(m,state.path,state.placements);
+   const ns=(exit===null?routeNeighbors(m,cur,state.placements,p.element):exit<0?[]:[exit]).filter(i=>!state.seen.has(i));
+   const closest=i=>Math.min(...targets.map(t=>distance(i,t)));
+   ns.sort((a,b)=>closest(b)-closest(a));
+   for(const i of ns){
+    const fromCh=confluenceAt(m,cur),toCh=confluenceAt(m,i);
+    if(fromCh&&(p.source!==cur||fromCh.output!==p.element||
+       i!==confluenceNeighbor(m,cur,fromCh.ports[p.element])))continue;
+    if(toCh&&(!targets.includes(i)||!toCh.inputs.includes(p.element)||
+       cur!==confluenceNeighbor(m,i,toCh.ports[p.element])))continue;
+    if(!allowedTransition(m,p.element,cur,i,state.placements))continue;
+    const c=m.cells[i];
+    if(c.node&&!(targets.includes(i)&&c.node.role==='destination'&&c.node.element===p.element))continue;
+    let pl=state.placements,comp=effective(m,pl,i),wanted=null;
+    const overlaps=routes.filter(r=>r.path.includes(i));
+    if(terrainError(m,p.element,i,comp)){
+     if(!comp)wanted=spanKinds.find(k=>budget[k]&&canPlace(m,pl,i,k)&&!terrainError(m,p.element,i,k));
+     if(!wanted)continue;
+    }
+    if(comp&&!['bridge','metalSpan','intersection','checkpoint','portal','tunnel','gate','confluence'].includes(comp))continue;
+    if(overlaps.length){
+     if(comp==='confluence'){
+      if(overlaps.some(r=>r.path.at(-1)!==i&&r.path[0]!==i))continue;
+     }else{
+      if(overlaps.length>1||overlaps.some(r=>r.element===p.element))continue;
+      if(spanKinds.includes(comp))continue;
+      if(comp!=='intersection')wanted='intersection';
+     }
+    }
+    if(wanted){
+     if(!allowPlacement||!canPlace(m,pl,i,wanted))continue;
+     if(Object.values(pl).filter(v=>placementKind(v)===wanted).length>=budget[wanted])continue;
+     pl={...pl,[i]:wanted};
+     if(m.construction&&constructionCost(m,placementCounts(pl))>m.construction.budget)continue;
+    }
+    const path=[...state.path,i];
+    if(overlaps.length&&comp!=='confluence'){
+     const r=overlaps[0],j=r.path.indexOf(i);
+     if(j===0||j===r.path.length-1||path.length<3)continue;
+     if(axis(r.path[j-1],i,m.width)!==axis(i,r.path[j+1],m.width)||
+        axis(path.at(-2),i,m.width)===axis(r.path[j-1],i,m.width))continue;
+    }
+    if(path.length>m.cells.length)continue;
+    stack.push({path,seen:new Set([...state.seen,i]),placements:pl});
+   }
+  }
+  return null;
+ }
+ const found=visitPair(0,[],initialPlacements);
+ return found?{status:'solved',...found,nodes,score:score(m,found.routes,found.placements)}:
+  {status:exhausted?'inconclusive':'unsolved',nodes,message:exhausted?
+   'Search budget reached; solvability unknown':'No solution under supported multi-chamber rules'};
+}
+
 /* Bounded search: route first; when water encountered, may consume bridge; when another route is present, may consume intersection.
    Search limits are NOT evidence of unsolvability. */
 function solve(m,{limit=120000,maxPairs=8,allowPlacement=true,initialPlacements={}}={}){
