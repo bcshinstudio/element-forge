@@ -408,10 +408,14 @@
       "terrain": "land"
     },
     {
-      "terrain": "land"
+      "terrain": "land",
+      "component": "gate",
+      "props": {
+        "direction": "E"
+      }
     },
     {
-      "terrain": "mountain"
+      "terrain": "land"
     },
     {
       "terrain": "land"
@@ -468,7 +472,7 @@
       "terrain": "land",
       "component": "gate",
       "props": {
-        "direction": "S"
+        "direction": "W"
       }
     },
     {
@@ -493,17 +497,13 @@
       "terrain": "land"
     },
     {
-      "terrain": "land",
-      "component": "gate",
-      "props": {
-        "direction": "E"
-      }
+      "terrain": "land"
     },
     {
       "terrain": "land"
     },
     {
-      "terrain": "land"
+      "terrain": "water"
     },
     {
       "terrain": "land",
