@@ -87,15 +87,22 @@
  $('menu-home').onclick=$('puzzle-home').onclick=()=>showHome();
  const informationHome=$('information-panel').parentNode;
  function showMenuInformation(show){
+  $('menu-main').hidden=show;
   $('menu-lessons').hidden=!show;
-  $('menu-content').hidden=show;
   $('menu-information').setAttribute('aria-expanded',String(show));
+  $('game-menu-title').textContent=show?'Information & Tutorials':'Game menu';
   if(show)$('menu-lessons').append($('information-panel'));
   else informationHome.insertBefore($('information-panel'),$('audio-settings'));
   $('information-panel').hidden=!show;
   $('info-back').hidden=show;
+  menu.scrollTop=0;
+  if(show)$('menu-lessons-back').focus({preventScroll:true});
  }
- $('menu-information').onclick=()=>{const show=$('menu-lessons').hidden;showMenuInformation(show);if(show)renderChoices();};
+ $('menu-information').onclick=()=>{showMenuInformation(true);renderChoices();};
+ $('menu-lessons-back').onclick=()=>{
+  showMenuInformation(false);
+  $('menu-information').focus({preventScroll:true});
+ };
  menu.addEventListener('close',()=>{if(!$('menu-lessons').hidden)showMenuInformation(false);});
  menu.addEventListener('close',()=>{if(!$('mobile-menu').hidden)$('mobile-menu').focus({preventScroll:true});});
  menu.addEventListener('click',event=>{
