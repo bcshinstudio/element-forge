@@ -61,7 +61,7 @@ def check(browser,url,width,height,touch):
     assert second["y"]>first["y"]+first["height"]-1,(first,second)
     assert abs(second["width"]-first["width"])<2,(first,second)
     press(page.locator("#menu-information"))
-    expect(page.locator("#game-menu-title")).to_have_text("Information & Tutorials")
+    expect(page.locator("#game-menu-title")).to_have_text("Guide")
     expect(page.locator("#menu-main")).to_be_hidden()
     expect(page.locator("#menu-lessons")).to_be_visible()
     expect(page.locator("#menu-lessons-back")).to_be_visible()
