@@ -99,7 +99,7 @@ def run():
     finally:
         server.shutdown()
         server.server_close()
-    print("PASS: hidden review unlock, all 108 stages accessible, Stage 97 completion does not change progress")
+    print("PASS: hidden review unlock, all 121 stages accessible, Stage 97 completion does not change progress")
 
 
 if __name__=="__main__":
