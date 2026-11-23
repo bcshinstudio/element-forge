@@ -1067,8 +1067,10 @@
    try{storage?.setItem(popupKey,skipTutorialPopups?'yes':'no');}catch{}
   };
  }
- $('settings-studio-credit').onclick=()=>{
-  if(developerReviewUnlocked||reviewChecks<3)return;
+ const activateDeveloperReview=()=>{
+  // The existing BC Shin Studio footer text is the hidden trigger.
+  // It is inactive outside Settings and requires three complete on/off cycles.
+  if($('audio-settings').hidden||developerReviewUnlocked||reviewChecks<3)return;
   developerReviewUnlocked=true;
   reviewChecks=0;
   reviewCheckArmed=false;
@@ -1078,6 +1080,13 @@
   $('home-total').textContent='Developer review enabled · All '+campaignSize+' stages accessible · Progress unchanged';
   showPanel('stage-list');
  };
+ $('studio-credit').addEventListener('click',activateDeveloperReview);
+ $('studio-credit').addEventListener('keydown',event=>{
+  if(event.key==='Enter'||event.key===' '){
+   event.preventDefault();
+   activateDeveloperReview();
+  }
+ });
  const reference=window.EFReference;
  function endpointKey(){
   const key=document.createElement('span');
