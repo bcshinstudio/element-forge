@@ -337,7 +337,7 @@ test('quick reference covers all engine elements and editor components and notes
  assert.deepEqual(Object.keys(reference.elements).sort(),Object.keys(F.ELEMENTS).sort());
  assert.deepEqual([...Object.keys(reference.tools),...reference.reserved].sort(),F.COMPONENTS.map(([kind])=>kind).sort());
  const campaign=Object.entries(chapters).filter(([key])=>key.startsWith('chapter')).flatMap(([,stages])=>stages);
- assert.equal(campaign.length,121);
+ assert.equal(campaign.length,120);
  for(const [id,note] of Object.entries(reference.notes)){
   assert.ok(campaign.some(stage=>stage.id===id),id);
   assert.ok(note.length<=2,id);
