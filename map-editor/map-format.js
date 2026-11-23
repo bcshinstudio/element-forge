@@ -135,6 +135,29 @@ function parseMap(source){
  }
  if(!result.phaseRules&&result.cells.some(c=>c.component==='phasePlate'||c.props?.phaseShift))
   throw Error('Enable Day/Night phases before adding a phase plate or shifting channels.');
+ if(source.phaseWitness!==undefined){
+  if(!result.phaseRules||!record(source.phaseWitness)||
+     !record(source.phaseWitness.placements)||!Array.isArray(source.phaseWitness.routes)||
+     source.phaseWitness.routes.length<2||source.phaseWitness.routes.length>16)
+   throw Error('Invalid authored Day/Night solution proof.');
+  const routes=source.phaseWitness.routes.map(route=>{
+   if(!record(route)||!Object.hasOwn(ELEMENTS,route.element)||
+      !Array.isArray(route.path)||route.path.length<2||route.path.length>width*height*2||
+      route.path.some(i=>!Number.isInteger(i)||i<0||i>=width*height)||
+      !['day','night'].includes(route.deliveredPhase))
+     throw Error('Invalid route in authored phase proof.');
+   return {element:route.element,path:[...route.path],deliveredPhase:route.deliveredPhase};
+  });
+  const placements={};
+  for(const [index,value] of Object.entries(source.phaseWitness.placements)){
+   const i=Number(index),kind=E.placementKind(value);
+   if(!/^\\d+$/.test(index)||!Number.isInteger(i)||i<0||i>=width*height||
+      !PLACEABLE.includes(kind)||Object.keys(placements).length>width*height)
+    throw Error('Invalid construction in authored phase proof.');
+   placements[i]=JSON.parse(JSON.stringify(value));
+  }
+  result.phaseWitness={placements,routes};
+ }
  result.constraints=parseConstraints(source.constraints);
  for(const kind of CIDS){
   const count=source.inventory?.[kind]??0;
