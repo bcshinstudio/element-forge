@@ -52,8 +52,10 @@ def test_chapter(browser,base):
             page.locator("#intro-next").click()
             expect(page.locator("#story-caption")).to_have_text("The Confluence Forges restored")
             page.locator("#intro-begin").click()
-            expect(page.locator("#home-total")).to_contain_text("Campaign complete")
-            expect(page.locator("#continue")).to_be_disabled()
+            expect(page.locator("#world-intro-title")).to_contain_text("Chapter 10")
+            page.locator("#intro-next").click()
+            page.locator("#intro-begin").click()
+            expect(page.locator("#puzzle")).to_have_text("First Eclipse")
         else:
             page.locator("#next").click()
     page.reload()
