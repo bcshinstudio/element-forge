@@ -139,6 +139,103 @@ function confluenceRouteError(m,element,path){
  return null;
 }
 const placementKind=v=>typeof v==='string'?v:v?.kind||null;
+
+/* Chapter 10 is opt-in: existing maps never enter phase-aware validation.
+   A delivery traversing the single phase plate changes Day to Night once.
+   Routes completed before the switch retain their original deliveredPhase. */
+const hasPhases=m=>Boolean(m.phaseRules);
+const phasePlateIndex=m=>m.cells.findIndex(c=>c.component==='phasePlate');
+const phaseView=(m,dayPhase='day')=>{
+ if(!hasPhases(m))return m;
+ return {...m,cells:m.cells.map(c=>{
+  if(!c.props?.phaseShift&&c.component!=='phasePlate')return c;
+  const out={...c};
+  if(c.props?.phaseShift&&dayPhase==='night')
+   out.terrain=c.terrain==='exposed'?'covered':c.terrain==='covered'?'exposed':c.terrain;
+  // A trigger plate is a passable fixed floor fixture; not a checkpoint.
+  if(out.component==='phasePlate')delete out.component;
+  return out;
+ })};
+};
+const phaseTriggerRoute=(m,r)=>r.element===m.cells[phasePlateIndex(m)]?.props?.element&&
+ r.path.includes(phasePlateIndex(m));
+function phaseValidation(m,routes,placements={},requireComplete=true){
+ const issues=[];
+ const plate=phasePlateIndex(m),trigger=m.cells[plate]?.props?.element;
+ if(plate<0||!trigger)return ['Phase puzzle needs a phase plate and triggering element.'];
+ if(Object.keys(placements).length)issues.push('Phase pilot does not support player-placed construction tools.');
+ const ps=pairs(m),found=new Set(),usedDest=new Set();
+ let phase=m.phaseRules.initial,switched=false;
+ const completed=[];
+ for(const r of routes){
+  const key=r.element+'@'+r.path?.[0],end=r.path?.at(-1),target=r.element+'@'+end;
+  const p=ps.find(q=>q.element===r.element&&q.source===r.path?.[0]&&q.destination===end);
+  if(!p){issues.push(r.element+': invalid phase route endpoints');continue;}
+  if(found.has(key)||usedDest.has(target))issues.push(r.element+': duplicate source or destination');
+  found.add(key);usedDest.add(target);
+  if(r.deliveredPhase!==undefined&&r.deliveredPhase!==phase)issues.push('Incorrect stored delivery phase for '+r.element);
+  const err=validatePath(phaseView(m,phase),r.element,r.path,completed,placements);
+  if(err)issues.push(r.element+': '+err);
+  if(r.path.includes(plate)&&r.element!==trigger)issues.push('Phase plate belongs to '+displayElement(trigger));
+  completed.push(r);
+  if(phaseTriggerRoute(m,r)){
+   if(switched)issues.push('Phase plate already activated');
+   switched=true;phase='night';
+  }
+ }
+ if(requireComplete){
+  if(!switched)issues.push('Complete the '+displayElement(trigger)+' route through the phase plate to switch to Night');
+  for(const p of ps)if(!found.has(p.element+'@'+p.source))issues.push(p.element+': missing route');
+ }
+ return issues;
+}
+function solvePhases(m,{limit=120000,allowPlacement=true}={}){
+ if(!hasPhases(m))return {status:'invalid',message:'No phase rules'};
+ const plate=phasePlateIndex(m),trigger=m.cells[plate]?.props?.element,ps=pairs(m);
+ if(plate<0||!trigger||ps.length<2||ps.length>4||ps.some(p=>p.source<0||p.destination<0))
+  return {status:'invalid',message:'Phase prototype requires 2–4 matched routes and one trigger plate'};
+ if(Object.values(m.inventory??{}).some(v=>v>0))
+  return {status:'unsupported',message:'Phase puzzle verification currently requires zero player construction tools'};
+ if(hasMultiConfluence(m)||m.cells.some(c=>c.component==='confluence'))
+  return {status:'unsupported',message:'Phase and Confluence combination is reserved for a later version'};
+ let count=0,exhausted=false;
+ const ordered=[...ps].sort((a,b)=>(a.element===trigger?-1:0)-(b.element===trigger?-1:0));
+ const distance=(i,j)=>Math.abs(i%m.width-j%m.width)+Math.abs(Math.floor(i/m.width)-Math.floor(j/m.width));
+ const dfs=(n,completed,dayPhase,switched)=>{
+  if(n===ordered.length)return switched&&phaseValidation(m,completed,{},true).length===0?completed:null;
+  const p=ordered[n],view=phaseView(m,dayPhase),needsPlate=p.element===trigger&&!switched;
+  const stack=[{path:[p.source],seen:new Set([p.source])}];
+  while(stack.length){
+   if(++count>limit){exhausted=true;return null;}
+   const {path,seen}=stack.pop(),cur=path.at(-1);
+   if(cur===p.destination){
+    if(needsPlate&&!seen.has(plate))continue;
+    if(path.includes(plate)&&p.element!==trigger)continue;
+    const err=validatePath(view,p.element,path,completed,{});
+    if(err)continue;
+    const next=[...completed,{element:p.element,path,deliveredPhase:dayPhase}];
+    const result=dfs(n+1,next,needsPlate?'night':dayPhase,switched||needsPlate);
+    if(result)return result;
+    if(exhausted)return null;
+    continue;
+   }
+   const ns=routeNeighbors(view,cur,{},p.element).filter(i=>!seen.has(i));
+   ns.sort((a,b)=>distance(b,p.destination)-distance(a,p.destination));
+   for(const i of ns){
+    if(i===plate&&p.element!==trigger)continue;
+    const next=[...path,i],partial=validatePath(view,p.element,next,completed,{},true);
+    if(partial)continue;
+    stack.push({path:next,seen:new Set([...seen,i])});
+   }
+  }
+  return null;
+ };
+ const found=dfs(0,[],m.phaseRules.initial,false);
+ return found?{status:'solved',routes:found,placements:{},nodes:count,score:score(m,found,{})}:
+  {status:exhausted?'inconclusive':'unsolved',nodes:count,message:exhausted?
+   'Phase search budget reached; result unknown':'No solution found under first-switch phase rules'};
+}
+
 const effective=(m,placements,i)=>placementKind(placements?.[i])||m.cells[i].component||null;
 const pairIdAt=(m,placements,i)=>placements?.[i]?.pairId||m.cells[i]?.props?.pairId||null;
 const linkPartner=(m,i,placements={})=>{
@@ -388,7 +485,7 @@ function placementCounts(placements){
  }
  return counts;
 }
-function checkAll(m,routes,placements={}){if(hasMultiConfluence(m))return checkMulti(m,routes,placements);const errors=[];const counts=placementCounts(placements);for(const [i,v] of Object.entries(placements)){const k=placementKind(v);if(!canPlace(m,Object.fromEntries(Object.entries(placements).filter(([j])=>j!==i)),+i,k))errors.push(`Invalid ${k} placement at ${+i+1}`);}for(const [k,n] of Object.entries(counts))if(n>(m.inventory?.[k]||0))errors.push(`Inventory exceeded: ${k}`);
+function checkAll(m,routes,placements={}){if(hasPhases(m))return phaseValidation(m,routes,placements,true);if(hasMultiConfluence(m))return checkMulti(m,routes,placements);const errors=[];const counts=placementCounts(placements);for(const [i,v] of Object.entries(placements)){const k=placementKind(v);if(!canPlace(m,Object.fromEntries(Object.entries(placements).filter(([j])=>j!==i)),+i,k))errors.push(`Invalid ${k} placement at ${+i+1}`);}for(const [k,n] of Object.entries(counts))if(n>(m.inventory?.[k]||0))errors.push(`Inventory exceeded: ${k}`);
  if(m.construction&&constructionCost(m,counts)>m.construction.budget)errors.push('Construction budget exceeded');
  for(let i=0;i<m.cells.length;i++)if(['portal','tunnel'].includes(effective(m,placements,i))&&linkPartner(m,i,placements)<0)errors.push(`Invalid or unpaired ${effective(m,placements,i)} at cell ${i+1}`);
  const boardPairs=pairs(m);
@@ -513,6 +610,7 @@ function solveMulti(m,{limit=120000,maxPairs=16,allowPlacement=true,initialPlace
 /* Bounded search: route first; when water encountered, may consume bridge; when another route is present, may consume intersection.
    Search limits are NOT evidence of unsolvability. */
 function solve(m,{limit=120000,maxPairs=8,allowPlacement=true,initialPlacements={}}={}){
+ if(hasPhases(m))return solvePhases(m,{limit,allowPlacement});
  if(hasMultiConfluence(m))return solveMulti(m,{limit,maxPairs:Math.max(maxPairs,16),allowPlacement,initialPlacements});
  const ps=pairs(m);if(!ps.length||ps.some(p=>p.source<0||p.destination<0))return {status:'invalid',message:'Missing or unmatched endpoints'};
  if(ps.length>maxPairs)return {status:'unsupported',message:`Maximum ${maxPairs} pairs for prototype solver`};
@@ -581,5 +679,5 @@ function solveConstruction(m,{limit=120000,maxPairs=8,maxCandidates=180}={}){
  }
  return {status:hitLimit||direct.status==='inconclusive'?'inconclusive':'unsolved',message:hitLimit?'Some construction searches exceeded their limits':'No solution found within supported construction candidates',constructionAttempts:attempts};
 }
-const api={hasMultiConfluence,confluences,confluenceAt,routeKey,CONFLUENCE_RECIPES,confluenceRecipe,confluencePortSides,displayElement,confluence,confluenceDirections,confluenceNeighbor,confluenceRouteError,portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
+const api={hasPhases,phaseView,phasePlateIndex,phaseTriggerRoute,phaseValidation,solvePhases,hasMultiConfluence,confluences,confluenceAt,routeKey,CONFLUENCE_RECIPES,confluenceRecipe,confluencePortSides,displayElement,confluence,confluenceDirections,confluenceNeighbor,confluenceRouteError,portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
