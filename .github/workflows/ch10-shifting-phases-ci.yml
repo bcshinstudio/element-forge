@@ -1,0 +1,64 @@
+name: Chapter 10 Shifting Phases Regression
+
+on:
+  push:
+    branches: [feature/ch10-shifting-phases]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out Chapter 10 prototype
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run full existing Node and new phase regression tests
+        run: |
+          node --test map-editor/tests/*.test.js game/tests/*.test.js
+          node --check map-editor/engine.js
+          node --check map-editor/map-format.js
+          node --check map-editor/app.js
+          node --check map-editor/artwork.js
+          node --check game/session.js
+          node --check game/app.js
+      - name: Install Playwright for Chromium
+        run: |
+          python3 -m pip install playwright==1.51.0
+          if command -v google-chrome >/dev/null; then
+            echo "CHROMIUM_EXECUTABLE=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            python3 -m playwright install --with-deps chromium
+          fi
+      - name: Build standalone game and editor
+        run: |
+          python3 game/build.py Wellspring_Shifting_Phases_Preview.html
+          python3 game/build.py --editor Wellspring_Shifting_Phases_Map_Editor.html
+          test -s Wellspring_Shifting_Phases_Preview.html
+          test -s Wellspring_Shifting_Phases_Map_Editor.html
+      - name: Test editor and game phases on desktop/phone and offline game
+        run: python3 game/tests/shifting_phases_browser.py
+      - name: Replay the 108 existing stages and validate saved progress
+        run: python3 game/tests/ch9_browser.py
+      - name: Preserve old Confluence editor and gameplay
+        run: python3 game/tests/confluence_browser.py
+      - name: Preserve clean stage UI and developer review
+        run: |
+          python3 game/tests/clean_stage_ui_browser.py
+          python3 game/tests/developer_review_browser.py
+      - name: Preserve pause menu and tutorials on phones and desktop
+        run: python3 game/tests/pause_menu_browser.py
+      - name: Package standalone Chapter 10 development previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: Wellspring-Chapter10-Shifting-Phases
+          path: |
+            Wellspring_Shifting_Phases_Preview.html
+            Wellspring_Shifting_Phases_Map_Editor.html
+          retention-days: 14
+          if-no-files-found: error
