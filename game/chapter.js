@@ -27,7 +27,8 @@
  const chapterSeven=typeof module==='undefined'?root.EFShatteredAbyss:require('./shattered-abyss');
  const chapterEight=typeof module==='undefined'?root.EFWorldHeartSanctuary:require('./world-heart-sanctuary');
  const chapterNine=typeof module==='undefined'?root.EFConfluenceForges:require('./confluence-forges');
- const api={chapter,chapterTwo,chapterThree,chapterFour,chapterFive,chapterSix,chapterSeven,chapterEight,chapterNine,archivedTutorials,previousChapter};
+ const chapterTen=typeof module==='undefined'?root.EFTwilightPendulum:require('./twilight-pendulum');
+ const api={chapter,chapterTwo,chapterThree,chapterFour,chapterFive,chapterSix,chapterSeven,chapterEight,chapterNine,chapterTen,archivedTutorials,previousChapter};
  root.EFChapter=api;
  if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);
