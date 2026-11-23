@@ -61,6 +61,7 @@ jobs:
           python game/build.py Wellspring.html
           python game/build.py --editor Wellspring_Map_Editor.html
           python game/tests/artwork_browser.py
+          WELLSPRING_EDITOR=Wellspring_Map_Editor.html WELLSPRING_GAME=Wellspring.html python game/tests/multi_confluence_offline.py
 
       - name: Upload standalone Confluence map editor
         uses: actions/upload-artifact@v4
