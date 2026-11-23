@@ -5,20 +5,46 @@ const ELEMENTS=['fire','water','nature','electricity','arcane','wind','earth','i
 const neighbors=(i,w,h)=>[[i-w,'N'],[i+1,'E'],[i+w,'S'],[i-1,'W']].filter(([j,d])=>j>=0&&j<w*h&&(d!=='E'||Math.floor(j/w)===Math.floor(i/w))&&(d!=='W'||Math.floor(j/w)===Math.floor(i/w)));
 const axis=(a,b,w)=>Math.floor(a/w)===Math.floor(b/w)?'h':'v';
 
-/* Chapter 9 prototype: one fixed chamber per map.
-   Inputs Water (counterclockwise from output) + Earth (clockwise), output Plant.
-   A route may be planned before the chamber is activated; the whole-map check
-   still requires both inputs and the output. All old maps use ordinary pairs. */
+/* A single Confluence Chamber merges two input currents into one output.
+   Existing maps without a recipe retain Water + Earth → Plant.
+   Preset recipes are game mechanics, not claims about real chemistry. */
+const CONFLUENCE_RECIPES=Object.freeze([
+ {id:'water-earth-nature',inputs:['water','earth'],output:'nature'},
+ {id:'fire-earth-metal',inputs:['fire','earth'],output:'metal'},
+ {id:'fire-water-wind',inputs:['fire','water'],output:'wind'},
+ {id:'water-wind-ice',inputs:['water','wind'],output:'ice'},
+ {id:'light-shadow-electricity',inputs:['light','shadow'],output:'electricity'}
+]);
+const ELEM_IDS=new Set(ELEMENTS);
+function confluenceRecipe(props={}){
+ const id=props?.recipe??((props?.inputs!==undefined||props?.output!==undefined)?'custom':CONFLUENCE_RECIPES[0].id);
+ if(id==='custom'){
+  const inputs=props.inputs,output=props.output;
+  if(!Array.isArray(inputs)||inputs.length!==2||
+    inputs.some(el=>typeof el!=='string'||!ELEM_IDS.has(el))||
+    typeof output!=='string'||!ELEM_IDS.has(output)||
+    new Set([...inputs,output]).size!==3)return null;
+  return {id,inputs:[...inputs],output};
+ }
+ return CONFLUENCE_RECIPES.find(r=>r.id===id)??null;
+}
+const displayElement=e=>e==='nature'?'Plant':e[0].toUpperCase()+e.slice(1);
 const confluenceDirections=(output='E')=>{
  const directions=['N','E','S','W'],i=directions.indexOf(output);
  if(i<0)return null;
- return {water:directions[(i+3)%4],earth:directions[(i+1)%4],nature:output};
+ const input1=directions[(i+3)%4],input2=directions[(i+1)%4];
+ return {input1,input2,exit:output,water:input1,earth:input2,nature:output};
 };
 const confluence=m=>{
  const chambers=m.cells.flatMap((c,i)=>c.component==='confluence'?[i]:[]);
  if(chambers.length!==1)return null;
- const index=chambers[0];
- return {index,...confluenceDirections(m.cells[index].props?.direction||'E')};
+ const index=chambers[0],cell=m.cells[index],recipe=confluenceRecipe(cell.props);
+ if(!recipe)return null;
+ const directions=confluenceDirections(cell.props?.direction||'E');
+ if(!directions)return null;
+ return {index,recipe:recipe.id,inputs:[...recipe.inputs],output:recipe.output,
+  ports:{[recipe.inputs[0]]:directions.input1,[recipe.inputs[1]]:directions.input2,[recipe.output]:directions.exit},
+  ...directions};
 };
 const confluenceNeighbor=(m,index,side)=>neighbors(index,m.width,m.height).find(([,d])=>d===side)?.[0]??-1;
 const pairs=m=>{
@@ -27,8 +53,8 @@ const pairs=m=>{
   let source=m.cells.findIndex(c=>c.node?.element===element&&c.node.role==='source');
   let destination=m.cells.findIndex(c=>c.node?.element===element&&c.node.role==='destination');
   if(chamber){
-   if(element==='nature'&&source<0)source=chamber.index;
-   if(['water','earth'].includes(element)&&destination<0)destination=chamber.index;
+   if(element===chamber.output&&source<0)source=chamber.index;
+   if(chamber.inputs.includes(element)&&destination<0)destination=chamber.index;
   }
   return {element,source,destination};
  }).filter(p=>p.source>=0||p.destination>=0);
@@ -36,16 +62,17 @@ const pairs=m=>{
 function confluenceRouteError(m,element,path){
  const chamber=confluence(m);
  if(!chamber||!path.includes(chamber.index))return null;
- if(!['water','earth','nature'].includes(element))return 'Only Water, Earth, and Plant may use the Confluence Chamber';
+ if(![...chamber.inputs,chamber.output].includes(element))
+  return 'Only the selected reaction elements may use the Confluence Chamber';
  const k=path.indexOf(chamber.index);
- if(element==='nature'){
-  if(k!==0)return 'Plant must start at the Confluence Chamber';
-  if(path.length>1&&path[1]!==confluenceNeighbor(m,chamber.index,chamber.nature))
-   return 'Plant must leave through the green output port';
+ if(element===chamber.output){
+  if(k!==0)return displayElement(element)+' must start at the Confluence Chamber';
+  if(path.length>1&&path[1]!==confluenceNeighbor(m,chamber.index,chamber.ports[element]))
+   return displayElement(element)+' must leave through the output port';
  }else{
-  if(k!==path.length-1)return element+' must end at the Confluence Chamber';
-  if(path.length>1&&path.at(-2)!==confluenceNeighbor(m,chamber.index,chamber[element]))
-   return (element==='water'?'Water':'Earth')+' must enter through its marked input port';
+  if(k!==path.length-1)return displayElement(element)+' must end at the Confluence Chamber';
+  if(path.length>1&&path.at(-2)!==confluenceNeighbor(m,chamber.index,chamber.ports[element]))
+   return displayElement(element)+' must enter through its marked input port';
  }
  return null;
 }
@@ -222,8 +249,8 @@ function solve(m,{limit=120000,maxPairs=8,allowPlacement=true,initialPlacements=
  for(const i of ns){
    const ch=confluence(m);
    if(ch){
-    if(cur===ch.index&&p.element==='nature'&&i!==confluenceNeighbor(m,ch.index,ch.nature))continue;
-    if(i===ch.index&&(i!==p.destination||!['water','earth'].includes(p.element)||cur!==confluenceNeighbor(m,ch.index,ch[p.element])))continue;
+    if(cur===ch.index&&p.element===ch.output&&i!==confluenceNeighbor(m,ch.index,ch.ports[ch.output]))continue;
+    if(i===ch.index&&(i!==p.destination||!ch.inputs.includes(p.element)||cur!==confluenceNeighbor(m,ch.index,ch.ports[p.element])))continue;
    }
    if(!allowedTransition(m,p.element,cur,i,state.placements))continue;const c=m.cells[i];if(c.node&&!(c.node.element===p.element&&c.node.role==='destination'))continue;let pl=state.placements,comp=effective(m,pl,i);const overlaps=routes.filter(r=>r.path.includes(i));let wanted=null;
  if(terrainError(m,p.element,i,comp)){if(!comp)wanted=spanKinds.find(kind=>budget[kind]&&canPlace(m,pl,i,kind)&&!terrainError(m,p.element,i,kind));if(!wanted)continue;}
@@ -270,5 +297,5 @@ function solveConstruction(m,{limit=120000,maxPairs=8,maxCandidates=180}={}){
  }
  return {status:hitLimit||direct.status==='inconclusive'?'inconclusive':'unsolved',message:hitLimit?'Some construction searches exceeded their limits':'No solution found within supported construction candidates',constructionAttempts:attempts};
 }
-const api={confluence,confluenceDirections,confluenceNeighbor,confluenceRouteError,portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
+const api={CONFLUENCE_RECIPES,confluenceRecipe,displayElement,confluence,confluenceDirections,confluenceNeighbor,confluenceRouteError,portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
