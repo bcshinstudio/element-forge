@@ -16,10 +16,12 @@
 
  function createSession(level){
   const map=F.readLevel(level);
+  const multi=E.hasMultiConfluence(map);
+  const routeId=r=>E.routeKey(map,r.element,r.path[0]);
   const state={phase:'inspect',loadout:{},placements:{},routes:[],drafts:{},active:null};
   let history=[];
   const onboard=index=>Number.isInteger(index)&&index>=0&&index<map.cells.length;
-  const remember=(toolChange=false)=>{history.push(copy({toolChange,placements:state.placements,routes:state.routes,drafts:state.drafts,active:state.active?.element}));};
+  const remember=(toolChange=false)=>{history.push(copy({toolChange,placements:state.placements,routes:state.routes,drafts:state.drafts,active:state.active?(multi?state.active.id:state.active.element):null}));};
   const activeMap=()=>({...map,inventory:state.loadout});
 
   function start(selection){
@@ -49,8 +51,8 @@
 
   function undo(){
    if(state.phase!=='build')return false;
-   if(state.active&&!history.at(-1)?.toolChange&&!history.at(-1)?.routes.some(route=>route.element===state.active.element)){
-    delete state.drafts[state.active.element];
+   if(state.active&&!history.at(-1)?.toolChange&&!history.at(-1)?.routes.some(r=>routeId(r)===(multi?state.active.id:state.active.element))){
+    delete state.drafts[multi?state.active.id:state.active.element];
     state.active=null;
     return true;
    }
@@ -95,7 +97,7 @@
    for(const [element,draft] of Object.entries(state.drafts)){
     if(affected(draft))delete state.drafts[element];
    }
-   if(state.active&&!state.drafts[state.active.element])state.active=null;
+   if(state.active&&!state.drafts[multi?state.active.id:state.active.element])state.active=null;
    return ok();
   }
 
@@ -126,7 +128,57 @@
   const placeTunnel=(first,second)=>placeLink(first,second,'tunnel');
   const placePortal=(first,second)=>placeLink(first,second,'portal');
 
+  function routeMulti(index,reopen=false){
+   const cell=map.cells[index],ch=E.confluenceAt(map,index);
+   const source=cell.node?.role==='source'?cell.node.element:ch?.output;
+   if(state.active?.path.at(-2)===index){state.active.path.pop();return ok();}
+   if(state.active){
+    const {path}=state.active,exit=path.at(-1),entry=path.at(-2);
+    if(path.at(-3)===index&&E.effective(map,state.placements,exit)==='portal'&&
+       E.linkPartner(map,exit,state.placements)===entry){path.splice(-2);return ok();}
+   }
+   const existing=Object.values(state.drafts).find(d=>d.path.at(-1)===index);
+   if(existing&&!(state.active&&ch&&ch.inputs.includes(state.active.element))){
+    state.active=existing;return ok();
+   }
+   if(source&&(!state.active||cell.node?.role==='source')){
+    const id=E.routeKey(map,source,index),completed=state.routes.find(r=>routeId(r)===id);
+    if(completed){remember();state.routes=state.routes.filter(r=>r!==completed);}
+    state.active=state.drafts[id]??{id,element:source,path:[index]};
+    state.drafts[id]=state.active;
+    return ok();
+   }
+   if((reopen||!state.active)&&!ch){
+    const completed=state.routes.find(r=>r.path.at(-1)===index);
+    if(completed){
+     remember();state.routes=state.routes.filter(r=>r!==completed);
+     const id=routeId(completed);
+     state.drafts[id]={...completed,id};state.active=state.drafts[id];return ok();
+    }
+   }
+   if(reopen){
+    const pending=Object.values(state.drafts).find(({path})=>E.portalExit(map,path,state.placements)===index);
+    if(pending)state.active=pending;
+   }
+   if(!state.active)return fail('Start at an element source or chamber output.');
+   const {element,path,id}=state.active,next=[...path,index];
+   const segment=E.pairs(map).find(p=>p.element===element&&p.source===path[0]);
+   const complete=next.length>1&&segment?.targets?.includes(index);
+   const problem=E.validatePath(map,element,next,state.routes,state.placements,!complete);
+   if(problem)return fail(problem);
+   if(complete){
+    remember();
+    delete state.drafts[id];state.active=null;
+    state.routes.push({element,path:next});
+   }else state.active.path=next;
+   return ok();
+  }
+
   function route(index,reopen=false){
+   if(multi){
+    if(state.phase!=='build'||!onboard(index))return fail('Choose an available board tile.');
+    return routeMulti(index,reopen);
+   }
    if(state.phase!=='build'||!onboard(index))return fail('Choose an available board tile.');
    const cell=map.cells[index];
    if(state.active?.path.at(-2)===index){state.active.path.pop();return ok();}
@@ -197,7 +249,7 @@
 
   function snapshot(){
    return copy({version:1,phase:state.phase,loadout:state.loadout,placements:state.placements,
-    routes:state.routes,drafts:state.drafts,active:state.active?.element});
+    routes:state.routes,drafts:state.drafts,active:state.active?(multi?state.active.id:state.active.element):null});
   }
 
   function restore(saved){
@@ -227,16 +279,24 @@
     }
     const used=new Set();
     const canKeep=route=>saved.phase==='complete'||E.validatePath(map,route.element,route.path,[],saved.placements,true)!==E.portalExitMessage;
-    const routes=saved.routes.filter(route=>!Object.hasOwn(saved.drafts,route.element)&&canKeep(route));
+    const routes=saved.routes.filter(route=>!Object.hasOwn(saved.drafts,multi?routeId(route):route.element)&&canKeep(route));
     const drafts=Object.fromEntries(Object.entries(saved.drafts).filter(([,route])=>canKeep(route)));
     for(const route of routes){
-     if(used.has(route.element)||E.validatePath(map,route.element,route.path,routes,saved.placements))
+     if(used.has(multi?routeId(route):route.element)||E.validatePath(map,route.element,route.path,routes.filter(r=>r!==route),saved.placements))
       throw Error('Invalid route');
-     used.add(route.element);
+     used.add(multi?routeId(route):route.element);
     }
     for(const [element,draft] of Object.entries(drafts)){
-     if(element!==draft.element||E.validatePath(map,element,draft.path,routes,saved.placements,true))
+     if(element!==(multi?routeId(draft):draft.element)||E.validatePath(map,draft.element,draft.path,routes,saved.placements,true))
       throw Error('Invalid draft');
+    }
+    if(multi){
+     const targets=new Set();
+     for(const route of routes){
+      const key=route.element+'@'+route.path.at(-1);
+      if(targets.has(key))throw Error('Duplicate route destination');
+      targets.add(key);
+     }
     }
     const restored=copy({...saved,routes,drafts});
     Object.assign(state,{loadout:restored.loadout,placements:restored.placements,routes:restored.routes,
