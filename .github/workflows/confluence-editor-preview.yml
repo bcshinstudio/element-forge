@@ -16,6 +16,15 @@ jobs:
         run: |
           python3 game/build.py --editor Wellspring_Map_Editor_Confluence.html
           test -s Wellspring_Map_Editor_Confluence.html
+      - name: Run focused Confluence browser test
+        run: |
+          python3 -m pip install playwright==1.51.0
+          if command -v google-chrome >/dev/null; then
+            export CHROMIUM_EXECUTABLE="$(command -v google-chrome)"
+          else
+            python3 -m playwright install --with-deps chromium
+          fi
+          python3 game/tests/confluence_browser.py
       - name: Upload Confluence editor preview
         uses: actions/upload-artifact@v4
         with:
