@@ -13,7 +13,7 @@ BASE = "/game/index.html"
 CAMPAIGN_KEY = "element-forge.sleeping-valley.v1"
 PLANS = [
     plan
-    for filename in ("sleeping-valley-solutions.json", "gatekeepers-solutions.json", "primeval-crucible-solutions.json", "astral-loom-solutions.json", "celestial-confluence-solutions.json", "weavers-playground-solutions.json", "shattered-abyss-solutions.json", "world-heart-sanctuary-solutions.json")
+    for filename in ("sleeping-valley-solutions.json", "gatekeepers-solutions.json", "primeval-crucible-solutions.json", "astral-loom-solutions.json", "celestial-confluence-solutions.json", "weavers-playground-solutions.json", "shattered-abyss-solutions.json", "world-heart-sanctuary-solutions.json", "confluence-forges-solutions.json")
     for plan in json.loads((ROOT / "game/tests/fixtures" / filename).read_text())
 ]
 
@@ -52,7 +52,7 @@ def prepare(page, plan, tap=False):
         counts[kind] = counts.get(kind, 0) + 1
     for kind, count in counts.items():
         if page.locator(f'#loadout input[name="{kind}"]').count():
-            label = {"tunnel": "Tunnel", "portal": "Portal", "intersection": "Intersection", "bridge": "Bridge"}[kind]
+            label = {"tunnel": "Tunnel", "portal": "Portal", "intersection": "Intersection", "bridge": "Bridge", "metalSpan": "Metal span"}[kind]
             for _ in range(count // 2 if kind in ("tunnel", "portal") else count):
                 press(page.get_by_role("button", name="Add " + label, exact=True))
     press(page.locator("#start"))
@@ -359,12 +359,14 @@ def test_campaign(browser, url):
         page.locator("#next").click()
         expect(page.locator("#world-intro")).to_be_visible()
         expect(page.locator("#story-skip")).to_be_disabled()
-        if index in [11, 23, 95]:
+        if index in [11, 23, 95, 107]:
             page.locator("#intro-next").click()
         if index == 95:
             expect(page.locator("#story-caption")).to_have_text("Chapter 8 Complete")
+        if index == 107:
+            expect(page.locator("#story-caption")).to_have_text("The Confluence Forges restored")
         page.locator("#intro-begin").click()
-        if index != 95:
+        if index != 107:
             expect(page.locator("#world-intro-title")).to_contain_text(f"Chapter {(index + 1) // 12 + 1}")
             page.locator("#intro-begin").click()
     expect(page.locator("#home-total")).to_contain_text("Campaign complete")
@@ -381,7 +383,7 @@ def test_campaign(browser, url):
     page.locator("#stage-select").click()
     expect(page.locator("#stage-list button").last).to_be_enabled()
     page.locator("#stage-list button").last.click()
-    expect(page.locator("#puzzle")).to_have_text("The World-Heart")
+    expect(page.locator("#puzzle")).to_have_text("The Grand Philosopher\u0027s Engine")
     page.locator("#home-button").click()
     page.locator("#continue").click()
     expect(page.locator("#puzzle")).to_have_text("Sunken Ashwood")
@@ -753,7 +755,7 @@ if __name__ == "__main__":
                         test_stage_controls(browser, offline, touch)
                     print("PASS stage story, reference, mouse and touch bridge gestures, and restart")
                     test_campaign(browser, url)
-                    print("PASS Stages 1–96 clear, finale unlock, replay isolation and new run")
+                    print("PASS Stages 1–108 clear, finale unlock, replay isolation and new run")
                     test_mobile_resume(browser, offline, 390, 844)
                     test_mobile_resume(browser, offline, 844, 390)
                     print("PASS offline portrait and landscape touch, menu dismissal, resume and audio settings")
