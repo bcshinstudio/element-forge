@@ -25,7 +25,7 @@ def open_developer_stage(page, index, tap=False):
         checkbox.check()
         checkbox.uncheck()
     press(page.locator('#studio-credit'))
-    expect(page.locator('#stage-list button')).to_have_count(121)
+    expect(page.locator('#stage-list button')).to_have_count(120)
     press(page.locator('#stage-list button').nth(index))
 
 def test_play(browser,url,stage,touch):
@@ -57,7 +57,7 @@ def test_editor(browser,url):
     page=browser.new_page(viewport={'width':1280,'height':930},accept_downloads=True)
     errors=[];page.on('pageerror',lambda exc:errors.append(str(exc)))
     page.goto(url)
-    page.locator('#file').set_input_files(str(ROOT/'game/ch10-drafts/stage-121.map.json'))
+    page.locator('#file').set_input_files(str(ROOT/'game/ch10-drafts/stage-120.map.json'))
     expect(page.locator('#mapName')).to_have_value('The Celestial Orrery')
     expect(page.locator('#phase-enabled')).to_be_checked()
     page.locator('#validate').click()
@@ -76,12 +76,12 @@ def main():
             try:
                 base=f'http://127.0.0.1:{server.server_port}'
                 test_editor(browser,base+'/map-editor/index.html')
-                for stage in (109,121):
+                for stage in (109,120):
                     for touch in (False,True):test_play(browser,base+BASE,stage,touch)
             finally:browser.close()
     finally:
         server.shutdown();server.server_close()
-    print('PASS: Chapter 10 stage 109 + 121, phase switching, board fit, editable boss map, phone and desktop')
+    print('PASS: Chapter 10 stage 109 + 120, phase switching, board fit, editable boss map, phone and desktop')
 
 if __name__=='__main__':
     main()

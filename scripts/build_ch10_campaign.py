@@ -26,10 +26,15 @@ def build():
     if sorted(map(int, data)) != list(range(109, 122)):
         raise ValueError("Verified chapter data must contain exactly Stages 109–121.")
 
+    # Keep the original 13-map source archive for historical design review,
+    # but retire Sundial Sluice (original 110) from the playable chapter.
+    # Every regenerated level after that is renumbered consecutively.
+    source_stages = [109, *range(111, 122)]
+    assert data["110"]["m"]["name"] == "Sundial Sluice"
     levels = []
     witnesses = {}
-    for stage in range(109, 122):
-        row = data[str(stage)]
+    for stage, original_stage in enumerate(source_stages, start=109):
+        row = data[str(original_stage)]
         m = row["m"]
         if m["name"] == "" or m.get("phaseRules") != {"initial": "day"}:
             raise ValueError(f"Stage {stage} has invalid phase metadata.")
@@ -53,6 +58,9 @@ def build():
         write_json(DRAFTS / f"stage-{stage}.solution.json", {"placements": placements, "routes": routes})
         levels.append(level)
         witnesses[level["id"]] = {"placements": placements, "routes": routes}
+    # Clean up old 13-map campaign output on subsequent rebuilds.
+    for stale in DRAFTS.glob("stage-121.*.json"):
+        stale.unlink()
     write_json(GAME / "tests/fixtures/twilight-pendulum-solutions.json", witnesses)
     module = ("'use strict';\n(function(root){\n const chapter="
               + json.dumps(levels, separators=(",", ":"), ensure_ascii=False)

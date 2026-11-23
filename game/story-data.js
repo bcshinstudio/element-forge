@@ -219,7 +219,7 @@ window.EFStoryChapters = [
     "ending": [
       {
         "art": "star",
-        "caption": "The Celestial Orrery · Stage 121",
+        "caption": "The Celestial Orrery · Stage 120",
         "motion": "relief",
         "duration": 5200,
         "line": "The final currents arrive in their inlets. The Orrery turns, and Day and Night fall into rhythm across the World-Heart."

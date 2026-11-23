@@ -75,83 +75,6 @@
   },
   "twilight-pendulum-110": {
     "placements": {
-      "110": "bridge"
-    },
-    "routes": [
-      {
-        "element": "light",
-        "path": [
-          25,
-          26,
-          27,
-          28,
-          29,
-          30,
-          31,
-          32,
-          33
-        ],
-        "deliveredPhase": "day"
-      },
-      {
-        "element": "water",
-        "path": [
-          14,
-          13,
-          12,
-          24,
-          36,
-          37,
-          38,
-          50,
-          62,
-          74,
-          86
-        ],
-        "deliveredPhase": "day"
-      },
-      {
-        "element": "shadow",
-        "path": [
-          88,
-          89,
-          90,
-          91,
-          92,
-          93,
-          105,
-          117
-        ],
-        "deliveredPhase": "night"
-      },
-      {
-        "element": "earth",
-        "path": [
-          58,
-          57,
-          56,
-          55,
-          54
-        ],
-        "deliveredPhase": "night"
-      },
-      {
-        "element": "nature",
-        "path": [
-          108,
-          109,
-          110,
-          111,
-          112,
-          113,
-          114
-        ],
-        "deliveredPhase": "night"
-      }
-    ]
-  },
-  "twilight-pendulum-111": {
-    "placements": {
       "92": {
         "kind": "tunnel",
         "pairId": "T1"
@@ -224,7 +147,7 @@
       }
     ]
   },
-  "twilight-pendulum-112": {
+  "twilight-pendulum-111": {
     "placements": {
       "53": "intersection"
     },
@@ -306,7 +229,7 @@
       }
     ]
   },
-  "twilight-pendulum-113": {
+  "twilight-pendulum-112": {
     "placements": {
       "9": {
         "kind": "portal",
@@ -394,7 +317,7 @@
       }
     ]
   },
-  "twilight-pendulum-114": {
+  "twilight-pendulum-113": {
     "placements": {
       "110": "bridge",
       "122": "intersection"
@@ -480,7 +403,7 @@
       }
     ]
   },
-  "twilight-pendulum-115": {
+  "twilight-pendulum-114": {
     "placements": {
       "17": "intersection",
       "125": "bridge"
@@ -581,7 +504,7 @@
       }
     ]
   },
-  "twilight-pendulum-116": {
+  "twilight-pendulum-115": {
     "placements": {
       "17": {
         "kind": "tunnel",
@@ -688,7 +611,7 @@
       }
     ]
   },
-  "twilight-pendulum-117": {
+  "twilight-pendulum-116": {
     "placements": {
       "37": {
         "kind": "portal",
@@ -809,7 +732,7 @@
       }
     ]
   },
-  "twilight-pendulum-118": {
+  "twilight-pendulum-117": {
     "placements": {
       "39": "intersection"
     },
@@ -889,7 +812,7 @@
       }
     ]
   },
-  "twilight-pendulum-119": {
+  "twilight-pendulum-118": {
     "placements": {
       "41": "intersection",
       "61": {
@@ -998,7 +921,7 @@
       }
     ]
   },
-  "twilight-pendulum-120": {
+  "twilight-pendulum-119": {
     "placements": {
       "46": {
         "kind": "portal",
@@ -1097,7 +1020,7 @@
       }
     ]
   },
-  "twilight-pendulum-121": {
+  "twilight-pendulum-120": {
     "placements": {
       "17": "intersection",
       "37": {

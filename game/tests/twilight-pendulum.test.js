@@ -39,10 +39,11 @@ function replay(level, plan) {
  return session;
 }
 
-test('Chapter Ten has exactly Stages 109–121 in blueprint order, leaving Chapter Nine intact',()=>{
+test('Chapter Ten has exactly Stages 109–120 in blueprint order, leaving Chapter Nine intact',()=>{
  assert.equal(chapterNine.length,12);
- assert.equal(levels.length,13);
- assert.equal(new Set(levels.map(l=>l.id)).size,13);
+ assert.equal(levels.length,12);
+ assert.ok(!levels.some(l=>l.map.name==='Sundial Sluice'),'Retired Medium map has been removed');
+ assert.equal(new Set(levels.map(l=>l.id)).size,12);
  for(const [i,level] of levels.entries()){
   assert.equal(level.id,'twilight-pendulum-'+(109+i));
   assert.equal(level.map.phaseRules.initial,'day');
@@ -62,7 +63,7 @@ test('Every authored map and recorded delivery sequence passes the complete engi
   replay(level,plan);
  }
 });
-test('The same 13 maps can be edited, exported, and reopened without rule changes',()=>{
+test('The same 12 maps can be edited, exported, and reopened without rule changes',()=>{
  for(const level of levels){
   const m=F.readLevel(level);
   assert.deepEqual(F.parseMap(m),m,level.id);
@@ -101,8 +102,8 @@ test('Undo restores Day and a prior route without completing a Night route prema
  assert.equal(g.state.dayPhase,'day');
  assert.equal(g.state.routes.length,0);
 });
-test('Chapter Ten Stage 120 enables one Confluence input in Day and the other in Night',()=>{
- const level=levels.find(l=>l.id==='twilight-pendulum-120');
+test('Chapter Ten Stage 119 enables one Confluence input in Day and the other in Night',()=>{
+ const level=levels.find(l=>l.id==='twilight-pendulum-119');
  const routes=witnesses[level.id].routes;
  const ch=E.confluences(level.map).find(c=>c.output==='electricity');
  assert.ok(ch);

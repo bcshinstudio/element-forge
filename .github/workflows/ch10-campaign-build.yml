@@ -25,11 +25,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Expand all 13 authored maps and delivery witnesses
+      - name: Expand all 12 retained maps and delivery witnesses
         run: |
           python3 scripts/build_ch10_campaign.py
           test -s game/twilight-pendulum.js
-          test -s game/ch10-drafts/stage-121.solution.json
+          test -s game/ch10-drafts/stage-120.solution.json
           test -s game/tests/fixtures/twilight-pendulum-solutions.json
       - name: Verify source and advanced campaign logic
         run: |
@@ -40,25 +40,26 @@ jobs:
           node --test map-editor/tests/*.test.js game/tests/*.test.js
       - name: Build offline game and map editor
         run: |
-          python3 game/build.py Wellspring_Chapter10_121_Stages.html
+          python3 game/build.py Wellspring_Chapter10_120_Stages.html
           python3 game/build.py --editor Wellspring_Chapter10_Map_Editor.html
-          test -s Wellspring_Chapter10_121_Stages.html
+          test -s Wellspring_Chapter10_120_Stages.html
           test -s Wellspring_Chapter10_Map_Editor.html
       - name: Commit editor-ready maps and regression fixtures only after all tests pass
         run: |
           git config user.name "BC Shin Studio Regression Builder"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add game/twilight-pendulum.js game/ch10-drafts/stage-*.json game/tests/fixtures/twilight-pendulum-solutions.json
+          git add -u game/ch10-drafts
           if ! git diff --cached --quiet; then
-            git commit -m "Generate and verify Chapter 10 Stages 109-121 [skip ci]"
+            git commit -m "Generate and verify Chapter 10 Stages 109-120 [skip ci]"
             git push origin HEAD:feature/ch10-twilight-pendulum-campaign
           fi
       - name: Upload standalone game and editor for direct HTML download
         uses: actions/upload-artifact@v4
         with:
-          name: Wellspring-Twilight-Pendulum-121-Stages
+          name: Wellspring-Twilight-Pendulum-120-Stages
           path: |
-            Wellspring_Chapter10_121_Stages.html
+            Wellspring_Chapter10_120_Stages.html
             Wellspring_Chapter10_Map_Editor.html
           retention-days: 14
           if-no-files-found: error
