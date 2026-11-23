@@ -1,0 +1,54 @@
+name: Multi-Chamber Confluence Preview
+
+on:
+  push:
+    branches:
+      - feature/ch9-multi-confluence
+  workflow_dispatch:
+
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test chambers and JavaScript syntax
+        run: |
+          node --test map-editor/tests/confluence*.test.js map-editor/tests/multi-confluence.test.js
+          node --check map-editor/engine.js
+          node --check map-editor/map-format.js
+          node --check map-editor/app.js
+          node --check map-editor/artwork.js
+          node --check game/app.js
+          node --check game/session.js
+      - name: Install Playwright Chromium
+        run: |
+          python3 -m pip install playwright==1.51.0
+          if command -v google-chrome >/dev/null; then
+            echo "CHROMIUM_EXECUTABLE=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            python3 -m playwright install --with-deps chromium
+          fi
+      - name: Test single and multiple chamber editor/gameplay
+        run: |
+          python3 game/tests/confluence_browser.py
+          python3 game/tests/multi_confluence_browser.py
+      - name: Build independent offline editor and game
+        run: |
+          python3 game/build.py --editor Wellspring_Multi_Confluence_Editor.html
+          python3 game/build.py Wellspring_Multi_Confluence_Game.html
+          test -s Wellspring_Multi_Confluence_Editor.html
+          test -s Wellspring_Multi_Confluence_Game.html
+      - name: Upload offline preview after validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: Wellspring-Multi-Confluence-Preview
+          path: |
+            Wellspring_Multi_Confluence_Editor.html
+            Wellspring_Multi_Confluence_Game.html
+          retention-days: 14
+          if-no-files-found: error
