@@ -30,6 +30,7 @@ def run():
             game=browser.new_page(viewport={"width":1280,"height":950})
             game.goto(GAME.as_uri())
             game.locator("#title-enter").click()
+            game.evaluate("document.getElementById('home-custom').hidden = false")
             game.locator("#home-custom").click()
             game.locator("#home-import").set_input_files(str(SAMPLES/"multi-confluence-repeated-input.level.json"))
             expect(game.locator("#board .confluence-core")).to_have_count(2)
