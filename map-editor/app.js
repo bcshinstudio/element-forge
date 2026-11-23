@@ -73,8 +73,8 @@ function updateProperties(){
   html+=`<label>Reaction recipe<select id="propReaction">${options}<option value="custom" ${reactionId==='custom'?'selected':''}>Custom: choose elements</option></select></label>`;
   if(reactionId==='custom'){
    const field=(label,id,value)=>`<label>${label}<select id="${id}">${Object.entries(ELEMENTS).map(([key,e])=>`<option value="${key}" ${value===key?'selected':''}>${e.name}</option>`).join('')}</select></label>`;
-   html+=field('Input 1 (blue port)','propReactionInput1',customInputs[0]);
-   html+=field('Input 2 (amber port)','propReactionInput2',customInputs[1]);
+   html+=field('Input 1 (counterclockwise port)','propReactionInput1',customInputs[0]);
+   html+=field('Input 2 (clockwise port)','propReactionInput2',customInputs[1]);
    html+=field('Output (green port)','propReactionOutput',customOutput);
    if(!reactionEngine.confluenceRecipe(confluenceProps()))html+='<p class="warning-text">Select three different elements.</p>';
   }
