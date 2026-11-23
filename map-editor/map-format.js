@@ -60,6 +60,10 @@ function parseCell(cell,index,version){
    if(props.element!=='any'&&!Object.hasOwn(ELEMENTS,props.element))fail('invalid checkpoint element.');
    next.props.element=props.element;
   }
+  if(props.ports!==undefined){
+   if(component!=='confluence'||!E.confluencePortSides(props))fail('invalid Confluence port sides.');
+   next.props.ports={...props.ports};
+  }
   if(props.recipe!==undefined||props.inputs!==undefined||props.output!==undefined){
    if(component!=='confluence')fail('reaction properties require a Confluence Chamber.');
    const recipe=E.confluenceRecipe(props);
