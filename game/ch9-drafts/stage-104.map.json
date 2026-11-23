@@ -221,7 +221,7 @@
       "terrain": "land"
     },
     {
-      "terrain": "land"
+      "terrain": "heated"
     },
     {
       "terrain": "mountain"
@@ -305,7 +305,7 @@
       "terrain": "mountain"
     },
     {
-      "terrain": "land",
+      "terrain": "heated",
       "component": "checkpoint",
       "props": {
         "element": "metal"
