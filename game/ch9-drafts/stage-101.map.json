@@ -304,7 +304,7 @@
       }
     },
     {
-      "terrain": "water"
+      "terrain": "land"
     },
     {
       "terrain": "land",
@@ -420,7 +420,7 @@
       "terrain": "land"
     },
     {
-      "terrain": "land"
+      "terrain": "water"
     },
     {
       "terrain": "land"
