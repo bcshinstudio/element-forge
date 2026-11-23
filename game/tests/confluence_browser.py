@@ -62,6 +62,64 @@ def test_editor(browser, base):
     page.close()
 
 
+def test_recipe_selection(browser, base):
+    """Editor paints presets and custom mappings, then changes a placed recipe."""
+    page = browser.new_page(viewport={"width": 1280, "height": 950})
+    page.goto(base + "/map-editor/index.html")
+    page.locator("summary").filter(has_text="Tools & Fixtures").click()
+    page.locator('[data-tool="component:confluence"]').click()
+    page.locator("#propReaction").select_option("fire-earth-metal")
+    page.locator('#board [data-i="24"]').click()
+    chamber = page.locator('#board [data-i="24"]')
+    assert chamber.locator(".port-N").inner_text() == "F"
+    assert chamber.locator(".port-S").inner_text() == "R"
+    assert chamber.locator(".port-E").inner_text() == "M"
+    inspector = page.locator("#cell-inspector label").filter(has_text="Reaction recipe").locator("select")
+    inspector.select_option("fire-water-wind")
+    assert chamber.locator(".port-N").inner_text() == "F"
+    assert chamber.locator(".port-S").inner_text() == "W"
+    assert chamber.locator(".port-E").inner_text() == "V"
+
+    page.locator("#propReaction").select_option("custom")
+    page.locator("#propReactionInput1").select_option("light")
+    page.locator("#propReactionInput2").select_option("shadow")
+    page.locator("#propReactionOutput").select_option("electricity")
+    page.locator('#board [data-i="24"]').click()
+    assert chamber.locator(".port-N").inner_text() == "L"
+    assert chamber.locator(".port-S").inner_text() == "H"
+    assert chamber.locator(".port-E").inner_text() == "E"
+    assert page.locator("#cell-inspector").inner_text().find("Output element") >= 0
+    page.close()
+
+
+def test_other_reactions(browser, base):
+    """A non-default preset and custom mapping run through actual game controls."""
+    for filename, title, ports in [
+        ("confluence-fire-earth-metal.map.json", "Confluence Workshop – Fire + Earth", ("F", "R", "M")),
+        ("confluence-custom.map.json", "Confluence Workshop – Ice + Metal", ("I", "M", "A")),
+    ]:
+        page = browser.new_page(viewport={"width": 1280, "height": 950})
+        page.goto(base + "/game/index.html")
+        page.locator("#title-enter").click()
+        page.locator("#home-custom").click()
+        page.locator("#home-import").set_input_files(
+            str(ROOT / "map-editor/examples" / filename)
+        )
+        expect(page.locator("#puzzle")).to_have_text(title)
+        chamber = page.locator('#board [data-index="24"]')
+        assert chamber.locator(".port-N").inner_text() == ports[0]
+        assert chamber.locator(".port-S").inner_text() == ports[1]
+        assert chamber.locator(".port-E").inner_text() == ports[2]
+        page.locator("#start").click()
+        trace(page, [24, 25, 26, 27])
+        trace(page, [3, 10, 17, 24])
+        trace(page, [45, 38, 31, 24])
+        expect(chamber).to_have_class(__import__("re").compile(r".*confluence-ready.*"))
+        page.locator("#check").click()
+        expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
+        page.close()
+
+
 if __name__ == "__main__":
     handler = partial(SimpleHTTPRequestHandler, directory=str(ROOT))
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
@@ -77,6 +135,8 @@ if __name__ == "__main__":
             try:
                 test_editor(browser, base)
                 test_game(browser, base)
+                test_recipe_selection(browser, base)
+                test_other_reactions(browser, base)
             finally:
                 browser.close()
     finally:
