@@ -487,7 +487,7 @@ body:has(#home:not([hidden])) .masthead { display:none; }
  padding-top: 4px;
 }
 .field .stage-heading #puzzle { grid-column: 1 / -1; margin: 0 0 .35rem; overflow-wrap: anywhere; }
-#stage-story { margin: .35rem 0 .65rem; color: var(--muted); line-height: 1.45; }
+#description { margin: .35rem 0 .65rem; color: var(--muted); line-height: 1.45; }
 #stage-note { margin-bottom: .45rem; font-size: .92rem; }
 #stage-note p { margin: .18rem 0; }
 #stage-note strong { color: #f3ce83; }
