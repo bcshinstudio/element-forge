@@ -113,7 +113,7 @@ function parseMap(source){
  result.description=String(source.description||'').slice(0,500);
  result.cells=Array.from(source.cells,(cell,index)=>parseCell(cell,index,source.schemaVersion));
  if(source.artPalette!==undefined){
-  if(!Number.isInteger(source.artPalette)||source.artPalette<1||source.artPalette>8)throw Error('Invalid chapter palette.');
+  if(!Number.isInteger(source.artPalette)||source.artPalette<1||source.artPalette>9)throw Error('Invalid chapter palette.');
   result.artPalette=source.artPalette;
  }
  if(source.toolArt!==undefined){
