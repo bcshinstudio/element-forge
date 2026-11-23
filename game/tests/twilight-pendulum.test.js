@@ -68,7 +68,13 @@ test('The same 13 maps can be edited, exported, and reopened without rule change
   assert.deepEqual(F.parseMap(m),m,level.id);
   assert.deepEqual(F.readLevel(F.asLevel(m)),m,level.id);
   const raw=JSON.parse(fs.readFileSync(path.join(__dirname,'../ch10-drafts/stage-'+level.id.split('-').at(-1)+'.map.json'),'utf8'));
-  assert.deepEqual(F.parseMap(raw),m,level.id);
+  const editable=F.parseMap(raw);
+  assert.ok(editable.phaseWitness,level.id+' editor verification proof');
+  const proofCheck=E.solveConstruction(editable);
+  assert.equal(proofCheck.status,'solved',level.id+' editor automatic validation');
+  assert.equal(proofCheck.verifiedWitness,true);
+  delete editable.phaseWitness;
+  assert.deepEqual(editable,m,level.id);
  }
 });
 test('Completed Day routes survive Night and shifting tiles become reusable only across phases',()=>{
