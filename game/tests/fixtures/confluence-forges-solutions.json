@@ -1,0 +1,1127 @@
+[
+  {
+    "id": "confluence-forges-97",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "water",
+        "path": [
+          15,
+          27,
+          39,
+          51,
+          63
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          60,
+          61,
+          62,
+          63
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          63,
+          75,
+          87,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          22,
+          34,
+          46,
+          58,
+          70,
+          69,
+          68
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          54,
+          66,
+          67,
+          68
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          68,
+          56,
+          44,
+          32,
+          30,
+          29,
+          17,
+          16
+        ]
+      }
+    ],
+    "placements": {
+      "102": "bridge"
+    }
+  },
+  {
+    "id": "confluence-forges-98",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "water",
+        "path": [
+          17,
+          29,
+          41,
+          53,
+          65
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          61,
+          62,
+          63,
+          64,
+          65
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          65,
+          77,
+          89,
+          101,
+          113,
+          114,
+          115,
+          127
+        ]
+      },
+      {
+        "element": "metal",
+        "path": [
+          18,
+          30,
+          34,
+          46,
+          58,
+          70,
+          82
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          85,
+          97,
+          109,
+          121,
+          122,
+          123,
+          124
+        ]
+      }
+    ],
+    "placements": {
+      "30": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "34": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      }
+    }
+  },
+  {
+    "id": "confluence-forges-99",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "fire",
+        "path": [
+          25,
+          37,
+          49,
+          61,
+          62,
+          63
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          99,
+          87,
+          75,
+          63
+        ]
+      },
+      {
+        "element": "metal",
+        "path": [
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          58
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          19,
+          31,
+          43,
+          55,
+          67,
+          79,
+          91,
+          103,
+          115,
+          127
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          13,
+          14,
+          15,
+          17,
+          29,
+          41,
+          53,
+          52,
+          40
+        ]
+      }
+    ],
+    "placements": {
+      "66": "metalSpan",
+      "67": "intersection"
+    }
+  },
+  {
+    "id": "confluence-forges-100",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "fire",
+        "path": [
+          25,
+          37,
+          49,
+          61,
+          62,
+          63,
+          64
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          16,
+          28,
+          40,
+          52,
+          64
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          64,
+          76,
+          88,
+          112,
+          111,
+          110,
+          109,
+          121
+        ]
+      },
+      {
+        "element": "light",
+        "path": [
+          19,
+          20,
+          32,
+          44,
+          56,
+          68,
+          67,
+          66
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          10,
+          22,
+          34,
+          104,
+          116,
+          117,
+          129,
+          130
+        ]
+      }
+    ],
+    "placements": {
+      "34": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "104": {
+        "kind": "portal",
+        "pairId": "P1"
+      }
+    }
+  },
+  {
+    "id": "confluence-forges-101",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "wind",
+        "path": [
+          13,
+          14,
+          16,
+          28,
+          40,
+          52
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          48,
+          49,
+          50,
+          51,
+          52
+        ]
+      },
+      {
+        "element": "ice",
+        "path": [
+          52,
+          64,
+          76,
+          88,
+          100,
+          112,
+          113,
+          114,
+          126
+        ]
+      },
+      {
+        "element": "electricity",
+        "path": [
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          21,
+          33,
+          45,
+          57,
+          69,
+          81,
+          93,
+          105,
+          117,
+          129,
+          128
+        ]
+      }
+    ],
+    "placements": {
+      "88": "intersection",
+      "117": "bridge"
+    }
+  },
+  {
+    "id": "confluence-forges-102",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "fire",
+        "path": [
+          13,
+          25,
+          37,
+          38,
+          50
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          86,
+          74,
+          62,
+          50
+        ]
+      },
+      {
+        "element": "metal",
+        "path": [
+          50,
+          51,
+          52,
+          56,
+          57,
+          69,
+          81,
+          93,
+          105,
+          117
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          87,
+          88,
+          89
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          121,
+          122,
+          124,
+          112,
+          113,
+          101,
+          89
+        ]
+      },
+      {
+        "element": "ice",
+        "path": [
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          82,
+          70
+        ]
+      }
+    ],
+    "placements": {
+      "52": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "56": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "93": "intersection"
+    }
+  },
+  {
+    "id": "confluence-forges-103",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "light",
+        "path": [
+          13,
+          14,
+          15,
+          27,
+          28,
+          40,
+          52
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          22,
+          21,
+          33,
+          49,
+          50,
+          51,
+          52
+        ]
+      },
+      {
+        "element": "electricity",
+        "path": [
+          52,
+          64,
+          76,
+          88,
+          100,
+          112,
+          124
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          46,
+          58,
+          70,
+          82,
+          81,
+          80
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          79,
+          80
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          80,
+          68,
+          56,
+          32,
+          20,
+          19,
+          18
+        ]
+      }
+    ],
+    "placements": {
+      "33": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "49": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "88": "intersection"
+    }
+  },
+  {
+    "id": "confluence-forges-104",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "water",
+        "path": [
+          15,
+          27,
+          39,
+          51
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          48,
+          49,
+          50,
+          51
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          51,
+          63,
+          75,
+          87,
+          99,
+          111,
+          123
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          18,
+          30,
+          42
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          21,
+          33,
+          45,
+          44,
+          43,
+          42
+        ]
+      },
+      {
+        "element": "metal",
+        "path": [
+          42,
+          54,
+          66,
+          70,
+          82,
+          94,
+          106,
+          118
+        ]
+      },
+      {
+        "element": "light",
+        "path": [
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          12,
+          24,
+          25,
+          115,
+          116,
+          117,
+          129
+        ]
+      }
+    ],
+    "placements": {
+      "25": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "66": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "70": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "87": "intersection",
+      "115": {
+        "kind": "portal",
+        "pairId": "P1"
+      }
+    }
+  },
+  {
+    "id": "confluence-forges-105",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "fire",
+        "path": [
+          12,
+          13,
+          14,
+          2,
+          3,
+          15,
+          27
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          24,
+          25,
+          26,
+          27
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          27,
+          28,
+          29,
+          31,
+          43,
+          55
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          58,
+          57,
+          56,
+          55
+        ]
+      },
+      {
+        "element": "ice",
+        "path": [
+          55,
+          67,
+          79,
+          91,
+          103,
+          115,
+          127
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          63,
+          75,
+          87
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          84,
+          85,
+          86,
+          87
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94
+        ]
+      }
+    ],
+    "placements": {
+      "91": "intersection",
+      "93": "bridge"
+    }
+  },
+  {
+    "id": "confluence-forges-106",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "fire",
+        "path": [
+          12,
+          13,
+          14,
+          26
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          24,
+          25,
+          26
+        ]
+      },
+      {
+        "element": "metal",
+        "path": [
+          26,
+          27,
+          28,
+          32,
+          33,
+          34,
+          46,
+          58
+        ]
+      },
+      {
+        "element": "light",
+        "path": [
+          51,
+          63,
+          75
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          22,
+          10,
+          9,
+          21,
+          72,
+          73,
+          74,
+          75
+        ]
+      },
+      {
+        "element": "electricity",
+        "path": [
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          55,
+          67,
+          79,
+          91,
+          103,
+          115,
+          127
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          97,
+          109,
+          121,
+          122,
+          123,
+          124,
+          125,
+          126
+        ]
+      }
+    ],
+    "placements": {
+      "21": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "28": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "32": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "72": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "79": "intersection",
+      "125": "bridge"
+    }
+  },
+  {
+    "id": "confluence-forges-107",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "water",
+        "path": [
+          51,
+          63,
+          75
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          72,
+          73,
+          74,
+          75
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          75,
+          87,
+          99,
+          111,
+          123,
+          124,
+          125
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          66,
+          67,
+          68
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          46,
+          70,
+          69,
+          68
+        ]
+      },
+      {
+        "element": "ice",
+        "path": [
+          68,
+          80,
+          92,
+          104,
+          116,
+          128
+        ]
+      },
+      {
+        "element": "fire",
+        "path": [
+          101,
+          102,
+          103,
+          104,
+          105,
+          106
+        ]
+      },
+      {
+        "element": "metal",
+        "path": [
+          1,
+          13,
+          17,
+          29,
+          41,
+          53,
+          65
+        ]
+      },
+      {
+        "element": "light",
+        "path": [
+          52,
+          53,
+          54,
+          55,
+          56
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          36,
+          48,
+          49,
+          107,
+          119,
+          131,
+          130
+        ]
+      }
+    ],
+    "placements": {
+      "13": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "17": {
+        "kind": "tunnel",
+        "pairId": "T1"
+      },
+      "49": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "53": "intersection",
+      "54": "bridge",
+      "104": "intersection",
+      "107": {
+        "kind": "portal",
+        "pairId": "P1"
+      }
+    }
+  },
+  {
+    "id": "confluence-forges-108",
+    "status": "solved",
+    "routes": [
+      {
+        "element": "fire",
+        "path": [
+          12,
+          13,
+          14,
+          2,
+          3,
+          4,
+          16,
+          28
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          24,
+          25,
+          26,
+          27,
+          28
+        ]
+      },
+      {
+        "element": "wind",
+        "path": [
+          28,
+          29,
+          31,
+          32,
+          33,
+          45,
+          57,
+          69
+        ]
+      },
+      {
+        "element": "water",
+        "path": [
+          51,
+          63,
+          75
+        ]
+      },
+      {
+        "element": "earth",
+        "path": [
+          72,
+          73,
+          74,
+          75
+        ]
+      },
+      {
+        "element": "nature",
+        "path": [
+          75,
+          87,
+          99,
+          111,
+          112,
+          100,
+          101,
+          102,
+          114,
+          126,
+          127
+        ]
+      },
+      {
+        "element": "light",
+        "path": [
+          54,
+          55,
+          56,
+          57,
+          58,
+          70,
+          82,
+          94,
+          93,
+          92,
+          91
+        ]
+      },
+      {
+        "element": "shadow",
+        "path": [
+          36,
+          48,
+          49,
+          89,
+          90,
+          91
+        ]
+      },
+      {
+        "element": "electricity",
+        "path": [
+          91,
+          103,
+          104,
+          105,
+          117,
+          116,
+          115,
+          114,
+          113
+        ]
+      }
+    ],
+    "placements": {
+      "49": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "57": "intersection",
+      "89": {
+        "kind": "portal",
+        "pairId": "P1"
+      },
+      "114": "intersection",
+      "126": "bridge"
+    }
+  }
+]
