@@ -79,7 +79,9 @@ test('all 121 campaign maps keep rule data and remain solvable after chapter art
    const exported=JSON.parse(JSON.stringify(F.asLevel(draft)));
    assert.deepEqual(F.parseMap(JSON.parse(JSON.stringify(draft))),F.readLevel(exported));
    assert.deepEqual(gameplay(F.readLevel(exported)),original);
-   assert.deepEqual(replay(exported,plans[i]),replay(level,plans[i]));
+   const plan=Array.isArray(plans)?plans[i]:plans[level.id];
+   assert.ok(plan,level.id+' plan');
+   assert.deepEqual(replay(exported,plan),replay(level,plan));
   }
  }
 });
