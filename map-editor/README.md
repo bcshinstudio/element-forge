@@ -34,31 +34,59 @@ A future game client can call `EFMap.readLevel(document)` or import `readLevel` 
 - `python tests/browser_smoke.py` runs Playwright Chromium coverage. Install Playwright and its Chromium build first, or set `CHROMIUM_EXECUTABLE` to an installed Chromium path.
 
 
-## Chapter 9 prototype: Confluence Chamber
+## Chapter 9 prototype: Flexible Confluence Chamber
 
-The **Confluence Chamber** is a fixed map fixture, not a player construction tool.
-It combines **Water + Earth → Plant** in one shared cell. Only one chamber is
-supported per map in this first prototype.
+A **Confluence Chamber** is one fixed, directional cell that accepts two
+different input elements and creates one distinct output element. Players must
+connect all three routes. It is not a construction tool; place it in the map
+editor. The current shared engine supports **one chamber per map**, and does
+not add Chapter 9 to the released campaign.
 
-1. Choose **Tools & Fixtures → Confluence Chamber** in the editor.
-2. Select the **output orientation** before painting, or select the placed chamber
-   and change **Gameplay direction** in the cell inspector.
-3. Place exactly **one Water source**, **one Earth source**, and **one Plant inlet**.
-   Do **not** place a Water inlet, an Earth inlet, or a separate Plant source.
-4. The colored ports show the required approaches: blue **W** for Water, amber
-   **E** for Earth, green **P** for the Plant output. With output **East**, Water
-   arrives from **North**, Earth arrives from **South**, and Plant leaves to **East**.
-   Rotating the fixture rotates all three ports together.
-5. Route the currents into the chamber and on to the Plant inlet. The Plant path
-   can be drawn first and stays **pending** until Water and Earth are connected.
-   All three routes must be complete to restore harmony.
+### Built-in recipes
+
+| Input 1 | Input 2 | Output |
+| --- | --- | --- |
+| Water | Earth | Plant |
+| Fire | Earth | Metal |
+| Fire | Water | Wind (the in-game equivalent of steam) |
+| Water | Wind | Ice |
+| Light | Shadow | Electricity |
+
+The **Custom: choose elements** option lets the map designer choose any two
+different existing elements as inputs and a third different element as the
+output. Custom combinations are map rules, not real chemistry, and they
+do **not** introduce any additional element types.
+
+### Build a Confluence map
+
+1. Under **Tools & Fixtures**, select **Confluence Chamber**.
+2. Under **Paint settings**, select a **Reaction recipe**, or **Custom** and
+   three distinct elements. Set the **Output direction**. Paint the fixture on
+   Land. One fixture is supported per map.
+3. Place **one Source for each input element** and **one Destination for the
+   output element**. Do **not** place input destinations or an output source:
+   the chamber is the inputs' destination and the output's source.
+4. The first input approaches from the counterclockwise side relative to
+   the output direction, the second input from the clockwise side.
+   With output **East**, input 1 is **North**, input 2 **South**, and output
+   **East**. The port letters and colors display the selected elements.
+5. You may also select a placed chamber to change its recipe, its custom
+   elements, or direction in the **Selected cell** inspector. If you change
+   a recipe, also update the Sources and Destination to match.
 6. Use **Check Map**, **Enter playtest**, and **Export verified level**.
+   The output route can be planned first, but harmony requires both inputs.
 
-Start from `examples/confluence-root-chamber.map.json`, an editable example, or
-`examples/confluence-root-chamber.level.json`, a game-ready level. Import
-either file through the matching editor/game import controls.
+### Importable examples
 
-The shared rules engine, editor, save/undo, and bounded verifier understand
-Confluence maps. Existing maps without the chamber retain their original
-behavior. This prototype does **not** add Chapter 9 to the story campaign;
-it allows isolated custom-map development and testing first.
+- `examples/confluence-root-chamber.map.json` — Water + Earth → Plant
+- `examples/confluence-fire-earth-metal.map.json`
+- `examples/confluence-fire-water-wind.map.json`
+- `examples/confluence-water-wind-ice.map.json`
+- `examples/confluence-light-shadow-electricity.map.json`
+- `examples/confluence-custom.map.json` — example custom: Ice + Metal → Arcane
+
+Maps saved by the previous single-recipe prototype remain compatible:
+a Confluence cell with no `props.recipe` defaults to Water + Earth → Plant.
+New maps keep their preset ID or explicit custom inputs/output in the
+same version-2 map schema. The game, map editor, and solver share one
+reaction definition and reject invalid custom combinations.
