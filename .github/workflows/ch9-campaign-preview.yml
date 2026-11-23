@@ -37,6 +37,8 @@ jobs:
           fi
       - name: Verify all 12 chapter stages and earlier saved progress
         run: python3 game/tests/ch9_browser.py
+      - name: Verify Settings developer review access and progress isolation
+        run: python3 game/tests/developer_review_browser.py
       - name: Verify flexible Confluence maps in Chromium
         run: |
           python3 game/tests/confluence_browser.py
