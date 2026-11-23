@@ -203,6 +203,7 @@
       return fail('Undo Night deliveries before changing the route that activated Night.');
      remember();
      state.routes=state.routes.filter(route=>route.element!==element);
+     if(shifting)state.dayPhase=state.routes.some(r=>E.phaseTriggerRoute(map,r))?'night':'day';
     }
     state.active=state.drafts[element]??{element,path:[index]};
     state.drafts[element]=state.active;
@@ -215,6 +216,7 @@
       return fail('Undo Night deliveries before reopening the Day trigger route.');
      remember();
      state.routes=state.routes.filter(route=>route!==completed);
+     if(shifting)state.dayPhase=state.routes.some(r=>E.phaseTriggerRoute(map,r))?'night':'day';
      state.drafts[completed.element]=completed;
      state.active=completed;
      return ok();
