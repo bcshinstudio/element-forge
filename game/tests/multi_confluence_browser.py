@@ -46,6 +46,7 @@ def check_game(browser, base):
         page = browser.new_page(viewport={"width":1280,"height":950})
         page.goto(base+"/game/index.html")
         page.locator("#title-enter").click()
+        page.evaluate("document.getElementById('home-custom').hidden = false")
         page.locator("#home-custom").click()
         page.locator("#home-import").set_input_files(
             str(ROOT/"map-editor/examples"/(name+".level.json"))
