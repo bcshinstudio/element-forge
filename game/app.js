@@ -485,8 +485,7 @@
     core.textContent='◇';
     mark.append(core);
     if(chamber&&recipe){
-     const directions=E.confluenceDirections(cell.props?.direction||'E');
-     const ports=[[recipe.inputs[0],directions.input1],[recipe.inputs[1],directions.input2],[recipe.output,directions.exit]];
+     const ports=[[recipe.inputs[0],chamber.ports[recipe.inputs[0]]],[recipe.inputs[1],chamber.ports[recipe.inputs[1]]],[recipe.output,chamber.ports[recipe.output]]];
      for(const [element,side] of ports){
       const port=document.createElement('span');
       port.className='confluence-port confluence-'+element+' port-'+side;
