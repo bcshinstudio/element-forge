@@ -1,34 +1,50 @@
-name: Confluence Editor Preview
+name: Flexible Confluence Preview
 
 on:
   push:
     branches:
-      - feature/ch9-confluence-water-earth-plant
+      - feature/ch9-flexible-confluence
   workflow_dispatch:
 
 jobs:
-  editor:
+  preview:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Build offline Wellspring editor
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Confluence unit regression tests
         run: |
-          python3 game/build.py --editor Wellspring_Map_Editor_Confluence.html
-          test -s Wellspring_Map_Editor_Confluence.html
-      - name: Run focused Confluence browser test
+          node --test map-editor/tests/confluence*.test.js
+          node --check map-editor/app.js
+          node --check map-editor/artwork.js
+          node --check game/app.js
+          node --check game/session.js
+      - name: Install browser test dependencies
         run: |
           python3 -m pip install playwright==1.51.0
           if command -v google-chrome >/dev/null; then
-            export CHROMIUM_EXECUTABLE="$(command -v google-chrome)"
+            echo "CHROMIUM_EXECUTABLE=$(command -v google-chrome)" >> "$GITHUB_ENV"
           else
             python3 -m playwright install --with-deps chromium
           fi
-          python3 game/tests/confluence_browser.py
-      - name: Upload Confluence editor preview
+      - name: Test all Confluence reaction workflows in Chromium
+        run: python3 game/tests/confluence_browser.py
+      - name: Build standalone editor and game
+        run: |
+          python3 game/build.py --editor Wellspring_Flexible_Confluence_Map_Editor.html
+          python3 game/build.py Wellspring_Flexible_Confluence_Game.html
+          test -s Wellspring_Flexible_Confluence_Map_Editor.html
+          test -s Wellspring_Flexible_Confluence_Game.html
+      - name: Upload standalone HTML previews
         uses: actions/upload-artifact@v4
         with:
-          name: Wellspring-Confluence-Map-Editor
-          path: Wellspring_Map_Editor_Confluence.html
-          if-no-files-found: error
+          name: Wellspring-Flexible-Confluence-Preview
+          path: |
+            Wellspring_Flexible_Confluence_Map_Editor.html
+            Wellspring_Flexible_Confluence_Game.html
           retention-days: 14
+          if-no-files-found: error
