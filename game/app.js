@@ -11,7 +11,8 @@
   {title:'Chapter Five',name:'The Celestial Confluence',stages:window.EFChapter.chapterFive},
   {title:'Chapter Six',name:"The Weaver's Playground",stages:window.EFChapter.chapterSix},
   {title:'Chapter Seven',name:'The Shattered Abyss',stages:window.EFChapter.chapterSeven},
-  {title:'Chapter Eight',name:'The World-Heart Sanctuary',stages:window.EFChapter.chapterEight}
+  {title:'Chapter Eight',name:'The World-Heart Sanctuary',stages:window.EFChapter.chapterEight},
+  {title:'Chapter Nine',name:'The Confluence Forges',stages:window.EFChapter.chapterNine}
  ];
  let offset=0;
  for(const chapter of chapters){
@@ -1219,7 +1220,7 @@
   const target=runTarget();
   document.body.classList.toggle('chapter-restored',Boolean(target?.complete));
   $('continue').disabled=!target||Boolean(target.complete);
-  $('home-total').textContent=target?.complete?'Campaign complete · The World-Heart restored':
+  $('home-total').textContent=target?.complete?'Campaign complete · The Confluence Forges awakened':
    target?`Chapter ${chapters.indexOf(chapterAt(target.index))+1} · Stage ${target.index+1} of ${campaignSize} · Best total ${progress.total()}`:'Chapter 1 · The Sleeping Valley';
   renderChallengeChoices();
   showPanel(null);
