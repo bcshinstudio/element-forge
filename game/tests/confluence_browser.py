@@ -50,7 +50,7 @@ def test_editor(browser, base):
     expect(page.locator("#mapName")).to_have_value("Root Chamber – Confluence Introduction")
     expect(page.locator('#board [data-i="24"] .confluence-port')).to_have_count(3)
     page.locator("#validate").click()
-    expect(page.locator("#messages")).to_contain_text("Structure valid")
+    expect(page.locator("#messages")).to_contain_text("Ready to playtest")
     with page.expect_download() as transfer:
         page.locator("#saveLevel").click()
     assert transfer.value.suggested_filename.endswith(".level.json")
