@@ -7,7 +7,6 @@ const E=require('../../map-editor/engine');
 const F=require('../../map-editor/map-format');
 const S=require('../session');
 const chapter=require('../chapter');
-const scenes=require('../story-data.js');
 const Art=require('../../art/variants');
 const fixtures=require('./fixtures/confluence-forges-solutions.json');
 const levels=chapter.chapterNine;
