@@ -151,7 +151,7 @@ function parseMap(source){
   const placements={};
   for(const [index,value] of Object.entries(source.phaseWitness.placements)){
    const i=Number(index),kind=E.placementKind(value);
-   if(!/^\\d+$/.test(index)||!Number.isInteger(i)||i<0||i>=width*height||
+   if(!/^\d+$/.test(index)||!Number.isInteger(i)||i<0||i>=width*height||
       !PLACEABLE.includes(kind)||Object.keys(placements).length>width*height)
     throw Error('Invalid construction in authored phase proof.');
    placements[i]=JSON.parse(JSON.stringify(value));
