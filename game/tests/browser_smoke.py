@@ -13,7 +13,7 @@ BASE = "/game/index.html"
 CAMPAIGN_KEY = "element-forge.sleeping-valley.v1"
 PLANS = [
     plan
-    for filename in ("sleeping-valley-solutions.json", "gatekeepers-solutions.json", "primeval-crucible-solutions.json", "astral-loom-solutions.json", "celestial-confluence-solutions.json", "weavers-playground-solutions.json", "shattered-abyss-solutions.json", "world-heart-sanctuary-solutions.json", "confluence-forges-solutions.json")
+    for filename in ("sleeping-valley-solutions.json", "gatekeepers-solutions.json", "primeval-crucible-solutions.json", "astral-loom-solutions.json", "celestial-confluence-solutions.json", "weavers-playground-solutions.json", "shattered-abyss-solutions.json", "world-heart-sanctuary-solutions.json", "confluence-forges-solutions.json", "twilight-pendulum-solutions.json")
     for plan in json.loads((ROOT / "game/tests/fixtures" / filename).read_text())
 ]
 
@@ -322,7 +322,9 @@ def test_campaign(browser, url):
     page.locator("#intro-begin").click()
     expect(page.locator("#puzzle")).to_have_text("Sunken Ashwood")
     for index in range(len(PLANS)):
-        expect(page.locator("#stage-number")).to_have_text(f"Chapter {index // 12 + 1} · Stage {index % 12 + 1}")
+        chapter_number = index // 12 + 1 if index < 108 else 10
+        stage_in_chapter = index % 12 + 1 if index < 108 else index - 107
+        expect(page.locator("#stage-number")).to_have_text(f"Chapter {chapter_number} · Stage {stage_in_chapter}")
         if index == 14:
             expect(page.locator("#level option:checked")).to_contain_text("15. The Smelter")
             for width in (1280, 320):
@@ -377,22 +379,24 @@ def test_campaign(browser, url):
             expect(page.get_by_role("heading", name="Delivery complete")).to_be_visible()
         else:
             finish(page, plan)
-        if (index + 1) % 12:
+        if index not in {11,23,35,47,59,71,83,95,107,120}:
             page.locator("#next").click()
             continue
         expect(page.locator("#next")).to_have_text("Chapter Ending")
         page.locator("#next").click()
         expect(page.locator("#world-intro")).to_be_visible()
         expect(page.locator("#story-skip")).to_be_disabled()
-        if index in [11, 23, 95, 107]:
+        if index in [11,23,95,107,120]:
             page.locator("#intro-next").click()
         if index == 95:
             expect(page.locator("#story-caption")).to_have_text("Chapter 8 Complete")
         if index == 107:
             expect(page.locator("#story-caption")).to_have_text("The Confluence Forges restored")
         page.locator("#intro-begin").click()
-        if index != 107:
-            expect(page.locator("#world-intro-title")).to_contain_text(f"Chapter {(index + 1) // 12 + 1}")
+        if index != 120:
+            expect(page.locator("#world-intro-title")).to_contain_text(f"Chapter {index // 12 + 2}")
+            if index == 107:
+                page.locator("#intro-next").click()
             page.locator("#intro-begin").click()
     expect(page.locator("#home-total")).to_contain_text("Campaign complete")
     page.reload()
@@ -408,7 +412,7 @@ def test_campaign(browser, url):
     page.locator("#stage-select").click()
     expect(page.locator("#stage-list button").last).to_be_enabled()
     page.locator("#stage-list button").last.click()
-    expect(page.locator("#puzzle")).to_have_text("The Grand Philosopher\u0027s Engine")
+    expect(page.locator("#puzzle")).to_have_text("The Celestial Orrery")
     page.locator("#home-button").click()
     page.locator("#continue").click()
     expect(page.locator("#puzzle")).to_have_text("Sunken Ashwood")
@@ -787,7 +791,7 @@ if __name__ == "__main__":
                         test_stage_controls(browser, offline, touch)
                     print("PASS stage story, reference, mouse and touch bridge gestures, and restart")
                     test_campaign(browser, url)
-                    print("PASS Stages 1–108 clear, finale unlock, replay isolation and new run")
+                    print("PASS Stages 1–121 clear, finale unlock, replay isolation and new run")
                     test_mobile_resume(browser, offline, 390, 844)
                     test_mobile_resume(browser, offline, 844, 390)
                     print("PASS offline portrait and landscape touch, menu dismissal, resume and audio settings")
