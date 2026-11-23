@@ -139,9 +139,9 @@
     }
    }
    const existing=Object.values(state.drafts).find(draft=>draft.path.at(-1)===index);
-   if(existing){state.active=existing;return ok();}
-   if(cell.node?.role==='source'){
-    const element=cell.node.element;
+   if(existing&&!(state.active&&cell.component==='confluence'&&['water','earth'].includes(state.active.element))){state.active=existing;return ok();}
+   if(cell.node?.role==='source'||(cell.component==='confluence'&&!state.active)){
+    const element=cell.component==='confluence'?'nature':cell.node.element;
     if(state.routes.some(route=>route.element===element)){
      remember();
      state.routes=state.routes.filter(route=>route.element!==element);
@@ -167,7 +167,7 @@
    if(!state.active)return fail('Start at an element source.');
    const {element,path}=state.active;
    const next=[...path,index];
-   const complete=cell.node?.role==='destination'&&cell.node.element===element;
+   const complete=next.length>1&&E.pairs(map).some(pair=>pair.element===element&&pair.destination===index);
    const reserved=state.routes.filter(route=>route.element!==element);
    const error=E.validatePath(map,element,next,reserved,state.placements,!complete);
    if(error)return fail(error);
