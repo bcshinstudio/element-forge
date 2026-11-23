@@ -117,7 +117,7 @@ test('Map validator rejects invalid trigger, unmarked phase tiles, missing plate
   m=>{m.cells[10].component=undefined;},
   m=>{m.cells[38].props.phaseShift=undefined;m.cells[9].props.phaseShift=undefined;},
   m=>{m.cells[17]={terrain:'land',component:'phasePlate',props:{element:'light'}};},
-  m=>{m.inventory.bridge=1;},
+  m=>{m.inventory.bridge=100;},
   m=>{m.cells[9].terrain='land';},
  ];
  for(const change of invalid){
