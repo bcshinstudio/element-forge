@@ -60,7 +60,7 @@ def test_chapter(browser,base):
             page.locator("#next").click()
     page.reload()
     page.locator("#title-enter").click()
-    expect(page.locator("#home-total")).to_contain_text("Campaign complete")
+    expect(page.locator("#home-total")).to_contain_text("Stage 109 of 121")
     assert errors==[],errors
     page.close()
 
