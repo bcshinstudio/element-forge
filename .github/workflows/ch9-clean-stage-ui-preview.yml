@@ -1,0 +1,50 @@
+name: Wellspring Clean Stage UI Preview
+
+on:
+  push:
+    branches:
+      - feature/ch9-clean-stage-ui
+  workflow_dispatch:
+
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run all Node regression tests and code syntax checks
+        run: |
+          node --test map-editor/tests/*.test.js game/tests/*.test.js
+          node --check game/app.js
+          node --check game/chapter.js
+          node --check map-editor/engine.js
+          node --check map-editor/map-format.js
+      - name: Install Playwright for Chromium
+        run: |
+          python3 -m pip install playwright==1.51.0
+          if command -v google-chrome >/dev/null; then
+            echo "CHROMIUM_EXECUTABLE=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          else
+            python3 -m playwright install --with-deps chromium
+          fi
+      - name: Build complete offline Chapter 9 game
+        run: |
+          python3 game/build.py Wellspring_Chapter9_Clean_Stage_UI.html
+          test -s Wellspring_Chapter9_Clean_Stage_UI.html
+      - name: Test clean stage UI on desktop and phone, source and offline
+        run: python3 game/tests/clean_stage_ui_browser.py
+      - name: Test developer review access and progress isolation
+        run: python3 game/tests/developer_review_browser.py
+      - name: Verify 12 Chapter 9 stages and previous saved progress
+        run: python3 game/tests/ch9_browser.py
+      - name: Upload directly shareable standalone game
+        uses: actions/upload-artifact@v4
+        with:
+          name: Wellspring-Clean-Stage-UI
+          path: Wellspring_Chapter9_Clean_Stage_UI.html
+          retention-days: 14
+          if-no-files-found: error
