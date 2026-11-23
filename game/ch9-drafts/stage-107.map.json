@@ -65,11 +65,7 @@
       "terrain": "land"
     },
     {
-      "terrain": "land",
-      "node": {
-        "element": "water",
-        "role": "source"
-      }
+      "terrain": "land"
     },
     {
       "terrain": "land"
@@ -153,11 +149,7 @@
       }
     },
     {
-      "terrain": "water",
-      "component": "checkpoint",
-      "props": {
-        "element": "water"
-      }
+      "terrain": "water"
     },
     {
       "terrain": "land"
@@ -209,7 +201,7 @@
       "terrain": "land"
     },
     {
-      "terrain": "exposed"
+      "terrain": "water"
     },
     {
       "terrain": "exposed",
@@ -257,10 +249,18 @@
       }
     },
     {
-      "terrain": "water"
+      "terrain": "land",
+      "node": {
+        "element": "water",
+        "role": "source"
+      }
     },
     {
-      "terrain": "water"
+      "terrain": "water",
+      "component": "checkpoint",
+      "props": {
+        "element": "water"
+      }
     },
     {
       "terrain": "land",
@@ -424,7 +424,7 @@
       }
     },
     {
-      "terrain": "land"
+      "terrain": "covered"
     },
     {
       "terrain": "land"
@@ -465,14 +465,14 @@
       "terrain": "covered"
     },
     {
-      "terrain": "land",
+      "terrain": "land"
+    },
+    {
+      "terrain": "covered",
       "component": "gate",
       "props": {
         "direction": "S"
       }
-    },
-    {
-      "terrain": "land"
     },
     {
       "terrain": "land"
