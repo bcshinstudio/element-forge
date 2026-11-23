@@ -1,0 +1,25 @@
+name: Confluence Editor Preview
+
+on:
+  push:
+    branches:
+      - feature/ch9-confluence-water-earth-plant
+  workflow_dispatch:
+
+jobs:
+  editor:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build offline Wellspring editor
+        run: |
+          python3 game/build.py --editor Wellspring_Map_Editor_Confluence.html
+          test -s Wellspring_Map_Editor_Confluence.html
+      - name: Upload Confluence editor preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: Wellspring-Confluence-Map-Editor
+          path: Wellspring_Map_Editor_Confluence.html
+          if-no-files-found: error
+          retention-days: 14
