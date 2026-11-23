@@ -96,7 +96,9 @@
    const tiles=linked<0?[index]:[index,linked];
    for(const i of tiles)delete state.placements[i];
    const affected=route=>route.path.some(i=>tiles.includes(i));
-   state.routes=state.routes.filter(route=>!affected(route));
+   const removingTrigger=shifting&&state.routes.some(r=>affected(r)&&E.phaseTriggerRoute(map,r));
+   state.routes=state.routes.filter(route=>!affected(route)&&!(removingTrigger&&route.deliveredPhase==='night'));
+   if(shifting)state.dayPhase=state.routes.some(r=>E.phaseTriggerRoute(map,r))?'night':'day';
    for(const [element,draft] of Object.entries(state.drafts)){
     if(affected(draft))delete state.drafts[element];
    }
@@ -145,8 +147,15 @@
     state.active=existing;return ok();
    }
    if(source&&(!state.active||cell.node?.role==='source')){
+    if(shifting&&ch&&ch.output===source&&!ch.inputs.every(el=>state.routes.some(r=>r.element===el&&r.path.at(-1)===ch.index)))
+     return fail('Complete both Confluence inputs before routing its output.');
     const id=E.routeKey(map,source,index),completed=state.routes.find(r=>routeId(r)===id);
-    if(completed){remember();state.routes=state.routes.filter(r=>r!==completed);}
+    if(completed){
+     if(shifting&&E.phaseTriggerRoute(map,completed)&&state.routes.some(r=>r.deliveredPhase==='night'))
+      return fail('Undo Night deliveries before changing the route that activated Night.');
+     remember();state.routes=state.routes.filter(r=>r!==completed);
+     if(shifting)state.dayPhase=state.routes.some(r=>E.phaseTriggerRoute(map,r))?'night':'day';
+    }
     state.active=state.drafts[id]??{id,element:source,path:[index]};
     state.drafts[id]=state.active;
     return ok();
@@ -154,7 +163,10 @@
    if((reopen||!state.active)&&!ch){
     const completed=state.routes.find(r=>r.path.at(-1)===index);
     if(completed){
+     if(shifting&&E.phaseTriggerRoute(map,completed)&&state.routes.some(r=>r.deliveredPhase==='night'))
+      return fail('Undo Night deliveries before changing the route that activated Night.');
      remember();state.routes=state.routes.filter(r=>r!==completed);
+     if(shifting)state.dayPhase=state.routes.some(r=>E.phaseTriggerRoute(map,r))?'night':'day';
      const id=routeId(completed);
      state.drafts[id]={...completed,id};state.active=state.drafts[id];return ok();
     }
@@ -167,12 +179,14 @@
    const {element,path,id}=state.active,next=[...path,index];
    const segment=E.pairs(map).find(p=>p.element===element&&p.source===path[0]);
    const complete=next.length>1&&segment?.targets?.includes(index);
-   const problem=E.validatePath(map,element,next,state.routes,state.placements,!complete);
+   const problem=E.validatePath(shifting?E.phaseView(map,state.dayPhase):map,element,next,
+    shifting?E.phasePrior(map,state.routes,state.dayPhase):state.routes,state.placements,!complete);
    if(problem)return fail(problem);
    if(complete){
     remember();
     delete state.drafts[id];state.active=null;
-    state.routes.push({element,path:next});
+    state.routes.push(shifting?{element,path:next,deliveredPhase:state.dayPhase}:{element,path:next});
+    if(shifting&&E.phaseTriggerRoute(map,{element,path:next}))state.dayPhase='night';
    }else state.active.path=next;
    return ok();
   }
@@ -197,6 +211,11 @@
    if(existing&&!(state.active&&cell.component==='confluence'&&E.confluence(map)?.inputs.includes(state.active.element))){state.active=existing;return ok();}
    if(cell.node?.role==='source'||(cell.component==='confluence'&&!state.active)){
     const element=cell.component==='confluence'?E.confluence(map)?.output:cell.node.element;
+    if(shifting&&cell.component==='confluence'){
+     const ch=E.confluence(map);
+     if(ch&&!ch.inputs.every(el=>state.routes.some(r=>r.element===el&&r.path.at(-1)===ch.index)))
+      return fail('Complete both Confluence inputs before routing its output.');
+    }
     if(state.routes.some(route=>route.element===element)){
      if(shifting&&element===map.cells[E.phasePlateIndex(map)]?.props?.element&&
         state.routes.some(r=>r.deliveredPhase==='night'))
@@ -230,7 +249,8 @@
    const {element,path}=state.active;
    const next=[...path,index];
    const complete=next.length>1&&E.pairs(map).some(pair=>pair.element===element&&pair.destination===index);
-   const reserved=state.routes.filter(route=>route.element!==element);
+   const reserved=shifting?E.phasePrior(map,state.routes.filter(route=>route.element!==element),state.dayPhase):
+    state.routes.filter(route=>route.element!==element);
    const error=E.validatePath(shifting?E.phaseView(map,state.dayPhase):map,element,next,reserved,state.placements,!complete);
    if(error)return fail(error);
    if(complete){
@@ -302,7 +322,7 @@
      used.add(multi?routeId(route):route.element);
     }
     for(const [element,draft] of Object.entries(drafts)){
-     if(element!==(multi?routeId(draft):draft.element)||E.validatePath(shifting?E.phaseView(map,saved.dayPhase):map,draft.element,draft.path,routes,saved.placements,true))
+     if(element!==(multi?routeId(draft):draft.element)||E.validatePath(shifting?E.phaseView(map,saved.dayPhase):map,draft.element,draft.path,shifting?E.phasePrior(map,routes,saved.dayPhase):routes,saved.placements,true))
       throw Error('Invalid draft');
     }
     if(multi){
