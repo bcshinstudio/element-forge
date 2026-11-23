@@ -226,6 +226,16 @@ function phaseValidation(m,routes,placements={},requireComplete=true){
 }
 function solvePhases(m,{limit=120000,allowPlacement=true}={}){
  if(!hasPhases(m))return {status:'invalid',message:'No phase rules'};
+ // Author-supplied proofs are never trusted blindly: validate the complete
+ // sequence against the current tiles, inventory, Confluence and phase rules.
+ // This lets large authored Chapter 10 maps verify quickly in the Map Editor.
+ if(m.phaseWitness){
+  const proof=m.phaseWitness;
+  const problems=phaseValidation(m,proof.routes,proof.placements,true);
+  if(problems.length)return {status:'invalid',message:'Stored phase solution no longer matches this map: '+problems[0],problems};
+  return {status:'solved',routes:proof.routes,placements:proof.placements,
+   nodes:0,constructionAttempts:0,verifiedWitness:true,score:score(m,proof.routes,proof.placements)};
+ }
  const plate=phasePlateIndex(m),trigger=m.cells[plate]?.props?.element,ps=pairs(m);
  if(plate<0||!trigger||ps.length<2||ps.length>4||ps.some(p=>p.source<0||p.destination<0))
   return {status:'invalid',message:'Phase prototype requires 2–4 matched routes and one trigger plate'};
