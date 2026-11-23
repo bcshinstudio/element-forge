@@ -55,6 +55,7 @@ jobs:
             export CHROMIUM_EXECUTABLE="$(python -c 'from playwright.sync_api import sync_playwright; p = sync_playwright().start(); print(p.chromium.executable_path); p.stop()')"
           fi
           python game/tests/confluence_browser.py
+          python game/tests/multi_confluence_browser.py
           python map-editor/tests/browser_smoke.py
           python game/tests/browser_smoke.py
           python game/build.py Wellspring.html
