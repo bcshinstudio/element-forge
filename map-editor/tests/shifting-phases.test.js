@@ -40,7 +40,7 @@ test('Night swaps only marked Exposed and Covered terrain, without mutating the 
  assert.equal(m.cells[38].terrain,'exposed');
  assert.equal(m.cells[10].component,'phasePlate');
  assert.equal(night.cells[10].component,undefined);
- assert.equal(E.terrainError(day,'shadow',38,null),null);
+ assert.match(E.terrainError(day,'shadow',38,null),/Shadow cannot pass/);
  assert.match(E.terrainError(day,'light',38,null)??'',/^$/);
  assert.match(E.terrainError(night,'light',38,null),/Light needs exposed/);
 });
