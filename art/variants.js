@@ -8,7 +8,8 @@
   {land:3,mountain:0,lava:1,heated:2,bridge:2,tunnel:2}, {land:2,mountain:2,exposed:1,portal:1},
   {land:0,mountain:1,wall:0,exposed:2,bridge:1}, {land:1,forest:2,intersection:1,junction:0},
   {land:3,mountain:2,wall:2,void:0,covered:0,portal:2}, {land:0,mountain:1,water:1,exposed:2,converter:2},
-  {land:2,mountain:1,wall:1,water:1,forest:1,lava:1,gate:1,metalSpan:1,portal:1,tunnel:1,intersection:1}
+  {land:2,mountain:1,wall:1,water:1,forest:1,lava:1,gate:1,metalSpan:1,portal:1,tunnel:1,intersection:1},
+  {land:2,exposed:1,covered:0,wall:1,gate:1,intersection:0,forest:1,portal:2}
  ];
  const compass=['N','E','S','W'];
  const headings={N:'north',E:'east',S:'south',W:'west'};
