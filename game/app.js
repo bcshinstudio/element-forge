@@ -12,7 +12,8 @@
   {title:'Chapter Six',name:"The Weaver's Playground",stages:window.EFChapter.chapterSix},
   {title:'Chapter Seven',name:'The Shattered Abyss',stages:window.EFChapter.chapterSeven},
   {title:'Chapter Eight',name:'The World-Heart Sanctuary',stages:window.EFChapter.chapterEight},
-  {title:'Chapter Nine',name:'The Confluence Forges',stages:window.EFChapter.chapterNine}
+  {title:'Chapter Nine',name:'The Confluence Forges',stages:window.EFChapter.chapterNine},
+  {title:'Chapter Ten',name:'The Twilight Pendulum',stages:window.EFChapter.chapterTen}
  ];
  let offset=0;
  for(const chapter of chapters){
