@@ -90,7 +90,7 @@
   $('menu-main').hidden=show;
   $('menu-lessons').hidden=!show;
   $('menu-information').setAttribute('aria-expanded',String(show));
-  $('game-menu-title').textContent=show?'Information & Tutorials':'Game menu';
+  $('game-menu-title').textContent=show?'Guide':'Game menu';
   if(show)$('menu-lessons').append($('information-panel'));
   else informationHome.insertBefore($('information-panel'),$('audio-settings'));
   $('information-panel').hidden=!show;
