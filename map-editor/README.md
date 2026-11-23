@@ -32,3 +32,33 @@ A future game client can call `EFMap.readLevel(document)` or import `readLevel` 
 - `npm test` runs the full Node suite and legacy regression scripts.
 - `npm run check` checks JavaScript syntax.
 - `python tests/browser_smoke.py` runs Playwright Chromium coverage. Install Playwright and its Chromium build first, or set `CHROMIUM_EXECUTABLE` to an installed Chromium path.
+
+
+## Chapter 9 prototype: Confluence Chamber
+
+The **Confluence Chamber** is a fixed map fixture, not a player construction tool.
+It combines **Water + Earth → Plant** in one shared cell. Only one chamber is
+supported per map in this first prototype.
+
+1. Choose **Tools & Fixtures → Confluence Chamber** in the editor.
+2. Select the **output orientation** before painting, or select the placed chamber
+   and change **Gameplay direction** in the cell inspector.
+3. Place exactly **one Water source**, **one Earth source**, and **one Plant inlet**.
+   Do **not** place a Water inlet, an Earth inlet, or a separate Plant source.
+4. The colored ports show the required approaches: blue **W** for Water, amber
+   **E** for Earth, green **P** for the Plant output. With output **East**, Water
+   arrives from **North**, Earth arrives from **South**, and Plant leaves to **East**.
+   Rotating the fixture rotates all three ports together.
+5. Route the currents into the chamber and on to the Plant inlet. The Plant path
+   can be drawn first and stays **pending** until Water and Earth are connected.
+   All three routes must be complete to restore harmony.
+6. Use **Check Map**, **Enter playtest**, and **Export verified level**.
+
+Start from `examples/confluence-root-chamber.map.json`, an editable example, or
+`examples/confluence-root-chamber.level.json`, a game-ready level. Import
+either file through the matching editor/game import controls.
+
+The shared rules engine, editor, save/undo, and bounded verifier understand
+Confluence maps. Existing maps without the chamber retain their original
+behavior. This prototype does **not** add Chapter 9 to the story campaign;
+it allows isolated custom-map development and testing first.
