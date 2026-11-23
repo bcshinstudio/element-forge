@@ -59,3 +59,12 @@ jobs:
           python game/build.py Wellspring.html
           python game/build.py --editor Wellspring_Map_Editor.html
           python game/tests/artwork_browser.py
+          python game/tests/confluence_browser.py
+
+      - name: Upload standalone Confluence map editor
+        uses: actions/upload-artifact@v4
+        with:
+          name: wellspring-confluence-map-editor
+          path: Wellspring_Map_Editor.html
+          retention-days: 14
+          if-no-files-found: error
