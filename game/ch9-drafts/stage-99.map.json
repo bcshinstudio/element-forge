@@ -191,7 +191,7 @@
       "terrain": "land"
     },
     {
-      "terrain": "wall"
+      "terrain": "land"
     },
     {
       "terrain": "land"
@@ -503,8 +503,8 @@
   ],
   "constraints": {},
   "inventory": {
-    "bridge": 1,
-    "metalSpan": 0,
+    "bridge": 0,
+    "metalSpan": 1,
     "intersection": 1,
     "tunnel": 0,
     "portal": 0,
