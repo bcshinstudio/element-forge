@@ -319,9 +319,9 @@ function checkMulti(m,routes,placements={}){
   targets.add(destKey);
   const issue=validateMultiPath(m,r.element,r.path,routes.filter(x=>x!==r),placements);
   if(issue)errors.push(r.element+' at cell '+(start+1)+': '+issue);
-  for(let i=0;i<m.cells.length;i++)if(m.cells[i].component==='checkpoint'&&
-   ['any',r.element].includes(m.cells[i].props?.element)&&!r.path.includes(i))
-   errors.push(r.element+': required checkpoint not visited');
+  // In multi-chamber maps several routes can carry the same element.
+  // A checkpoint requires a visit by at least one eligible route;
+  // individual route-exclusive checkpoints may be added in future.
  }
  for(const p of ps)if(p.source>=0&&!sources.has(p.element+'@'+p.source))
   errors.push(p.element+': missing route from cell '+(p.source+1));
@@ -330,6 +330,12 @@ function checkMulti(m,routes,placements={}){
    errors.push('Confluence at cell '+(ch.index+1)+': missing '+displayElement(el)+' input');
   if(!routes.some(r=>r.element===ch.output&&r.path?.[0]===ch.index))
    errors.push('Confluence at cell '+(ch.index+1)+': missing '+displayElement(ch.output)+' output');
+ }
+ for(let i=0;i<m.cells.length;i++){
+  const c=m.cells[i];
+  if(c.component==='checkpoint'&&!routes.some(r=>
+    ['any',r.element].includes(c.props?.element)&&r.path.includes(i)))
+   errors.push((c.props?.element||'any')+': checkpoint at cell '+(i+1)+' not visited');
  }
  // A chamber becomes active only when both complete inputs originate at
  // real sources or upstream active chambers. Cycles without input power fail.
@@ -436,7 +442,8 @@ function solveMulti(m,{limit=120000,maxPairs=16,allowPlacement=true,initialPlace
    if(targets.includes(cur)&&state.path.length>1){
     const problem=validateMultiPath(m,p.element,state.path,routes,state.placements);
     const needed=m.cells.flatMap((c,i)=>c.component==='checkpoint'&&['any',p.element].includes(c.props?.element)?[i]:[]);
-    if(!problem&&needed.every(i=>state.seen.has(i))){
+    const unique=ordered.filter(q=>q.element===p.element).length===1;
+    if(!problem&&(!unique||needed.every(i=>state.seen.has(i)))){
      const found=visitPair(pi+1,[...routes,{element:p.element,path:state.path}],state.placements);
      if(found)return found;
      if(exhausted)return null;
