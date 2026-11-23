@@ -175,7 +175,7 @@ def test_stage_controls(browser, offline, touch):
     press(page.locator("#information"))
     press(page.locator("summary").filter(has_text="Quick Reference"))
     expect(page.locator("#information-reference table")).to_have_count(2)
-    expect(page.locator("#information-reference tbody tr")).to_have_count(23)
+    expect(page.locator("#information-reference tbody tr")).to_have_count(24)
     press(page.locator("#info-back"))
     press(page.locator("#new-campaign"))
     press(page.locator("#intro-next"))
