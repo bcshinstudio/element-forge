@@ -19,9 +19,6 @@ concurrency:
 jobs:
   preview:
     runs-on: ubuntu-24.04
-    environment:
-      name: github-pages
-      url: https://bcshinstudio.github.io/element-forge/wellspring-preview/game/
     steps:
       - name: Checkout exactly the QA-verified Wellspring feature revision
         uses: actions/checkout@v4
