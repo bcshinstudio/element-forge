@@ -6,6 +6,12 @@ on:
     paths:
       - scripts/build_ch10_campaign.py
       - game/ch10-drafts/verified-maps.zlib.b64
+      - game/ch10-drafts/curation.json
+      - game/twilight-pendulum.js
+      - game/tests/twilight-pendulum.test.js
+      - game/tests/game.test.js
+      - game/tests/fixtures/twilight-pendulum-solutions.json
+      - game/story-data.js
       - .github/workflows/ch10-campaign-build.yml
   workflow_dispatch:
 
