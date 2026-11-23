@@ -421,6 +421,14 @@ body:has(#home:not([hidden])) .masthead { display:none; }
  min-height:54px; padding:.55rem 0; border-bottom:1px solid var(--border); cursor:pointer;
 }
 .setting-row input { width:1.25rem; height:1.25rem; margin:0; flex-shrink:0; accent-color:var(--accent); }
+/* Unobtrusive developer review trigger, available from Settings only. */
+#home .settings-credit {
+ display:block; margin:1.1rem auto .15rem; padding:.5rem .75rem;
+ border:0; background:transparent; color:var(--muted); font-size:.88rem;
+ cursor:pointer; text-align:center; box-shadow:none;
+}
+#home .settings-credit:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+#home .settings-credit:hover { color:var(--accent); }
 
 /* The editor hosts the normal custom-puzzle view without campaign navigation. */
 .editor-playtest :is(#home-button,#puzzle-home,#menu-home,#menu-information,.campaign-picker,#challenge-library,#custom-level,footer) {display:none}
