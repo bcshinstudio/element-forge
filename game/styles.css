@@ -725,3 +725,20 @@ body:has(#home:not([hidden])) .masthead { display:none; }
  #game-menu .pause-menu-header { padding:.65rem .9rem; }
  #game-menu #menu-main, #game-menu #menu-lessons { padding:.7rem .9rem; }
 }
+
+
+/* Chapter 10: compact, opt-in phase status with no clock and no large overlay. */
+.world-phase:not([hidden]) {
+ display:inline-flex; align-items:center; gap:.3rem;
+ margin:.15rem 0 .35rem; padding:.28rem .65rem;
+ border-radius:999px; border:1px solid #c8ac6b77;
+ background:#715e302b; color:#f3d28c;
+ font-size:clamp(.7rem,1.4vw,.82rem); font-weight:700; line-height:1.3;
+}
+.world-phase[data-day-phase="night"] { background:#7779aa24; color:#d5caf6; border-color:#9b9ccb77; }
+#board .phase-shifting { outline:2px dotted #eccc87aa; outline-offset:-3px; }
+#board .phase-plate-mark { font-size:clamp(1rem,2.3vw,1.55rem); color:#eeca72; text-shadow:0 1px 4px #101a16; }
+@media (max-width:600px) {
+ .world-phase:not([hidden]) { padding:.2rem .45rem; margin:.05rem 0 .25rem; font-size:.68rem; }
+ #board .phase-shifting { outline-width:1px; }
+}
