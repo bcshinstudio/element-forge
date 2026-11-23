@@ -6,8 +6,8 @@
     "format": "element-forge-map",
     "schemaVersion": 2,
     "rulesVersion": 4,
-    "name": "Thunder-Dusk Reactor",
-    "description": "At the heart of Thunder-Dusk Reactor stands a split-phase Confluence Chamber that can only be ignited across both halves of the day-night cycle! Route Light across the sunlit northern gallery into the chamber's western port first during Day, then fuse Water and Earth in the lower chamber to grow Plant—depressing the Plant Pressure Plate to plunge the eastern approach into Covered ☾ darkness so Shadow can warp via your Portal Pair into the chamber's eastern port during Night and spark raw Electricity!",
+    "name": "The Celestial Orrery",
+    "description": "Suspended at the zenith of The Celestial Orrery, nine elemental currents orbit twin alchemical synthesis chambers beneath a rotating eclipse pendulum! Guide Light across the northern Exposed ☀ ring first during Day—intersecting the central Water aqueduct straight at right angles—to depress the Light Pressure Plate, plunging the southern vault into Covered ☾ shadow so Shadow can warp via your Portal Pair, while twin chambers forge living Plant (forest) and glacial Ice (shallows) alongside Metal (heated + Tunnel) and Electricity (Bridge + Intersection #2)!",
     "width": 12,
     "height": 12,
     "phaseRules": {
@@ -16,8 +16,8 @@
     "inventory": {
       "bridge": 1,
       "metalSpan": 0,
-      "intersection": 1,
-      "tunnel": 0,
+      "intersection": 2,
+      "tunnel": 2,
       "portal": 2,
       "junction": 0,
       "sorter": 0,
@@ -47,43 +47,11 @@
         "terrain": "land"
       },
       {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
+        "terrain": "land",
+        "node": {
+          "element": "water",
+          "role": "source"
+        }
       },
       {
         "terrain": "land"
@@ -117,11 +85,7 @@
         "terrain": "exposed"
       },
       {
-        "terrain": "land",
-        "component": "checkpoint",
-        "props": {
-          "element": "light"
-        }
+        "terrain": "exposed"
       },
       {
         "terrain": "exposed",
@@ -133,17 +97,71 @@
         "terrain": "land"
       },
       {
-        "terrain": "land",
-        "component": "gate",
+        "terrain": "exposed",
         "props": {
-          "direction": "S"
+          "phaseShift": true
         }
       },
       {
-        "terrain": "wall"
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "light"
+        }
+      },
+      {
+        "terrain": "land",
+        "component": "gate",
+        "props": {
+          "direction": "E"
+        }
+      },
+      {
+        "terrain": "land",
+        "component": "phasePlate",
+        "props": {
+          "element": "light"
+        }
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "light",
+          "role": "destination"
+        }
       },
       {
         "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "metal",
+          "role": "destination"
+        }
+      },
+      {
+        "terrain": "land",
+        "component": "gate",
+        "props": {
+          "direction": "W"
+        }
+      },
+      {
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "metal"
+        }
+      },
+      {
+        "terrain": "water"
       },
       {
         "terrain": "land"
@@ -166,7 +184,41 @@
       {
         "terrain": "land",
         "node": {
-          "element": "water",
+          "element": "metal",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "wind",
           "role": "source"
         }
       },
@@ -177,62 +229,74 @@
         "terrain": "land"
       },
       {
+        "terrain": "land"
+      },
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "water",
+          "role": "source"
+        }
+      },
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "void"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "water"
+      },
+      {
         "terrain": "land",
         "component": "confluence",
         "props": {
           "ports": {
-            "input1": "N",
+            "input1": "W",
             "input2": "E",
             "output": "S"
           },
-          "recipe": "light-shadow-electricity"
+          "recipe": "water-wind-ice"
         }
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "exposed",
-        "props": {
-          "phaseShift": true
-        }
-      },
-      {
-        "terrain": "exposed",
-        "props": {
-          "phaseShift": true
-        }
-      },
-      {
-        "terrain": "covered"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "wall"
-      },
-      {
-        "terrain": "land",
-        "component": "gate",
-        "props": {
-          "direction": "S"
-        }
-      },
-      {
-        "terrain": "wall"
-      },
-      {
-        "terrain": "wall"
-      },
-      {
-        "terrain": "land"
       },
       {
         "terrain": "land",
@@ -242,10 +306,11 @@
         }
       },
       {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "wind"
+        }
       },
       {
         "terrain": "land"
@@ -261,14 +326,14 @@
         }
       },
       {
-        "terrain": "scree"
-      },
-      {
         "terrain": "land",
         "component": "gate",
         "props": {
           "direction": "E"
         }
+      },
+      {
+        "terrain": "land"
       },
       {
         "terrain": "land",
@@ -289,11 +354,13 @@
         "terrain": "land"
       },
       {
-        "terrain": "land",
-        "component": "checkpoint",
-        "props": {
-          "element": "electricity"
-        }
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "mountain"
       },
       {
         "terrain": "land"
@@ -317,75 +384,29 @@
         "terrain": "land"
       },
       {
-        "terrain": "wall"
-      },
-      {
-        "terrain": "forest"
-      },
-      {
-        "terrain": "wall"
-      },
-      {
         "terrain": "land"
       },
       {
-        "terrain": "land",
-        "component": "gate",
-        "props": {
-          "direction": "S"
-        }
+        "terrain": "water"
       },
       {
-        "terrain": "land"
+        "terrain": "mountain"
       },
       {
-        "terrain": "land"
+        "terrain": "shallow"
       },
       {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
+        "terrain": "mountain"
       },
       {
         "terrain": "land"
       },
       {
         "terrain": "land",
-        "component": "phasePlate",
-        "props": {
-          "element": "nature"
+        "node": {
+          "element": "electricity",
+          "role": "destination"
         }
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "wall"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "wall"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
       },
       {
         "terrain": "land"
@@ -404,25 +425,20 @@
         "terrain": "land"
       },
       {
-        "terrain": "land",
-        "component": "checkpoint",
-        "props": {
-          "element": "nature"
-        }
+        "terrain": "forest"
       },
       {
         "terrain": "land",
         "node": {
-          "element": "fire",
+          "element": "electricity",
           "role": "source"
         }
       },
       {
-        "terrain": "land",
-        "component": "checkpoint",
-        "props": {
-          "element": "fire"
-        }
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
       },
       {
         "terrain": "land"
@@ -438,14 +454,113 @@
         }
       },
       {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "nature"
+        }
+      },
+      {
+        "terrain": "shallow"
+      },
+      {
+        "terrain": "water"
+      },
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "ice"
+        }
+      },
+      {
         "terrain": "land",
         "node": {
-          "element": "fire",
+          "element": "ice",
+          "role": "destination"
+        }
+      },
+      {
+        "terrain": "mountain"
+      },
+      {
+        "terrain": "land",
+        "node": {
+          "element": "shadow",
           "role": "destination"
         }
       },
       {
         "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land",
+        "component": "gate",
+        "props": {
+          "direction": "S"
+        }
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "land"
+      },
+      {
+        "terrain": "covered"
+      },
+      {
+        "terrain": "exposed",
+        "props": {
+          "phaseShift": true
+        }
+      },
+      {
+        "terrain": "exposed",
+        "props": {
+          "phaseShift": true
+        }
+      },
+      {
+        "terrain": "land",
+        "component": "checkpoint",
+        "props": {
+          "element": "shadow"
+        }
+      },
+      {
+        "terrain": "land",
+        "component": "gate",
+        "props": {
+          "direction": "E"
+        }
       },
       {
         "terrain": "land"
@@ -470,86 +585,10 @@
         "terrain": "land"
       },
       {
-        "terrain": "wall"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "wall"
-      },
-      {
         "terrain": "land"
       },
       {
         "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "wall"
-      },
-      {
-        "terrain": "land",
-        "node": {
-          "element": "electricity",
-          "role": "destination"
-        }
-      },
-      {
-        "terrain": "wall"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "land"
-      },
-      {
-        "terrain": "wall"
       },
       {
         "terrain": "land"

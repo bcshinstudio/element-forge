@@ -1,105 +1,119 @@
 {
   "placements": {
-    "17": {
-      "kind": "tunnel",
-      "pairId": "T1"
-    },
-    "21": {
-      "kind": "tunnel",
-      "pairId": "T1"
-    },
-    "61": {
+    "37": {
       "kind": "portal",
       "pairId": "P1"
     },
-    "100": "intersection",
-    "103": {
+    "89": "intersection",
+    "114": {
       "kind": "portal",
       "pairId": "P1"
-    }
+    },
+    "125": "bridge"
   },
   "routes": [
     {
       "element": "light",
       "path": [
-        25,
-        26,
-        27,
-        28,
-        40,
-        39,
-        51
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
       ],
       "deliveredPhase": "day"
     },
     {
-      "element": "metal",
+      "element": "electricity",
       "path": [
-        16,
-        17,
-        21,
-        33,
-        45,
-        46,
-        58
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        79,
+        80
       ],
       "deliveredPhase": "day"
     },
     {
       "element": "shadow",
       "path": [
-        60,
-        61,
-        103,
-        104,
-        105,
-        106,
+        36,
+        37,
+        114,
+        115,
+        116,
+        117,
         118,
-        130
+        130,
+        142
       ],
       "deliveredPhase": "night"
     },
     {
-      "element": "ice",
+      "element": "nature",
       "path": [
-        76,
-        88,
-        100,
-        112,
-        124
-      ],
-      "deliveredPhase": "night"
-    },
-    {
-      "element": "fire",
-      "path": [
-        97,
-        98,
-        99,
-        100,
-        101,
-        102
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128
       ],
       "deliveredPhase": "night"
     },
     {
       "element": "water",
       "path": [
+        53,
+        65,
+        77,
+        89,
+        101,
+        113,
+        112,
+        111,
+        110,
+        109,
+        108,
         120,
-        121,
-        122,
-        123
+        132,
+        133,
+        134,
+        135,
+        136,
+        137
       ],
       "deliveredPhase": "night"
     },
     {
-      "element": "earth",
+      "element": "wind",
       "path": [
-        79,
-        80,
-        68,
+        43,
+        45,
+        57,
         69,
         70
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "fire",
+      "path": [
+        61,
+        62,
+        63,
+        51,
+        52
       ],
       "deliveredPhase": "night"
     }

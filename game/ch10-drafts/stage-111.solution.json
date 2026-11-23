@@ -1,72 +1,80 @@
 {
   "placements": {
-    "92": {
-      "kind": "tunnel",
-      "pairId": "T1"
-    },
-    "128": {
-      "kind": "tunnel",
-      "pairId": "T1"
-    }
+    "53": "intersection"
   },
   "routes": [
     {
       "element": "light",
       "path": [
-        25,
-        26,
-        27,
-        28,
-        40,
-        39,
-        51
-      ],
-      "deliveredPhase": "day"
-    },
-    {
-      "element": "wind",
-      "path": [
-        18,
-        19,
-        31,
-        32,
-        44
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        45,
+        46
       ],
       "deliveredPhase": "day"
     },
     {
       "element": "shadow",
       "path": [
-        61,
-        62,
-        63,
-        64,
-        65,
+        27,
+        28,
+        40,
+        41,
+        42,
+        54,
         66,
-        78,
-        90
+        67,
+        68,
+        69,
+        81
       ],
       "deliveredPhase": "night"
     },
     {
-      "element": "metal",
+      "element": "water",
       "path": [
-        80,
-        92,
-        128,
-        129,
-        130
+        17,
+        29,
+        41,
+        53,
+        65,
+        77,
+        89,
+        101,
+        113,
+        125
       ],
       "deliveredPhase": "night"
     },
     {
-      "element": "fire",
+      "element": "electricity",
       "path": [
         97,
         98,
         99,
-        111,
-        112
+        100,
+        101,
+        102,
+        103,
+        104,
+        105
+      ],
+      "deliveredPhase": "night"
+    },
+    {
+      "element": "ice",
+      "path": [
+        13,
+        14,
+        15,
+        16
       ],
       "deliveredPhase": "night"
     }
