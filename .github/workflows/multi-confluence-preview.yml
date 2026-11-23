@@ -43,6 +43,8 @@ jobs:
           python3 game/build.py Wellspring_Multi_Confluence_Game.html
           test -s Wellspring_Multi_Confluence_Editor.html
           test -s Wellspring_Multi_Confluence_Game.html
+      - name: Test actual offline editor and game HTML
+        run: python3 game/tests/multi_confluence_offline.py
       - name: Upload offline preview after validation
         uses: actions/upload-artifact@v4
         with:
