@@ -56,8 +56,8 @@ test('Reaction input order and direction are enforced',()=>{
  for(const recipe of recipes){
   const map=makeMap(recipe);
   const [first,second]=recipe.inputs;
-  assert.match(E.validatePath(map,first,incoming.S,[],{}),/input port/);
-  assert.match(E.validatePath(map,second,incoming.N,[],{}),/input port/);
+  assert.match(E.validatePath(map,first,[2,1,6,11,16,17,12],[],{}),/input port/);
+  assert.match(E.validatePath(map,second,[22,21,16,11,6,7,12],[],{}),/input port/);
   assert.match(E.validatePath(map,recipe.output,[12,11,10],[],{},true),/output port/);
   assert.match(E.checkAll(map,routes(map).slice(0,2)).join(' '),/missing route/);
  }
