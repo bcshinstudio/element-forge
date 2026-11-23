@@ -18,6 +18,20 @@ PLANS = [
 ]
 
 
+def enable_deferred_ui(page):
+    """Test-only reveal of archived challenges and custom import.
+
+    These modes stay hidden in the shipped UI, but their internal regression
+    coverage remains active so they can be restored after content review.
+    """
+    page.evaluate("""() => {
+      for (const id of ['choose-challenge','home-custom',
+                        'challenge-library','custom-level']) {
+        document.getElementById(id).hidden = false;
+      }
+    }""")
+
+
 def open_stage_two(page, tap=False):
     # Start these focused checks at Stage 2 with saved progress.
     page.evaluate("""key => {
@@ -182,16 +196,22 @@ def test_stage_controls(browser, offline, touch):
     press(page.locator("#intro-begin"))
     expect(page.locator("#stage-number")).to_have_text("Chapter 1 · Stage 1")
     assert page.locator(".stage-actions").evaluate("e => e.getBoundingClientRect().right <= innerWidth")
-    press(page.locator("#story-toggle"))
-    expect(page.locator("#stage-story")).to_contain_text("collapsed aqueduct")
-    expect(page.locator("#stage-story")).to_be_visible()
-    press(page.locator("#story-toggle"))
-    expect(page.locator("#stage-story")).to_be_hidden()
+    full_description = page.locator("#description").text_content()
+    assert full_description and len(full_description) > 30
+    expect(page.locator("#description")).to_be_visible()
+    expect(page.locator("#story-toggle")).to_be_hidden()
     expect(page.locator("#stage-note")).to_contain_text("P crosses forest")
     press(page.locator("#stage-tip"))
     expect(page.locator("#stage-reference tbody tr")).to_have_count(4)
     press(page.locator("#close-stage-help"))
     prepare(page, {"placements": {}}, tap=touch)
+    expect(page.locator("#description")).to_be_hidden()
+    expect(page.locator("#story-toggle")).to_be_visible()
+    press(page.locator("#story-toggle"))
+    expect(page.locator("#description")).to_have_text(full_description)
+    expect(page.locator("#description")).to_be_visible()
+    press(page.locator("#story-toggle"))
+    expect(page.locator("#description")).to_be_hidden()
     board = page.locator("#board")
     width = board.bounding_box()["width"]
     # The approved Ashwood solution carries Plant over a bridge.
@@ -315,14 +335,19 @@ def test_campaign(browser, url):
                 assert title["y"] >= actions["y"] + actions["height"] - 0.5
                 assert title["width"] > actions["x"] - title["x"]
                 assert actions["x"] + actions["width"] <= width
-                page.locator("#story-toggle").click()
-                expect(page.locator("#stage-story")).to_be_visible()
-                page.locator("#story-toggle").click()
-                expect(page.locator("#stage-story")).to_be_hidden()
+                expect(page.locator("#story-toggle")).to_be_hidden()
+                expect(page.locator("#description")).to_be_visible()
             page.set_viewport_size({"width": 1280, "height": 950})
         plan = current_plan(page, index)
         assert plan["status"] == "solved"
+        before_story = page.locator("#description").text_content() if index == 14 else None
         prepare(page, plan)
+        if index == 14:
+            expect(page.locator("#description")).to_be_hidden()
+            page.locator("#story-toggle").click()
+            expect(page.locator("#description")).to_have_text(before_story)
+            page.locator("#story-toggle").click()
+            expect(page.locator("#description")).to_be_hidden()
         if index == 2:
             checkpoints = page.locator("#board .badge-checkpoint")
             assert checkpoints.count()
@@ -523,6 +548,7 @@ def test_keyboard_and_import(browser, url):
     page.goto(url + BASE)
     page.locator("#title-enter").click()
     open_stage_two(page)
+    enable_deferred_ui(page)
     plan = current_plan(page, 1)
     prepare(page, plan)
     path = plan["routes"][0]["path"]
@@ -576,6 +602,7 @@ def test_import_navigation(browser, offline, width, height, touch):
     page.context.set_offline(True)
     page.goto(offline.as_uri())
     page.locator("#title-enter").click()
+    enable_deferred_ui(page)
     press(page.locator("#new-campaign"))
     press(page.locator("#intro-next"))
     press(page.locator("#intro-begin"))
@@ -599,6 +626,7 @@ def test_import_navigation(browser, offline, width, height, touch):
     expect(page.locator("#challenge-puzzles button")).to_have_count(6)
     page.reload()
     page.locator("#title-enter").click()
+    enable_deferred_ui(page)
     press(page.locator("#choose-challenge"))
     press(page.locator("#challenge-puzzles button").first)
     expect(page.locator("#puzzle")).to_have_text("Hard · Grove Crossing 1")
@@ -615,6 +643,7 @@ def test_challenge_fallback(browser, url):
     page = browser.new_page()
     page.goto(url + BASE)
     page.locator("#title-enter").click()
+    enable_deferred_ui(page)
     page.evaluate("EFChallenges.generate = () => ({pack:{stages:[]}})")
     page.locator("#choose-challenge").click()
     page.locator("#challenge-tier").select_option("Easy")
@@ -657,6 +686,7 @@ def test_challenge_pack_offline(browser, offline):
     page.context.set_offline(True)
     page.goto(offline.as_uri())
     page.locator("#title-enter").click()
+    enable_deferred_ui(page)
     page.locator("#choose-challenge").tap()
     page.locator("#home-curated").tap()
     pack = page.evaluate("EFRevisedBoards.pack")
@@ -683,6 +713,7 @@ def test_challenge_pack_offline(browser, offline):
                 if i == 0 and route_index == 0 and step == 1:
                     page.reload()
                     page.locator("#title-enter").click()
+                    enable_deferred_ui(page)
                     page.locator("#choose-challenge").tap()
                     page.locator("#resume-challenge").tap()
                     expect(tile(page, index).locator(".track")).to_have_count(1)
@@ -719,6 +750,7 @@ def test_challenge_pack_offline(browser, offline):
     expect(page.locator("#status")).to_contain_text("Imported")
     page.reload()
     page.locator("#title-enter").click()
+    enable_deferred_ui(page)
     page.locator("#choose-challenge").tap()
     expect(page.locator("#challenge-puzzles button")).to_have_count(len(pack["stages"]))
     page.locator("#home-pack-file").set_input_files(file)
