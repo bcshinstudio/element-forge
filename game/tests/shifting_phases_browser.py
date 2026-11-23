@@ -24,6 +24,7 @@ def test_editor(browser,base):
     expect(page.locator("#phase-preview")).to_be_enabled()
     page.locator("#phase-preview").select_option("night")
     page.locator("#phase-preview").select_option("day")
+    page.once("dialog",lambda dialog:dialog.accept())
     page.locator("#file").set_input_files(str(EXAMPLE))
     expect(page.locator("#phase-enabled")).to_be_checked()
     expect(page.locator("#mapName")).to_have_value("First Nightfall")
