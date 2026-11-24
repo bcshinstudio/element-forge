@@ -54,12 +54,15 @@
   return window.EFVariants?.resolve({id:'library-'+prefix+'-'+node.element},type)??null;
  }
  function setNode(cell,mode,node){
-  cell.querySelector('.library-node-art')?.remove();
-  cell.classList.remove('illustrated-node');
   const item=nodeArtwork(mode,node);
+  const current=cell.querySelector('.library-node-art');
+  if(current&&item&&current.dataset.artId===item.id)return;
+  current?.remove();
+  cell.classList.remove('illustrated-node');
   if(!item)return;
   const image=document.createElement('img');
   image.className='library-node-art';
+  image.dataset.artId=item.id;
   image.alt='';
   image.src=item.src;
   image.onerror=()=>{image.remove();cell.classList.remove('illustrated-node');};

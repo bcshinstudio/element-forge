@@ -1,0 +1,24 @@
+name: Library integration regression
+on:
+  push:
+    branches: [feature/library-artwork-integration]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax checks
+        run: |
+          for f in art/board.js art/catalog.js art/variants.js game/app.js mapeditor/{app,artwork,play,map-format}.js map-editor/{app,artwork,play,map-format}.js; do node --check "$f" || exit 1; done
+      - name: Full Node regression
+        run: node --test map-editor/tests/*.test.js game/tests/*.test.js
+      - name: Public editor library regression
+        run: node --test mapeditor/tests/library-art.test.js
+      - name: Standalone editor build
+        run: python3 game/build.py /tmp/WellspringEditor.html --editor

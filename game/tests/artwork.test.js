@@ -49,8 +49,8 @@ function gameplay(map){
 }
 
 test('all approved art is cataloged, placed in its gameplay family, and present in the source builds',()=>{
- assert.equal(Object.keys(catalog).length,178);
- assert.equal(new Set(Object.values(catalog).map(a=>a.type+'|'+a.label)).size,88);
+ assert.equal(Object.keys(catalog).length,237);
+ assert.equal(new Set(Object.values(catalog).map(a=>a.type+'|'+a.label)).size,147);
  for(const [type] of [...F.TERRAIN,...F.COMPONENTS]){
    if(type==='confluence')assert.match(fs.readFileSync(path.join(__dirname,'../../art/board.css'),'utf8'),/\.confluence-mark/,'Confluence uses procedural CSS art');
    else if(type==='phasePlate')assert.match(fs.readFileSync(path.join(__dirname,'../styles.css'),'utf8'),/\.phase-plate-mark/,'Phase Plate uses procedural CSS art');
