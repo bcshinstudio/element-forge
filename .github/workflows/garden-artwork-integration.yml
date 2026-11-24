@@ -1,0 +1,44 @@
+name: Garden artwork integration
+on:
+  push:
+    branches: [feature/garden-artwork-integration]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  integration:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install and verify artwork package
+        run: |
+          if test -f scripts/garden-transfer/part-00.bin; then python3 scripts/install-garden-artwork.py; fi
+      - name: Syntax checks
+        run: |
+          for f in art/board.js art/catalog.js art/variants.js game/app.js mapeditor/{app,artwork,map-format}.js map-editor/{app,artwork,map-format}.js; do node --check "$f" || exit 1; done
+      - name: Full Node regression
+        run: node --test map-editor/tests/*.test.js game/tests/*.test.js mapeditor/tests/*.test.js
+      - name: Standalone builds
+        run: |
+          python3 game/build.py /tmp/Wellspring.html
+          python3 game/build.py /tmp/WellspringEditor.html --editor
+      - name: Browser dependencies
+        run: |
+          python3 -m pip install playwright
+          python3 -m playwright install --with-deps chromium
+      - name: Garden editor browser regression
+        run: python3 mapeditor/tests/garden_browser.py
+      - name: Existing developer story browser regression
+        run: python3 game/tests/developer_story_browser.py
+      - name: Commit tested artwork
+        run: |
+          git config user.name "Wellspring QA"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Install 166 verified Garden artwork tiles"
+            git push origin HEAD:feature/garden-artwork-integration
+          fi

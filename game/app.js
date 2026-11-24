@@ -378,7 +378,7 @@
   $('instructions').textContent={
    inspect:session.map.construction?'Choose tools within the available budget.':'',
    build:'',
-   complete:'Every element reached its destination.'
+   complete:'Every element reached its inlet.'
   }[phase];
   $('plan').hidden=phase!=='inspect';
   $('puzzle-options').hidden=phase!=='build'||!session.map.construction;
@@ -584,7 +584,7 @@
    tile.classList.toggle('archive-index',living);if(living)tile.style.setProperty('--archive-glow',String(Math.min(1,state.routes.length/11)));
    const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
    const label=`Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, `+
-    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[terrain]||terrain));
+    (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role==='source'?'source':'inlet'}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[terrain]||terrain));
    const direction=kind==='gate'||terrain==='oneway'?' '+(cell.props?.direction??'E'):'';
    const visited=mark.querySelector('[data-visited]')?' · visited':'';
    const chamber=kind==='confluence'?E.confluenceAt(map,i):null;
@@ -594,7 +594,7 @@
     ', '+F.ELEMENTS[chamber.output].name+' exits '+chamber.ports[chamber.output]+
     (tile.classList.contains('confluence-ready')?' · inputs ready':' · inputs pending'):'';
    const tileLabel=pendingOpening?label+' · '+toolNames[pendingOpening]+' opening selected':label+direction+visited+reaction+(cell.props?.phaseShift?' · Day/Night shifting channel':'');
-   tile.title=archive&&cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role==='source'?'source':'tome'}`:tileLabel;
+   tile.title=(archive||map.nodeAppearance==='garden')&&cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role==='source'?'source':archive?'tome':'inlet'}`:tileLabel;
    tile.setAttribute('aria-label',tileLabel);
   }
  }
@@ -603,7 +603,7 @@
   const {map,state}=session;
   const element=state.active?.element;
   if(result.message==='Start at an element source.'&&map.cells[index].node?.role==='destination'){
-   return 'This is a destination (D). Start at the matching source (S).';
+   return 'This is an inlet (I). Start at the matching source (S).';
   }
   if(element==='wind'&&map.cells[index].terrain==='void')return 'Tap the landing across one hole. Wind cannot stop in the Void.';
   if(result.message==='Element terrain restriction violated'){

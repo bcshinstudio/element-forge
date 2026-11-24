@@ -25,7 +25,7 @@ function setTool(value){
  document.querySelectorAll('[data-tool]').forEach(button=>button.classList.toggle('active',button.dataset.tool===value));
  const labels={erase:'Eraser',inspect:'Inspect',art:'Paint artwork',pick:'Copy artwork',copy:'Copy cell',stamp:'Stamp cell','phase:toggle':'Mark shifting channel'};
  const [kind,id]=value.split(':');
- $('selected').textContent=labels[value]??(kind==='node'?`${ELEMENTS[element].name} ${id==='source'?'source':'destination'}`:id);
+ $('selected').textContent=labels[value]??(kind==='node'?`${ELEMENTS[element].name} ${id==='source'?'source':'inlet'}`:id);
  updateProperties();
  refreshElementArtwork();
  window.EFEditorArt?.showBrush();
@@ -66,7 +66,7 @@ function buildPalette(){
   palette.append(content);
  };
  paintGroup('Terrain','terrain',TERRAIN,true);
- paintGroup('Sources & Destinations','node',[['source','Source','●'],['destination','Destination','◎']],true);
+ paintGroup('Sources & Inlets','node',[['source','Source','●'],['destination','Inlet','◎']],true);
  paintGroup('Tools & Fixtures','component',COMPONENTS);
  const brushes=document.createElement('div');
  brushes.className='palette-grid';
@@ -107,7 +107,7 @@ function updateProperties(){
    html+=field('Output (green port)','propReactionOutput',customOutput);
    if(!reactionEngine.confluenceRecipe(confluenceProps()))html+='<p class="warning-text">Select three different elements.</p>';
   }
-  html+='<p class="property-note">One chamber per map. Place one Source for each input, and one Destination for the output. Rotate all three ports with Output direction.</p>';
+  html+='<p class="property-note">One chamber per map. Place one Source for each input, and one Inlet for the output. Rotate all three ports with Output direction.</p>';
  }
  if(type==='checkpoint')
   html+=`<label>Required element<select id="propCheckpoint"><option value="any">Any element</option>${Object.entries(ELEMENTS).map(([id,e])=>`<option value="${id}" ${checkpointElement===id?'selected':''}>${e.name}</option>`).join('')}</select></label>`;
@@ -142,7 +142,7 @@ function cellMarkup(c){
  }
  if(c.node){
   const e=ELEMENTS[c.node.element];
-  out+=`<span class="node-shape ${c.node.role}" style="background:${e.color};border-color:${e.color}">${c.node.role==='source'?'S':'D'}</span>`;
+  out+=`<span class="node-shape ${c.node.role}" style="background:${e.color};border-color:${e.color}">${c.node.role==='source'?'S':'I'}</span>`;
  }
  if(c.component==='phasePlate')out+='<span class="phase-plate-editor" aria-label="Day and Night pressure plate">◈</span>';
  if(c.props?.phaseShift)out+='<span class="phase-mark" aria-label="Shifts between Day and Night">↔</span>';
@@ -163,7 +163,7 @@ function decorateCell(element,cell){
 }
 function cellClass(c){return `cell ${c.terrain} ${c.component?'has-component':''} ${c.node?'node':''}`}
 function cellLabel(c,i){
- return `Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, ${c.node?ELEMENTS[c.node.element].name.toLowerCase()+' '+c.node.role:c.component==='confluence'?'Confluence: '+(reactionEngine.confluenceRecipe(c.props)?reactionLabel(reactionEngine.confluenceRecipe(c.props)):'invalid recipe')+', output '+(c.props?.direction||'E'):c.component||c.terrain}`;
+ return `Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, ${c.node?ELEMENTS[c.node.element].name.toLowerCase()+' '+(c.node.role==='source'?'source':'inlet'):c.component==='confluence'?'Confluence: '+(reactionEngine.confluenceRecipe(c.props)?reactionLabel(reactionEngine.confluenceRecipe(c.props)):'invalid recipe')+', output '+(c.props?.direction||'E'):c.component||c.terrain}`;
 }
 function render(){const b=$('board');b.style.setProperty('--cols',map.width);b.style.setProperty('--rows',map.height);b.innerHTML=map.cells.map((c,i)=>`<div class="${cellClass(previewCell(c))}" data-i="${i}" role="gridcell" aria-label="${cellLabel(c,i)}">${cellMarkup(previewCell(c))}</div>`).join('');map.cells.forEach((cell,i)=>decorateCell(b.children[i],previewCell(cell)));$('count').textContent=`${map.width} × ${map.height} · ${map.width*map.height} cells`;$('width').value=map.width;$('height').value=map.height;updateHistory();window.EFEditorArt?.boardChanged()}
 function refreshCell(i){
@@ -211,6 +211,7 @@ function paint(i){
   else if(id==='phasePlate')next.props={element};
  }
  if(map.artPalette===11&&['land','wall'].includes(next.terrain)&&!next.terrainArt)next.terrainArt={id:next.terrain==='land'?'library-stone-floor':'library-bookshelf',rotation:0};
+ if(map.artPalette===12&&!next.terrainArt){const spec=window.EFVariants.gardenTerrain(next.terrain);if(spec)next.terrainArt=spec;}
  if(kind==='terrain'||kind==='component'){
   const spec=window.EFEditorArt?.placementArt(kind,id);
   if(spec)next[kind==='terrain'?'terrainArt':'componentArt']=spec;

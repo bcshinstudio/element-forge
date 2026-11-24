@@ -38,7 +38,10 @@
   host.className='art-gallery';
   host.replaceChildren();
   const missing=spec&&!art.resolve(spec,type)?[{id:spec.id,label:'Missing · '+spec.id}]:[];
-  for(const item of [null,...missing,...art.options(type)]){
+  const choices=art.options(type);
+  const garden=map.artPalette===12?choices.filter(item=>item.id.startsWith('garden-')):[];
+  const ordered=garden.length?[...garden,...choices.filter(item=>!item.id.startsWith('garden-'))]:choices;
+  for(const item of [null,...missing,...ordered]){
    const active=(item?.id??null)===(spec?.id??null);
    const choice=item?{id:item.id,rotation:active?spec.rotation??0:0}:null;
    const button=document.createElement('button');
@@ -182,7 +185,7 @@
   if(cell.node){
    addProperty('Element',Object.entries(ELEMENTS).map(([id,e])=>[id,e.name]),cell.node.element,
     value=>editCell(next=>{next.node.element=value;}));
-   addProperty('Endpoint',[['source','Source'],['destination','Destination']],cell.node.role,
+   addProperty('Endpoint',[['source','Source'],['destination','Inlet']],cell.node.role,
     value=>editCell(next=>{next.node.role=value;}));
   }
   const issues=artIssues(cell);

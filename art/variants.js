@@ -2,7 +2,7 @@
 (function(root){
  const catalog=root.EFArtCatalog??{};
  const chapters=['The Sleeping Valley','The Gatekeepers','The Primeval Crucible','The Astral Loom',
-  'The Celestial Confluence',"The Weaver’s Playground",'The Shattered Abyss','The World-Heart Sanctuary','The Confluence Forges','The Twilight Pendulum','The Archive of First Currents'];
+  'The Celestial Confluence',"The Weaver’s Playground",'The Shattered Abyss','The World-Heart Sanctuary','The Confluence Forges','The Twilight Pendulum','The Archive of First Currents','The Garden of Forgotten Wonders'];
  const themes=[
   {land:0,forest:1,bridge:0,portal:0}, {land:2,wall:1,bridge:1,gate:0},
   {land:3,mountain:0,lava:1,heated:2,bridge:2,tunnel:2}, {land:2,mountain:2,exposed:1,portal:1},
@@ -56,7 +56,16 @@
   return choices.find(item=>item.label===style&&item.piece===suggestedPiece(map,i,type))??
    choices.find(item=>item.label===style);
  }
+ function gardenTerrain(type){
+  const id={land:'garden-stone-floor',wall:'garden-hedge-straight',forest:'garden-tree-green',water:'garden-water-straight'}[type];
+  return id&&resolve({id},type)?{id,rotation:0}:null;
+ }
  function applyPalette(map,index){
+  if(index===11){
+   map.artPalette=12;map.nodeAppearance='garden';
+   for(const cell of map.cells){const spec=gardenTerrain(cell.terrain);if(spec&&!cell.terrainArt?.id?.startsWith('garden-'))cell.terrainArt=spec;}
+   return true;
+  }
   if(index===10){
    map.artPalette=11;
    for(const cell of map.cells){
@@ -97,7 +106,7 @@
   applyPalette(map,index);
   return {...level,map};
  }
- const api={campaignLevel,chapters,options,resolve,suggest,suggestedPiece,applyPalette,heading,toolAppearance};
+ const api={campaignLevel,chapters,options,resolve,suggest,suggestedPiece,applyPalette,heading,toolAppearance,gardenTerrain};
  root.EFVariants=api;
  if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

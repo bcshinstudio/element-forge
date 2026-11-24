@@ -19,7 +19,7 @@ jobs:
       - name: Full Node regression
         run: node --test map-editor/tests/*.test.js game/tests/*.test.js
       - name: Public editor library regression
-        run: node --test mapeditor/tests/library-art.test.js
+        run: node --test mapeditor/tests/*.test.js
       - name: Standalone game build
         run: python3 game/build.py /tmp/Wellspring.html
       - name: Standalone editor build

@@ -48,7 +48,12 @@
  }
 
  function nodeArtwork(mode,node){
-  if(!node||!['library','books-only'].includes(mode))return null;
+  if(!node)return null;
+  if(mode==='garden'){
+   const source=node.role==='source';
+   return window.EFVariants?.resolve({id:'garden-'+(source?'source':'inlet')+'-'+node.element},source?'node-source':'node-destination')??null;
+  }
+  if(!['library','books-only'].includes(mode))return null;
   const prefix=node.role==='source'?(mode==='library'?'lectern-source':'source'):mode==='library'?'destination':'open-destination';
   const type=node.role==='source'?(mode==='library'?'node-lectern-source':'node-source'):mode==='library'?'node-destination':'node-open-destination';
   return window.EFVariants?.resolve({id:'library-'+prefix+'-'+node.element},type)??null;
