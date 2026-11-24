@@ -37,12 +37,37 @@ def run():
                 expect(page.locator("#intro-begin")).to_have_text("Enter the Archive")
                 page.locator("#intro-begin").click()
                 expect(page.locator("#world-intro-title")).to_have_text("The Archive of First Currents")
+                def verify_dialogue(part):
+                    panels=page.evaluate("(part)=>EFArchive.panels(part)",part)
+                    for i,panel in enumerate(panels):
+                        expect(page.locator(".jeeah-dialogue strong")).to_have_text(panel["speaker"])
+                        portrait=page.locator(".jeeah-portrait")
+                        expect(portrait).to_have_attribute("data-speaker",panel["speaker"])
+                        if panel["speaker"]=="Narrator":
+                            expect(portrait).to_be_hidden()
+                        else:
+                            expect(portrait).to_be_visible()
+                            expect(portrait).to_have_attribute("aria-label",panel["speaker"])
+                            if panel["speaker"]=="Eldrin":
+                                assert "archive-4.webp" in portrait.evaluate("(el)=>getComputedStyle(el).backgroundImage")
+                        if i<len(panels)-1:
+                            page.locator("#intro-next").click()
+                verify_dialogue("opening")
                 page.get_by_role("button",name="Skip sequence").click()
                 expect(page.locator("#stage-number")).to_have_text("Interlude · The Archive")
+                labels=page.evaluate("""()=>EFArchive.level.map.cells.flatMap((cell,i)=>cell.node?[{
+                    expected:EFMap.ELEMENTS[cell.node.element].name+' '+(cell.node.role==='source'?'source':'tome'),
+                    actual:document.querySelector('#board [data-index="'+i+'"]').title,
+                    accessible:document.querySelector('#board [data-index="'+i+'"]').getAttribute('aria-label')
+                }]:[])""")
+                assert len(labels)==22
+                assert all(x["expected"]==x["actual"] and "Row " in x["accessible"] for x in labels)
+
                 page.locator("#developer-reset-stage").click()
                 expect(page.locator("#stage-number")).to_have_text("Interlude · The Archive")
                 page.locator("#developer-complete").click()
                 expect(page.locator("#world-intro-title")).to_have_text("The Archive of First Currents")
+                verify_dialogue("ending")
                 page.get_by_role("button",name="Skip sequence").click()
                 expect(page.locator("#world-intro-title")).to_contain_text("Chapter 4")
                 while page.locator("#intro-next").is_visible():
