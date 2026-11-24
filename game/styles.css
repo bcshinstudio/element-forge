@@ -395,6 +395,9 @@ body:has(#home:not([hidden])) .masthead { display:none; }
  border-radius: 8px;
  background: #e9ddcc url(../art/jeeah-portrait.webp) center 20% / cover no-repeat;
 }
+.jeeah-dialogue[data-speaker="Eldrin"] .jeeah-portrait { background-size: 450% auto; background-position: 86% 4%; }
+.jeeah-dialogue[data-speaker="Narrator"] { grid-template-columns: 1fr; }
+.jeeah-portrait[hidden] { display: none; }
 .story-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; }
 .story-actions button { min-height: 44px; }
 @media (orientation: landscape) and (max-height: 520px) and (min-width: 560px) {
