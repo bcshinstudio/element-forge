@@ -180,7 +180,7 @@
   $('puzzle').textContent=map.name;
   const chapter=index<campaignSize?chapterAt(index):null;
   $('stage-number').hidden=!chapter;
-  $('stage-number').textContent=isInterlude(index)?'Interlude · '+interludeName(index):chapter?`Chapter ${chapters.indexOf(chapter)+1} · Stage ${index-chapter.start+1}`:'';
+  $('stage-number').textContent=isGarden(index)?'Interlude · The Garden':isArchive(index)?'Interlude · The Archive':chapter?`Chapter ${chapters.indexOf(chapter)+1} · Stage ${index-chapter.start+1}`:'';
 
   $('description').textContent=map.description;
   storyExpanded=false;

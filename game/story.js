@@ -7,6 +7,7 @@
  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
  const cache = new Map();
  let panels, panelIndex, onFinish, frameRequest, renderVersion = 0, textTimer;
+ let voice=null,gardenMode=false;
  let audio,archiveMode=false,autoTimer=null,auto=false,paused=false;
  const back = $('intro-back'), next = $('intro-next'), finish = $('intro-begin');
  const replay = $('story-replay'), skip = $('story-skip');
@@ -26,6 +27,7 @@
  function stop() {
   cancelAnimationFrame(frameRequest);clearTimeout(autoTimer);clearInterval(textTimer);
   audio?.stopCue();
+  if(voice){voice.pause();voice=null;}
   return ++renderVersion;
  }
 
@@ -37,6 +39,10 @@
   const portrait=dialog.querySelector('.jeeah-portrait');
   dialog.querySelector('.jeeah-dialogue strong').textContent=speaker;
   portrait.dataset.speaker=speaker;
+  const portraitSrc=gardenMode?window.EFGarden.portraits[speaker]:null;
+  portrait.style.backgroundImage=portraitSrc?'url("'+portraitSrc+'")':'';
+  portrait.style.backgroundSize=portraitSrc?'contain':'';
+  portrait.style.backgroundPosition=portraitSrc?'center':'';
   portrait.setAttribute('aria-label',speaker==='Narrator'?'':speaker);
   portrait.setAttribute('aria-hidden',String(speaker==='Narrator'));
   const line=$('story-line');line.textContent='“'+panel.line+'”';
@@ -51,18 +57,26 @@
   ctx.fillStyle = '#111c16';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   const [image, extra] = await Promise.all([getImage(panel.art), extraKey && getImage(extraKey)]);
-  if (version !== renderVersion || !dialog.open || !image) return;
+  if (version !== renderVersion || !dialog.open) return;
+  if(!image){ctx.fillStyle='#e9ddcc';ctx.font='24px sans-serif';ctx.textAlign='center';ctx.fillText(panel.caption,canvas.width/2,canvas.height/2);if(auto&&!paused)autoTimer=setTimeout(()=>{if(next.hidden)finish.click();else next.click();},4000);return;}
   const scale = Math.min(canvas.width / image.naturalWidth, canvas.height / image.naturalHeight);
   const w = image.naturalWidth * scale, h = image.naturalHeight * scale;
   const x = (canvas.width - w) / 2, y = (canvas.height - h) / 2;
   function paint(value) {
    ctx.drawImage(image, x, y, w, h);
-   if(effect==='archive'){const z=1+0.055*value;ctx.save();ctx.translate(canvas.width/2,canvas.height/2);ctx.scale(z,z);ctx.drawImage(image,x-canvas.width/2,y-canvas.height/2,w,h);ctx.restore();for(let i=0;i<22;i++){const px=x+w*((i*47+13)%100)/100,py=y+h*((i*29+95-30*value+100)%100)/100;ctx.fillStyle='rgba(255,226,155,'+(0.15+0.3*Math.sin(i+value*3)**2)+')';ctx.beginPath();ctx.arc(px,py,1+i%3,0,Math.PI*2);ctx.fill();}}
+   if(effect==='garden'){
+    const z=1+0.035*value;ctx.save();ctx.translate(canvas.width/2,canvas.height/2);ctx.scale(z,z);ctx.drawImage(image,x-canvas.width/2,y-canvas.height/2,w,h);ctx.restore();
+    const colors={petals:'#ffc6dd',sparks:'#ffcf72',water:'#9eeaff',gold:'#ffe39b',motes:'#e1f7c6'};for(let i=0;i<26;i++){const px=x+w*((i*47+13+(panel.effect==='petals'?value*12:0))%100)/100,py=y+h*((i*29+95-30*value+100)%100)/100;ctx.save();ctx.globalAlpha=.2+.4*Math.sin(i+value*3)**2;ctx.fillStyle=colors[panel.effect]||colors.motes;ctx.beginPath();ctx.arc(px,py,1+i%3,0,Math.PI*2);ctx.fill();ctx.restore();}
+   }
+   else if(effect==='archive'){const z=1+0.055*value;ctx.save();ctx.translate(canvas.width/2,canvas.height/2);ctx.scale(z,z);ctx.drawImage(image,x-canvas.width/2,y-canvas.height/2,w,h);ctx.restore();for(let i=0;i<22;i++){const px=x+w*((i*47+13)%100)/100,py=y+h*((i*29+95-30*value+100)%100)/100;ctx.fillStyle='rgba(255,226,155,'+(0.15+0.3*Math.sin(i+value*3)**2)+')';ctx.beginPath();ctx.arc(px,py,1+i%3,0,Math.PI*2);ctx.fill();}}
    else if (effect) window.EFStoryMotion(effect, {x,y,w,h}, value, ctx, {beyond:extra,restored:extra});
   }
   const cue = panel.motion ?? (['river','rest'].includes(panel.art) ? 'river' : null);
-  if (animate && cue && cue!=='archive' && (!reducedMotion.matches || !panel.motion)) audio?.effect(cue);
-  if(archiveMode&&auto&&!paused)autoTimer=setTimeout(()=>{if(next.hidden)finish.click();else next.click();},Math.max(3000,panel.line.length*65));
+  if (animate && cue && cue!=='archive' && cue!=='garden' && (!reducedMotion.matches || !panel.motion)) audio?.effect(cue);
+  const advance=()=>{if(version!==renderVersion||paused||!dialog.open)return;if(next.hidden)finish.click();else next.click();};
+  const schedule=()=>{if(archiveMode&&auto&&!paused&&version===renderVersion)autoTimer=setTimeout(advance,Math.max(3000,panel.line.length*65));};
+  const src=panel.voice||window.EFCharacterVoices?.[panel.voiceId];
+  if(src&&!paused&&animate){const clip=new Audio(src);voice=clip;clip.addEventListener('ended',()=>{if(auto)advance();},{once:true});let failed=false;const fallback=()=>{if(!failed&&version===renderVersion){failed=true;schedule();}};clip.addEventListener('error',fallback,{once:true});clip.play().catch(fallback);}else schedule();
   if (!animate || !panel.motion || reducedMotion.matches || paused) { paint(1); return; }
   skip.disabled = false;
   const start = performance.now();
@@ -82,7 +96,7 @@
  }
 
  function open(chapter, type, label, callback) {
-  archiveMode=false;auto=false;paused=false;archiveControls.hidden=true;
+  gardenMode=false;archiveMode=false;auto=false;paused=false;archiveControls.hidden=true;
   panels = window.EFStoryChapters[chapter][type];
   panelIndex = 0;
   onFinish = callback;
@@ -122,14 +136,14 @@
  control('Skip sequence',()=>finish.click());
  control('Full screen',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await dialog.requestFullscreen();}catch{}});
  function openArchive(type,label,callback){
-  archiveMode=true;auto=false;paused=false;autoButton.textContent='Auto: off';pauseButton.textContent='Pause';archiveControls.hidden=false;
+  gardenMode=false;archiveMode=true;auto=false;paused=false;autoButton.textContent='Auto: off';pauseButton.textContent='Pause';archiveControls.hidden=false;
   panels=window.EFArchive.panels(type);panelIndex=0;onFinish=callback;
   window.EFArchive.art.forEach((src,i)=>window.EFStoryArt['archive-'+(i+1)]=src);
   $('world-intro-title').textContent='The Archive of First Currents';finish.textContent=label;
   if(!dialog.open)dialog.showModal();audio?.story(true);render();next.focus();
  }
  function openGarden(type,label,callback){
-  archiveMode=true;auto=false;paused=false;autoButton.textContent='Auto: off';pauseButton.textContent='Pause';archiveControls.hidden=false;
+  gardenMode=true;Object.assign(window.EFStoryArt,window.EFGarden.art);archiveMode=true;auto=false;paused=false;autoButton.textContent='Auto: off';pauseButton.textContent='Pause';archiveControls.hidden=false;
   panels=window.EFGarden.panels(type);panelIndex=0;onFinish=callback;
   $('world-intro-title').textContent='The Garden of Forgotten Wonders';finish.textContent=label;
   if(!dialog.open)dialog.showModal();audio?.story(true);render();next.focus();

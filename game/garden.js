@@ -44,19 +44,238 @@
   }
   tile.append(layer);
  }
- const panels=type=>(type==='opening'?[
- ['The Hidden Garden','Jeeah','Look, Eldrin. A garden hidden beyond the old stone arch.'],
- ['The Unexpected Explosion','Tessa','Pip! That was supposed to be a tiny spark!'],
- ['Meeting Tessa','Tessa','I am Tessa, a wandering inventor. And this is Pip.'],
- ['The Friendly Challenge','Eldrin','These mechanisms were built to carry six elemental currents.'],
- ['The Forgotten Mechanism','Jeeah','Let us restore the currents and awaken the Heart of Wonders.']
- ]:[
- ['The Garden Awakens','Tessa','It works! Every current is flowing again!'],
- ['Laughter Among Friends','Eldrin','A little water never hurt a scholar.'],
- ['An Invitation to Adventure','Jeeah','Come with us, Tessa. There is so much more to discover.'],
- ["The Weaver’s Playground Revealed",'Tessa','Look beyond the gate! What a wonderful place to explore.'],
- ['A Journey Shared','Jeeah','Together, then. The next current is waiting.']
- ]).map(([caption,speaker,line],i)=>({caption,speaker,line,art:'garden-'+(type==='opening'?i+1:i+6),motion:'archive',duration:4500}));
- const api={panels,elements,isGarden,group,delivered,view,motion,level};
+ const art={
+  "garden-1": "../art/story/garden-1.webp",
+  "garden-2": "../art/story/garden-2.webp",
+  "garden-3": "../art/story/garden-3.webp",
+  "garden-4": "../art/story/garden-4.webp",
+  "garden-5": "../art/story/garden-5.webp",
+  "garden-6": "../art/story/garden-6.webp",
+  "garden-7": "../art/story/garden-7.webp",
+  "garden-8": "../art/story/garden-8.webp",
+  "garden-9": "../art/story/garden-9.webp",
+  "garden-10": "../art/story/garden-10.webp"
+};
+ const portraits={
+  "Jeeah": "../art/story/garden-jeeah-portrait.webp",
+  "Eldrin": "../art/story/garden-eldrin-portrait.webp",
+  "Tessa": "../art/story/garden-tessa-portrait.webp"
+};
+ const scenes=[
+  {
+    "scene": 1,
+    "caption": "The Hidden Garden",
+    "art": "garden-1",
+    "effect": "petals",
+    "dialogue": [
+      {
+        "speaker": "Narrator",
+        "line": "Beyond the Celestial Confluence, a forgotten path led into a garden of brass and stone."
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "Look, Eldrin. Someone built an entire garden around that crystal."
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "Remarkable. Its mechanisms have been silent for a very long time."
+      }
+    ]
+  },
+  {
+    "scene": 2,
+    "caption": "The Unexpected Explosion",
+    "art": "garden-2",
+    "effect": "sparks",
+    "dialogue": [
+      {
+        "speaker": "Narrator",
+        "line": "A sudden crackle interrupted the silence."
+      },
+      {
+        "speaker": "Tessa",
+        "line": "Oh! That was supposed to happen. Well… most of it."
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "An unconventional greeting, I must say."
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "Are you all right?"
+      }
+    ]
+  },
+  {
+    "scene": 3,
+    "caption": "Meeting Tessa",
+    "art": "garden-3",
+    "effect": "petals",
+    "dialogue": [
+      {
+        "speaker": "Tessa",
+        "line": "Perfectly fine! I'm Tessa, wandering inventor. And this little troublemaker is Pip."
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "I'm Jeeah. This is Eldrin. We've been restoring the elemental currents."
+      },
+      {
+        "speaker": "Tessa",
+        "line": "Then you two are exactly who I've been looking for!"
+      }
+    ]
+  },
+  {
+    "scene": 4,
+    "caption": "The Friendly Challenge",
+    "art": "garden-4",
+    "effect": "motes",
+    "dialogue": [
+      {
+        "speaker": "Tessa",
+        "line": "I've mapped the garden, but I can't get its six currents to work together. Care to try?"
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "The inscriptions suggest each mechanism responds to a different element."
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "Let's see what we can do together."
+      }
+    ]
+  },
+  {
+    "scene": 5,
+    "caption": "The Forgotten Mechanism",
+    "art": "garden-5",
+    "effect": "motes",
+    "dialogue": [
+      {
+        "speaker": "Eldrin",
+        "line": "The Heart of Wonders will awaken only when every current reaches its inlet."
+      },
+      {
+        "speaker": "Tessa",
+        "line": "Fire, Water, Plant, Electricity, Wind and Arcane. Six deliveries, one garden."
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "Then let's bring it back to life."
+      }
+    ]
+  },
+  {
+    "scene": 6,
+    "caption": "The Garden Awakens",
+    "art": "garden-6",
+    "effect": "gold",
+    "dialogue": [
+      {
+        "speaker": "Narrator",
+        "line": "The six currents converged. The Heart of Wonders awakened."
+      },
+      {
+        "speaker": "Tessa",
+        "line": "It works! Every single mechanism!"
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "It's beautiful."
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "A splendid reminder of what can be achieved together."
+      }
+    ]
+  },
+  {
+    "scene": 7,
+    "caption": "Laughter Among Friends",
+    "art": "garden-7",
+    "effect": "water",
+    "dialogue": [
+      {
+        "speaker": "Narrator",
+        "line": "One of the newly awakened fountains had a surprise for Eldrin."
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "I believe the fountain is rather enthusiastic."
+      },
+      {
+        "speaker": "Tessa",
+        "line": "At least we know the water pressure is excellent!"
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "Careful, Pip! You're next."
+      }
+    ]
+  },
+  {
+    "scene": 8,
+    "caption": "An Invitation to Adventure",
+    "art": "garden-8",
+    "effect": "petals",
+    "dialogue": [
+      {
+        "speaker": "Jeeah",
+        "line": "We're heading into the next realm. Would you like to join us?"
+      },
+      {
+        "speaker": "Tessa",
+        "line": "More forgotten inventions? More mysteries? Absolutely!"
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "I suspect our journey is about to become considerably less quiet."
+      }
+    ]
+  },
+  {
+    "scene": 9,
+    "caption": "The Weaver’s Playground Revealed",
+    "art": "garden-9",
+    "effect": "motes",
+    "dialogue": [
+      {
+        "speaker": "Narrator",
+        "line": "The northern gate opened onto a realm of floating paths and impossible bridges."
+      },
+      {
+        "speaker": "Tessa",
+        "line": "Look at those structures! Pip, wait for us!"
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "The next current is waiting."
+      }
+    ]
+  },
+  {
+    "scene": 10,
+    "caption": "A Journey Shared",
+    "art": "garden-10",
+    "effect": "gold",
+    "dialogue": [
+      {
+        "speaker": "Narrator",
+        "line": "Three companions and one little inventor's creation set out together."
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "There is much yet to discover."
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "And we'll discover it together."
+      }
+    ]
+  }
+];
+ const panels=type=>scenes.filter(s=>type==='opening'?s.scene<=5:s.scene>5).flatMap(s=>s.dialogue.map((d,i)=>({...d,caption:s.caption,art:s.art,effect:s.effect,motion:'garden',duration:4500,voiceId:'garden-'+s.scene+'-'+(i+1)})));
+ const api={art,portraits,scenes,panels,elements,isGarden,group,delivered,view,motion,level};
  root.EFGarden=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

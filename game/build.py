@@ -41,7 +41,7 @@ def build(editor=False, playtest=False):
             source = "" if playtest else art_catalog()
         if "</script" in source.lower():
             raise ValueError(f"Unsafe inline script delimiter in {match[1]}")
-        if match[1] in ("story-data.js", "archive.js"):
+        if match[1] in ("story-data.js", "archive.js", "garden.js"):
             def embed_story_image(asset):
                 payload = base64.b64encode((source_root / asset[1]).read_bytes()).decode("ascii")
                 return f"data:image/webp;base64,{payload}"
