@@ -80,6 +80,53 @@ def run():
                     page.locator("#intro-next").click()
                 page.locator("#intro-begin").click()
                 expect(page.locator("#stage-number")).to_have_text("Chapter 4 · Stage 1")
+                # Leave review mode and re-enter it to exercise Garden through Stage 60.
+                page.locator("#developer-exit-stage").click()
+                page.locator("#settings").click()
+                control=page.locator("#settings-skip-tutorial-popups")
+                if control.is_checked():control.uncheck()
+                for _ in range(3):
+                    control.check()
+                    control.uncheck()
+                page.locator("#studio-credit").click()
+                page.locator("#stage-list button").nth(60).click()
+                expect(page.locator("#stage-number")).to_have_text("Chapter 5 · Stage 12")
+                page.locator("#developer-complete").click()
+                expect(page.locator("#intro-begin")).to_have_text("Enter the Garden")
+                while page.locator("#intro-next").is_visible():
+                    page.locator("#intro-next").click()
+                page.locator("#intro-begin").click()
+                expect(page.locator("#world-intro-title")).to_have_text("The Garden of Forgotten Wonders")
+                def verify_garden(part):
+                    panels=page.evaluate("(part)=>EFGarden.panels(part)",part)
+                    assert len(set(p["art"] for p in panels))==5
+                    for i,panel in enumerate(panels):
+                        expect(page.locator(".jeeah-dialogue strong")).to_have_text(panel["speaker"])
+                        expect(page.locator("#story-line")).to_contain_text(panel["line"])
+                        loaded=page.evaluate("""async key=>{const img=new Image();img.src=EFGarden.art[key];await img.decode();return img.naturalWidth>0&&img.naturalHeight>0;}""",panel["art"])
+                        assert loaded
+                        if panel["speaker"]!="Narrator":
+                            portrait=page.locator(".jeeah-portrait")
+                            expect(portrait).to_be_visible()
+                            assert "garden-"+panel["speaker"].lower()+"-portrait.webp" in portrait.evaluate("(el)=>getComputedStyle(el).backgroundImage")
+                            assert portrait.evaluate("(el)=>getComputedStyle(el).backgroundSize")=="contain"
+                        if i<len(panels)-1:
+                            page.locator("#intro-next").click()
+                verify_garden("opening")
+                page.get_by_role("button",name="Skip sequence").click()
+                expect(page.locator("#stage-number")).to_have_text("Interlude · The Garden")
+                assert page.locator("#board [data-index]").count()==169
+                page.locator("#developer-reset-stage").click()
+                expect(page.locator("#stage-number")).to_have_text("Interlude · The Garden")
+                page.locator("#developer-complete").click()
+                expect(page.locator("#world-intro-title")).to_have_text("The Garden of Forgotten Wonders")
+                verify_garden("ending")
+                page.get_by_role("button",name="Skip sequence").click()
+                expect(page.locator("#world-intro-title")).to_contain_text("Chapter 6")
+                while page.locator("#intro-next").is_visible():
+                    page.locator("#intro-next").click()
+                page.locator("#intro-begin").click()
+                expect(page.locator("#stage-number")).to_have_text("Chapter 6 · Stage 1")
                 page.locator("#developer-exit-stage").click()
                 expect(page.locator("#developer-tools")).to_be_hidden()
                 page.locator("#stage-select").click()
@@ -91,7 +138,7 @@ def run():
     finally:
         server.shutdown()
         server.server_close()
-    print("PASS: Stage 36, Archive, Chapter 4, reset, exit and storage isolation on desktop and mobile")
+    print("PASS: both interludes, chapter transitions, Garden artwork, portraits, reset, exit and storage isolation on desktop and mobile")
 
 if __name__=="__main__":
     run()
