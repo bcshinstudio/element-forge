@@ -47,5 +47,24 @@
   }
  }
 
- window.EFBoardArt = { decorate, setTerrain, structures, terrains };
+ function nodeArtwork(mode,node){
+  if(!node||!['library','books-only'].includes(mode))return null;
+  const prefix=node.role==='source'?'source':mode==='library'?'destination':'open-destination';
+  const type=node.role==='source'?'node-source':mode==='library'?'node-destination':'node-open-destination';
+  return window.EFVariants?.resolve({id:'library-'+prefix+'-'+node.element},type)??null;
+ }
+ function setNode(cell,mode,node){
+  cell.querySelector('.library-node-art')?.remove();
+  cell.classList.remove('illustrated-node');
+  const item=nodeArtwork(mode,node);
+  if(!item)return;
+  const image=document.createElement('img');
+  image.className='library-node-art';
+  image.alt='';
+  image.src=item.src;
+  image.onerror=()=>{image.remove();cell.classList.remove('illustrated-node');};
+  cell.prepend(image);
+  cell.classList.add('illustrated-node');
+ }
+ window.EFBoardArt = { decorate, setTerrain, structures, terrains, nodeArtwork, setNode };
 })();

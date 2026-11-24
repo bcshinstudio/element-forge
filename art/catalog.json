@@ -1244,5 +1244,418 @@
   "label": "Illuminated channel plate",
   "piece": "",
   "file": "tools/booster-illuminated-channel-plate.webp"
+ },
+ "library-stone-floor": {
+  "id": "library-stone-floor",
+  "type": "land",
+  "label": "Library · stone floor",
+  "piece": "",
+  "file": "library/library-stone-floor.webp"
+ },
+ "library-mosaic-floor": {
+  "id": "library-mosaic-floor",
+  "type": "land",
+  "label": "Library · mosaic floor",
+  "piece": "",
+  "file": "library/library-mosaic-floor.webp"
+ },
+ "library-wood-floor": {
+  "id": "library-wood-floor",
+  "type": "land",
+  "label": "Library · wood floor",
+  "piece": "",
+  "file": "library/library-wood-floor.webp"
+ },
+ "library-reading-rug": {
+  "id": "library-reading-rug",
+  "type": "land",
+  "label": "Library · reading rug",
+  "piece": "",
+  "file": "library/library-reading-rug.webp"
+ },
+ "library-archway": {
+  "id": "library-archway",
+  "type": "land",
+  "label": "Library · archway",
+  "piece": "",
+  "file": "library/library-archway.webp"
+ },
+ "library-bookshelf": {
+  "id": "library-bookshelf",
+  "type": "wall",
+  "label": "Library · bookshelf",
+  "piece": "",
+  "file": "library/library-bookshelf.webp"
+ },
+ "library-corner-bookshelf": {
+  "id": "library-corner-bookshelf",
+  "type": "wall",
+  "label": "Library · corner bookshelf",
+  "piece": "",
+  "file": "library/library-corner-bookshelf.webp"
+ },
+ "library-reading-desk": {
+  "id": "library-reading-desk",
+  "type": "wall",
+  "label": "Library · reading desk",
+  "piece": "",
+  "file": "library/library-reading-desk.webp"
+ },
+ "library-book-stack": {
+  "id": "library-book-stack",
+  "type": "wall",
+  "label": "Library · book stack",
+  "piece": "",
+  "file": "library/library-book-stack.webp"
+ },
+ "library-stone-wall": {
+  "id": "library-stone-wall",
+  "type": "wall",
+  "label": "Library · stone wall",
+  "piece": "",
+  "file": "library/library-stone-wall.webp"
+ },
+ "library-sealed-gate": {
+  "id": "library-sealed-gate",
+  "type": "wall",
+  "label": "Library · sealed gate",
+  "piece": "",
+  "file": "library/library-sealed-gate.webp"
+ },
+ "library-living-index": {
+  "id": "library-living-index",
+  "type": "wall",
+  "label": "Library · living index",
+  "piece": "",
+  "file": "library/library-living-index.webp"
+ },
+ "library-ladder": {
+  "id": "library-ladder",
+  "type": "wall",
+  "label": "Library · ladder",
+  "piece": "",
+  "file": "library/library-ladder.webp"
+ },
+ "library-catalog-cabinet": {
+  "id": "library-catalog-cabinet",
+  "type": "wall",
+  "label": "Library · catalog cabinet",
+  "piece": "",
+  "file": "library/library-catalog-cabinet.webp"
+ },
+ "library-map-table": {
+  "id": "library-map-table",
+  "type": "wall",
+  "label": "Library · map table",
+  "piece": "",
+  "file": "library/library-map-table.webp"
+ },
+ "library-book-cart": {
+  "id": "library-book-cart",
+  "type": "wall",
+  "label": "Library · book cart",
+  "piece": "",
+  "file": "library/library-book-cart.webp"
+ },
+ "library-armillary": {
+  "id": "library-armillary",
+  "type": "wall",
+  "label": "Library · armillary",
+  "piece": "",
+  "file": "library/library-armillary.webp"
+ },
+ "library-reading-chair": {
+  "id": "library-reading-chair",
+  "type": "wall",
+  "label": "Library · reading chair",
+  "piece": "",
+  "file": "library/library-reading-chair.webp"
+ },
+ "library-lantern": {
+  "id": "library-lantern",
+  "type": "wall",
+  "label": "Library · lantern",
+  "piece": "",
+  "file": "library/library-lantern.webp"
+ },
+ "library-scroll-chest": {
+  "id": "library-scroll-chest",
+  "type": "wall",
+  "label": "Library · scroll chest",
+  "piece": "",
+  "file": "library/library-scroll-chest.webp"
+ },
+ "library-notice-board": {
+  "id": "library-notice-board",
+  "type": "wall",
+  "label": "Library · notice board",
+  "piece": "",
+  "file": "library/library-notice-board.webp"
+ },
+ "library-chained-shelf": {
+  "id": "library-chained-shelf",
+  "type": "wall",
+  "label": "Library · chained shelf",
+  "piece": "",
+  "file": "library/library-chained-shelf.webp"
+ },
+ "library-hidden-stairs": {
+  "id": "library-hidden-stairs",
+  "type": "wall",
+  "label": "Library · hidden stairs",
+  "piece": "",
+  "file": "library/library-hidden-stairs.webp"
+ },
+ "library-archive-dais": {
+  "id": "library-archive-dais",
+  "type": "wall",
+  "label": "Library · archive dais",
+  "piece": "",
+  "file": "library/library-archive-dais.webp"
+ },
+ "library-source-fire": {
+  "id": "library-source-fire",
+  "type": "node-source",
+  "label": "Library · source fire",
+  "piece": "",
+  "file": "library/library-source-fire.webp"
+ },
+ "library-destination-fire": {
+  "id": "library-destination-fire",
+  "type": "node-destination",
+  "label": "Library · destination fire",
+  "piece": "",
+  "file": "library/library-destination-fire.webp"
+ },
+ "library-open-destination-fire": {
+  "id": "library-open-destination-fire",
+  "type": "node-open-destination",
+  "label": "Library · open destination fire",
+  "piece": "",
+  "file": "library/library-open-destination-fire.webp"
+ },
+ "library-source-water": {
+  "id": "library-source-water",
+  "type": "node-source",
+  "label": "Library · source water",
+  "piece": "",
+  "file": "library/library-source-water.webp"
+ },
+ "library-destination-water": {
+  "id": "library-destination-water",
+  "type": "node-destination",
+  "label": "Library · destination water",
+  "piece": "",
+  "file": "library/library-destination-water.webp"
+ },
+ "library-open-destination-water": {
+  "id": "library-open-destination-water",
+  "type": "node-open-destination",
+  "label": "Library · open destination water",
+  "piece": "",
+  "file": "library/library-open-destination-water.webp"
+ },
+ "library-source-nature": {
+  "id": "library-source-nature",
+  "type": "node-source",
+  "label": "Library · source nature",
+  "piece": "",
+  "file": "library/library-source-nature.webp"
+ },
+ "library-destination-nature": {
+  "id": "library-destination-nature",
+  "type": "node-destination",
+  "label": "Library · destination nature",
+  "piece": "",
+  "file": "library/library-destination-nature.webp"
+ },
+ "library-open-destination-nature": {
+  "id": "library-open-destination-nature",
+  "type": "node-open-destination",
+  "label": "Library · open destination nature",
+  "piece": "",
+  "file": "library/library-open-destination-nature.webp"
+ },
+ "library-source-electricity": {
+  "id": "library-source-electricity",
+  "type": "node-source",
+  "label": "Library · source electricity",
+  "piece": "",
+  "file": "library/library-source-electricity.webp"
+ },
+ "library-destination-electricity": {
+  "id": "library-destination-electricity",
+  "type": "node-destination",
+  "label": "Library · destination electricity",
+  "piece": "",
+  "file": "library/library-destination-electricity.webp"
+ },
+ "library-open-destination-electricity": {
+  "id": "library-open-destination-electricity",
+  "type": "node-open-destination",
+  "label": "Library · open destination electricity",
+  "piece": "",
+  "file": "library/library-open-destination-electricity.webp"
+ },
+ "library-source-arcane": {
+  "id": "library-source-arcane",
+  "type": "node-source",
+  "label": "Library · source arcane",
+  "piece": "",
+  "file": "library/library-source-arcane.webp"
+ },
+ "library-destination-arcane": {
+  "id": "library-destination-arcane",
+  "type": "node-destination",
+  "label": "Library · destination arcane",
+  "piece": "",
+  "file": "library/library-destination-arcane.webp"
+ },
+ "library-open-destination-arcane": {
+  "id": "library-open-destination-arcane",
+  "type": "node-open-destination",
+  "label": "Library · open destination arcane",
+  "piece": "",
+  "file": "library/library-open-destination-arcane.webp"
+ },
+ "library-source-wind": {
+  "id": "library-source-wind",
+  "type": "node-source",
+  "label": "Library · source wind",
+  "piece": "",
+  "file": "library/library-source-wind.webp"
+ },
+ "library-destination-wind": {
+  "id": "library-destination-wind",
+  "type": "node-destination",
+  "label": "Library · destination wind",
+  "piece": "",
+  "file": "library/library-destination-wind.webp"
+ },
+ "library-open-destination-wind": {
+  "id": "library-open-destination-wind",
+  "type": "node-open-destination",
+  "label": "Library · open destination wind",
+  "piece": "",
+  "file": "library/library-open-destination-wind.webp"
+ },
+ "library-source-earth": {
+  "id": "library-source-earth",
+  "type": "node-source",
+  "label": "Library · source earth",
+  "piece": "",
+  "file": "library/library-source-earth.webp"
+ },
+ "library-destination-earth": {
+  "id": "library-destination-earth",
+  "type": "node-destination",
+  "label": "Library · destination earth",
+  "piece": "",
+  "file": "library/library-destination-earth.webp"
+ },
+ "library-open-destination-earth": {
+  "id": "library-open-destination-earth",
+  "type": "node-open-destination",
+  "label": "Library · open destination earth",
+  "piece": "",
+  "file": "library/library-open-destination-earth.webp"
+ },
+ "library-source-ice": {
+  "id": "library-source-ice",
+  "type": "node-source",
+  "label": "Library · source ice",
+  "piece": "",
+  "file": "library/library-source-ice.webp"
+ },
+ "library-destination-ice": {
+  "id": "library-destination-ice",
+  "type": "node-destination",
+  "label": "Library · destination ice",
+  "piece": "",
+  "file": "library/library-destination-ice.webp"
+ },
+ "library-open-destination-ice": {
+  "id": "library-open-destination-ice",
+  "type": "node-open-destination",
+  "label": "Library · open destination ice",
+  "piece": "",
+  "file": "library/library-open-destination-ice.webp"
+ },
+ "library-source-metal": {
+  "id": "library-source-metal",
+  "type": "node-source",
+  "label": "Library · source metal",
+  "piece": "",
+  "file": "library/library-source-metal.webp"
+ },
+ "library-destination-metal": {
+  "id": "library-destination-metal",
+  "type": "node-destination",
+  "label": "Library · destination metal",
+  "piece": "",
+  "file": "library/library-destination-metal.webp"
+ },
+ "library-open-destination-metal": {
+  "id": "library-open-destination-metal",
+  "type": "node-open-destination",
+  "label": "Library · open destination metal",
+  "piece": "",
+  "file": "library/library-open-destination-metal.webp"
+ },
+ "library-source-light": {
+  "id": "library-source-light",
+  "type": "node-source",
+  "label": "Library · source light",
+  "piece": "",
+  "file": "library/library-source-light.webp"
+ },
+ "library-destination-light": {
+  "id": "library-destination-light",
+  "type": "node-destination",
+  "label": "Library · destination light",
+  "piece": "",
+  "file": "library/library-destination-light.webp"
+ },
+ "library-open-destination-light": {
+  "id": "library-open-destination-light",
+  "type": "node-open-destination",
+  "label": "Library · open destination light",
+  "piece": "",
+  "file": "library/library-open-destination-light.webp"
+ },
+ "library-source-shadow": {
+  "id": "library-source-shadow",
+  "type": "node-source",
+  "label": "Library · source shadow",
+  "piece": "",
+  "file": "library/library-source-shadow.webp"
+ },
+ "library-destination-shadow": {
+  "id": "library-destination-shadow",
+  "type": "node-destination",
+  "label": "Library · destination shadow",
+  "piece": "",
+  "file": "library/library-destination-shadow.webp"
+ },
+ "library-open-destination-shadow": {
+  "id": "library-open-destination-shadow",
+  "type": "node-open-destination",
+  "label": "Library · open destination shadow",
+  "piece": "",
+  "file": "library/library-open-destination-shadow.webp"
+ },
+ "library-source-world": {
+  "id": "library-source-world",
+  "type": "node-source",
+  "label": "Library · source world",
+  "piece": "",
+  "file": "library/library-source-world.webp"
+ },
+ "library-destination-world": {
+  "id": "library-destination-world",
+  "type": "node-destination",
+  "label": "Library · destination world",
+  "piece": "",
+  "file": "library/library-destination-world.webp"
  }
 }

@@ -2,7 +2,7 @@
 (function(root){
  const catalog=root.EFArtCatalog??{};
  const chapters=['The Sleeping Valley','The Gatekeepers','The Primeval Crucible','The Astral Loom',
-  'The Celestial Confluence',"The Weaver’s Playground",'The Shattered Abyss','The World-Heart Sanctuary','The Confluence Forges','The Twilight Pendulum'];
+  'The Celestial Confluence',"The Weaver’s Playground",'The Shattered Abyss','The World-Heart Sanctuary','The Confluence Forges','The Twilight Pendulum','The Archive of First Currents'];
  const themes=[
   {land:0,forest:1,bridge:0,portal:0}, {land:2,wall:1,bridge:1,gate:0},
   {land:3,mountain:0,lava:1,heated:2,bridge:2,tunnel:2}, {land:2,mountain:2,exposed:1,portal:1},
@@ -57,6 +57,13 @@
    choices.find(item=>item.label===style);
  }
  function applyPalette(map,index){
+  if(index===10){
+   map.artPalette=11;
+   for(const cell of map.cells){
+    if(cell.terrain==='land'||cell.terrain==='wall') cell.terrainArt={id:cell.terrain==='land'?'library-stone-floor':'library-bookshelf',rotation:0};
+   }
+   return true;
+  }
   const theme=themes[index];
   if(!theme)return false;
   map.artPalette=index+1;

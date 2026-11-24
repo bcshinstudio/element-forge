@@ -19,6 +19,10 @@
  function artForDraft(map){
   const catalog=window.EFArtCatalog;
   const ids=new Set(map.cells.flatMap(cell=>[cell.terrainArt?.id,cell.componentArt?.id]).filter(Boolean));
+  for(const cell of map.cells){
+   const item=window.EFBoardArt.nodeArtwork(map.nodeAppearance,cell.node);
+   if(item)ids.add(item.id);
+  }
   for(const [type,spec] of Object.entries(map.toolArt??{})){
    const selected=window.EFVariants.resolve(spec,type);
    if(!selected)continue;
@@ -39,7 +43,7 @@
     inlineGame??=JSON.parse(inline.textContent);
     frame.srcdoc=inlineGame.replace('<body>',()=>'<body>'+bootstrap);
    }else{
-    const gameURL=new URL('../game/index.html',location.href);
+    const gameURL=new URL('../game/library-playtest.html',location.href);
     const response=await fetch(gameURL);
     if(!response.ok)throw Error('The game playtest could not be loaded.');
     const document=await response.text();

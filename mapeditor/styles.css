@@ -77,3 +77,14 @@
  .phase-editor-toggle { min-height:44px; }
  #board .phase-mark { font-size:.63rem; }
 }
+
+/* Prevent sidebar controls from overflowing at intermediate widths. */
+#editor-layout > *, #editor-layout .panel, #editor-layout .panel > *{min-width:0;}
+#editor-layout .element-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
+#editor-layout .element{min-width:0;min-height:48px;padding:6px 3px;font-size:12px;overflow-wrap:anywhere;text-align:center;}
+#editor-layout .palette-grid,#editor-layout .two,#editor-layout .dimensions,#editor-layout .generator-controls{grid-template-columns:repeat(2,minmax(0,1fr));}
+#editor-layout .tool span:last-child{white-space:normal;overflow-wrap:anywhere;overflow:visible;text-overflow:clip;}
+#editor-layout select{max-width:100%;width:100%;min-width:0;}
+#editor-layout .art-picker-button{min-width:0;overflow-wrap:anywhere;}
+@media(max-width:1050px){#editor-layout .element-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:720px){#editor-layout .element-grid{grid-template-columns:repeat(auto-fit,minmax(76px,1fr));}#editor-layout .generator-controls{grid-template-columns:1fr;}}

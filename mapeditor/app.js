@@ -131,6 +131,7 @@ function cellMarkup(c){
 }
 function decorateCell(element,cell){
  window.EFBoardArt.setTerrain(element,cell.terrain,cell.terrainArt);
+ window.EFBoardArt.setNode(element,map.nodeAppearance,cell.node);
  window.EFBoardArt.decorate(element,cell.component,{link:cell.props?.pairId,custom:Boolean(assets.components?.[cell.component]),spec:cell.componentArt});
 }
 function cellClass(c){return `cell ${c.terrain} ${c.component?'has-component':''} ${c.node?'node':''}`}
@@ -182,6 +183,7 @@ function paint(i){
   else if(id==='checkpoint')next.props={element:checkpointElement};
   else if(id==='phasePlate')next.props={element};
  }
+ if(map.artPalette===11&&['land','wall'].includes(next.terrain)&&!next.terrainArt)next.terrainArt={id:next.terrain==='land'?'library-stone-floor':'library-bookshelf',rotation:0};
  if(kind==='terrain'||kind==='component'){
   const spec=window.EFEditorArt?.placementArt(kind,id);
   if(spec)next[kind==='terrain'?'terrainArt':'componentArt']=spec;

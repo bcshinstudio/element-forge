@@ -326,6 +326,7 @@
  function boardChanged(){
   if(!map.cells[selected])selected=-1;
   $('art-palette').value=map.artPalette??1;
+  $('node-appearance').value=map.nodeAppearance??'classic';
   drawInspector();
   drawTools();
   validate(false);
@@ -350,6 +351,11 @@
  drawBrushTypes();
  art.chapters.forEach((name,i)=>$('art-palette').add(new Option(`${i+1} · ${name}`,i+1)));
  campaign.forEach(({level},i)=>$('existing-stage').add(new Option(`${i+1} · ${level.map.name}`,i)));
+ $('node-appearance').onchange=()=>{
+  const mode=$('node-appearance').value;
+  if(mode===(map.nodeAppearance??'classic'))return;
+  snapshot();map.nodeAppearance=mode;render();markDirty();
+ };
  $('apply-palette').onclick=()=>{
   const next=clone(map);
   if(!art.applyPalette(next,Number($('art-palette').value)-1)||JSON.stringify(next)===JSON.stringify(map))return;

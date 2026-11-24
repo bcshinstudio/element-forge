@@ -566,6 +566,7 @@
     window.EFBoardArt.setTerrain(tile,terrain,cell.props?.phaseShift&&state.dayPhase==='night'?undefined:cell.terrainArt);
    }
    window.EFBoardArt.decorate(tile,pendingOpening??kind,{link,spec:pendingOpening?map.toolArt?.[pendingOpening]:appearance});
+   window.EFBoardArt.setNode(tile,map.nodeAppearance,cell.node);
    const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
    const label=`Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, `+
     (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[terrain]||terrain));
