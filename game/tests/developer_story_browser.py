@@ -5,6 +5,27 @@ from pathlib import Path
 from threading import Thread
 from playwright.sync_api import expect, sync_playwright
 
+def check_dialogue(page, part):
+    panels=page.evaluate("(part)=>window.EFArchive.panels(part)",part)
+    for i,panel in enumerate(panels):
+        speaker=panel["speaker"]
+        dialogue=page.locator(".jeeah-dialogue")
+        expect(dialogue.locator("strong")).to_have_text(speaker)
+        portrait=dialogue.locator(".jeeah-portrait")
+        if speaker=="Narrator":
+            expect(portrait).to_be_hidden()
+        else:
+            expect(portrait).to_be_visible()
+            expect(portrait).to_have_attribute("aria-label",speaker)
+            background=portrait.evaluate("(el)=>el.style.backgroundImage")
+            if speaker=="Eldrin":
+                assert background and background!="none",background
+            else:
+                assert background=="",background
+        if i<len(panels)-1:
+            page.locator("#intro-next").click()
+    page.locator("#intro-begin").click()
+
 def run():
     root=Path(__file__).resolve().parents[2]
     server=ThreadingHTTPServer(("127.0.0.1",0),partial(SimpleHTTPRequestHandler,directory=str(root)))
@@ -37,8 +58,13 @@ def run():
                 expect(page.locator("#intro-begin")).to_have_text("Enter the Archive")
                 page.locator("#intro-begin").click()
                 expect(page.locator("#world-intro-title")).to_have_text("The Archive of First Currents")
-                page.get_by_role("button",name="Skip sequence").click()
+                check_dialogue(page,"opening")
                 expect(page.locator("#stage-number")).to_have_text("Interlude · The Archive")
+                labels=page.evaluate("""()=>window.EFArchive.level.map.cells.map((cell,i)=>cell.node?{i,name:window.EFMap.ELEMENTS[cell.node.element].name}:null).filter(Boolean)""")
+                assert len(labels)==22
+                for item in labels:
+                    tile=page.locator(f'#board [data-index="{item["i"]}"]')
+                    expect(tile).to_have_attribute("title",item["name"])
                 page.locator("#developer-reset-stage").click()
                 expect(page.locator("#stage-number")).to_have_text("Interlude · The Archive")
                 page.locator("#developer-complete").click()
