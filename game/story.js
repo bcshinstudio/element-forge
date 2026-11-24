@@ -6,7 +6,7 @@
  const ctx = canvas.getContext('2d');
  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
  const cache = new Map();
- let panels, panelIndex, onFinish, frameRequest, renderVersion = 0;
+ let panels, panelIndex, onFinish, frameRequest, renderVersion = 0, textTimer;
  let audio,archiveMode=false,autoTimer=null,auto=false,paused=false;
  const back = $('intro-back'), next = $('intro-next'), finish = $('intro-begin');
  const replay = $('story-replay'), skip = $('story-skip');
@@ -24,7 +24,7 @@
  }
 
  function stop() {
-  cancelAnimationFrame(frameRequest);clearTimeout(autoTimer);
+  cancelAnimationFrame(frameRequest);clearTimeout(autoTimer);clearInterval(textTimer);
   audio?.stopCue();
   return ++renderVersion;
  }
@@ -33,7 +33,8 @@
   const version = stop();
   const panel = panels[panelIndex];
   $('story-caption').textContent = panel.speaker ? panel.caption+' · '+panel.speaker : panel.caption;
-  $('story-line').textContent = '“' + panel.line + '”';
+  const line=$('story-line');line.textContent='“'+panel.line+'”';
+  if(archiveMode&&animate&&!paused&&!reducedMotion.matches){let n=0;line.textContent='';textTimer=setInterval(()=>{line.textContent=panel.line.slice(0,++n);if(n>=panel.line.length)clearInterval(textTimer);},26);}
   canvas.setAttribute('aria-label', panel.caption);
   next.hidden = panelIndex === panels.length - 1;
   finish.hidden = !next.hidden;
@@ -113,6 +114,7 @@
  const pauseButton=control('Pause',()=>{paused=!paused;pauseButton.textContent=paused?'Resume':'Pause';render(!paused);});
  control('Replay sequence',()=>{panelIndex=0;render();});
  control('Skip sequence',()=>finish.click());
+ control('Full screen',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await dialog.requestFullscreen();}catch{}});
  function openArchive(type,label,callback){
   archiveMode=true;auto=false;paused=false;autoButton.textContent='Auto: off';pauseButton.textContent='Pause';archiveControls.hidden=false;
   panels=window.EFArchive.panels(type);panelIndex=0;onFinish=callback;

@@ -1301,7 +1301,7 @@
   document.body.classList.toggle('chapter-restored',Boolean(target?.complete));
   $('continue').disabled=!target||Boolean(target.complete);
   $('home-total').textContent=target?.complete?'Campaign complete · The Confluence Forges awakened':
-   target?`Chapter ${chapters.indexOf(chapterAt(target.index))+1} · Stage ${target.index+1} of ${campaignSize} · Best total ${progress.total()}`:'Chapter 1 · The Sleeping Valley';
+   target?`${isArchive(target.index)?'Interlude · The Archive':`Chapter ${chapters.indexOf(chapterAt(target.index))+1} · Stage ${stageLabel(target.index)} of ${campaignSize-1}`} · Best total ${progress.total()}`:'Chapter 1 · The Sleeping Valley';
   renderChallengeChoices();
   showPanel(null);
   renderChoices();
