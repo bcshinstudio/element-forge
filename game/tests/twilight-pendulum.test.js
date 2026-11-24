@@ -166,3 +166,28 @@ test('Dusk-Gate Relay rejects a Wind delivery bypassing the assigned plate',()=>
  for(const j of bypass.slice(0,-1))assert.equal(g.route(j).ok,true);
  const rejected=g.route(bypass.at(-1));assert.equal(rejected.ok,false);assert.match(rejected.message,/Pressure Plate/);assert.equal(g.state.dayPhase,'day');
 });
+
+test('Chapter Ten rejects wrong-phase deliveries and missing assigned checkpoints',()=>{
+ for(const level of levels){
+  const m=level.map,p=witnesses[level.id];
+  assert.equal(E.requiresTwilightOrder(m),true);
+  for(const r of p.routes){
+   assert.equal(E.phaseDeliveryError(m,r.element,r.path,r.deliveredPhase),null,level.id+' '+r.element);
+   if(r.element==='light'||r.element==='shadow')assert.match(E.phaseDeliveryError(m,r.element,r.path,r.element==='light'?'night':'day'),/must complete its delivery during/);
+   if(E.pairs(m).filter(x=>x.element===r.element).length===1){
+    const checkpoint=r.path.find(i=>m.cells[i].component==='checkpoint'&&m.cells[i].props?.element===r.element);
+    if(checkpoint!==undefined)assert.match(E.phaseDeliveryError(m,r.element,r.path.filter(i=>i!==checkpoint),r.deliveredPhase),/checkpoint/);
+   }
+  }
+ }
+});
+test('Celestial Orrery formerly valid full-board Day Shadow bypass is now rejected',()=>{
+ const level=levels.at(-1),p=witnesses[level.id],shadow=p.routes.find(r=>r.element==='shadow');
+ const bypass=[96,97,126,138,139,140,141,129,130,131,119,118];
+ const alternate=[{...shadow,path:bypass,deliveredPhase:'day'},...p.routes.filter(r=>r!==shadow)];
+ assert.ok(E.phaseValidation(level.map,alternate,p.placements,true).some(x=>x.includes('Shadow must complete its delivery during Night')));
+ const g=S.createSession(level);assert.equal(g.start().ok,true);
+ for(const [i,v] of Object.entries(p.placements))assert.equal(g.place(+i,E.placementKind(v),v.pairId??'A').ok,true);
+ for(const i of bypass.slice(0,-1))assert.equal(g.route(i).ok,true);
+ const rejected=g.route(bypass.at(-1));assert.equal(rejected.ok,false);assert.match(rejected.message,/Shadow must complete its delivery during Night/);
+});

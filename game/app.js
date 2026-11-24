@@ -193,7 +193,8 @@
   if(E.hasPhases(map)){
    const trigger=map.cells[E.phasePlateIndex(map)]?.props?.element;
    if(trigger)ruleItems.push([F.ELEMENTS[trigger].name,'Complete delivery through its Pressure Plate to activate Night.']);
-   ruleItems.push(['Light','Cannot cross covered channels.'],['Shadow','Cannot cross exposed channels.'],['Phase change','Completed deliveries remain valid.']);
+   ruleItems.push(['Light',E.requiresTwilightOrder(map)?'Deliver during Day; cannot cross covered channels.':'Cannot cross covered channels.'],['Shadow',E.requiresTwilightOrder(map)?'Deliver during Night; cannot cross exposed channels.':'Cannot cross exposed channels.'],['Phase change','Completed deliveries remain valid.']);
+   if(E.requiresTwilightOrder(map))ruleItems.push(['Checkpoints','Visit assigned checkpoints before completing delivery.']);
   }
   rules.querySelector('ul').replaceChildren(...ruleItems.map(([name,copy])=>{
    const li=document.createElement('li'),strong=document.createElement('strong');

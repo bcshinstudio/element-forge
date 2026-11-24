@@ -139,6 +139,7 @@
 
   function plateRouteError(element,path,complete){
    if(!shifting)return null;
+   if(complete){const requirement=E.phaseDeliveryError(map,element,path,state.dayPhase);if(requirement)return requirement;}
    const plate=E.phasePlateIndex(map),trigger=map.cells[plate]?.props?.element;
    if(path.includes(plate)&&element!==trigger)return 'Only '+E.displayElement(trigger)+' can use this Pressure Plate.';
    const target=map.cells[path.at(-1)]?.node;

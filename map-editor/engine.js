@@ -159,6 +159,20 @@ const phaseView=(m,dayPhase='day')=>{
 };
 const phaseTriggerRoute=(m,r)=>r.element===m.cells[phasePlateIndex(m)]?.props?.element&&
  r.path.includes(phasePlateIndex(m));
+// Chapter Ten explicitly teaches phase-ordered Light and Shadow deliveries.
+// Other custom phase maps retain their existing terrain-only sequencing.
+const twilightNames=new Set(['First Eclipse','Dusk-Gate Relay','Nocturne Overpass','Shadow-Vault Switch','Twin-Horizon Lock','Eclipse Bottleneck','Umbral Portal Relay','The Twilight Gauntlet','Daybreak Synthesis','Smelted Eclipse','Thunder-Dusk Reactor','The Celestial Orrery']);
+const requiresTwilightOrder=m=>hasPhases(m)&&twilightNames.has(m.name);
+function phaseDeliveryError(m,element,path,phase){
+ if(!requiresTwilightOrder(m))return null;
+ if(element==='light'&&phase!=='day')return 'Light must complete its delivery during Day.';
+ if(element==='shadow'&&phase!=='night')return 'Shadow must complete its delivery during Night.';
+ // A uniquely assigned checkpoint belongs to the sole route of its element.
+ // Shared checkpoints and repeated elements remain whole-board requirements.
+ if(pairs(m).filter(p=>p.element===element).length===1&&m.cells.some((c,i)=>c.component==='checkpoint'&&c.props?.element===element&&!path.includes(i)))
+  return displayElement(element)+' must visit its assigned checkpoint before completing delivery.';
+ return null;
+}
 function phasePrior(m,routes,currentPhase){
  // A finished route remains delivered. Only tiles explicitly marked to shift
  // can be reused by a delivery in another phase. Keep full path geometry
@@ -191,6 +205,8 @@ function phaseValidation(m,routes,placements={},requireComplete=true){
   if(r.deliveredPhase!==undefined&&r.deliveredPhase!==phase)issues.push('Incorrect stored delivery phase for '+r.element);
   if(r.path.includes(plate)&&r.element!==trigger)issues.push('The phase plate belongs to '+displayElement(trigger));
   if(!switched&&r.element===trigger&&m.cells[end]?.node?.role==='destination'&&!r.path.includes(plate))issues.push(displayElement(trigger)+' must complete its delivery through the Pressure Plate to activate Night.');
+  const deliveryError=phaseDeliveryError(m,r.element,r.path,phase);
+  if(deliveryError)issues.push(deliveryError);
   const prior=phasePrior(m,completed,phase);
   const err=validatePath(phaseView(m,phase),r.element,r.path,prior,placements);
   if(err)issues.push(r.element+': '+err);
@@ -725,5 +741,5 @@ function solveConstruction(m,{limit=120000,maxPairs=8,maxCandidates=180}={}){
  }
  return {status:hitLimit||direct.status==='inconclusive'?'inconclusive':'unsolved',message:hitLimit?'Some construction searches exceeded their limits':'No solution found within supported construction candidates',constructionAttempts:attempts};
 }
-const api={hasPhases,phasePrior,phaseView,phasePlateIndex,phaseTriggerRoute,phaseValidation,solvePhases,hasMultiConfluence,confluences,confluenceAt,routeKey,CONFLUENCE_RECIPES,confluenceRecipe,confluencePortSides,displayElement,confluence,confluenceDirections,confluenceNeighbor,confluenceRouteError,portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
+const api={hasPhases,requiresTwilightOrder,phaseDeliveryError,phasePrior,phaseView,phasePlateIndex,phaseTriggerRoute,phaseValidation,solvePhases,hasMultiConfluence,confluences,confluenceAt,routeKey,CONFLUENCE_RECIPES,confluenceRecipe,confluencePortSides,displayElement,confluence,confluenceDirections,confluenceNeighbor,confluenceRouteError,portalExit,portalExitMessage,terrainError,spanKinds,windLandings,constructionCost,placementCounts,placementKind,pairIdAt,allowedTransition,constraintError,neighbors,routeNeighbors,linkPartner,pairs,canPlace,effective,validatePath,checkAll,score,solve,solveConstruction,solveFixed:(m,o)=>solve(m,{...o,allowPlacement:false})};root.EFEngine=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
