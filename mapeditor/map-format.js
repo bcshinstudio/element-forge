@@ -291,7 +291,8 @@ function mapFindings(map,includePlayability=true){
   else if(E.linkPartner(map,indices[0])<0)report(`${key}: tunnel ends must align and cross blocked terrain.`,indices);
  }
  if(includePlayability){
-  if(matched>(chambers.length>1||map.phaseRules?16:8))report('Game levels currently support up to '+(chambers.length>1||map.phaseRules?16:8)+' route segments.');
+  const routeLimit=chambers.length>1||map.phaseRules?16:map.rulesVersion===4&&map.nodeAppearance==='library'?11:8;
+  if(matched>routeLimit)report('Game levels currently support up to '+routeLimit+' route segments.');
   for(const [kind,count] of Object.entries(map.inventory)){
    if(count&&!PLACEABLE.includes(kind))report(`Unsupported player inventory: ${kind}.`);
   }
