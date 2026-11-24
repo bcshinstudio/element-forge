@@ -1,0 +1,214 @@
+[
+  {
+    "scene": 1,
+    "caption": "The Hidden Garden",
+    "art": "garden-1",
+    "effect": "petals",
+    "dialogue": [
+      {
+        "speaker": "Narrator",
+        "line": "Beyond the Celestial Confluence, a forgotten path led into a garden of brass and stone."
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "Look, Eldrin. Someone built an entire garden around that crystal."
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "Remarkable. Its mechanisms have been silent for a very long time."
+      }
+    ]
+  },
+  {
+    "scene": 2,
+    "caption": "The Unexpected Explosion",
+    "art": "garden-2",
+    "effect": "sparks",
+    "dialogue": [
+      {
+        "speaker": "Narrator",
+        "line": "A sudden crackle interrupted the silence."
+      },
+      {
+        "speaker": "Tessa",
+        "line": "Oh! That was supposed to happen. Well… most of it."
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "An unconventional greeting, I must say."
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "Are you all right?"
+      }
+    ]
+  },
+  {
+    "scene": 3,
+    "caption": "Meeting Tessa",
+    "art": "garden-3",
+    "effect": "petals",
+    "dialogue": [
+      {
+        "speaker": "Tessa",
+        "line": "Perfectly fine! I'm Tessa, wandering inventor. And this little troublemaker is Pip."
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "I'm Jeeah. This is Eldrin. We've been restoring the elemental currents."
+      },
+      {
+        "speaker": "Tessa",
+        "line": "Then you two are exactly who I've been looking for!"
+      }
+    ]
+  },
+  {
+    "scene": 4,
+    "caption": "The Friendly Challenge",
+    "art": "garden-4",
+    "effect": "motes",
+    "dialogue": [
+      {
+        "speaker": "Tessa",
+        "line": "I've mapped the garden, but I can't get its six currents to work together. Care to try?"
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "The inscriptions suggest each mechanism responds to a different element."
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "Let's see what we can do together."
+      }
+    ]
+  },
+  {
+    "scene": 5,
+    "caption": "The Forgotten Mechanism",
+    "art": "garden-5",
+    "effect": "motes",
+    "dialogue": [
+      {
+        "speaker": "Eldrin",
+        "line": "The Heart of Wonders will awaken only when every current reaches its inlet."
+      },
+      {
+        "speaker": "Tessa",
+        "line": "Fire, Water, Plant, Electricity, Wind and Arcane. Six deliveries, one garden."
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "Then let's bring it back to life."
+      }
+    ]
+  },
+  {
+    "scene": 6,
+    "caption": "The Garden Awakens",
+    "art": "garden-6",
+    "effect": "gold",
+    "dialogue": [
+      {
+        "speaker": "Narrator",
+        "line": "The six currents converged. The Heart of Wonders awakened."
+      },
+      {
+        "speaker": "Tessa",
+        "line": "It works! Every single mechanism!"
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "It's beautiful."
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "A splendid reminder of what can be achieved together."
+      }
+    ]
+  },
+  {
+    "scene": 7,
+    "caption": "Laughter Among Friends",
+    "art": "garden-7",
+    "effect": "water",
+    "dialogue": [
+      {
+        "speaker": "Narrator",
+        "line": "One of the newly awakened fountains had a surprise for Eldrin."
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "I believe the fountain is rather enthusiastic."
+      },
+      {
+        "speaker": "Tessa",
+        "line": "At least we know the water pressure is excellent!"
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "Careful, Pip! You're next."
+      }
+    ]
+  },
+  {
+    "scene": 8,
+    "caption": "An Invitation to Adventure",
+    "art": "garden-8",
+    "effect": "petals",
+    "dialogue": [
+      {
+        "speaker": "Jeeah",
+        "line": "We're heading into the next realm. Would you like to join us?"
+      },
+      {
+        "speaker": "Tessa",
+        "line": "More forgotten inventions? More mysteries? Absolutely!"
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "I suspect our journey is about to become considerably less quiet."
+      }
+    ]
+  },
+  {
+    "scene": 9,
+    "caption": "The Weaver’s Playground Revealed",
+    "art": "garden-9",
+    "effect": "motes",
+    "dialogue": [
+      {
+        "speaker": "Narrator",
+        "line": "The northern gate opened onto a realm of floating paths and impossible bridges."
+      },
+      {
+        "speaker": "Tessa",
+        "line": "Look at those structures! Pip, wait for us!"
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "The next current is waiting."
+      }
+    ]
+  },
+  {
+    "scene": 10,
+    "caption": "A Journey Shared",
+    "art": "garden-10",
+    "effect": "gold",
+    "dialogue": [
+      {
+        "speaker": "Narrator",
+        "line": "Three companions and one little inventor's creation set out together."
+      },
+      {
+        "speaker": "Eldrin",
+        "line": "There is much yet to discover."
+      },
+      {
+        "speaker": "Jeeah",
+        "line": "And we'll discover it together."
+      }
+    ]
+  }
+]
