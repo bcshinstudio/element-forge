@@ -1,7 +1,7 @@
 name: Library integration regression
 on:
   push:
-    branches: [feature/library-artwork-integration, phone-playtest]
+    branches: [feature/library-artwork-integration, phone-playtest, feature/developer-story-tools]
   workflow_dispatch:
 permissions:
   contents: read
@@ -24,3 +24,9 @@ jobs:
         run: python3 game/build.py /tmp/Wellspring.html
       - name: Standalone editor build
         run: python3 game/build.py /tmp/WellspringEditor.html --editor
+      - name: Install browser test dependencies
+        run: |
+          python3 -m pip install playwright
+          python3 -m playwright install --with-deps chromium
+      - name: Developer story browser regression
+        run: python3 game/tests/developer_story_browser.py
