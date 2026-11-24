@@ -1,7 +1,7 @@
 name: Library integration regression
 on:
   push:
-    branches: [feature/library-artwork-integration]
+    branches: [feature/library-artwork-integration, phone-playtest]
   workflow_dispatch:
 permissions:
   contents: read

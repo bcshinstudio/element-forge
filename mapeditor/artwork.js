@@ -327,6 +327,7 @@
   if(!map.cells[selected])selected=-1;
   $('art-palette').value=map.artPalette??1;
   $('node-appearance').value=map.nodeAppearance??'classic';
+  refreshElementArtwork();
   drawInspector();
   drawTools();
   validate(false);

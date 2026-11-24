@@ -19,7 +19,7 @@ def art_catalog():
 
 def build(editor=False, playtest=False):
     source_root = GAME.parent / "map-editor" if editor else GAME
-    page = (source_root / "index.html").read_text(encoding="utf-8")
+    page = (source_root / ("index.html" if editor else "library-playtest.html")).read_text(encoding="utf-8")
 
     def stylesheet(match):
         path = source_root / match[1]

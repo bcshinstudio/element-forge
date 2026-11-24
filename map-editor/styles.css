@@ -88,3 +88,9 @@
 #editor-layout .art-picker-button{min-width:0;overflow-wrap:anywhere;}
 @media(max-width:1050px){#editor-layout .element-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media(max-width:720px){#editor-layout .element-grid{grid-template-columns:repeat(auto-fit,minmax(76px,1fr));}#editor-layout .generator-controls{grid-template-columns:1fr;}}
+
+/* Endpoint art previews follow the selected brush and map appearance. */
+#elements .element{gap:4px;align-content:center;}
+#elements .element-preview{display:block;width:100%;max-width:68px;aspect-ratio:1;object-fit:contain;border-radius:5px;}
+#elements .destination-swatch{border:3px double;}
+#node-appearance{display:block;margin-top:5px;min-height:36px;}
