@@ -288,7 +288,12 @@
   }
 
   function evaluate(){
-   if(state.phase==='inspect'||Object.keys(state.drafts).length)return fail('Finish or undo your current route before testing.');
+   if(state.phase==='inspect')return fail('Start building first.');
+   const unfinished=Object.values(state.drafts);
+   if(unfinished.length){
+    const details=unfinished.map(r=>E.displayElement(r.element)+' ('+r.path.length+' tiles)').join(', ');
+    return fail('Finish or undo your current route before testing. Unfinished: '+details+'.');
+   }
    const errors=E.checkAll(activeMap(),state.routes,state.placements);
    if(errors.length)return fail(errors.join('. '));
    return {ok:true,track:E.score(map,state.routes,state.placements).track,...score(map,state.routes,state.placements)};

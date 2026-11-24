@@ -104,3 +104,14 @@
 /* Illustrated endpoints: tracks and moving elements remain above artwork. */
 #board .library-node-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;z-index:1;}
 #board .illustrated-node .node-shape,#board .illustrated-node .mark.endpoint{visibility:hidden;}
+
+/* Game-specific chamber styling: this file loads after game/styles.css. */
+#board .tile .confluence-mark { inset:1%; background:#173229; border:1px solid #e5c78e; border-radius:7px; }
+#board .tile .confluence-core { inset:32%; border-width:1px; font-size:clamp(8px,1.2vw,15px); }
+#board .tile .confluence-port { width:36%;height:36%;color:#132720;font:900 clamp(9px,1.6vw,17px)/1 system-ui,sans-serif;text-shadow:none;z-index:4; }
+#board .tile .port-input { border-radius:50%; }
+#board .tile .port-output { border-radius:3px;box-shadow:inset 0 0 0 1px #142820; }
+#board .tile .port-N { left:32%;top:0; }
+#board .tile .port-S { left:32%;bottom:0; }
+#board .tile .port-W { left:0;top:32%; }
+#board .tile .port-E { right:0;top:32%; }

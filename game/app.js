@@ -190,12 +190,15 @@
    for(const id of rule.forbidComponents??[])ruleItems.push([name,'Cannot use '+(toolNames[id]??id).toLowerCase()+'.']);
    for(const id of rule.forbidTerrain??[])ruleItems.push([name,'Cannot cross '+(terrainNames[id]??id).toLowerCase()+'.']);
   }
+  const earlier=chapter&&!isInterlude(index)?levels.slice(chapter.start,index).map(l=>l.map):[];
+  const firstPhase=!earlier.some(m=>E.hasPhases(m));
+  const firstCheckpoint=map.cells.some(c=>c.component==='checkpoint')&&!earlier.some(m=>m.cells.some(c=>c.component==='checkpoint'));
   if(E.hasPhases(map)){
    const trigger=map.cells[E.phasePlateIndex(map)]?.props?.element;
    if(trigger)ruleItems.push([F.ELEMENTS[trigger].name,'Complete delivery through its Pressure Plate to activate Night.']);
-   ruleItems.push(['Light',E.requiresTwilightOrder(map)?'Deliver during Day; cannot cross covered channels.':'Cannot cross covered channels.'],['Shadow',E.requiresTwilightOrder(map)?'Deliver during Night; cannot cross exposed channels.':'Cannot cross exposed channels.'],['Phase change','Completed deliveries remain valid.']);
-   if(E.requiresTwilightOrder(map))ruleItems.push(['Checkpoints','Visit assigned checkpoints before completing delivery.']);
+   if(firstPhase)ruleItems.push(['Light',E.requiresTwilightOrder(map)?'Deliver during Day; cannot cross covered channels.':'Cannot cross covered channels.'],['Shadow',E.requiresTwilightOrder(map)?'Deliver during Night; cannot cross exposed channels.':'Cannot cross exposed channels.'],['Phase change','Completed deliveries remain valid.']);
   }
+  if(firstCheckpoint)ruleItems.push(['Checkpoints','Visit assigned checkpoints before completing the puzzle.']);
   rules.querySelector('ul').replaceChildren(...ruleItems.map(([name,copy])=>{
    const li=document.createElement('li'),strong=document.createElement('strong');
    strong.textContent=name+': ';li.append(strong,copy);return li;
@@ -706,8 +709,10 @@
     return false;
    }
   }
+  const tip=state.active?.path.at(-1);
+  const canContinue=element&&tip!==index&&E.routeNeighbors(E.phaseView(map,state.dayPhase),tip,state.placements,element).includes(index)&&!E.terrainError(E.phaseView(map,state.dayPhase),element,index,placed);
   const removePlaced=direct&&!dragStart&&tool==='route'&&placed&&
-   (placed==='bridge'||!element);
+   ((placed==='bridge'&&!canContinue)||!element);
   const bridgeTile=direct&&!dragStart&&tool==='route'&&state.loadout.bridge>(E.placementCounts(state.placements).bridge||0)&&
    E.canPlace(map,state.placements,index,'bridge')&&(!element||Boolean(E.terrainError(map,element,index,null)));
   const linked=toolUnit(tool)===2;

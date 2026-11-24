@@ -191,3 +191,13 @@ test('Celestial Orrery formerly valid full-board Day Shadow bypass is now reject
  for(const i of bypass.slice(0,-1))assert.equal(g.route(i).ok,true);
  const rejected=g.route(bypass.at(-1));assert.equal(rejected.ok,false);assert.match(rejected.message,/Shadow must complete its delivery during Night/);
 });
+
+test('Wind can jump straight over the Dusk-Gate Void onto its assigned Pressure Plate',()=>{
+ const level=levels[1],m=level.map,view=E.phaseView(m,'day'),plate=E.phasePlateIndex(m);
+ assert.equal(plate,32);assert.ok(E.windLandings(view,8).includes(plate));
+ assert.equal(E.validatePath(view,'wind',[18,19,7,8,32,44],[],{},false),null);
+ const g=S.createSession(level);g.start();
+ for(const r of witnesses[level.id].routes.filter(r=>r.element==='light'))for(const i of r.path)assert.equal(g.route(i).ok,true);
+ for(const i of [18,19,7,8,32,44])assert.equal(g.route(i).ok,true);
+ assert.equal(g.state.dayPhase,'night');
+});
