@@ -33,6 +33,14 @@
   const version = stop();
   const panel = panels[panelIndex];
   $('story-caption').textContent = panel.speaker ? panel.caption+' · '+panel.speaker : panel.caption;
+  const speaker=panel.speaker??'Jeeah';
+  const portrait=dialog.querySelector('.jeeah-portrait');
+  const dialogue=dialog.querySelector('.jeeah-dialogue');
+  dialogue.dataset.speaker=speaker;
+  dialogue.querySelector('strong').textContent=speaker;
+  portrait.hidden=speaker==='Narrator';
+  portrait.setAttribute('aria-label',speaker);
+  portrait.style.backgroundImage=speaker==='Eldrin'?`url("${window.EFArchive.art[3]}")`:'';
   const line=$('story-line');line.textContent='“'+panel.line+'”';
   if(archiveMode&&animate&&!paused&&!reducedMotion.matches){let n=0;line.textContent='';textTimer=setInterval(()=>{line.textContent=panel.line.slice(0,++n);if(n>=panel.line.length)clearInterval(textTimer);},26);}
   canvas.setAttribute('aria-label', panel.caption);
