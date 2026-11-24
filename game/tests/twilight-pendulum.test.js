@@ -125,3 +125,44 @@ test('The Celestial Orrery finale uses two chambers, permanent Day deliveries, a
  assert.deepEqual(new Set(Object.values(p.placements).map(E.placementKind)),new Set(['intersection','portal','tunnel']));
  replay(level,p);
 });
+
+test('All 12 maps preserve assigned trigger and activate Night only through completed plate route',()=>{
+ const expected=['light','wind','light','nature','earth','light','metal','electricity','nature','light','nature','light'];
+ for(const [i,level] of levels.entries()){
+  const m=level.map,p=witnesses[level.id],plate=E.phasePlateIndex(m);
+  assert.equal(m.cells[plate].props.element,expected[i],level.id);
+  const trigger=p.routes.find(r=>E.phaseTriggerRoute(m,r));
+  assert.ok(trigger,level.id);
+  assert.equal(trigger.deliveredPhase,'day');
+  const before=p.routes.slice(0,p.routes.indexOf(trigger));
+  assert.ok(before.every(r=>!E.phaseTriggerRoute(m,r)));
+  assert.ok(m.cells.some((c,j)=>c.props?.phaseShift&&E.phaseView(m,'day').cells[j].terrain!==E.phaseView(m,'night').cells[j].terrain));
+  const g=S.createSession(level);assert.equal(g.start().ok,true);
+  for(const [j,placement] of Object.entries(p.placements))assert.equal(g.place(+j,E.placementKind(placement),placement.pairId??'A').ok,true);
+  for(const r of before)for(const j of r.path)assert.equal(g.route(j).ok,true,level.id);
+  assert.equal(g.state.dayPhase,'day');
+  for(const j of trigger.path.slice(0,-1))assert.equal(g.route(j).ok,true,level.id);
+  assert.equal(g.state.dayPhase,'day');
+  assert.equal(g.route(trigger.path.at(-1)).ok,true,level.id);
+  assert.equal(g.state.dayPhase,'night');
+  assert.deepEqual(g.state.routes.slice(0,before.length),before);
+  const restored=S.createSession(level);assert.equal(restored.restore(g.snapshot()),true,level.id);assert.equal(restored.state.dayPhase,'night');
+  assert.equal(g.undo(),true);assert.equal(g.state.dayPhase,'day');
+ }
+});
+test('Dusk-Gate Relay rejects a Wind delivery bypassing the assigned plate',()=>{
+ const level=levels[1],m=level.map,g=S.createSession(level);g.start();
+ // Find a legal direct Wind path in the former phase-view rules, excluding plate.
+ const plate=E.phasePlateIndex(m),pair=E.pairs(m).find(p=>p.element==='wind');
+ const view=E.phaseView(m,'day'),queue=[[pair.source]];let bypass=null;
+ while(queue.length&&!bypass){const path=queue.shift();if(path.length>8)continue;
+  for(const [j] of E.neighbors(path.at(-1),m.width,m.height)){
+   if(j===plate||path.includes(j))continue;const next=[...path,j],done=j===pair.destination;
+   if(E.validatePath(view,'wind',next,[],{},!done))continue;
+   if(done){bypass=next;break;}queue.push(next);
+  }
+ }
+ assert.ok(bypass,'Expected a previously legal bypass');
+ for(const j of bypass.slice(0,-1))assert.equal(g.route(j).ok,true);
+ const rejected=g.route(bypass.at(-1));assert.equal(rejected.ok,false);assert.match(rejected.message,/Pressure Plate/);assert.equal(g.state.dayPhase,'day');
+});

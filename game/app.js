@@ -200,6 +200,7 @@
    strong.textContent=name+': ';li.append(strong,copy);return li;
   }));
   rules.hidden=!ruleItems.length;
+  $('chamber-inspection').hidden=true;
   $('description').textContent=map.description;
   storyExpanded=false;
   $('description').hidden=session.state.phase!=='inspect';
@@ -944,10 +945,22 @@
  }
  $('pack-file').onchange=importPack;
  $('home-pack-file').onchange=importPack;
+ function inspectChamber(tile){
+  const formula=tile?.dataset.formula;
+  if(!formula)return;
+  const panel=$('chamber-inspection');
+  panel.querySelector('strong').textContent='Confluence Chamber';
+  panel.querySelector('span').textContent=formula;
+  panel.hidden=false;
+ }
  board.addEventListener('click',event=>{
   const tile=event.target.closest('.tile');
-  if(tile)act(Number(tile.dataset.index),true);
+  if(!tile)return;
+  inspectChamber(tile);
+  if(tile.dataset.formula&&session.state.phase!=='build')return;
+  act(Number(tile.dataset.index),true);
  });
+ board.addEventListener('focusin',event=>inspectChamber(event.target.closest('.tile')));
  board.addEventListener('pointerdown',event=>{
   const tile=event.target.closest('.tile');
   if(!tile||!event.isPrimary||event.button!==0||session.state.phase!=='build')return;
@@ -955,6 +968,7 @@
   const routeStart=Object.values(session.state.drafts).some(({path})=>path.at(-1)===index||E.portalExit(session.map,path,session.state.placements)===index)||
    (session.map.cells[index].node?.role==='source'||session.map.cells[index].component==='confluence')||
    session.state.routes.some(route=>route.path.at(-1)===index);
+  if(tile.dataset.formula)inspectChamber(tile);
   if(tool==='route'&&routeStart&&!drag){
    const bridge=E.effective(session.map,session.state.placements,index)==='bridge';
    drag={pointer:event.pointerId,index,bridge};

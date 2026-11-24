@@ -810,3 +810,7 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 @keyframes phase-night-flash { 0% { box-shadow:0 0 0 3px #f1ce7b; } 45% { box-shadow:0 0 20px 5px #a895ed; } 100% { box-shadow:none; } }
 #board.night-transition { animation:phase-night-flash .8s ease-out; }
 @media(prefers-reduced-motion:reduce){#board.night-transition{animation:none}}
+
+.chamber-inspection { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:6px 12px; margin:8px 0; padding:8px 10px; border:1px solid #887548; border-radius:6px; font-size:clamp(13px,2.5vw,16px); }
+.chamber-inspection strong { color:#efc77b; }
+.chamber-inspection[hidden] { display:none; }
