@@ -128,7 +128,13 @@
   $('world-intro-title').textContent='The Archive of First Currents';finish.textContent=label;
   if(!dialog.open)dialog.showModal();audio?.story(true);render();next.focus();
  }
- window.EFStory = {openArchive,
+ function openGarden(type,label,callback){
+  archiveMode=true;auto=false;paused=false;autoButton.textContent='Auto: off';pauseButton.textContent='Pause';archiveControls.hidden=false;
+  panels=window.EFGarden.panels(type);panelIndex=0;onFinish=callback;
+  $('world-intro-title').textContent='The Garden of Forgotten Wonders';finish.textContent=label;
+  if(!dialog.open)dialog.showModal();audio?.story(true);render();next.focus();
+ }
+ window.EFStory = {openArchive,openGarden,
   open, close,
   configureAudio(controller) { audio = controller; },
  };

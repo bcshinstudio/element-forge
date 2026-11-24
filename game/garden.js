@@ -44,6 +44,19 @@
   }
   tile.append(layer);
  }
- const api={elements,isGarden,group,delivered,view,motion,level};
+ const panels=type=>(type==='opening'?[
+ ['The Hidden Garden','Jeeah','Look, Eldrin. A garden hidden beyond the old stone arch.'],
+ ['The Unexpected Explosion','Tessa','Pip! That was supposed to be a tiny spark!'],
+ ['Meeting Tessa','Tessa','I am Tessa, a wandering inventor. And this is Pip.'],
+ ['The Friendly Challenge','Eldrin','These mechanisms were built to carry six elemental currents.'],
+ ['The Forgotten Mechanism','Jeeah','Let us restore the currents and awaken the Heart of Wonders.']
+ ]:[
+ ['The Garden Awakens','Tessa','It works! Every current is flowing again!'],
+ ['Laughter Among Friends','Eldrin','A little water never hurt a scholar.'],
+ ['An Invitation to Adventure','Jeeah','Come with us, Tessa. There is so much more to discover.'],
+ ["The Weaver’s Playground Revealed",'Tessa','Look beyond the gate! What a wonderful place to explore.'],
+ ['A Journey Shared','Jeeah','Together, then. The next current is waiting.']
+ ]).map(([caption,speaker,line],i)=>({caption,speaker,line,art:'garden-'+(type==='opening'?i+1:i+6),motion:'archive',duration:4500}));
+ const api={panels,elements,isGarden,group,delivered,view,motion,level};
  root.EFGarden=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

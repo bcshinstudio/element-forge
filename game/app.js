@@ -22,12 +22,18 @@
  }
  const archiveIndex=chapters[3].start;
  for(const chapter of chapters.slice(3))chapter.start++;
+ const gardenIndex=chapters[5].start;
+ for(const chapter of chapters.slice(5))chapter.start++;
+ const isGarden=index=>index===gardenIndex;
+ const isInterlude=index=>isArchive(index)||isGarden(index);
+ const interludeName=index=>isGarden(index)?'The Garden of Forgotten Wonders':'The Archive of First Currents';
  const chapterAt=index=>chapters.findLast(chapter=>index>=chapter.start);
  const isArchive=index=>index===archiveIndex;
- const stageLabel=index=>isArchive(index)?'Interlude':String(index+1-(index>archiveIndex?1:0));
- const isChapterEnd=index=>!isArchive(index)&&index<campaignSize&&index===chapterAt(index).start+chapterAt(index).stages.length-1;
+ const stageLabel=index=>isInterlude(index)?'Interlude':String(index+1-(index>archiveIndex?1:0)-(index>gardenIndex?1:0));
+ const isChapterEnd=index=>!isInterlude(index)&&index<campaignSize&&index===chapterAt(index).start+chapterAt(index).stages.length-1;
  const levels=chapters.flatMap((chapter,index)=>chapter.stages.map(level=>window.EFVariants.campaignLevel(level,index)));
  levels.splice(archiveIndex,0,window.EFArchive.level);
+ levels.splice(gardenIndex,0,window.EFGarden.level);
  const campaignSize=levels.length;
  const tutorials=[...window.EFLevels.catalog,window.EFLevels.prototype,...window.EFChapter.archivedTutorials];
  levels.push(...tutorials);
@@ -174,7 +180,7 @@
   $('puzzle').textContent=map.name;
   const chapter=index<campaignSize?chapterAt(index):null;
   $('stage-number').hidden=!chapter;
-  $('stage-number').textContent=isArchive(index)?'Interlude · The Archive':chapter?`Chapter ${chapters.indexOf(chapter)+1} · Stage ${index-chapter.start+1}`:'';
+  $('stage-number').textContent=isInterlude(index)?'Interlude · '+interludeName(index):chapter?`Chapter ${chapters.indexOf(chapter)+1} · Stage ${index-chapter.start+1}`:'';
 
   $('description').textContent=map.description;
   storyExpanded=false;
@@ -406,7 +412,7 @@
   if(phase==='build')drawToolBar();
   $('next').disabled=mode==='independent'&&(levelIndex<challengeStart||levelIndex+1>=challengeEnd);
   $('next').textContent=mode==='tutorial'?(tutorialReturn?'Return to Stage':'Tutorials'):
-   mode==='replay'?'Stage Select':(mode==='run'||mode==='review')&&(isChapterEnd(levelIndex)||isArchive(levelIndex))?'Chapter Ending':'Next Stage';
+   mode==='replay'?'Stage Select':(mode==='run'||mode==='review')&&(isChapterEnd(levelIndex)||isInterlude(levelIndex))?'Chapter Ending':'Next Stage';
   $('return-lesson').hidden=mode!=='tutorial';
   drawBoard();
  }
@@ -804,7 +810,7 @@
   if(!result.ok){message(result.message);return;}
   if(levelIndex<campaignSize&&!developerReviewUnlocked){
    const snapshot=mode==='run'?campaignSnapshot():null;
-   if(snapshot&&(isChapterEnd(levelIndex)||isArchive(levelIndex)))snapshot.storyPending=true;
+   if(snapshot&&(isChapterEnd(levelIndex)||isInterlude(levelIndex)))snapshot.storyPending=true;
    progress.complete(levels[levelIndex].id,result.points,snapshot);
    updateLevelLabels();
   }else if(mode==='tutorial'){
@@ -1003,7 +1009,7 @@
    $('level').options[i].disabled=!canOpen(i);
    $('level').options[i].textContent=`${stageLabel(i)}. ${map.name}${progress.hasCompleted(id)?' ✓':canOpen(i)?'':' · Locked'}`;
   }
-  const stages=isArchive(levelIndex)?[window.EFArchive.level]:chapterAt(levelIndex<campaignSize?levelIndex:0).stages;
+  const stages=isInterlude(levelIndex)?[levels[levelIndex]]:chapterAt(levelIndex<campaignSize?levelIndex:0).stages;
   $('campaign-progress').textContent=`${stages.filter(level=>progress.hasCompleted(level.id)).length} / ${stages.length} complete`;
  }
  const story=window.EFStory;
@@ -1018,10 +1024,10 @@
   }
   if(!canOpen(index))return {index:progress.unlockedIndex(),recovered:true};
   if(saved.board?.phase==='complete'){
-   if(saved.storyPending&&(isChapterEnd(index)||isArchive(index)))return {index,ending:true};
+   if(saved.storyPending&&(isChapterEnd(index)||isInterlude(index)))return {index,ending:true};
    if(index===campaignSize-1)return {complete:true};
    if(!canOpen(index+1))return {index:progress.unlockedIndex(),recovered:true};
-   return {index:index+1,opening:isChapterEnd(index)||isArchive(index)};
+   return {index:index+1,opening:isChapterEnd(index)||isInterlude(index)};
   }
   const changed=(saved.layout??1)!==(levels[index].layout??1);
   return {index,changed,board:!changed&&saved.rules===levels[index].rulesVersion?saved.board:null};
@@ -1077,9 +1083,9 @@
   $('stage-list').replaceChildren();
   levels.slice(0,campaignSize).forEach((level,index)=>{
    const chapter=chapterAt(index);
-   if(index===chapter.start||isArchive(index)){
+   if(index===chapter.start||isInterlude(index)){
     const heading=document.createElement('h3');
-    heading.textContent=isArchive(index)?'Interlude · The Archive of First Currents':`${chapter.title} · ${chapter.name}`;
+    heading.textContent=isInterlude(index)?'Interlude · '+interludeName(index):`${chapter.title} · ${chapter.name}`;
     $('stage-list').append(heading);
    }
    makeChoice($('stage-list'),`${stageLabel(index)}. ${level.map.name}${progress.hasCompleted(level.id)?' ✓':''}`,
@@ -1318,7 +1324,7 @@
   document.body.classList.toggle('chapter-restored',Boolean(target?.complete));
   $('continue').disabled=!target||Boolean(target.complete);
   $('home-total').textContent=target?.complete?'Campaign complete · The Confluence Forges awakened':
-   target?`${isArchive(target.index)?'Interlude · The Archive':`Chapter ${chapters.indexOf(chapterAt(target.index))+1} · Stage ${stageLabel(target.index)} of ${campaignSize-1}`} · Best total ${progress.total()}`:'Chapter 1 · The Sleeping Valley';
+   target?`${isInterlude(target.index)?'Interlude · '+interludeName(target.index):`Chapter ${chapters.indexOf(chapterAt(target.index))+1} · Stage ${stageLabel(target.index)} of ${campaignSize-2}`} · Best total ${progress.total()}`:'Chapter 1 · The Sleeping Valley';
   renderChallengeChoices();
   showPanel(null);
   renderChoices();
@@ -1326,6 +1332,7 @@
   (target&&!target.complete?$('continue'):$('new-campaign')).focus();
  }
  function showChapterOpening(index,playMode=developerReviewUnlocked?'review':'run'){
+  if(isGarden(index)){story.openGarden('opening','Restore the currents',()=>openLevel(index,null,playMode));return;}
   if(isArchive(index)){story.openArchive('opening','Restore the currents',()=>openLevel(index,null,playMode));return;}
   story.open(chapters.indexOf(chapterAt(index)),'opening','Begin',()=>{
    openLevel(index,null,playMode);
@@ -1333,14 +1340,15 @@
   });
  }
  function advanceCampaign(index,playMode){
-  if(isChapterEnd(index)||isArchive(index))showChapterEnding(index,playMode);
+  if(isChapterEnd(index)||isInterlude(index))showChapterEnding(index,playMode);
   else openLevel(index+1,null,playMode);
  }
  function showChapterEnding(index,playMode=developerReviewUnlocked?'review':'run'){
   stopAnimation();
+  if(isGarden(index)){story.openGarden('ending','Start Chapter Six',()=>showChapterOpening(index+1,playMode));return;}
   if(isArchive(index)){story.openArchive('ending','Start Chapter Four',()=>showChapterOpening(index+1,playMode));return;}
   const last=index===campaignSize-1;
-  const label=last?'Campaign Summary':isArchive(index+1)?'Enter the Archive':`Start ${chapterAt(index+1).title}`;
+  const label=last?'Campaign Summary':isGarden(index+1)?'Enter the Garden':isArchive(index+1)?'Enter the Archive':`Start ${chapterAt(index+1).title}`;
   story.open(chapters.indexOf(chapterAt(index)),'ending',label,()=>{
    if(!last){showChapterOpening(index+1,playMode);return;}
    if(playMode==='review'){showHome();showPanel('stage-list');return;}
@@ -1377,6 +1385,8 @@
   action(developerTools,'developer-opening','Play opening cinematic',()=>story.open(Number(selection.value),'opening','Return to Developer Tools',()=>{}));
   action(developerTools,'developer-ending','Replay chapter ending',()=>showChapterEnding(chapters[Number(selection.value)].start+chapters[Number(selection.value)].stages.length-1,'review'));
   action(developerTools,'developer-archive','Visit the Archive',()=>showChapterOpening(archiveIndex,'review'));
+  action(developerTools,'developer-garden','Visit the Garden',()=>showChapterOpening(gardenIndex,'review'));
+  action(developerTools,'developer-garden-ending','Play Garden ending',()=>showChapterEnding(gardenIndex,'review'));
   action(developerTools,'developer-archive-ending','Play Archive ending',()=>showChapterEnding(archiveIndex,'review'));
   action(developerTools,'developer-reset-chapter','Restart selected chapter',()=>openLevel(chapters[Number(selection.value)].start,null,'review'));
   action(developerTools,'developer-exit','Exit Developer Mode',leaveDeveloperReview);
