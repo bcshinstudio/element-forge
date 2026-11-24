@@ -25,7 +25,7 @@ function setTool(value){
  document.querySelectorAll('[data-tool]').forEach(button=>button.classList.toggle('active',button.dataset.tool===value));
  const labels={erase:'Eraser',inspect:'Inspect',art:'Paint artwork',pick:'Copy artwork',copy:'Copy cell',stamp:'Stamp cell','phase:toggle':'Mark shifting channel'};
  const [kind,id]=value.split(':');
- $('selected').textContent=labels[value]??(kind==='node'?`${ELEMENTS[element].name} ${id==='source'?'source':'inlet'}`:id);
+ $('selected').textContent=labels[value]??(kind==='node'?`${ELEMENTS[element].name} ${id==='source'?'source':'destination'}`:id);
  updateProperties();
  refreshElementArtwork();
  window.EFEditorArt?.showBrush();
@@ -66,7 +66,7 @@ function buildPalette(){
   palette.append(content);
  };
  paintGroup('Terrain','terrain',TERRAIN,true);
- paintGroup('Sources & Inlets','node',[['source','Source','●'],['destination','Inlet','◎']],true);
+ paintGroup('Sources & Destinations','node',[['source','Source','●'],['destination','Destination','◎']],true);
  paintGroup('Tools & Fixtures','component',COMPONENTS);
  const brushes=document.createElement('div');
  brushes.className='palette-grid';

@@ -1657,5 +1657,82 @@
   "label": "Library · destination world",
   "piece": "",
   "file": "library/library-destination-world.webp"
+ },
+ "library-lectern-source-fire": {
+  "id": "library-lectern-source-fire",
+  "type": "node-lectern-source",
+  "label": "Library · closed lectern fire",
+  "piece": "",
+  "file": "library/library-lectern-source-fire.webp"
+ },
+ "library-lectern-source-water": {
+  "id": "library-lectern-source-water",
+  "type": "node-lectern-source",
+  "label": "Library · closed lectern water",
+  "piece": "",
+  "file": "library/library-lectern-source-water.webp"
+ },
+ "library-lectern-source-nature": {
+  "id": "library-lectern-source-nature",
+  "type": "node-lectern-source",
+  "label": "Library · closed lectern nature",
+  "piece": "",
+  "file": "library/library-lectern-source-nature.webp"
+ },
+ "library-lectern-source-electricity": {
+  "id": "library-lectern-source-electricity",
+  "type": "node-lectern-source",
+  "label": "Library · closed lectern electricity",
+  "piece": "",
+  "file": "library/library-lectern-source-electricity.webp"
+ },
+ "library-lectern-source-arcane": {
+  "id": "library-lectern-source-arcane",
+  "type": "node-lectern-source",
+  "label": "Library · closed lectern arcane",
+  "piece": "",
+  "file": "library/library-lectern-source-arcane.webp"
+ },
+ "library-lectern-source-wind": {
+  "id": "library-lectern-source-wind",
+  "type": "node-lectern-source",
+  "label": "Library · closed lectern wind",
+  "piece": "",
+  "file": "library/library-lectern-source-wind.webp"
+ },
+ "library-lectern-source-earth": {
+  "id": "library-lectern-source-earth",
+  "type": "node-lectern-source",
+  "label": "Library · closed lectern earth",
+  "piece": "",
+  "file": "library/library-lectern-source-earth.webp"
+ },
+ "library-lectern-source-ice": {
+  "id": "library-lectern-source-ice",
+  "type": "node-lectern-source",
+  "label": "Library · closed lectern ice",
+  "piece": "",
+  "file": "library/library-lectern-source-ice.webp"
+ },
+ "library-lectern-source-metal": {
+  "id": "library-lectern-source-metal",
+  "type": "node-lectern-source",
+  "label": "Library · closed lectern metal",
+  "piece": "",
+  "file": "library/library-lectern-source-metal.webp"
+ },
+ "library-lectern-source-light": {
+  "id": "library-lectern-source-light",
+  "type": "node-lectern-source",
+  "label": "Library · closed lectern light",
+  "piece": "",
+  "file": "library/library-lectern-source-light.webp"
+ },
+ "library-lectern-source-shadow": {
+  "id": "library-lectern-source-shadow",
+  "type": "node-lectern-source",
+  "label": "Library · closed lectern shadow",
+  "piece": "",
+  "file": "library/library-lectern-source-shadow.webp"
  }
 }

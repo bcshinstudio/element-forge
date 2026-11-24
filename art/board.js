@@ -49,8 +49,8 @@
 
  function nodeArtwork(mode,node){
   if(!node||!['library','books-only'].includes(mode))return null;
-  const prefix=node.role==='source'?'source':mode==='library'?'destination':'open-destination';
-  const type=node.role==='source'?'node-source':mode==='library'?'node-destination':'node-open-destination';
+  const prefix=node.role==='source'?(mode==='library'?'lectern-source':'source'):mode==='library'?'destination':'open-destination';
+  const type=node.role==='source'?(mode==='library'?'node-lectern-source':'node-source'):mode==='library'?'node-destination':'node-open-destination';
   return window.EFVariants?.resolve({id:'library-'+prefix+'-'+node.element},type)??null;
  }
  function setNode(cell,mode,node){

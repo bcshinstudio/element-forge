@@ -182,7 +182,7 @@
   if(cell.node){
    addProperty('Element',Object.entries(ELEMENTS).map(([id,e])=>[id,e.name]),cell.node.element,
     value=>editCell(next=>{next.node.element=value;}));
-   addProperty('Endpoint',[['source','Source'],['destination','Inlet']],cell.node.role,
+   addProperty('Endpoint',[['source','Source'],['destination','Destination']],cell.node.role,
     value=>editCell(next=>{next.node.role=value;}));
   }
   const issues=artIssues(cell);
