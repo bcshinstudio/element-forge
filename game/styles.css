@@ -748,3 +748,16 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 }
 
 .archive-controls:not([hidden]){display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:.7rem}.archive-delivered .library-node-art{filter:drop-shadow(0 0 6px #ffe7a3) brightness(1.2)}.archive-index:after,.archive-lantern:after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle,#ffdc8166,transparent 70%);opacity:var(--archive-glow,.35);animation:archive-flicker 2s alternate infinite}@keyframes archive-flicker{to{filter:brightness(1.5)}}@media(prefers-reduced-motion:reduce){.archive-index:after,.archive-lantern:after{animation:none}}
+
+/* Garden restoration: visual overlays never change terrain or intercept input. */
+.cell[data-garden-effect]::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;border-radius:inherit;mix-blend-mode:screen;animation:garden-pulse 2.8s ease-in-out infinite alternate;}
+.cell[data-garden-effect="fire"]::after{background:radial-gradient(circle at 50% 37%,#ffd36b99,transparent 62%);}
+.cell[data-garden-effect="water"]::after{background:radial-gradient(ellipse at 50% 25%,#bafaffbb,transparent 62%);animation:garden-water 1.8s ease-in-out infinite;}
+.cell[data-garden-effect="nature"]::after{background:radial-gradient(circle,#c8ff9877,transparent 70%);}
+.cell[data-garden-effect="electricity"]::after{background:conic-gradient(from 0deg,transparent,#b5edff88,transparent 24%,transparent 70%,#ffdc9977,transparent);animation:garden-pulse 1.2s ease-in-out infinite alternate;}
+.cell[data-garden-effect="wind"]::after{background:repeating-linear-gradient(145deg,transparent 0 13px,#dcfff955 14px 15px,transparent 16px 27px);animation:garden-water 2s ease-in-out infinite;}
+.cell[data-garden-effect="arcane"]::after{background:radial-gradient(circle,#c397ff55,transparent 70%);}
+.cell[data-garden-effect="complete"]::after{background:radial-gradient(circle,#ffe7a855,transparent 75%);}
+@keyframes garden-pulse{from{opacity:.25}to{opacity:.9}}
+@keyframes garden-water{0%,100%{opacity:.3;transform:translateY(2%)}50%{opacity:.95;transform:translateY(-3%)}}
+@media(prefers-reduced-motion:reduce){.cell[data-garden-effect]::after{animation:none;opacity:.55;transform:none}}

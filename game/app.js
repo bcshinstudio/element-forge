@@ -461,6 +461,7 @@
   syncDragHandles();
   const {map,state}=session;
   const visible=E.phaseView(map,state.dayPhase);
+  const garden=window.EFGarden.isGarden(map)?window.EFGarden.view(map,state.routes,window.EFArtCatalog):null;
   // Routes update the board without calling update(); refresh the phase badge here.
   if(E.hasPhases(map)){
    const night=state.dayPhase==='night';
@@ -575,6 +576,10 @@
     tile.replaceChildren(fragments[i]);
     window.EFBoardArt.setTerrain(tile,terrain,cell.props?.phaseShift&&state.dayPhase==='night'?undefined:cell.terrainArt);
    }
+   if(garden){
+    window.EFBoardArt.setTerrain(tile,terrain,garden[i].spec);
+    if(garden[i].effect)tile.dataset.gardenEffect=garden[i].effect;else delete tile.dataset.gardenEffect;
+   }else delete tile.dataset.gardenEffect;
    window.EFBoardArt.decorate(tile,pendingOpening??kind,{link,spec:pendingOpening?map.toolArt?.[pendingOpening]:appearance});
    window.EFBoardArt.setNode(tile,map.nodeAppearance,cell.node);
    const archive=map.nodeAppearance==='library'&&map.name===window.EFArchive.level.map.name;

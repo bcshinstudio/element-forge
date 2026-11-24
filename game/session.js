@@ -18,6 +18,7 @@
   const map=F.readLevel(level);
   const multi=E.hasMultiConfluence(map);
   const shifting=E.hasPhases(map);
+  const garden=map.nodeAppearance==='garden'&&map.name==='The Garden of Forgotten Wonders';
   const routeId=r=>E.routeKey(map,r.element,r.path[0]);
   const state={phase:'inspect',dayPhase:map.phaseRules?.initial??null,loadout:{},placements:{},routes:[],drafts:{},active:null};
   let history=[];
@@ -58,8 +59,10 @@
     state.active=null;
     return true;
    }
-   const previous=history.pop();
+   const previous=history.at(-1);
    if(!previous)return false;
+   if(garden&&state.routes.some(r=>!previous.routes.some(p=>routeId(p)===routeId(r))))return false;
+   history.pop();
    state.placements=previous.placements;
    state.dayPhase=previous.dayPhase;
    state.routes=previous.routes;
@@ -91,9 +94,10 @@
   function remove(index){
    if(state.phase!=='build')return fail('Start building first.');
    if(!onboard(index)||!Object.hasOwn(state.placements,index))return fail('Choose a tool you placed.');
-   remember(true);
    const linked=E.linkPartner(map,index,state.placements);
    const tiles=linked<0?[index]:[index,linked];
+   if(garden&&state.routes.some(r=>r.path.some(i=>tiles.includes(i))))return fail('A delivered current cannot be changed. Restart to reset the garden.');
+   remember(true);
    for(const i of tiles)delete state.placements[i];
    const affected=route=>route.path.some(i=>tiles.includes(i));
    const removingTrigger=shifting&&state.routes.some(r=>affected(r)&&E.phaseTriggerRoute(map,r));
@@ -217,6 +221,7 @@
       return fail('Complete both Confluence inputs before routing its output.');
     }
     if(state.routes.some(route=>route.element===element)){
+     if(garden)return fail('This current has already been delivered.');
      if(shifting&&element===map.cells[E.phasePlateIndex(map)]?.props?.element&&
         state.routes.some(r=>r.deliveredPhase==='night'))
       return fail('Undo Night deliveries before changing the route that activated Night.');
@@ -231,6 +236,7 @@
    if((reopen||!state.active)&&cell.node?.role==='destination'){
     const completed=state.routes.find(route=>route.path.at(-1)===index);
     if(completed){
+     if(garden)return fail('This current has already been delivered.');
      if(shifting&&E.phaseTriggerRoute(map,completed)&&state.routes.some(r=>r.deliveredPhase==='night'))
       return fail('Undo Night deliveries before reopening the Day trigger route.');
      remember();
