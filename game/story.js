@@ -33,6 +33,12 @@
   const version = stop();
   const panel = panels[panelIndex];
   $('story-caption').textContent = panel.speaker ? panel.caption+' · '+panel.speaker : panel.caption;
+  const speaker=panel.speaker??'Jeeah';
+  const portrait=dialog.querySelector('.jeeah-portrait');
+  dialog.querySelector('.jeeah-dialogue strong').textContent=speaker;
+  portrait.dataset.speaker=speaker;
+  portrait.setAttribute('aria-label',speaker==='Narrator'?'':speaker);
+  portrait.setAttribute('aria-hidden',String(speaker==='Narrator'));
   const line=$('story-line');line.textContent='“'+panel.line+'”';
   if(archiveMode&&animate&&!paused&&!reducedMotion.matches){let n=0;line.textContent='';textTimer=setInterval(()=>{line.textContent=panel.line.slice(0,++n);if(n>=panel.line.length)clearInterval(textTimer);},26);}
   canvas.setAttribute('aria-label', panel.caption);
