@@ -42,6 +42,9 @@ def run():
                 expect(page.locator("#world-intro")).to_be_visible()
                 expect(page.locator("#intro-begin")).to_have_text("Enter the Archive")
                 page.locator("#intro-begin").click()
+                expect(page.get_by_role("button",name="Auto: on")).to_be_visible()
+                page.get_by_role("button",name="Pause",exact=True).click()
+                expect(page.get_by_role("button",name="Resume",exact=True)).to_be_visible()
                 expect(page.locator("#world-intro-title")).to_have_text("The Archive of First Currents")
                 def verify_dialogue(part):
                     panels=page.evaluate("(part)=>EFArchive.panels(part)",part)

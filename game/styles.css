@@ -791,3 +791,13 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 .routing-restrictions ul { margin: 0; padding-left: 1.15em; }
 .routing-restrictions li { margin: 4px 0; line-height: 1.4; }
 .routing-restrictions[hidden] { display: none; }
+
+/* Accessible chamber ports and phase plates */
+.confluence-mark .confluence-core { background:#172c25; border:1px solid #e5c78e; }
+.confluence-mark .confluence-port { color:#132720; font-weight:900; font-size:clamp(8px,1.25vw,15px); width:34%; height:34%; border:1px solid white; display:grid; place-items:center; text-shadow:none; }
+.confluence-mark .port-input { border-radius:50%; }
+.confluence-mark .port-output { border-radius:3px; box-shadow:inset 0 0 0 1px #142820; }
+.phase-plate-mark { display:flex; flex-direction:column; align-items:center; justify-content:center; width:80%; height:80%; background:#173229; border:1px solid #efc77b; border-radius:7px; line-height:1; }
+.phase-plate-mark b { color:#172c25; background:var(--plate-color); border-radius:50%; padding:2px 4px; font-size:clamp(10px,1.5vw,20px); }
+.phase-plate-mark small { color:#f3cc80; font-size:clamp(7px,.9vw,12px); }
+.phase-plate-mark[data-activated="true"] { border-color:#b6a2f1; box-shadow:0 0 5px #b6a2f1; }

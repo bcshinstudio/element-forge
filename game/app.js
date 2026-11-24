@@ -190,6 +190,11 @@
    for(const id of rule.forbidComponents??[])ruleItems.push([name,'Cannot use '+(toolNames[id]??id).toLowerCase()+'.']);
    for(const id of rule.forbidTerrain??[])ruleItems.push([name,'Cannot cross '+(terrainNames[id]??id).toLowerCase()+'.']);
   }
+  if(E.hasPhases(map)){
+   const trigger=map.cells[E.phasePlateIndex(map)]?.props?.element;
+   if(trigger)ruleItems.push([F.ELEMENTS[trigger].name,'Complete delivery through its Pressure Plate to activate Night.']);
+   ruleItems.push(['Light','Cannot cross covered channels.'],['Shadow','Cannot cross exposed channels.'],['Phase change','Completed deliveries remain valid.']);
+  }
   rules.querySelector('ul').replaceChildren(...ruleItems.map(([name,copy])=>{
    const li=document.createElement('li'),strong=document.createElement('strong');
    strong.textContent=name+': ';li.append(strong,copy);return li;
@@ -391,7 +396,7 @@
   $('phase-indicator').hidden=!E.hasPhases(session.map);
   if(E.hasPhases(session.map)){
    const night=session.state.dayPhase==='night';
-   $('phase-indicator').textContent=night?'☾ Night · Day deliveries preserved':'☀ Day · Complete the plate route to switch';
+   $('phase-indicator').textContent=night?'☾ Night · Day deliveries preserved':'☀ Day · '+F.ELEMENTS[session.map.cells[E.phasePlateIndex(session.map)].props.element].name+' activates Night';
    $('phase-indicator').dataset.dayPhase=session.state.dayPhase;
   }
   $('instructions').textContent={
@@ -484,7 +489,7 @@
   // Routes update the board without calling update(); refresh the phase badge here.
   if(E.hasPhases(map)){
    const night=state.dayPhase==='night';
-   $('phase-indicator').textContent=night?'☾ Night · Day deliveries preserved':'☀ Day · Complete the plate route to switch';
+   $('phase-indicator').textContent=night?'☾ Night · Day deliveries preserved':'☀ Day · '+F.ELEMENTS[session.map.cells[E.phasePlateIndex(session.map)].props.element].name+' activates Night';
    $('phase-indicator').dataset.dayPhase=state.dayPhase;
   }
   const fragments=tiles.map(()=>document.createDocumentFragment());
@@ -550,10 +555,11 @@
      const ports=[[recipe.inputs[0],chamber.ports[recipe.inputs[0]]],[recipe.inputs[1],chamber.ports[recipe.inputs[1]]],[recipe.output,chamber.ports[recipe.output]]];
      for(const [element,side] of ports){
       const port=document.createElement('span');
-      port.className='confluence-port confluence-'+element+' port-'+side;
+      port.className='confluence-port confluence-'+element+' port-'+side+' '+(element===recipe.output?'port-output':'port-input');
+      port.dataset.role=element===recipe.output?'output':'input';
       port.style.background=colors[element];
       port.textContent=symbols[element];
-      port.title=F.ELEMENTS[element].name;
+      port.setAttribute('aria-hidden','true');
       mark.append(port);
      }
     }
@@ -562,8 +568,11 @@
    }else if(kind==='phasePlate'){
     mark.classList.add('structure','phase-plate-mark');
     const triggered=state.routes.some(r=>E.phaseTriggerRoute(map,r));
-    mark.textContent=triggered?'☾':'☀';
-    mark.title='Day/Night pressure plate · '+F.ELEMENTS[cell.props.element].name+' delivery';
+    mark.dataset.activated=String(triggered);
+    mark.style.setProperty('--plate-color',colors[cell.props.element]);
+    const plateElement=document.createElement('b');plateElement.textContent=symbols[cell.props.element];
+    const platePhase=document.createElement('small');platePhase.textContent=triggered?'☾':'☀ → ☾';
+    mark.append(plateElement,platePhase);
    }else if(kind==='checkpoint'){
     const element=cell.props?.element;
     const visited=[...fragments[i].querySelectorAll('.track')].find(line=>
@@ -619,7 +628,9 @@
     ', '+F.ELEMENTS[chamber.output].name+' exits '+chamber.ports[chamber.output]+
     (tile.classList.contains('confluence-ready')?' · inputs ready':' · inputs pending'):'';
    const tileLabel=pendingOpening?label+' · '+toolNames[pendingOpening]+' opening selected':label+direction+visited+reaction+(cell.props?.phaseShift?' · Day/Night shifting channel':'');
-   tile.title=(archive||map.nodeAppearance==='garden')&&cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role==='source'?'source':archive?'tome':'inlet'}`:tileLabel;
+   const formula=chamber?chamber.inputs.map(el=>F.ELEMENTS[el].name).join(' + ')+' → '+F.ELEMENTS[chamber.output].name:'';
+   tile.title=cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role==='source'?'source':archive?'tome':'inlet'}`:chamber?'Confluence Chamber — '+formula:kind==='phasePlate'?F.ELEMENTS[cell.props.element].name+' Pressure Plate — Activates Night':kind?checkpoint+toolNames[kind]+(link?' '+link:'')+direction:terrain==='land'?'':terrainNames[terrain]||terrain;
+   if(formula)tile.dataset.formula=formula;else delete tile.dataset.formula;
    tile.setAttribute('aria-label',tileLabel);
   }
  }
@@ -631,6 +642,10 @@
    return 'This is an inlet (I). Start at the matching source (S).';
   }
   if(element==='wind'&&map.cells[index].terrain==='void')return 'Tap the landing across one hole. Wind cannot stop in the Void.';
+  if(result.message==='Required component not used'&&element){
+   const missing=(map.constraints?.[element]?.requireComponents??[]).filter(id=>![...state.active.path,index].some(i=>E.effective(map,state.placements,i)===id));
+   return F.ELEMENTS[element].name+' must use '+missing.map(id=>toolNames[id].toLowerCase()).join(' and ')+' before reaching its inlet.';
+  }
   if(result.message==='Element terrain restriction violated'){
    return F.ELEMENTS[element].name+' cannot cross '+terrainNames[map.cells[index].terrain].toLowerCase()+' on this level.';
   }

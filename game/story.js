@@ -8,7 +8,11 @@
  const cache = new Map();
  let panels, panelIndex, onFinish, frameRequest, renderVersion = 0, textTimer;
  let voice=null,gardenMode=false;
- let audio,archiveMode=false,autoTimer=null,auto=false,paused=false;
+ let audio,archiveMode=false,autoTimer=null,auto=true,paused=false;
+ const autoKey='wellspring.story.autoplay';
+ function autoPreference(){try{return localStorage.getItem(autoKey)!=='off';}catch{return true;}}
+ function setAutoPreference(value){try{localStorage.setItem(autoKey,value?'on':'off');}catch{}}
+ function resetPlayback(){auto=autoPreference();paused=false;autoButton.textContent='Auto: '+(auto?'on':'off');pauseButton.textContent='Pause';archiveControls.hidden=false;}
  const back = $('intro-back'), next = $('intro-next'), finish = $('intro-begin');
  const replay = $('story-replay'), skip = $('story-skip');
 
@@ -74,7 +78,7 @@
   const cue = panel.motion ?? (['river','rest'].includes(panel.art) ? 'river' : null);
   if (animate && cue && cue!=='archive' && cue!=='garden' && (!reducedMotion.matches || !panel.motion)) audio?.effect(cue);
   const advance=()=>{if(version!==renderVersion||paused||!dialog.open)return;if(next.hidden)finish.click();else next.click();};
-  const schedule=()=>{if(archiveMode&&auto&&!paused&&version===renderVersion)autoTimer=setTimeout(advance,Math.max(3000,panel.line.length*65));};
+  const schedule=()=>{if(auto&&!paused&&version===renderVersion)autoTimer=setTimeout(advance,Math.max(4500,panel.line.length*65, panel.duration??0));};
   const src=panel.voice||window.EFCharacterVoices?.[panel.voiceId];
   if(src&&!paused&&animate){const clip=new Audio(src);voice=clip;clip.addEventListener('ended',()=>{if(auto)advance();},{once:true});let failed=false;const fallback=()=>{if(!failed&&version===renderVersion){failed=true;schedule();}};clip.addEventListener('error',fallback,{once:true});clip.play().catch(fallback);}else schedule();
   if (!animate || !panel.motion || reducedMotion.matches || paused) { paint(1); return; }
@@ -96,7 +100,7 @@
  }
 
  function open(chapter, type, label, callback) {
-  gardenMode=false;archiveMode=false;auto=false;paused=false;archiveControls.hidden=true;
+  gardenMode=false;archiveMode=false;resetPlayback();
   panels = window.EFStoryChapters[chapter][type];
   panelIndex = 0;
   onFinish = callback;
@@ -130,20 +134,20 @@
 
  const archiveControls=document.createElement('div');archiveControls.hidden=true;archiveControls.className='archive-controls';dialog.append(archiveControls);
  const control=(label,fn)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=fn;archiveControls.append(b);return b;};
- const autoButton=control('Auto: off',()=>{auto=!auto;autoButton.textContent='Auto: '+(auto?'on':'off');render(false);});
+ const autoButton=control('Auto: on',()=>{auto=!auto;setAutoPreference(auto);autoButton.textContent='Auto: '+(auto?'on':'off');render(false);});
  const pauseButton=control('Pause',()=>{paused=!paused;pauseButton.textContent=paused?'Resume':'Pause';render(!paused);});
  control('Replay sequence',()=>{panelIndex=0;render();});
  control('Skip sequence',()=>finish.click());
  control('Full screen',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await dialog.requestFullscreen();}catch{}});
  function openArchive(type,label,callback){
-  gardenMode=false;archiveMode=true;auto=false;paused=false;autoButton.textContent='Auto: off';pauseButton.textContent='Pause';archiveControls.hidden=false;
+  gardenMode=false;archiveMode=true;resetPlayback();
   panels=window.EFArchive.panels(type);panelIndex=0;onFinish=callback;
   window.EFArchive.art.forEach((src,i)=>window.EFStoryArt['archive-'+(i+1)]=src);
   $('world-intro-title').textContent='The Archive of First Currents';finish.textContent=label;
   if(!dialog.open)dialog.showModal();audio?.story(true);render();next.focus();
  }
  function openGarden(type,label,callback){
-  gardenMode=true;Object.assign(window.EFStoryArt,window.EFGarden.art);archiveMode=true;auto=false;paused=false;autoButton.textContent='Auto: off';pauseButton.textContent='Pause';archiveControls.hidden=false;
+  gardenMode=true;Object.assign(window.EFStoryArt,window.EFGarden.art);archiveMode=true;resetPlayback();
   panels=window.EFGarden.panels(type);panelIndex=0;onFinish=callback;
   $('world-intro-title').textContent='The Garden of Forgotten Wonders';finish.textContent=label;
   if(!dialog.open)dialog.showModal();audio?.story(true);render();next.focus();
