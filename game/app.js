@@ -570,7 +570,7 @@
       port.style.background=colors[element];
       port.textContent=symbols[element];
       port.setAttribute('aria-hidden','true');
-      const arrow=document.createElement('span');arrow.className='port-flow port-flow-'+side+' '+(element===recipe.output?'flow-out':'flow-in');arrow.setAttribute('aria-hidden','true');arrow.textContent=element===recipe.output?'↑':'↓';
+      const arrow=document.createElement('span');arrow.className='port-flow port-flow-'+side+' '+(element===recipe.output?'flow-out':'flow-in');arrow.setAttribute('aria-hidden','true');arrow.textContent=(element===recipe.output?{N:'↑',S:'↓',W:'←',E:'→'}:{N:'↓',S:'↑',W:'→',E:'←'})[side];
       mark.append(port,arrow);
      }
     }
