@@ -20,7 +20,7 @@
   const catalog=window.EFArtCatalog;
   const ids=new Set(map.cells.flatMap(cell=>[cell.terrainArt?.id,cell.componentArt?.id]).filter(Boolean));
   for(const cell of map.cells){
-   const item=window.EFBoardArt.nodeArtwork(map.nodeAppearance,cell.node);
+   const item=window.EFBoardArt?.nodeArtwork(map.nodeAppearance,cell.node);
    if(item)ids.add(item.id);
   }
   for(const [type,spec] of Object.entries(map.toolArt??{})){
