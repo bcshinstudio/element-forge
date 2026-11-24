@@ -49,7 +49,7 @@ def run():
                             expect(portrait).to_be_visible()
                             expect(portrait).to_have_attribute("aria-label",panel["speaker"])
                             if panel["speaker"]=="Eldrin":
-                                assert "archive-4.webp" in portrait.evaluate("(el)=>getComputedStyle(el).backgroundImage")
+                                assert "eldrin-portrait.webp" in portrait.evaluate("(el)=>getComputedStyle(el).backgroundImage")
                         if i<len(panels)-1:
                             page.locator("#intro-next").click()
                 verify_dialogue("opening")

@@ -393,10 +393,10 @@ body:has(#home:not([hidden])) .masthead { display:none; }
  aspect-ratio: 1;
  border: 1px solid #ad956a;
  border-radius: 8px;
- background: #e9ddcc url(../art/jeeah-portrait.webp) center 20% / cover no-repeat;
+ background: #e9ddcc url(../art/jeeah-portrait.webp) center / cover no-repeat;
 }
 .jeeah-portrait[data-speaker="Eldrin"] {
- background: #e9ddcc url(../art/story/archive-4.webp) 83% 9% / 560% auto no-repeat;
+ background: #e9ddcc url(../art/eldrin-portrait.webp) center / cover no-repeat;
 }
 .jeeah-portrait[data-speaker="Narrator"] { visibility: hidden; }
 .story-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; }
