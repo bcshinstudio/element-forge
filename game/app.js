@@ -182,6 +182,19 @@
   $('stage-number').hidden=!chapter;
   $('stage-number').textContent=isGarden(index)?'Interlude · The Garden':isArchive(index)?'Interlude · The Archive':chapter?`Chapter ${chapters.indexOf(chapter)+1} · Stage ${index-chapter.start+1}`:'';
 
+  const rules=$('routing-restrictions');
+  const ruleItems=[];
+  for(const [element,rule] of Object.entries(map.constraints??{})){
+   const name=F.ELEMENTS[element]?.name??element;
+   for(const id of rule.requireComponents??[])ruleItems.push([name,'Must use '+(toolNames[id]??id).toLowerCase()+'.']);
+   for(const id of rule.forbidComponents??[])ruleItems.push([name,'Cannot use '+(toolNames[id]??id).toLowerCase()+'.']);
+   for(const id of rule.forbidTerrain??[])ruleItems.push([name,'Cannot cross '+(terrainNames[id]??id).toLowerCase()+'.']);
+  }
+  rules.querySelector('ul').replaceChildren(...ruleItems.map(([name,copy])=>{
+   const li=document.createElement('li'),strong=document.createElement('strong');
+   strong.textContent=name+': ';li.append(strong,copy);return li;
+  }));
+  rules.hidden=!ruleItems.length;
   $('description').textContent=map.description;
   storyExpanded=false;
   $('description').hidden=session.state.phase!=='inspect';

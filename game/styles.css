@@ -784,3 +784,10 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 @keyframes garden-rise{0%{transform:translateY(0) scale(.5);opacity:0}25%{opacity:1}100%{transform:translateY(-750%) scale(.2);opacity:0}}
 @keyframes garden-reveal{from{opacity:.45;filter:brightness(1.7)}to{opacity:1;filter:brightness(1)}}
 @media(prefers-reduced-motion:reduce){.garden-motion i,.cell[data-garden-effect] .terrain-variant{animation:none!important;will-change:auto}.garden-motion{display:none}}
+
+/* Map-specific requirements remain visible while planning and routing. */
+.routing-restrictions { border: 1px solid #887548; border-radius: 8px; padding: 10px 12px; margin: 12px 0; }
+.routing-restrictions h3 { font-size: 1rem; margin: 0 0 6px; color: #f3cc80; }
+.routing-restrictions ul { margin: 0; padding-left: 1.15em; }
+.routing-restrictions li { margin: 4px 0; line-height: 1.4; }
+.routing-restrictions[hidden] { display: none; }

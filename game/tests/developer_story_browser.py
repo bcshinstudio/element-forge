@@ -116,6 +116,11 @@ def run():
                 page.get_by_role("button",name="Skip sequence").click()
                 expect(page.locator("#stage-number")).to_have_text("Interlude · The Garden")
                 assert page.locator("#board [data-index]").count()==169
+                rules=page.locator("#routing-restrictions")
+                expect(rules).to_be_visible()
+                expect(rules).to_contain_text("Wind: Must use bridge.")
+                expect(rules).to_contain_text("Plant: Cannot use bridge.")
+                assert page.evaluate("EFGarden.level.map.constraints.wind.requireComponents.includes('bridge')")
                 page.locator("#developer-reset-stage").click()
                 expect(page.locator("#stage-number")).to_have_text("Interlude · The Garden")
                 page.locator("#developer-complete").click()
