@@ -594,7 +594,7 @@
     ', '+F.ELEMENTS[chamber.output].name+' exits '+chamber.ports[chamber.output]+
     (tile.classList.contains('confluence-ready')?' · inputs ready':' · inputs pending'):'';
    const tileLabel=pendingOpening?label+' · '+toolNames[pendingOpening]+' opening selected':label+direction+visited+reaction+(cell.props?.phaseShift?' · Day/Night shifting channel':'');
-   tile.title=tileLabel;
+   tile.title=archive?(cell.node?F.ELEMENTS[cell.node.element].name:label.replace(/^Row \d+, column \d+, /,'')):tileLabel;
    tile.setAttribute('aria-label',tileLabel);
   }
  }
