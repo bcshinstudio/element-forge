@@ -34,8 +34,10 @@
  const importIndex=levels.length;
  let storage;
  try{if(!editorDraft)storage=window.localStorage;}catch{}
- const progress=window.EFProgress.createProgress(storage,levels.slice(0,campaignSize).map(level=>level.id),levels[0].rulesVersion,'element-forge.sleeping-valley.v1',Object.fromEntries(levels.slice(0,campaignSize).map(level=>[level.id,level.layout??1])),'element-forge.chapter-one.v1');
- const tutorialProgress=window.EFProgress.createProgress(storage,tutorials.map(level=>level.id),4);
+ const makeCampaignProgress=store=>window.EFProgress.createProgress(store,levels.slice(0,campaignSize).map(level=>level.id),levels[0].rulesVersion,'element-forge.sleeping-valley.v1',Object.fromEntries(levels.slice(0,campaignSize).map(level=>[level.id,level.layout??1])),'element-forge.chapter-one.v1');
+ const playerProgress=makeCampaignProgress(storage);
+ const playerTutorialProgress=window.EFProgress.createProgress(storage,tutorials.map(level=>level.id),4);
+ let progress=playerProgress,tutorialProgress=playerTutorialProgress;
  const audio=window.EFAudio.createAudio({storage,document,AudioContext:window.AudioContext||window.webkitAudioContext});
  document.addEventListener('click',()=>audio.unlock(),true);
  const challengeStart=importIndex+1;
@@ -130,6 +132,8 @@
 
  // Review access is deliberately transient: no completion or unlock records are written.
  let developerReviewUnlocked=false;
+ let developerStorage,developerTools,developerStageTools;
+ const reviewMode=()=>developerReviewUnlocked?'review':'replay';
  function canOpen(index){
   return developerReviewUnlocked||index>=campaignSize||index<=progress.reachedIndex();
  }
@@ -212,7 +216,8 @@
   update();
   persist();
   message(saved&&!restored?'This board changed. Your unlocked stages and scores were kept.':'');
-  if(index<campaignSize&&levels[index].lesson&&!skipTutorialPopups&&!tipSeen(levels[index].id))showTip();
+  if(index<campaignSize&&levels[index].lesson&&!skipTutorialPopups&&!developerReviewUnlocked&&!tipSeen(levels[index].id))showTip();
+  refreshDeveloperTools();
  }
 
  function campaignSnapshot(){
@@ -401,7 +406,7 @@
   if(phase==='build')drawToolBar();
   $('next').disabled=mode==='independent'&&(levelIndex<challengeStart||levelIndex+1>=challengeEnd);
   $('next').textContent=mode==='tutorial'?(tutorialReturn?'Return to Stage':'Tutorials'):
-   mode==='replay'?'Stage Select':mode==='run'&&(isChapterEnd(levelIndex)||isArchive(levelIndex))?'Chapter Ending':'Next Stage';
+   mode==='replay'?'Stage Select':(mode==='run'||mode==='review')&&(isChapterEnd(levelIndex)||isArchive(levelIndex))?'Chapter Ending':'Next Stage';
   $('return-lesson').hidden=mode!=='tutorial';
   drawBoard();
  }
@@ -791,7 +796,7 @@
   if(session.state.phase!=='build')return;
   const result=session.verify();
   if(!result.ok){message(result.message);return;}
-  if(levelIndex<campaignSize&&!(developerReviewUnlocked&&mode==='replay')){
+  if(levelIndex<campaignSize&&!developerReviewUnlocked){
    const snapshot=mode==='run'?campaignSnapshot():null;
    if(snapshot&&(isChapterEnd(levelIndex)||isArchive(levelIndex)))snapshot.storyPending=true;
    progress.complete(levels[levelIndex].id,result.points,snapshot);
@@ -814,13 +819,13 @@
   if(session.state.phase!=='complete')return;
   if(mode==='tutorial')returnFromTutorial();
   else if(mode==='replay'){showHome();showPanel('stage-list');}
-  else if(mode==='run'&&(isChapterEnd(levelIndex)||isArchive(levelIndex)))showChapterEnding(levelIndex);
+  else if(mode==='run'||mode==='review')advanceCampaign(levelIndex,mode);
   else openLevel(levelIndex+1);
  };
  $('level').onchange=()=>{
   importTicket++;
   const target=Number($('level').value);
-  if(target!==levelIndex)openLevel(target,null,'replay');
+  if(target!==levelIndex)openLevel(target,null,reviewMode());
  };
  $('import').onchange=$('home-import').onchange=async event=>{
   const input=event.target,file=input.files[0],ticket=++importTicket;
@@ -1038,6 +1043,7 @@
    $(panel).hidden=panel!==id;
    $(control).setAttribute('aria-expanded',String(panel===id));
   }
+  if(developerTools)developerTools.hidden=!developerReviewUnlocked||support;
   if(support)$(id==='information-panel'?'info-back':'settings-back').focus();
  }
  function makeChoice(parent,label,callback,disabled=false){
@@ -1071,7 +1077,7 @@
     $('stage-list').append(heading);
    }
    makeChoice($('stage-list'),`${stageLabel(index)}. ${level.map.name}${progress.hasCompleted(level.id)?' ✓':''}`,
-    ()=>openLevel(index,null,'replay'),!canOpen(index));
+    ()=>openLevel(index,null,reviewMode()),!canOpen(index));
   });
   $('tutorial-list').replaceChildren();
   const groups=[['Route basics and elements',0,11],['Tools and combined routes',11,17],['Wind practice',17,18],['Original Sleeping Valley',18,tutorials.length]];
@@ -1111,7 +1117,7 @@
    }
    skipTutorialPopups=control.checked;
    for(const input of popupControls)input.checked=skipTutorialPopups;
-   try{storage?.setItem(popupKey,skipTutorialPopups?'yes':'no');}catch{}
+   try{if(!developerReviewUnlocked)storage?.setItem(popupKey,skipTutorialPopups?'yes':'no');}catch{}
   };
  }
  const activateDeveloperReview=()=>{
@@ -1119,6 +1125,10 @@
   // It is inactive outside Settings and requires three complete on/off cycles.
   if($('audio-settings').hidden||developerReviewUnlocked||reviewChecks<3)return;
   developerReviewUnlocked=true;
+  developerStorage=new Map();
+  const memory={getItem:key=>developerStorage.get(key)??null,setItem:(key,value)=>developerStorage.set(key,value)};
+  progress=makeCampaignProgress(memory);
+  tutorialProgress=window.EFProgress.createProgress(memory,tutorials.map(level=>level.id),4);
   reviewChecks=0;
   reviewCheckArmed=false;
   updateLevelLabels();
@@ -1126,6 +1136,7 @@
   $('stage-select').textContent='Stage Select · Review';
   $('home-total').textContent='Developer review enabled · All '+campaignSize+' stages accessible · Progress unchanged';
   showPanel('stage-list');
+  refreshDeveloperTools();
  };
  $('studio-credit').addEventListener('click',activateDeveloperReview);
  $('studio-credit').addEventListener('keydown',event=>{
@@ -1257,7 +1268,7 @@
  function tipSeen(id){return seenTips.has(id);}
  function dismissTip(){
   seenTips.add(levels[levelIndex].id);
-  try{storage?.setItem(tipsKey,JSON.stringify([...seenTips]));}catch{}
+  try{if(!developerReviewUnlocked)storage?.setItem(tipsKey,JSON.stringify([...seenTips]));}catch{}
   tip.close();
  }
  function showTip(){
@@ -1305,27 +1316,72 @@
   renderChallengeChoices();
   showPanel(null);
   renderChoices();
+  refreshDeveloperTools();
   (target&&!target.complete?$('continue'):$('new-campaign')).focus();
  }
- function showChapterOpening(index){
-  if(isArchive(index)){story.openArchive('opening','Restore the currents',()=>openLevel(index));return;}
+ function showChapterOpening(index,playMode=developerReviewUnlocked?'review':'run'){
+  if(isArchive(index)){story.openArchive('opening','Restore the currents',()=>openLevel(index,null,playMode));return;}
   story.open(chapters.indexOf(chapterAt(index)),'opening','Begin',()=>{
-   openLevel(index);
+   openLevel(index,null,playMode);
    if(!tip.open)$('start').focus();
   });
  }
- function showChapterEnding(index){
+ function advanceCampaign(index,playMode){
+  if(isChapterEnd(index)||isArchive(index))showChapterEnding(index,playMode);
+  else openLevel(index+1,null,playMode);
+ }
+ function showChapterEnding(index,playMode=developerReviewUnlocked?'review':'run'){
   stopAnimation();
-  if(isArchive(index)){story.openArchive('ending','Start Chapter Four',()=>showChapterOpening(index+1));return;}
+  if(isArchive(index)){story.openArchive('ending','Start Chapter Four',()=>showChapterOpening(index+1,playMode));return;}
   const last=index===campaignSize-1;
   const label=last?'Campaign Summary':isArchive(index+1)?'Enter the Archive':`Start ${chapterAt(index+1).title}`;
   story.open(chapters.indexOf(chapterAt(index)),'ending',label,()=>{
-   if(!last){showChapterOpening(index+1);return;}
+   if(!last){showChapterOpening(index+1,playMode);return;}
+   if(playMode==='review'){showHome();showPanel('stage-list');return;}
    const saved=progress.campaign();
    if(saved?.id===levels[index].id&&saved.storyPending)progress.saveCampaign({...saved,storyPending:false});
    showHome();
   });
  }
+ function refreshDeveloperTools(){
+  if(!developerTools)return;
+  developerTools.hidden=!developerReviewUnlocked||$('home').hidden;
+  developerStageTools.hidden=!developerReviewUnlocked||$('play-view').hidden||!(levelIndex<campaignSize);
+ }
+ function leaveDeveloperReview(){
+  if(!developerReviewUnlocked)return;
+  developerReviewUnlocked=false;
+  progress=playerProgress;tutorialProgress=playerTutorialProgress;developerStorage=null;
+  activePack=null;challengeBest={};tutorialReturn=null;
+  seenTips=new Set();
+  try{const saved=JSON.parse(storage?.getItem(tipsKey)??'[]');if(Array.isArray(saved))seenTips=new Set(saved);}catch{}
+  try{skipTutorialPopups=storage?.getItem(popupKey)==='yes';}catch{}
+  for(const input of popupControls)input.checked=skipTutorialPopups;
+  $('stage-select').textContent='Stage Select';
+  updateLevelLabels();showHome();
+ }
+ function installDeveloperTools(){
+  developerTools=document.createElement('section');developerTools.id='developer-tools';developerTools.hidden=true;
+  const heading=document.createElement('h2');heading.textContent='Developer Tools';developerTools.append(heading);
+  const note=document.createElement('p');note.textContent='Temporary review only. Player progress and scores are not changed.';developerTools.append(note);
+  const selection=document.createElement('select');selection.id='developer-chapter';selection.setAttribute('aria-label','Chapter to review');
+  chapters.forEach((chapter,i)=>selection.add(new Option(chapter.title+' · '+chapter.name,i)));
+  developerTools.append(selection);
+  const action=(parent,id,label,fn)=>{makeChoice(parent,label,()=>{if(developerReviewUnlocked)fn();});parent.lastElementChild.id=id;};
+  action(developerTools,'developer-opening','Play opening cinematic',()=>story.open(Number(selection.value),'opening','Return to Developer Tools',()=>{}));
+  action(developerTools,'developer-ending','Replay chapter ending',()=>showChapterEnding(chapters[Number(selection.value)].start+chapters[Number(selection.value)].stages.length-1,'review'));
+  action(developerTools,'developer-archive','Visit the Archive',()=>showChapterOpening(archiveIndex,'review'));
+  action(developerTools,'developer-archive-ending','Play Archive ending',()=>showChapterEnding(archiveIndex,'review'));
+  action(developerTools,'developer-reset-chapter','Restart selected chapter',()=>openLevel(chapters[Number(selection.value)].start,null,'review'));
+  action(developerTools,'developer-exit','Exit Developer Mode',leaveDeveloperReview);
+  $('stage-list').before(developerTools);
+  developerStageTools=document.createElement('div');developerStageTools.id='developer-stage-tools';developerStageTools.hidden=true;
+  action(developerStageTools,'developer-complete','Force Complete Stage (no score)',()=>{if(levelIndex<campaignSize){if(menu.open)menu.close();if(tip.open)tip.close();stopAnimation();advanceCampaign(levelIndex,'review');}});
+  action(developerStageTools,'developer-reset-stage','Reset Stage',()=>openLevel(levelIndex,null,'review'));
+  action(developerStageTools,'developer-exit-stage','Exit Developer Mode',leaveDeveloperReview);
+  $('phase').before(developerStageTools);
+ }
+ installDeveloperTools();
  $('new-game-start').onclick=()=>{
   newGameConfirm.close();
   showChapterOpening(0);
