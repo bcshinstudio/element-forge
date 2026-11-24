@@ -742,3 +742,5 @@ body:has(#home:not([hidden])) .masthead { display:none; }
  .world-phase:not([hidden]) { padding:.2rem .45rem; margin:.05rem 0 .25rem; font-size:.68rem; }
  #board .phase-shifting { outline-width:1px; }
 }
+
+.archive-controls:not([hidden]){display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:.7rem}.archive-delivered .library-node-art{filter:drop-shadow(0 0 6px #ffe7a3) brightness(1.2)}.archive-index:after,.archive-lantern:after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle,#ffdc8166,transparent 70%);opacity:var(--archive-glow,.35);animation:archive-flicker 2s alternate infinite}@keyframes archive-flicker{to{filter:brightness(1.5)}}@media(prefers-reduced-motion:reduce){.archive-index:after,.archive-lantern:after{animation:none}}

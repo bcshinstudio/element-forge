@@ -7,7 +7,7 @@
  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
  const cache = new Map();
  let panels, panelIndex, onFinish, frameRequest, renderVersion = 0;
- let audio;
+ let audio,archiveMode=false,autoTimer=null,auto=false,paused=false;
  const back = $('intro-back'), next = $('intro-next'), finish = $('intro-begin');
  const replay = $('story-replay'), skip = $('story-skip');
 
@@ -24,7 +24,7 @@
  }
 
  function stop() {
-  cancelAnimationFrame(frameRequest);
+  cancelAnimationFrame(frameRequest);clearTimeout(autoTimer);
   audio?.stopCue();
   return ++renderVersion;
  }
@@ -32,7 +32,7 @@
  async function render(animate = true) {
   const version = stop();
   const panel = panels[panelIndex];
-  $('story-caption').textContent = panel.caption;
+  $('story-caption').textContent = panel.speaker ? panel.caption+' · '+panel.speaker : panel.caption;
   $('story-line').textContent = '“' + panel.line + '”';
   canvas.setAttribute('aria-label', panel.caption);
   next.hidden = panelIndex === panels.length - 1;
@@ -50,11 +50,13 @@
   const x = (canvas.width - w) / 2, y = (canvas.height - h) / 2;
   function paint(value) {
    ctx.drawImage(image, x, y, w, h);
-   if (effect) window.EFStoryMotion(effect, {x,y,w,h}, value, ctx, {beyond:extra,restored:extra});
+   if(effect==='archive'){const z=1+0.055*value;ctx.save();ctx.translate(canvas.width/2,canvas.height/2);ctx.scale(z,z);ctx.drawImage(image,x-canvas.width/2,y-canvas.height/2,w,h);ctx.restore();for(let i=0;i<22;i++){const px=x+w*((i*47+13)%100)/100,py=y+h*((i*29+95-30*value+100)%100)/100;ctx.fillStyle='rgba(255,226,155,'+(0.15+0.3*Math.sin(i+value*3)**2)+')';ctx.beginPath();ctx.arc(px,py,1+i%3,0,Math.PI*2);ctx.fill();}}
+   else if (effect) window.EFStoryMotion(effect, {x,y,w,h}, value, ctx, {beyond:extra,restored:extra});
   }
   const cue = panel.motion ?? (['river','rest'].includes(panel.art) ? 'river' : null);
-  if (animate && cue && (!reducedMotion.matches || !panel.motion)) audio?.effect(cue);
-  if (!animate || !panel.motion || reducedMotion.matches) { paint(1); return; }
+  if (animate && cue && cue!=='archive' && (!reducedMotion.matches || !panel.motion)) audio?.effect(cue);
+  if(archiveMode&&auto&&!paused)autoTimer=setTimeout(()=>{if(next.hidden)finish.click();else next.click();},Math.max(3000,panel.line.length*65));
+  if (!animate || !panel.motion || reducedMotion.matches || paused) { paint(1); return; }
   skip.disabled = false;
   const start = performance.now();
   paint(0);
@@ -73,6 +75,7 @@
  }
 
  function open(chapter, type, label, callback) {
+  archiveMode=false;auto=false;paused=false;archiveControls.hidden=true;
   panels = window.EFStoryChapters[chapter][type];
   panelIndex = 0;
   onFinish = callback;
@@ -104,7 +107,20 @@
  dialog.addEventListener('cancel', event => { event.preventDefault(); close(); });
  reducedMotion.addEventListener('change', () => { if (dialog.open) render(false); });
 
- window.EFStory = {
+ const archiveControls=document.createElement('div');archiveControls.hidden=true;archiveControls.className='archive-controls';dialog.append(archiveControls);
+ const control=(label,fn)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=fn;archiveControls.append(b);return b;};
+ const autoButton=control('Auto: off',()=>{auto=!auto;autoButton.textContent='Auto: '+(auto?'on':'off');render(false);});
+ const pauseButton=control('Pause',()=>{paused=!paused;pauseButton.textContent=paused?'Resume':'Pause';render(!paused);});
+ control('Replay sequence',()=>{panelIndex=0;render();});
+ control('Skip sequence',()=>finish.click());
+ function openArchive(type,label,callback){
+  archiveMode=true;auto=false;paused=false;autoButton.textContent='Auto: off';pauseButton.textContent='Pause';archiveControls.hidden=false;
+  panels=window.EFArchive.panels(type);panelIndex=0;onFinish=callback;
+  window.EFArchive.art.forEach((src,i)=>window.EFStoryArt['archive-'+(i+1)]=src);
+  $('world-intro-title').textContent='The Archive of First Currents';finish.textContent=label;
+  if(!dialog.open)dialog.showModal();audio?.story(true);render();next.focus();
+ }
+ window.EFStory = {openArchive,
   open, close,
   configureAudio(controller) { audio = controller; },
  };

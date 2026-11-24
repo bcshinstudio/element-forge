@@ -20,9 +20,14 @@
   chapter.start=offset;
   offset+=chapter.stages.length;
  }
+ const archiveIndex=chapters[3].start;
+ for(const chapter of chapters.slice(3))chapter.start++;
  const chapterAt=index=>chapters.findLast(chapter=>index>=chapter.start);
- const isChapterEnd=index=>index<campaignSize&&index===chapterAt(index).start+chapterAt(index).stages.length-1;
+ const isArchive=index=>index===archiveIndex;
+ const stageLabel=index=>isArchive(index)?'Interlude':String(index+1-(index>archiveIndex?1:0));
+ const isChapterEnd=index=>!isArchive(index)&&index<campaignSize&&index===chapterAt(index).start+chapterAt(index).stages.length-1;
  const levels=chapters.flatMap((chapter,index)=>chapter.stages.map(level=>window.EFVariants.campaignLevel(level,index)));
+ levels.splice(archiveIndex,0,window.EFArchive.level);
  const campaignSize=levels.length;
  const tutorials=[...window.EFLevels.catalog,window.EFLevels.prototype,...window.EFChapter.archivedTutorials];
  levels.push(...tutorials);
@@ -165,7 +170,7 @@
   $('puzzle').textContent=map.name;
   const chapter=index<campaignSize?chapterAt(index):null;
   $('stage-number').hidden=!chapter;
-  $('stage-number').textContent=chapter?`Chapter ${chapters.indexOf(chapter)+1} · Stage ${index-chapter.start+1}`:'';
+  $('stage-number').textContent=isArchive(index)?'Interlude · The Archive':chapter?`Chapter ${chapters.indexOf(chapter)+1} · Stage ${index-chapter.start+1}`:'';
 
   $('description').textContent=map.description;
   storyExpanded=false;
@@ -396,7 +401,7 @@
   if(phase==='build')drawToolBar();
   $('next').disabled=mode==='independent'&&(levelIndex<challengeStart||levelIndex+1>=challengeEnd);
   $('next').textContent=mode==='tutorial'?(tutorialReturn?'Return to Stage':'Tutorials'):
-   mode==='replay'?'Stage Select':mode==='run'&&isChapterEnd(levelIndex)?'Chapter Ending':'Next Stage';
+   mode==='replay'?'Stage Select':mode==='run'&&(isChapterEnd(levelIndex)||isArchive(levelIndex))?'Chapter Ending':'Next Stage';
   $('return-lesson').hidden=mode!=='tutorial';
   drawBoard();
  }
@@ -567,6 +572,11 @@
    }
    window.EFBoardArt.decorate(tile,pendingOpening??kind,{link,spec:pendingOpening?map.toolArt?.[pendingOpening]:appearance});
    window.EFBoardArt.setNode(tile,map.nodeAppearance,cell.node);
+   const archive=map.nodeAppearance==='library'&&map.name===window.EFArchive.level.map.name;
+   tile.classList.toggle('archive-delivered',archive&&cell.node?.role==='destination'&&state.routes.some(r=>r.element===cell.node.element&&r.path.at(-1)===i));
+   tile.classList.toggle('archive-lantern',archive&&cell.terrainArt?.id==='library-lantern');
+   const living=archive&&cell.terrainArt?.id==='library-living-index';
+   tile.classList.toggle('archive-index',living);if(living)tile.style.setProperty('--archive-glow',String(Math.min(1,state.routes.length/11)));
    const checkpoint=kind==='checkpoint'&&cell.props?.element&&cell.props.element!=='any'?F.ELEMENTS[cell.props.element].name+' ':'';
    const label=`Row ${Math.floor(i/map.width)+1}, column ${i%map.width+1}, `+
     (cell.node?`${F.ELEMENTS[cell.node.element].name} ${cell.node.role}`:kind?checkpoint+toolNames[kind]+(link?' '+link:''):(terrainNames[terrain]||terrain));
@@ -783,7 +793,7 @@
   if(!result.ok){message(result.message);return;}
   if(levelIndex<campaignSize&&!(developerReviewUnlocked&&mode==='replay')){
    const snapshot=mode==='run'?campaignSnapshot():null;
-   if(snapshot&&isChapterEnd(levelIndex))snapshot.storyPending=true;
+   if(snapshot&&(isChapterEnd(levelIndex)||isArchive(levelIndex)))snapshot.storyPending=true;
    progress.complete(levels[levelIndex].id,result.points,snapshot);
    updateLevelLabels();
   }else if(mode==='tutorial'){
@@ -804,7 +814,7 @@
   if(session.state.phase!=='complete')return;
   if(mode==='tutorial')returnFromTutorial();
   else if(mode==='replay'){showHome();showPanel('stage-list');}
-  else if(mode==='run'&&isChapterEnd(levelIndex))showChapterEnding(levelIndex);
+  else if(mode==='run'&&(isChapterEnd(levelIndex)||isArchive(levelIndex)))showChapterEnding(levelIndex);
   else openLevel(levelIndex+1);
  };
  $('level').onchange=()=>{
@@ -980,9 +990,9 @@
   for(let i=0;i<campaignSize;i++){
    const {id,map}=levels[i];
    $('level').options[i].disabled=!canOpen(i);
-   $('level').options[i].textContent=`${i+1}. ${map.name}${progress.hasCompleted(id)?' ✓':canOpen(i)?'':' · Locked'}`;
+   $('level').options[i].textContent=`${stageLabel(i)}. ${map.name}${progress.hasCompleted(id)?' ✓':canOpen(i)?'':' · Locked'}`;
   }
-  const stages=chapterAt(levelIndex<campaignSize?levelIndex:0).stages;
+  const stages=isArchive(levelIndex)?[window.EFArchive.level]:chapterAt(levelIndex<campaignSize?levelIndex:0).stages;
   $('campaign-progress').textContent=`${stages.filter(level=>progress.hasCompleted(level.id)).length} / ${stages.length} complete`;
  }
  const story=window.EFStory;
@@ -997,10 +1007,10 @@
   }
   if(!canOpen(index))return {index:progress.unlockedIndex(),recovered:true};
   if(saved.board?.phase==='complete'){
-   if(saved.storyPending&&isChapterEnd(index))return {index,ending:true};
+   if(saved.storyPending&&(isChapterEnd(index)||isArchive(index)))return {index,ending:true};
    if(index===campaignSize-1)return {complete:true};
    if(!canOpen(index+1))return {index:progress.unlockedIndex(),recovered:true};
-   return {index:index+1,opening:isChapterEnd(index)};
+   return {index:index+1,opening:isChapterEnd(index)||isArchive(index)};
   }
   const changed=(saved.layout??1)!==(levels[index].layout??1);
   return {index,changed,board:!changed&&saved.rules===levels[index].rulesVersion?saved.board:null};
@@ -1055,12 +1065,12 @@
   $('stage-list').replaceChildren();
   levels.slice(0,campaignSize).forEach((level,index)=>{
    const chapter=chapterAt(index);
-   if(index===chapter.start){
+   if(index===chapter.start||isArchive(index)){
     const heading=document.createElement('h3');
-    heading.textContent=`${chapter.title} · ${chapter.name}`;
+    heading.textContent=isArchive(index)?'Interlude · The Archive of First Currents':`${chapter.title} · ${chapter.name}`;
     $('stage-list').append(heading);
    }
-   makeChoice($('stage-list'),`${index+1}. ${level.map.name}${progress.hasCompleted(level.id)?' ✓':''}`,
+   makeChoice($('stage-list'),`${stageLabel(index)}. ${level.map.name}${progress.hasCompleted(level.id)?' ✓':''}`,
     ()=>openLevel(index,null,'replay'),!canOpen(index));
   });
   $('tutorial-list').replaceChildren();
@@ -1298,6 +1308,7 @@
   (target&&!target.complete?$('continue'):$('new-campaign')).focus();
  }
  function showChapterOpening(index){
+  if(isArchive(index)){story.openArchive('opening','Restore the currents',()=>openLevel(index));return;}
   story.open(chapters.indexOf(chapterAt(index)),'opening','Begin',()=>{
    openLevel(index);
    if(!tip.open)$('start').focus();
@@ -1305,8 +1316,9 @@
  }
  function showChapterEnding(index){
   stopAnimation();
+  if(isArchive(index)){story.openArchive('ending','Start Chapter Four',()=>showChapterOpening(index+1));return;}
   const last=index===campaignSize-1;
-  const label=last?'Campaign Summary':`Start ${chapterAt(index+1).title}`;
+  const label=last?'Campaign Summary':isArchive(index+1)?'Enter the Archive':`Start ${chapterAt(index+1).title}`;
   story.open(chapters.indexOf(chapterAt(index)),'ending',label,()=>{
    if(!last){showChapterOpening(index+1);return;}
    const saved=progress.campaign();
