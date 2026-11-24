@@ -571,15 +571,16 @@
    const pendingOpening=i===linkStart?tool:null;
    tile.classList.toggle('tunnel-preview',Boolean(pendingOpening));
    const terrainLayer=tile.querySelector('.terrain-variant');
-   if(terrainLayer)tile.replaceChildren(terrainLayer,fragments[i]);
+   const gardenLayer=garden?tile.querySelector('.garden-motion'):null;
+   if(terrainLayer)tile.replaceChildren(terrainLayer,fragments[i],...(gardenLayer?[gardenLayer]:[]));
    else{
     tile.replaceChildren(fragments[i]);
     window.EFBoardArt.setTerrain(tile,terrain,cell.props?.phaseShift&&state.dayPhase==='night'?undefined:cell.terrainArt);
    }
    if(garden){
     window.EFBoardArt.setTerrain(tile,terrain,garden[i].spec);
-    if(garden[i].effect)tile.dataset.gardenEffect=garden[i].effect;else delete tile.dataset.gardenEffect;
-   }else delete tile.dataset.gardenEffect;
+    window.EFGarden.motion(tile,garden[i]);
+   }else window.EFGarden.motion(tile,null);
    window.EFBoardArt.decorate(tile,pendingOpening??kind,{link,spec:pendingOpening?map.toolArt?.[pendingOpening]:appearance});
    window.EFBoardArt.setNode(tile,map.nodeAppearance,cell.node);
    const archive=map.nodeAppearance==='library'&&map.name===window.EFArchive.level.map.name;

@@ -27,3 +27,15 @@ test('Garden deliveries persist, prevent undo/reopen/removal, survive save and r
  assert.equal(s.remove(87).ok,false);const restored=S.createSession(G.level);assert.ok(restored.restore(s.snapshot()));assert.equal(G.delivered(map,restored.state.routes).size,6);assert.ok(restored.verify().ok);
  restored.restart();assert.equal(G.delivered(map,restored.state.routes).size,0);
 });
+
+test('Garden motion layers are idempotent, distinct and removed on reset',()=>{
+ const make=()=>({dataset:{},children:[],style:{setProperty(){}},setAttribute(){},append(child){this.children.push(child);child.remove=()=>{this.children=this.children.filter(x=>x!==child)}},querySelector(){return this.children.find(x=>x.className==='garden-motion')??null}});
+ const tile=make();tile.ownerDocument={createElement:make};
+ const view=G.view(map,solution.routes,catalog);
+ for(const item of view.filter(x=>x.effect)){
+  G.motion(tile,null);G.motion(tile,item);
+  const layer=tile.querySelector();assert.ok(layer);assert.ok(layer.children.length>0);
+  G.motion(tile,item);assert.equal(tile.querySelector(),layer);
+  G.motion(tile,null);assert.equal(tile.querySelector(),null);assert.equal(tile.dataset.gardenEffect,undefined);
+ }
+});
