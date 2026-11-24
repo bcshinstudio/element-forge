@@ -11,6 +11,8 @@
  let selected=-1,brush=null,reportVisible=false;
 
  const placementStyles=new Map();
+ const activatedIds=new Set(Object.values(window.EFArtCatalog).map(item=>item.activeId).filter(Boolean));
+ const artState=item=>!item?'static':item.activeId?'inactive':activatedIds.has(item.id)||/garden-.*-(?:active|glowing|open|flow)$/.test(item.id)?'active':'static';
  const styleLabel=item=>item.label+(item.piece?' · '+item.piece.replaceAll('-',' '):'');
  function thumbnail(type,spec,kind){
   const tile=document.createElement('span');
@@ -51,11 +53,37 @@
    button.setAttribute('aria-pressed',String(active));
    const label=document.createElement('span');
    label.textContent=item?styleLabel(item):'Original';
+   button.dataset.state=artState(item);
    button.append(thumbnail(type,choice,kind),label);
+   if(item&&button.dataset.state!=='static'){
+    const tag=document.createElement('span');tag.className='art-state-label';
+    tag.textContent=button.dataset.state==='inactive'?'INACTIVE · use before restoration':'ACTIVATED · after restoration';
+    button.append(tag);
+   }
    button.onclick=()=>choose(choice,button.dataset.artId);
    host.append(button);
   }
  }
+ function filterArt(){
+  const query=$('art-search').value.trim().toLowerCase(),state=$('art-state').value,collection=$('art-collection').value;
+  let count=0;
+  for(const button of $('art-picker-grid').querySelectorAll('.art-choice')){
+   const id=button.dataset.artId,garden=id.startsWith('garden-');
+   button.hidden=!(button.textContent.toLowerCase().includes(query)||id.includes(query))||
+    (state!=='all'&&button.dataset.state!==state)||
+    (collection==='garden'&&!garden)||(collection==='other'&&garden);
+   if(!button.hidden)count++;
+  }
+  $('art-result-count').textContent=count+' matching artwork choices';
+ }
+ function browseArt(type,spec,kind,choose){
+  const dialog=$('art-picker');
+  $('art-picker-title').textContent=names[type]+' artwork';
+  $('art-search').value='';$('art-state').value='all';$('art-collection').value='all';
+  gallery($('art-picker-grid'),type,spec,kind,choice=>{dialog.close();choose(choice);});
+  filterArt();dialog.showModal();$('art-search').focus();
+ }
+ $('art-search').oninput=filterArt;$('art-state').onchange=filterArt;$('art-collection').onchange=filterArt;
  function pickerButton(type,spec,kind,label,choose){
   const button=document.createElement('button');
   button.type='button';
@@ -64,16 +92,7 @@
   const item=art.resolve(spec,type);
   text.textContent=`${label} · ${item?styleLabel(item):spec?'Missing artwork':'Original'}`;
   button.append(thumbnail(type,spec,kind),text);
-  button.onclick=()=>{
-   const dialog=$('art-picker');
-   $('art-picker-title').textContent=`${names[type]} artwork`;
-   gallery($('art-picker-grid'),type,spec,kind,choice=>{
-    dialog.close();
-    choose(choice);
-   });
-   dialog.showModal();
-   ($('art-picker-grid').querySelector('[aria-pressed="true"]')??$('art-picker-grid').firstChild)?.focus();
-  };
+  button.onclick=()=>browseArt(type,spec,kind,choose);
   return button;
  }
  function rotation(selectId,value){
@@ -303,12 +322,14 @@
   const spec=placement?placementArt(kind,type):brush.spec;
   $('paint-images-title').textContent=`${names[target]} artwork`;
   const grid=$('paint-images-grid');
-  gallery(grid,target,spec,layer,(choice,id)=>{
+  const choose=(choice,id)=>{
    if(placement)placementStyles.set(kind+':'+type,choice);
    else brush.spec=choice;
    $('art-angle').value=brush.spec?.rotation??0;
    showBrush(id);
-  });
+  };
+  gallery(grid,target,spec,layer,choose);
+  $('browse-artwork').onclick=()=>browseArt(target,spec,layer,choose);
   if(focusId!==undefined)grid.querySelector('[aria-pressed="true"]')?.focus({preventScroll:true});
  }
  function setBrush(){
@@ -367,6 +388,12 @@
   map=next;
   render();
   markDirty();
+ };
+ $('load-garden').onclick=()=>{
+  if(dirty&&!confirm('Replace the current draft with the Garden puzzle?'))return;
+  snapshot();selected=-1;reportVisible=false;
+  map=F.parseMap(structuredClone(window.EFGardenPreset));syncMeta();render();markDirty();showBrush();
+  showMessage('Garden puzzle opened. Edit or export it, or enter playtest.',true);
  };
  $('load-stage').onclick=()=>{
   if(dirty&&!confirm('Replace the current draft with this campaign stage?'))return;

@@ -94,3 +94,16 @@
 #elements .element-preview{display:block;width:100%;max-width:68px;aspect-ratio:1;object-fit:contain;border-radius:5px;}
 #elements .destination-swatch{border:3px double;}
 #node-appearance{display:block;margin-top:5px;min-height:36px;}
+
+/* Large artwork browser; inline gallery remains available for quick painting. */
+.art-browser-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap}
+#paint-images-grid{max-height:340px}
+#art-picker{width:min(1100px,calc(100% - 1rem));max-height:92dvh;overflow:auto}
+#art-picker .art-gallery{max-height:65dvh;grid-template-columns:repeat(auto-fill,minmax(106px,1fr))}
+#art-picker .art-swatch{width:76px;height:76px}
+.art-browser-filters{display:flex;gap:.75rem;flex-wrap:wrap;align-items:end}
+.art-browser-filters label{flex:1 1 160px}
+.art-state-label{font-size:.72rem;color:#e9d19b;font-weight:650}
+.art-choice[data-state="active"] .art-state-label{color:#a4e2a8}
+.art-choice[hidden]{display:none}
+@media(max-width:760px){#art-picker .art-gallery{grid-template-columns:repeat(auto-fill,minmax(90px,1fr));max-height:55dvh}#art-picker .art-swatch{width:62px;height:62px}}
