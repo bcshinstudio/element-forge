@@ -487,6 +487,11 @@
   const visible=E.phaseView(map,state.dayPhase);
   const garden=window.EFGarden.isGarden(map)?window.EFGarden.view(map,state.routes,window.EFArtCatalog):null;
   // Routes update the board without calling update(); refresh the phase badge here.
+  const priorPhase=board.dataset.dayPhase;
+  board.dataset.dayPhase=state.dayPhase??'';
+  if(E.hasPhases(map)&&priorPhase==='day'&&state.dayPhase==='night'){
+   board.classList.remove('night-transition');void board.offsetWidth;board.classList.add('night-transition');
+  }else if(state.dayPhase!=='night')board.classList.remove('night-transition');
   if(E.hasPhases(map)){
    const night=state.dayPhase==='night';
    $('phase-indicator').textContent=night?'☾ Night · Day deliveries preserved':'☀ Day · '+F.ELEMENTS[session.map.cells[E.phasePlateIndex(session.map)].props.element].name+' activates Night';
@@ -560,7 +565,8 @@
       port.style.background=colors[element];
       port.textContent=symbols[element];
       port.setAttribute('aria-hidden','true');
-      mark.append(port);
+      const arrow=document.createElement('span');arrow.className='port-flow port-flow-'+side+' '+(element===recipe.output?'flow-out':'flow-in');arrow.setAttribute('aria-hidden','true');arrow.textContent=element===recipe.output?'↑':'↓';
+      mark.append(port,arrow);
      }
     }
     tile.classList.toggle('confluence-ready',inputReady);

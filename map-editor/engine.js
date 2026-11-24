@@ -190,6 +190,7 @@ function phaseValidation(m,routes,placements={},requireComplete=true){
   sources.add(key);targets.add(target);
   if(r.deliveredPhase!==undefined&&r.deliveredPhase!==phase)issues.push('Incorrect stored delivery phase for '+r.element);
   if(r.path.includes(plate)&&r.element!==trigger)issues.push('The phase plate belongs to '+displayElement(trigger));
+  if(!switched&&r.element===trigger&&m.cells[end]?.node?.role==='destination'&&!r.path.includes(plate))issues.push(displayElement(trigger)+' must complete its delivery through the Pressure Plate to activate Night.');
   const prior=phasePrior(m,completed,phase);
   const err=validatePath(phaseView(m,phase),r.element,r.path,prior,placements);
   if(err)issues.push(r.element+': '+err);

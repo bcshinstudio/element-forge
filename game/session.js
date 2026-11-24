@@ -137,6 +137,16 @@
   const placeTunnel=(first,second)=>placeLink(first,second,'tunnel');
   const placePortal=(first,second)=>placeLink(first,second,'portal');
 
+  function plateRouteError(element,path,complete){
+   if(!shifting)return null;
+   const plate=E.phasePlateIndex(map),trigger=map.cells[plate]?.props?.element;
+   if(path.includes(plate)&&element!==trigger)return 'Only '+E.displayElement(trigger)+' can use this Pressure Plate.';
+   const target=map.cells[path.at(-1)]?.node;
+   if(complete&&element===trigger&&target?.role==='destination'&&!path.includes(plate)&&!state.routes.some(r=>E.phaseTriggerRoute(map,r)))
+    return E.displayElement(trigger)+' must complete its delivery through the Pressure Plate to activate Night.';
+   return null;
+  }
+
   function routeMulti(index,reopen=false){
    const cell=map.cells[index],ch=E.confluenceAt(map,index);
    const source=cell.node?.role==='source'?cell.node.element:ch?.output;
@@ -183,6 +193,8 @@
    const {element,path,id}=state.active,next=[...path,index];
    const segment=E.pairs(map).find(p=>p.element===element&&p.source===path[0]);
    const complete=next.length>1&&segment?.targets?.includes(index);
+   const plateProblem=plateRouteError(element,next,complete);
+   if(plateProblem)return fail(plateProblem);
    const problem=E.validatePath(shifting?E.phaseView(map,state.dayPhase):map,element,next,
     shifting?E.phasePrior(map,state.routes,state.dayPhase):state.routes,state.placements,!complete);
    if(problem)return fail(problem);
@@ -257,6 +269,8 @@
    const complete=next.length>1&&E.pairs(map).some(pair=>pair.element===element&&pair.destination===index);
    const reserved=shifting?E.phasePrior(map,state.routes.filter(route=>route.element!==element),state.dayPhase):
     state.routes.filter(route=>route.element!==element);
+   const plateProblem=plateRouteError(element,next,complete);
+   if(plateProblem)return fail(plateProblem);
    const error=E.validatePath(shifting?E.phaseView(map,state.dayPhase):map,element,next,reserved,state.placements,!complete);
    if(error)return fail(error);
    if(complete){
