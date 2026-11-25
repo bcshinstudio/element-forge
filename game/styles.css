@@ -382,7 +382,7 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 .opening-story { padding: clamp(.85rem, 3vw, 1.45rem); }
 .jeeah-dialogue {
  display: grid;
- grid-template-columns: clamp(3.5rem, 12vw, 5rem) 1fr;
+ grid-template-columns: clamp(4.5rem, 16vw, 7rem) minmax(0, 1fr);
  gap: .75rem;
  align-items: start;
  margin: .75rem 0;
@@ -393,7 +393,7 @@ body:has(#home:not([hidden])) .masthead { display:none; }
  aspect-ratio: 1;
  border: 1px solid #ad956a;
  border-radius: 8px;
- background: #e9ddcc url(../art/jeeah-portrait.webp) center / cover no-repeat;
+ background: #e9ddcc url(../art/jeeah-portrait.webp) center / contain no-repeat;
 }
 .jeeah-portrait[data-speaker="Eldrin"] {
  background: #e9ddcc url(../art/eldrin-portrait.webp) center / cover no-repeat;

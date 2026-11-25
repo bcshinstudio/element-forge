@@ -116,6 +116,7 @@ def run():
                             expect(portrait).to_be_visible()
                             assert "garden-"+panel["speaker"].lower()+"-portrait.webp" in portrait.evaluate("(el)=>getComputedStyle(el).backgroundImage")
                             assert portrait.evaluate("(el)=>getComputedStyle(el).backgroundSize")=="contain"
+                            assert portrait.evaluate("(el)=>el.getBoundingClientRect().width")>=72
                         if i<len(panels)-1:
                             page.locator("#intro-next").click()
                 verify_garden("opening")

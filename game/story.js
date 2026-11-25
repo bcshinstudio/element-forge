@@ -45,8 +45,8 @@
   portrait.dataset.speaker=speaker;
   const portraitSrc=sanctuaryMode&&speaker==='Caelan'?window.EFSanctuaryStory.portraits[panel.expression]:gardenMode?window.EFGarden.portraits[speaker]:null;
   portrait.style.backgroundImage=portraitSrc?'url("'+portraitSrc+'")':'';
-  portrait.style.backgroundSize=portraitSrc?'contain':'';
-  portrait.style.backgroundPosition=portraitSrc?'center':'';
+  portrait.style.backgroundSize='contain';
+  portrait.style.backgroundPosition='center';
   portrait.setAttribute('aria-label',speaker==='Narrator'?'':speaker);
   portrait.setAttribute('aria-hidden',String(speaker==='Narrator'));
   const line=$('story-line');line.textContent='“'+panel.line+'”';
