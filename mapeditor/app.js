@@ -211,6 +211,7 @@ function paint(i){
   else if(id==='phasePlate')next.props={element};
  }
  if(map.artPalette===11&&['land','wall'].includes(next.terrain)&&!next.terrainArt)next.terrainArt={id:next.terrain==='land'?'library-stone-floor':'library-bookshelf',rotation:0};
+ if(map.artPalette===13&&!next.terrainArt){const spec=window.EFVariants.sanctuaryTerrain(next.terrain);if(spec)next.terrainArt=spec;}
  if(map.artPalette===12&&!next.terrainArt){const spec=window.EFVariants.gardenTerrain(next.terrain);if(spec)next.terrainArt=spec;}
  if(kind==='terrain'||kind==='component'){
   const spec=window.EFEditorArt?.placementArt(kind,id);

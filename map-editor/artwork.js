@@ -39,8 +39,9 @@
   host.replaceChildren();
   const missing=spec&&!art.resolve(spec,type)?[{id:spec.id,label:'Missing · '+spec.id}]:[];
   const choices=art.options(type);
-  const garden=map.artPalette===12?choices.filter(item=>item.id.startsWith('garden-')):[];
-  const ordered=garden.length?[...garden,...choices.filter(item=>!item.id.startsWith('garden-'))]:choices;
+  const prefix=map.artPalette===13?'sanctuary-':map.artPalette===12?'garden-':null;
+  const garden=prefix?choices.filter(item=>item.id.startsWith(prefix)):[];
+  const ordered=garden.length?[...garden,...choices.filter(item=>!item.id.startsWith(prefix))]:choices;
   for(const item of [null,...missing,...ordered]){
    const active=(item?.id??null)===(spec?.id??null);
    const choice=item?{id:item.id,rotation:active?spec.rotation??0:0}:null;

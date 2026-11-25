@@ -49,9 +49,9 @@
 
  function nodeArtwork(mode,node){
   if(!node)return null;
-  if(mode==='garden'){
+  if(mode==='garden'||mode==='sanctuary'){
    const source=node.role==='source';
-   return window.EFVariants?.resolve({id:'garden-'+(source?'source':'inlet')+'-'+node.element},source?'node-source':'node-destination')??null;
+   return window.EFVariants?.resolve({id:mode+'-'+(source?'source':'inlet')+'-'+node.element},source?'node-source':'node-destination')??null;
   }
   if(!['library','books-only'].includes(mode))return null;
   const prefix=node.role==='source'?(mode==='library'?'lectern-source':'source'):mode==='library'?'destination':'open-destination';

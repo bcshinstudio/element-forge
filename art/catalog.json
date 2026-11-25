@@ -2913,5 +2913,404 @@
     "label": "Garden · Inventor Book",
     "piece": "",
     "file": "garden/garden-inventor-book.webp"
+  },
+  "sanctuary-stone-floor": {
+    "id": "sanctuary-stone-floor",
+    "type": "land",
+    "label": "Sanctuary · Weathered stone floor",
+    "piece": "",
+    "file": "sanctuary/sanctuary-stone-floor.svg"
+  },
+  "sanctuary-courtyard": {
+    "id": "sanctuary-courtyard",
+    "type": "land",
+    "label": "Sanctuary · Courtyard flagstones",
+    "piece": "",
+    "file": "sanctuary/sanctuary-courtyard.svg"
+  },
+  "sanctuary-moss-floor": {
+    "id": "sanctuary-moss-floor",
+    "type": "land",
+    "label": "Sanctuary · Mossy paving",
+    "piece": "",
+    "file": "sanctuary/sanctuary-moss-floor.svg"
+  },
+  "sanctuary-emblem-floor": {
+    "id": "sanctuary-emblem-floor",
+    "type": "land",
+    "label": "Sanctuary · Guardian emblem pavement",
+    "piece": "",
+    "file": "sanctuary/sanctuary-emblem-floor.svg"
+  },
+  "sanctuary-steps": {
+    "id": "sanctuary-steps",
+    "type": "land",
+    "label": "Sanctuary · Stone steps",
+    "piece": "",
+    "file": "sanctuary/sanctuary-steps.svg"
+  },
+  "sanctuary-water": {
+    "id": "sanctuary-water",
+    "type": "water",
+    "label": "Sanctuary · Sacred water",
+    "piece": "",
+    "file": "sanctuary/sanctuary-water.svg"
+  },
+  "sanctuary-water-channel": {
+    "id": "sanctuary-water-channel",
+    "type": "water",
+    "label": "Sanctuary · Stone-lined water channel",
+    "piece": "",
+    "file": "sanctuary/sanctuary-water-channel.svg"
+  },
+  "sanctuary-water-basin": {
+    "id": "sanctuary-water-basin",
+    "type": "water",
+    "label": "Sanctuary · Reflecting basin",
+    "piece": "",
+    "file": "sanctuary/sanctuary-water-basin.svg"
+  },
+  "sanctuary-shallow": {
+    "id": "sanctuary-shallow",
+    "type": "shallow",
+    "label": "Sanctuary · Shallow turquoise water",
+    "piece": "",
+    "file": "sanctuary/sanctuary-shallow.svg"
+  },
+  "sanctuary-river": {
+    "id": "sanctuary-river",
+    "type": "river",
+    "label": "Sanctuary · Mountain stream",
+    "piece": "",
+    "file": "sanctuary/sanctuary-river.svg"
+  },
+  "sanctuary-forest": {
+    "id": "sanctuary-forest",
+    "type": "forest",
+    "label": "Sanctuary · Mountain grove",
+    "piece": "",
+    "file": "sanctuary/sanctuary-forest.svg"
+  },
+  "sanctuary-ferns": {
+    "id": "sanctuary-ferns",
+    "type": "forest",
+    "label": "Sanctuary · Fern garden",
+    "piece": "",
+    "file": "sanctuary/sanctuary-ferns.svg"
+  },
+  "sanctuary-mountain": {
+    "id": "sanctuary-mountain",
+    "type": "mountain",
+    "label": "Sanctuary · Slate mountain rock",
+    "piece": "",
+    "file": "sanctuary/sanctuary-mountain.svg"
+  },
+  "sanctuary-scree": {
+    "id": "sanctuary-scree",
+    "type": "scree",
+    "label": "Sanctuary · Loose sanctuary stone",
+    "piece": "",
+    "file": "sanctuary/sanctuary-scree.svg"
+  },
+  "sanctuary-void": {
+    "id": "sanctuary-void",
+    "type": "void",
+    "label": "Sanctuary · Mountain chasm",
+    "piece": "",
+    "file": "sanctuary/sanctuary-void.svg"
+  },
+  "sanctuary-lava": {
+    "id": "sanctuary-lava",
+    "type": "lava",
+    "label": "Sanctuary · Ancient fire channel",
+    "piece": "",
+    "file": "sanctuary/sanctuary-lava.svg"
+  },
+  "sanctuary-wall": {
+    "id": "sanctuary-wall",
+    "type": "wall",
+    "label": "Sanctuary · Ancient stone wall",
+    "piece": "",
+    "file": "sanctuary/sanctuary-wall.svg"
+  },
+  "sanctuary-pillar": {
+    "id": "sanctuary-pillar",
+    "type": "wall",
+    "label": "Sanctuary · Guardian pillar",
+    "piece": "",
+    "file": "sanctuary/sanctuary-pillar.svg"
+  },
+  "sanctuary-statue": {
+    "id": "sanctuary-statue",
+    "type": "wall",
+    "label": "Sanctuary · Guardian statue",
+    "piece": "",
+    "file": "sanctuary/sanctuary-statue.svg"
+  },
+  "sanctuary-fountain": {
+    "id": "sanctuary-fountain",
+    "type": "wall",
+    "label": "Sanctuary · Sacred fountain",
+    "piece": "",
+    "file": "sanctuary/sanctuary-fountain.svg"
+  },
+  "sanctuary-dry-fountain": {
+    "id": "sanctuary-dry-fountain",
+    "type": "wall",
+    "label": "Sanctuary · Dormant fountain",
+    "piece": "",
+    "file": "sanctuary/sanctuary-dry-fountain.svg"
+  },
+  "sanctuary-memorial": {
+    "id": "sanctuary-memorial",
+    "type": "wall",
+    "label": "Sanctuary · Guardian memorial",
+    "piece": "",
+    "file": "sanctuary/sanctuary-memorial.svg"
+  },
+  "sanctuary-lantern": {
+    "id": "sanctuary-lantern",
+    "type": "wall",
+    "label": "Sanctuary · Sanctuary lantern",
+    "piece": "",
+    "file": "sanctuary/sanctuary-lantern.svg"
+  },
+  "sanctuary-heart": {
+    "id": "sanctuary-heart",
+    "type": "wall",
+    "label": "Sanctuary · Heart of the Guardians",
+    "piece": "",
+    "file": "sanctuary/sanctuary-heart.svg"
+  },
+  "sanctuary-altar": {
+    "id": "sanctuary-altar",
+    "type": "wall",
+    "label": "Sanctuary · Dormant guardian altar",
+    "piece": "",
+    "file": "sanctuary/sanctuary-altar.svg"
+  },
+  "sanctuary-gate-closed": {
+    "id": "sanctuary-gate-closed",
+    "type": "wall",
+    "label": "Sanctuary · Sealed mountain gate",
+    "piece": "",
+    "file": "sanctuary/sanctuary-gate-closed.svg"
+  },
+  "sanctuary-gate-open": {
+    "id": "sanctuary-gate-open",
+    "type": "land",
+    "label": "Sanctuary · Open mountain passage",
+    "piece": "",
+    "file": "sanctuary/sanctuary-gate-open.svg"
+  },
+  "sanctuary-source-fire": {
+    "id": "sanctuary-source-fire",
+    "type": "node-source",
+    "label": "Sanctuary · fire source",
+    "piece": "",
+    "file": "sanctuary/sanctuary-source-fire.svg"
+  },
+  "sanctuary-inlet-fire": {
+    "id": "sanctuary-inlet-fire",
+    "type": "node-destination",
+    "label": "Sanctuary · fire inlet",
+    "piece": "",
+    "file": "sanctuary/sanctuary-inlet-fire.svg"
+  },
+  "sanctuary-source-water": {
+    "id": "sanctuary-source-water",
+    "type": "node-source",
+    "label": "Sanctuary · water source",
+    "piece": "",
+    "file": "sanctuary/sanctuary-source-water.svg"
+  },
+  "sanctuary-inlet-water": {
+    "id": "sanctuary-inlet-water",
+    "type": "node-destination",
+    "label": "Sanctuary · water inlet",
+    "piece": "",
+    "file": "sanctuary/sanctuary-inlet-water.svg"
+  },
+  "sanctuary-source-nature": {
+    "id": "sanctuary-source-nature",
+    "type": "node-source",
+    "label": "Sanctuary · nature source",
+    "piece": "",
+    "file": "sanctuary/sanctuary-source-nature.svg"
+  },
+  "sanctuary-inlet-nature": {
+    "id": "sanctuary-inlet-nature",
+    "type": "node-destination",
+    "label": "Sanctuary · nature inlet",
+    "piece": "",
+    "file": "sanctuary/sanctuary-inlet-nature.svg"
+  },
+  "sanctuary-source-electricity": {
+    "id": "sanctuary-source-electricity",
+    "type": "node-source",
+    "label": "Sanctuary · electricity source",
+    "piece": "",
+    "file": "sanctuary/sanctuary-source-electricity.svg"
+  },
+  "sanctuary-inlet-electricity": {
+    "id": "sanctuary-inlet-electricity",
+    "type": "node-destination",
+    "label": "Sanctuary · electricity inlet",
+    "piece": "",
+    "file": "sanctuary/sanctuary-inlet-electricity.svg"
+  },
+  "sanctuary-source-arcane": {
+    "id": "sanctuary-source-arcane",
+    "type": "node-source",
+    "label": "Sanctuary · arcane source",
+    "piece": "",
+    "file": "sanctuary/sanctuary-source-arcane.svg"
+  },
+  "sanctuary-inlet-arcane": {
+    "id": "sanctuary-inlet-arcane",
+    "type": "node-destination",
+    "label": "Sanctuary · arcane inlet",
+    "piece": "",
+    "file": "sanctuary/sanctuary-inlet-arcane.svg"
+  },
+  "sanctuary-source-wind": {
+    "id": "sanctuary-source-wind",
+    "type": "node-source",
+    "label": "Sanctuary · wind source",
+    "piece": "",
+    "file": "sanctuary/sanctuary-source-wind.svg"
+  },
+  "sanctuary-inlet-wind": {
+    "id": "sanctuary-inlet-wind",
+    "type": "node-destination",
+    "label": "Sanctuary · wind inlet",
+    "piece": "",
+    "file": "sanctuary/sanctuary-inlet-wind.svg"
+  },
+  "sanctuary-source-earth": {
+    "id": "sanctuary-source-earth",
+    "type": "node-source",
+    "label": "Sanctuary · earth source",
+    "piece": "",
+    "file": "sanctuary/sanctuary-source-earth.svg"
+  },
+  "sanctuary-inlet-earth": {
+    "id": "sanctuary-inlet-earth",
+    "type": "node-destination",
+    "label": "Sanctuary · earth inlet",
+    "piece": "",
+    "file": "sanctuary/sanctuary-inlet-earth.svg"
+  },
+  "sanctuary-source-ice": {
+    "id": "sanctuary-source-ice",
+    "type": "node-source",
+    "label": "Sanctuary · ice source",
+    "piece": "",
+    "file": "sanctuary/sanctuary-source-ice.svg"
+  },
+  "sanctuary-inlet-ice": {
+    "id": "sanctuary-inlet-ice",
+    "type": "node-destination",
+    "label": "Sanctuary · ice inlet",
+    "piece": "",
+    "file": "sanctuary/sanctuary-inlet-ice.svg"
+  },
+  "sanctuary-source-metal": {
+    "id": "sanctuary-source-metal",
+    "type": "node-source",
+    "label": "Sanctuary · metal source",
+    "piece": "",
+    "file": "sanctuary/sanctuary-source-metal.svg"
+  },
+  "sanctuary-inlet-metal": {
+    "id": "sanctuary-inlet-metal",
+    "type": "node-destination",
+    "label": "Sanctuary · metal inlet",
+    "piece": "",
+    "file": "sanctuary/sanctuary-inlet-metal.svg"
+  },
+  "sanctuary-source-light": {
+    "id": "sanctuary-source-light",
+    "type": "node-source",
+    "label": "Sanctuary · light source",
+    "piece": "",
+    "file": "sanctuary/sanctuary-source-light.svg"
+  },
+  "sanctuary-inlet-light": {
+    "id": "sanctuary-inlet-light",
+    "type": "node-destination",
+    "label": "Sanctuary · light inlet",
+    "piece": "",
+    "file": "sanctuary/sanctuary-inlet-light.svg"
+  },
+  "sanctuary-source-shadow": {
+    "id": "sanctuary-source-shadow",
+    "type": "node-source",
+    "label": "Sanctuary · shadow source",
+    "piece": "",
+    "file": "sanctuary/sanctuary-source-shadow.svg"
+  },
+  "sanctuary-inlet-shadow": {
+    "id": "sanctuary-inlet-shadow",
+    "type": "node-destination",
+    "label": "Sanctuary · shadow inlet",
+    "piece": "",
+    "file": "sanctuary/sanctuary-inlet-shadow.svg"
+  },
+  "sanctuary-bridge-horizontal": {
+    "id": "sanctuary-bridge-horizontal",
+    "type": "bridge",
+    "label": "Sanctuary · Bridge",
+    "piece": "horizontal",
+    "file": "sanctuary/sanctuary-bridge-horizontal.svg"
+  },
+  "sanctuary-bridge-vertical": {
+    "id": "sanctuary-bridge-vertical",
+    "type": "bridge",
+    "label": "Sanctuary · Bridge",
+    "piece": "vertical",
+    "file": "sanctuary/sanctuary-bridge-vertical.svg"
+  },
+  "sanctuary-metalSpan-horizontal": {
+    "id": "sanctuary-metalSpan-horizontal",
+    "type": "metalSpan",
+    "label": "Sanctuary · Bronze span",
+    "piece": "horizontal",
+    "file": "sanctuary/sanctuary-metalSpan-horizontal.svg"
+  },
+  "sanctuary-metalSpan-vertical": {
+    "id": "sanctuary-metalSpan-vertical",
+    "type": "metalSpan",
+    "label": "Sanctuary · Bronze span",
+    "piece": "vertical",
+    "file": "sanctuary/sanctuary-metalSpan-vertical.svg"
+  },
+  "sanctuary-intersection-horizontal": {
+    "id": "sanctuary-intersection-horizontal",
+    "type": "intersection",
+    "label": "Sanctuary · Stone crossing",
+    "piece": "horizontal",
+    "file": "sanctuary/sanctuary-intersection-horizontal.svg"
+  },
+  "sanctuary-intersection-vertical": {
+    "id": "sanctuary-intersection-vertical",
+    "type": "intersection",
+    "label": "Sanctuary · Stone crossing",
+    "piece": "vertical",
+    "file": "sanctuary/sanctuary-intersection-vertical.svg"
+  },
+  "sanctuary-tunnel": {
+    "id": "sanctuary-tunnel",
+    "type": "tunnel",
+    "label": "Sanctuary · Tunnel",
+    "piece": "",
+    "file": "sanctuary/sanctuary-tunnel.svg"
+  },
+  "sanctuary-portal": {
+    "id": "sanctuary-portal",
+    "type": "portal",
+    "label": "Sanctuary · Portal",
+    "piece": "",
+    "file": "sanctuary/sanctuary-portal.svg"
   }
 }

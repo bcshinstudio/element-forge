@@ -13,7 +13,8 @@ def art_catalog():
     for item in manifest.values():
         source = GAME.parent / "art/variants" / item["file"]
         payload = base64.b64encode(source.read_bytes()).decode("ascii")
-        item["src"] = f"data:image/webp;base64,{payload}"
+        mime = "image/svg+xml" if source.suffix == ".svg" else "image/webp"
+        item["src"] = f"data:{mime};base64,{payload}"
     return "window.EFArtCatalog = " + json.dumps(manifest, ensure_ascii=True) + ";"
 
 
