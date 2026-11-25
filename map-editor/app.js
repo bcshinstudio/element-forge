@@ -150,7 +150,7 @@ function cellMarkup(c){
   const recipe=reactionEngine.confluenceRecipe(c.props),ports=reactionEngine.confluencePortSides(c.props);
   const entries=recipe&&ports?[[recipe.inputs[0],ports.input1],[recipe.inputs[1],ports.input2],[recipe.output,ports.output]]:[];
   out+='<span class="confluence-mark" aria-hidden="true"><span class="confluence-core">◇</span>'+
-   entries.map(([kind,side])=>`<span class="confluence-port confluence-${kind} port-${side}" style="background:${ELEMENTS[kind].color}">${confluenceSymbol(kind)}</span>`).join('')+'</span>';
+   entries.map(([kind,side],index)=>{const output=index===2;const arrow=(output?{N:"↑",S:"↓",W:"←",E:"→"}:{N:"↓",S:"↑",W:"→",E:"←"})[side];return `<span class="confluence-port confluence-${kind} port-${side} ${output?"port-output":"port-input"}" style="background:${ELEMENTS[kind].color}">${confluenceSymbol(kind)}</span><span class="port-flow port-flow-${side} ${output?"flow-out":"flow-in"}">${arrow}</span>`;}).join('')+'</span>';
  }
   if(c.component&&c.props?.pairId&&(!illustrated||url))out+=`<span class="overlay">${escapeHtml(c.props.pairId)}</span>`;
  if((c.terrain==='oneway'||c.props?.direction)&&!c.node&&c.component!=='confluence')out+=`<span class="direction">${{N:'↑',E:'→',S:'↓',W:'←'}[c.props?.direction||'E']}</span>`;

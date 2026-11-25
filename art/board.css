@@ -106,31 +106,41 @@
 #board .illustrated-node .node-shape,#board .illustrated-node .mark.endpoint{visibility:hidden;}
 
 /* Alchemical chamber artwork — embedded SVGs keep offline builds self-contained. */
-#board .tile .confluence-mark {
- inset:0; background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22gold%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23ffe6a0%22%2F%3E%3Cstop%20offset%3D%22.45%22%20stop-color%3D%22%23a97635%22%2F%3E%3Cstop%20offset%3D%22.72%22%20stop-color%3D%22%23f2c777%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2367421f%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22stone%22%3E%3Cstop%20stop-color%3D%22%23365e50%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23172e27%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20x%3D%222%22%20y%3D%222%22%20width%3D%2296%22%20height%3D%2296%22%20rx%3D%2213%22%20fill%3D%22%23122820%22%20stroke%3D%22%234b3420%22%20stroke-width%3D%223%22%2F%3E%3Crect%20x%3D%225%22%20y%3D%225%22%20width%3D%2290%22%20height%3D%2290%22%20rx%3D%2210%22%20fill%3D%22url(%23stone)%22%20stroke%3D%22url(%23gold)%22%20stroke-width%3D%223%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2210%22%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%227%22%20fill%3D%22none%22%20stroke%3D%22%23c4a56a%22%20stroke-opacity%3D%22.45%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22%23987743%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2225%22%20fill%3D%22none%22%20stroke%3D%22%235c9e85%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M12%2022V12H22M78%2012H88V22M12%2078V88H22M78%2088H88V78%22%20fill%3D%22none%22%20stroke%3D%22%23e0bb77%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M16%2016l7%207m61-7-7%207m7%2061-7-7m-61%207%207-7%22%20stroke%3D%22%237ba18a%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E") center/100% 100% no-repeat;
+#board :is(.tile,.cell) .confluence-mark {
+ inset:0; background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220.8%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23ffe8a5%22%2F%3E%3Cstop%20offset%3D%22.28%22%20stop-color%3D%22%23bd863f%22%2F%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%23f9d68b%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2378502b%22%2F%3E%3C%2FlinearGradient%3E%3CradialGradient%20id%3D%22s%22%3E%3Cstop%20stop-color%3D%22%23315c4a%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2326332a%22%2F%3E%3C%2FradialGradient%3E%3Cpattern%20id%3D%22p%22%20width%3D%2222%22%20height%3D%2222%22%20patternUnits%3D%22userSpaceOnUse%22%3E%3Crect%20width%3D%2222%22%20height%3D%2222%22%20rx%3D%223%22%20fill%3D%22%23485348%22%20stroke%3D%22%23263d32%22%20stroke-width%3D%221.3%22%2F%3E%3Cpath%20d%3D%22M2%204L8%202%2017%205M5%2018l5-3%209%202%22%20fill%3D%22none%22%20stroke%3D%22%237b8060%22%20stroke-opacity%3D%22.24%22%20stroke-width%3D%22.8%22%2F%3E%3C%2Fpattern%3E%3C%2Fdefs%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2298%22%20height%3D%2298%22%20rx%3D%2212%22%20fill%3D%22%23172c24%22%20stroke%3D%22%23352e20%22%20stroke-width%3D%222%22%2F%3E%3Crect%20x%3D%224%22%20y%3D%224%22%20width%3D%2292%22%20height%3D%2292%22%20rx%3D%229%22%20fill%3D%22url(%23p)%22%20stroke%3D%22url(%23g)%22%20stroke-width%3D%224%22%2F%3E%3Crect%20x%3D%229%22%20y%3D%229%22%20width%3D%2282%22%20height%3D%2282%22%20rx%3D%225%22%20fill%3D%22none%22%20stroke%3D%22%23b39a62%22%20stroke-opacity%3D%22.6%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2231%22%20fill%3D%22url(%23s)%22%20stroke%3D%22%23172b23%22%20stroke-width%3D%223%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2229%22%20fill%3D%22none%22%20stroke%3D%22url(%23g)%22%20stroke-width%3D%223%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2224%22%20fill%3D%22none%22%20stroke%3D%22%2351a18b%22%20stroke-width%3D%221.5%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22%23b89b61%22%20stroke-width%3D%221%22%2F%3E%3Cg%20fill%3D%22%23c7a45e%22%20stroke%3D%22%234a3926%22%20stroke-width%3D%22.6%22%3E%3Cpath%20d%3D%22M12%2012h13l-4%204h-5v5l-4%204z%22%2F%3E%3Cpath%20d%3D%22M88%2012H75l4%204h5v5l4%204z%22%2F%3E%3Cpath%20d%3D%22M12%2088h13l-4-4h-5v-5l-4-4z%22%2F%3E%3Cpath%20d%3D%22M88%2088H75l4-4h5v-5l4-4z%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22%23568347%22%20opacity%3D%22.7%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2230%22%20r%3D%222%22%2F%3E%3Ccircle%20cx%3D%2215%22%20cy%3D%2233%22%20r%3D%221.5%22%2F%3E%3Ccircle%20cx%3D%2286%22%20cy%3D%2272%22%20r%3D%222%22%2F%3E%3Ccircle%20cx%3D%2282%22%20cy%3D%2276%22%20r%3D%221.5%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E") center/100% 100% no-repeat;
  border:0; border-radius:0; container-type:inline-size;
 }
-#board .tile .confluence-core {
+#board :is(.tile,.cell) .confluence-core {
  inset:37%; border:0; border-radius:50%; font-size:0;
  background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%3E%3CradialGradient%20id%3D%22gem%22%3E%3Cstop%20stop-color%3D%22%23d6fff0%22%2F%3E%3Cstop%20offset%3D%22.3%22%20stop-color%3D%22%2370e4bc%22%2F%3E%3Cstop%20offset%3D%22.65%22%20stop-color%3D%22%23197c68%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23103e37%22%2F%3E%3C%2FradialGradient%3E%3ClinearGradient%20id%3D%22rim%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23ffe9a3%22%2F%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%23a87938%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23e5bd6b%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2229%22%20fill%3D%22%23123c32%22%20stroke%3D%22url(%23rim)%22%20stroke-width%3D%225%22%2F%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2223%22%20fill%3D%22url(%23gem)%22%20stroke%3D%22%239aefcc%22%20stroke-width%3D%221.5%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23defff2%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M32%2015C15%2018%2017%2036%2032%2032C42%2029%2042%2022%2035%2021%22%2F%3E%3Cpath%20d%3D%22M32%2049C49%2046%2047%2028%2032%2032C22%2035%2022%2042%2029%2043%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%223%22%20fill%3D%22%23fff5c6%22%2F%3E%3C%2Fsvg%3E") center/contain no-repeat; box-shadow:none;
 }
 #board .tile.confluence-pending .confluence-core { filter:saturate(.7); }
 #board .tile.confluence-ready .confluence-core { filter:drop-shadow(0 0 2px #96ffcc); box-shadow:none; }
-#board .tile .confluence-port {
+#board :is(.tile,.cell) .confluence-port {
  box-sizing:border-box; width:39%;height:39%;color:#10221c;
  font:900 clamp(9px,29cqw,21px)/1 system-ui,sans-serif;
  text-shadow:none; z-index:4; border:1px solid #e9ca83;
  background-image:linear-gradient(145deg,#ffffff45,transparent 55%,#14282025)!important;
  box-shadow:inset 0 0 0 1px #704e2e,0 1px 2px #10221c;
 }
-#board .tile .port-input { border-radius:50%; }
-#board .tile .port-output { border-radius:17%; box-shadow:inset 0 0 0 1px #704e2e,inset 0 0 0 2px #fff0a0,0 1px 2px #10221c; }
-#board .tile .port-N { left:30.5%;top:0; }
-#board .tile .port-S { left:30.5%;bottom:0; }
-#board .tile .port-W { left:0;top:30.5%; }
-#board .tile .port-E { right:0;top:30.5%; }
-#board .tile .port-flow { position:absolute; z-index:6; color:#fff0a0; font:900 clamp(7px,17cqw,13px)/1 system-ui,sans-serif; text-shadow:0 1px 1px #583619; transform:translate(-50%,-50%); pointer-events:none; }
-#board .tile .port-flow-N { left:50%;top:39%;right:auto;bottom:auto; }
-#board .tile .port-flow-S { left:50%;top:61%;right:auto;bottom:auto; }
-#board .tile .port-flow-W { left:39%;top:50%;right:auto;bottom:auto; }
-#board .tile .port-flow-E { left:61%;top:50%;right:auto;bottom:auto; }
+#board :is(.tile,.cell) .port-input { border-radius:50%; }
+#board :is(.tile,.cell) .port-output { border-radius:17%; box-shadow:inset 0 0 0 1px #704e2e,inset 0 0 0 2px #fff0a0,0 1px 2px #10221c; }
+#board :is(.tile,.cell) .port-N { left:30.5%;top:0; }
+#board :is(.tile,.cell) .port-S { left:30.5%;bottom:0; }
+#board :is(.tile,.cell) .port-W { left:0;top:30.5%; }
+#board :is(.tile,.cell) .port-E { right:0;top:30.5%; }
+#board :is(.tile,.cell) .port-flow { position:absolute; z-index:6; color:#fff0a0; font:900 clamp(7px,17cqw,13px)/1 system-ui,sans-serif; text-shadow:0 1px 1px #583619; transform:translate(-50%,-50%); pointer-events:none; }
+#board :is(.tile,.cell) .port-flow-N { left:50%;top:39%;right:auto;bottom:auto; }
+#board :is(.tile,.cell) .port-flow-S { left:50%;top:61%;right:auto;bottom:auto; }
+#board :is(.tile,.cell) .port-flow-W { left:39%;top:50%;right:auto;bottom:auto; }
+#board :is(.tile,.cell) .port-flow-E { left:61%;top:50%;right:auto;bottom:auto; }
+
+/* Approved chamber finish: three live ports, no decoration on unused sides. */
+#board :is(.tile,.cell) .confluence-port { width:40%;height:40%; font:900 31cqw/1 system-ui,sans-serif; color:#10221c; border:1px solid #ffe5a0; box-shadow:inset 0 0 0 1px #a36d2d,0 1px 2px #10221c; }
+#board :is(.tile,.cell) .port-output { border-radius:16%; box-shadow:inset 0 0 0 1px #704e2e,inset 0 0 0 2px #fff0a0,0 1px 2px #10221c; }
+#board :is(.tile,.cell) .port-N { left:30%;top:0; }
+#board :is(.tile,.cell) .port-S { left:30%;bottom:0; }
+#board :is(.tile,.cell) .port-W { left:0;top:30%; }
+#board :is(.tile,.cell) .port-E { right:0;top:30%; }
+#board :is(.tile,.cell) .confluence-core { inset:39%; }
+#board :is(.tile,.cell) .port-flow { font:900 15cqw/1 system-ui,sans-serif; }
