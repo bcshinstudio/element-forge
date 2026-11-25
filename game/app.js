@@ -495,7 +495,7 @@
   const {map,state}=session;
   const visible=E.phaseView(map,state.dayPhase);
   const garden=window.EFGarden.isGarden(map)?window.EFGarden.view(map,state.routes,window.EFArtCatalog):null;
-  const sanctuary=window.EFSanctuary.isSanctuary(map)?window.EFSanctuary.view(map,state.routes):null;
+  const sanctuary=window.EFSanctuary.isSanctuary(map)?window.EFSanctuary.view(map,state.routes,window.EFArtCatalog):null;
   // Routes update the board without calling update(); refresh the phase badge here.
   const priorPhase=board.dataset.dayPhase;
   board.dataset.dayPhase=state.dayPhase??'';
@@ -616,7 +616,8 @@
    tile.classList.toggle('tunnel-preview',Boolean(pendingOpening));
    const terrainLayer=tile.querySelector('.terrain-variant');
    const gardenLayer=garden?tile.querySelector('.garden-motion'):null;
-   if(terrainLayer)tile.replaceChildren(terrainLayer,fragments[i],...(gardenLayer?[gardenLayer]:[]));
+   const sanctuaryLayer=sanctuary?tile.querySelector('.sanctuary-motion'):null;
+   if(terrainLayer)tile.replaceChildren(terrainLayer,fragments[i],...(gardenLayer?[gardenLayer]:[]),...(sanctuaryLayer?[sanctuaryLayer]:[]));
    else{
     tile.replaceChildren(fragments[i]);
     window.EFBoardArt.setTerrain(tile,terrain,cell.props?.phaseShift&&state.dayPhase==='night'?undefined:cell.terrainArt);
@@ -625,8 +626,7 @@
     window.EFBoardArt.setTerrain(tile,terrain,garden[i].spec);
     window.EFGarden.motion(tile,garden[i]);
    }else window.EFGarden.motion(tile,null);
-   if(sanctuary?.[i].effect==='gate')window.EFBoardArt.setTerrain(tile,terrain,{id:'sanctuary-gate-open-restored',rotation:cell.terrainArt.rotation??0});
-   else if(sanctuary)window.EFBoardArt.setTerrain(tile,terrain,cell.terrainArt);
+   if(sanctuary)window.EFBoardArt.setTerrain(tile,terrain,sanctuary[i].spec);
    window.EFSanctuary.motion(tile,sanctuary?.[i]);
    window.EFBoardArt.decorate(tile,pendingOpening??kind,{link,spec:pendingOpening?map.toolArt?.[pendingOpening]:appearance});
    window.EFBoardArt.setNode(tile,map.nodeAppearance,cell.node);

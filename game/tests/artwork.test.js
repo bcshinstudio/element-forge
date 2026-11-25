@@ -53,7 +53,7 @@ test('all approved art is cataloged, placed in its gameplay family, and present 
  assert.equal(original.length,248);
  assert.equal(new Set(original.map(a=>a.type+'|'+a.label)).size,158);
  assert.equal(Object.values(catalog).filter(a=>a.id.startsWith('garden-')).length,166);
- assert.equal(Object.values(catalog).filter(a=>a.id.startsWith('sanctuary-')).length,67);
+ assert.equal(Object.values(catalog).filter(a=>a.id.startsWith('sanctuary-')).length,85);
  for(const [type] of [...F.TERRAIN,...F.COMPONENTS]){
    if(type==='confluence')assert.match(fs.readFileSync(path.join(__dirname,'../../art/board.css'),'utf8'),/\.confluence-mark/,'Confluence uses procedural CSS art');
    else if(type==='phasePlate')assert.match(fs.readFileSync(path.join(__dirname,'../styles.css'),'utf8'),/\.phase-plate-mark/,'Phase Plate uses procedural CSS art');

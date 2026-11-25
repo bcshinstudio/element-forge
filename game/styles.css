@@ -806,15 +806,24 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 .chamber-inspection strong { color:#efc77b; }
 .chamber-inspection[hidden] { display:none; }
 
-/* Sanctuary restoration */
-.cell[data-sanctuary-effect="inlet"] .library-node-art{filter:drop-shadow(0 0 5px #fff0b5) brightness(1.25)}
-.cell[data-sanctuary-effect="heart"] .terrain-variant,.cell[data-sanctuary-effect="crystal"] .terrain-variant{animation:sanctuary-reveal 1.4s ease-out both}
-.cell[data-sanctuary-effect="gate"] .terrain-variant{animation:sanctuary-reveal 1s ease-out both;animation-delay:.5s}
-.cell[data-sanctuary-effect="light"]::after,.cell[data-sanctuary-effect="water"]::after,.cell[data-sanctuary-effect="crystal"]::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;border-radius:inherit}
-.cell[data-sanctuary-effect="light"]::after{background:radial-gradient(circle at 50% 32%,#ffe0a488,transparent 65%);animation:sanctuary-glow 3s ease-in-out infinite alternate}
-.cell[data-sanctuary-effect="crystal"]::after{background:radial-gradient(circle,#afffcb99,transparent 70%);animation:sanctuary-glow 3s ease-in-out infinite alternate}
-.cell[data-sanctuary-effect="water"]::after{background:radial-gradient(circle at 50% 50%,transparent 16%,#d7fff5a0 20%,transparent 24%,transparent 35%,#d7fff550 39%,transparent 43%);animation:sanctuary-ripple 2s ease-out infinite}
-@keyframes sanctuary-reveal{from{filter:brightness(.85)}to{filter:brightness(1.25) saturate(1.2)}}
-@keyframes sanctuary-glow{from{opacity:.4}to{opacity:.85}}
-@keyframes sanctuary-ripple{from{transform:scale(.65);opacity:.8}to{transform:scale(1.05);opacity:.15}}
-@media(prefers-reduced-motion:reduce){.cell[data-sanctuary-effect] .terrain-variant,.cell[data-sanctuary-effect]::after{animation:none!important}}
+/* Sanctuary restoration: actual game tiles are .tile, not .cell. */
+#board .tile[data-sanctuary-effect="inlet"] .library-node-art{filter:brightness(1.45) drop-shadow(0 0 5px #fff4bc)}
+#board .sanctuary-motion{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}
+#board .sanctuary-motion i{position:absolute;display:block;pointer-events:none}
+#board .sanctuary-motion[data-motion="inlet"]{inset:8%;border:2px solid #fff5c5;border-radius:24%;box-shadow:inset 0 0 5px #fff5b9,0 0 6px #ffe18b;animation:sanctuary-inlet 1s ease-out both}
+#board .sanctuary-motion[data-motion="light"]{background:radial-gradient(circle at 50% 32%,#fff2a9a0 0%,#ffd36d60 35%,transparent 72%)}
+#board .sanctuary-motion[data-motion="light"] i,#board .sanctuary-motion[data-motion="fire"] i{left:var(--x);top:48%;width:7%;height:7%;border-radius:50%;background:#fff0a2;box-shadow:0 0 4px 2px #ffad43;animation:sanctuary-rise 2.4s ease-out infinite;animation-delay:var(--delay)}
+#board .sanctuary-motion[data-motion="water"] i,#board .sanctuary-motion[data-motion="fountain"] i{left:var(--x);top:24%;width:6%;height:10%;border-radius:60%;background:#e4ffff;box-shadow:0 0 4px #8afaff;animation:garden-droplet 1.6s ease-in infinite;animation-delay:var(--delay)}
+#board .sanctuary-motion[data-motion="fountain"]{background:radial-gradient(circle,#9cfff966,transparent 72%)}
+#board .sanctuary-motion[data-motion="nature"] i{left:var(--x);top:62%;width:9%;height:5%;border-radius:80% 0;background:#cfff8e;animation:garden-petal 3s ease-out infinite;animation-delay:var(--delay)}
+#board .sanctuary-motion[data-motion="earth"]{background:radial-gradient(circle,#ffdc7455,transparent 74%)}
+#board .sanctuary-motion[data-motion="wind"] i{left:5%;top:calc(20% + var(--n)*18%);width:55%;height:3%;border-radius:50%;background:linear-gradient(90deg,transparent,#e2fff5,transparent);animation:garden-breeze 2.5s linear infinite;animation-delay:var(--delay)}
+#board .sanctuary-motion[data-motion="heart"],#board .sanctuary-motion[data-motion="crystal"]{background:radial-gradient(circle,#ffe4a43b,transparent 75%)}
+#board .sanctuary-motion[data-motion="crystal"]{background:radial-gradient(circle,#b7ffdb91,transparent 72%)}
+#board .sanctuary-motion[data-motion="heart"] i,#board .sanctuary-motion[data-motion="crystal"] i,#board .sanctuary-motion[data-motion="gate"] i,#board .sanctuary-motion[data-motion="earth"] i{left:var(--x);top:68%;width:6%;aspect-ratio:1;border-radius:50%;background:#ffedab;box-shadow:0 0 4px #ffe39a;animation:sanctuary-rise 2.8s ease-out infinite;animation-delay:var(--delay)}
+#board .sanctuary-motion[data-motion="crystal"] i:nth-child(even){background:#b0ffda;box-shadow:0 0 5px #8cffbf}
+#board .tile:is([data-sanctuary-effect="heart"],[data-sanctuary-effect="crystal"],[data-sanctuary-effect="gate"]) .terrain-variant{animation:sanctuary-awaken 1.6s ease-out both}
+@keyframes sanctuary-inlet{from{opacity:.45;transform:scale(.75)}to{opacity:1;transform:scale(1)}}
+@keyframes sanctuary-rise{0%{transform:translateY(0) scale(.55);opacity:0}25%{opacity:1}100%{transform:translateY(-650%) scale(.35);opacity:0}}
+@keyframes sanctuary-awaken{from{opacity:.55}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){#board .sanctuary-motion,#board .sanctuary-motion i,#board .tile[data-sanctuary-effect] .terrain-variant{animation:none!important}#board .sanctuary-motion i{display:none}}

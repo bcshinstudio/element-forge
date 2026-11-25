@@ -2954,14 +2954,16 @@
     "type": "water",
     "label": "Sanctuary · Sacred water",
     "piece": "",
-    "file": "sanctuary/sanctuary-water.svg"
+    "file": "sanctuary/sanctuary-water.svg",
+    "activeId": "sanctuary-water-awake"
   },
   "sanctuary-water-channel": {
     "id": "sanctuary-water-channel",
     "type": "water",
     "label": "Sanctuary · Stone-lined water channel",
     "piece": "",
-    "file": "sanctuary/sanctuary-water-channel.svg"
+    "file": "sanctuary/sanctuary-water-channel.svg",
+    "activeId": "sanctuary-water-channel-awake"
   },
   "sanctuary-water-basin": {
     "id": "sanctuary-water-basin",
@@ -2989,14 +2991,16 @@
     "type": "forest",
     "label": "Sanctuary · Mountain grove",
     "piece": "",
-    "file": "sanctuary/sanctuary-forest.svg"
+    "file": "sanctuary/sanctuary-forest.svg",
+    "activeId": "sanctuary-forest-awake"
   },
   "sanctuary-ferns": {
     "id": "sanctuary-ferns",
     "type": "forest",
     "label": "Sanctuary · Fern garden",
     "piece": "",
-    "file": "sanctuary/sanctuary-ferns.svg"
+    "file": "sanctuary/sanctuary-ferns.svg",
+    "activeId": "sanctuary-ferns-awake"
   },
   "sanctuary-mountain": {
     "id": "sanctuary-mountain",
@@ -3024,7 +3028,8 @@
     "type": "lava",
     "label": "Sanctuary · Ancient fire channel",
     "piece": "",
-    "file": "sanctuary/sanctuary-lava.svg"
+    "file": "sanctuary/sanctuary-lava.svg",
+    "activeId": "sanctuary-lava-awake"
   },
   "sanctuary-wall": {
     "id": "sanctuary-wall",
@@ -3038,21 +3043,24 @@
     "type": "wall",
     "label": "Sanctuary · Guardian pillar",
     "piece": "",
-    "file": "sanctuary/sanctuary-pillar.svg"
+    "file": "sanctuary/sanctuary-pillar.svg",
+    "activeId": "sanctuary-pillar-awake"
   },
   "sanctuary-statue": {
     "id": "sanctuary-statue",
     "type": "wall",
     "label": "Sanctuary · Guardian statue",
     "piece": "",
-    "file": "sanctuary/sanctuary-statue.svg"
+    "file": "sanctuary/sanctuary-statue.svg",
+    "activeId": "sanctuary-statue-awake"
   },
   "sanctuary-fountain": {
     "id": "sanctuary-fountain",
     "type": "wall",
     "label": "Sanctuary · Sacred fountain",
     "piece": "",
-    "file": "sanctuary/sanctuary-fountain.svg"
+    "file": "sanctuary/sanctuary-fountain.svg",
+    "activeId": "sanctuary-fountain-awake"
   },
   "sanctuary-dry-fountain": {
     "id": "sanctuary-dry-fountain",
@@ -3073,7 +3081,8 @@
     "type": "wall",
     "label": "Sanctuary · Sanctuary lantern",
     "piece": "",
-    "file": "sanctuary/sanctuary-lantern.svg"
+    "file": "sanctuary/sanctuary-lantern.svg",
+    "activeId": "sanctuary-lantern-awake"
   },
   "sanctuary-heart": {
     "id": "sanctuary-heart",
@@ -3318,63 +3327,72 @@
     "type": "land",
     "label": "Sanctuary · Grand altar NW",
     "piece": "",
-    "file": "sanctuary/sanctuary-grand-altar-nw.svg"
+    "file": "sanctuary/sanctuary-grand-altar-nw.svg",
+    "activeId": "sanctuary-grand-altar-nw-awake"
   },
   "sanctuary-grand-altar-n": {
     "id": "sanctuary-grand-altar-n",
     "type": "wall",
     "label": "Sanctuary · Grand altar N",
     "piece": "",
-    "file": "sanctuary/sanctuary-grand-altar-n.svg"
+    "file": "sanctuary/sanctuary-grand-altar-n.svg",
+    "activeId": "sanctuary-grand-altar-n-awake"
   },
   "sanctuary-grand-altar-ne": {
     "id": "sanctuary-grand-altar-ne",
     "type": "land",
     "label": "Sanctuary · Grand altar NE",
     "piece": "",
-    "file": "sanctuary/sanctuary-grand-altar-ne.svg"
+    "file": "sanctuary/sanctuary-grand-altar-ne.svg",
+    "activeId": "sanctuary-grand-altar-ne-awake"
   },
   "sanctuary-grand-altar-w": {
     "id": "sanctuary-grand-altar-w",
     "type": "wall",
     "label": "Sanctuary · Grand altar W",
     "piece": "",
-    "file": "sanctuary/sanctuary-grand-altar-w.svg"
+    "file": "sanctuary/sanctuary-grand-altar-w.svg",
+    "activeId": "sanctuary-grand-altar-w-awake"
   },
   "sanctuary-grand-altar-center": {
     "id": "sanctuary-grand-altar-center",
     "type": "wall",
     "label": "Sanctuary · Grand altar CENTER",
     "piece": "",
-    "file": "sanctuary/sanctuary-grand-altar-center.svg"
+    "file": "sanctuary/sanctuary-grand-altar-center.svg",
+    "activeId": "sanctuary-grand-altar-center-awake"
   },
   "sanctuary-grand-altar-e": {
     "id": "sanctuary-grand-altar-e",
     "type": "wall",
     "label": "Sanctuary · Grand altar E",
     "piece": "",
-    "file": "sanctuary/sanctuary-grand-altar-e.svg"
+    "file": "sanctuary/sanctuary-grand-altar-e.svg",
+    "activeId": "sanctuary-grand-altar-e-awake"
   },
   "sanctuary-grand-altar-sw": {
     "id": "sanctuary-grand-altar-sw",
     "type": "land",
     "label": "Sanctuary · Grand altar SW",
     "piece": "",
-    "file": "sanctuary/sanctuary-grand-altar-sw.svg"
+    "file": "sanctuary/sanctuary-grand-altar-sw.svg",
+    "activeId": "sanctuary-grand-altar-sw-awake"
   },
   "sanctuary-grand-altar-s": {
     "id": "sanctuary-grand-altar-s",
     "type": "wall",
     "label": "Sanctuary · Grand altar S",
     "piece": "",
-    "file": "sanctuary/sanctuary-grand-altar-s.svg"
+    "file": "sanctuary/sanctuary-grand-altar-s.svg",
+    "activeId": "sanctuary-grand-altar-s-awake"
   },
   "sanctuary-grand-altar-se": {
     "id": "sanctuary-grand-altar-se",
     "type": "land",
     "label": "Sanctuary · Grand altar SE",
     "piece": "",
-    "file": "sanctuary/sanctuary-grand-altar-se.svg"
+    "file": "sanctuary/sanctuary-grand-altar-se.svg",
+    "activeId": "sanctuary-grand-altar-se-awake"
   },
   "sanctuary-gate-open-restored": {
     "id": "sanctuary-gate-open-restored",
@@ -3382,5 +3400,131 @@
     "label": "Sanctuary · Restored gate",
     "piece": "",
     "file": "sanctuary/sanctuary-gate-open-restored.svg"
+  },
+  "sanctuary-grand-altar-nw-awake": {
+    "id": "sanctuary-grand-altar-nw-awake",
+    "type": "land",
+    "label": "Sanctuary · Grand altar NW · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-nw-awake.svg"
+  },
+  "sanctuary-grand-altar-n-awake": {
+    "id": "sanctuary-grand-altar-n-awake",
+    "type": "wall",
+    "label": "Sanctuary · Grand altar N · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-n-awake.svg"
+  },
+  "sanctuary-grand-altar-ne-awake": {
+    "id": "sanctuary-grand-altar-ne-awake",
+    "type": "land",
+    "label": "Sanctuary · Grand altar NE · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-ne-awake.svg"
+  },
+  "sanctuary-grand-altar-w-awake": {
+    "id": "sanctuary-grand-altar-w-awake",
+    "type": "wall",
+    "label": "Sanctuary · Grand altar W · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-w-awake.svg"
+  },
+  "sanctuary-grand-altar-center-awake": {
+    "id": "sanctuary-grand-altar-center-awake",
+    "type": "wall",
+    "label": "Sanctuary · Grand altar CENTER · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-center-awake.svg"
+  },
+  "sanctuary-grand-altar-e-awake": {
+    "id": "sanctuary-grand-altar-e-awake",
+    "type": "wall",
+    "label": "Sanctuary · Grand altar E · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-e-awake.svg"
+  },
+  "sanctuary-grand-altar-sw-awake": {
+    "id": "sanctuary-grand-altar-sw-awake",
+    "type": "land",
+    "label": "Sanctuary · Grand altar SW · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-sw-awake.svg"
+  },
+  "sanctuary-grand-altar-s-awake": {
+    "id": "sanctuary-grand-altar-s-awake",
+    "type": "wall",
+    "label": "Sanctuary · Grand altar S · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-s-awake.svg"
+  },
+  "sanctuary-grand-altar-se-awake": {
+    "id": "sanctuary-grand-altar-se-awake",
+    "type": "land",
+    "label": "Sanctuary · Grand altar SE · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-se-awake.svg"
+  },
+  "sanctuary-lava-awake": {
+    "id": "sanctuary-lava-awake",
+    "type": "lava",
+    "label": "Sanctuary · Ancient fire channel · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-lava-awake.svg"
+  },
+  "sanctuary-water-awake": {
+    "id": "sanctuary-water-awake",
+    "type": "water",
+    "label": "Sanctuary · Sacred water · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-water-awake.svg"
+  },
+  "sanctuary-water-channel-awake": {
+    "id": "sanctuary-water-channel-awake",
+    "type": "water",
+    "label": "Sanctuary · Stone-lined water channel · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-water-channel-awake.svg"
+  },
+  "sanctuary-fountain-awake": {
+    "id": "sanctuary-fountain-awake",
+    "type": "wall",
+    "label": "Sanctuary · Sacred fountain · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-fountain-awake.svg"
+  },
+  "sanctuary-statue-awake": {
+    "id": "sanctuary-statue-awake",
+    "type": "wall",
+    "label": "Sanctuary · Guardian statue · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-statue-awake.svg"
+  },
+  "sanctuary-pillar-awake": {
+    "id": "sanctuary-pillar-awake",
+    "type": "wall",
+    "label": "Sanctuary · Guardian pillar · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-pillar-awake.svg"
+  },
+  "sanctuary-ferns-awake": {
+    "id": "sanctuary-ferns-awake",
+    "type": "forest",
+    "label": "Sanctuary · Fern garden · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-ferns-awake.svg"
+  },
+  "sanctuary-forest-awake": {
+    "id": "sanctuary-forest-awake",
+    "type": "forest",
+    "label": "Sanctuary · Mountain grove · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-forest-awake.svg"
+  },
+  "sanctuary-lantern-awake": {
+    "id": "sanctuary-lantern-awake",
+    "type": "wall",
+    "label": "Sanctuary · Sanctuary lantern · Awakened",
+    "piece": "",
+    "file": "sanctuary/sanctuary-lantern-awake.svg"
   }
 }
