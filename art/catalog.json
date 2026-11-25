@@ -3375,5 +3375,12 @@
     "label": "Sanctuary · Grand altar SE",
     "piece": "",
     "file": "sanctuary/sanctuary-grand-altar-se.svg"
+  },
+  "sanctuary-gate-open-restored": {
+    "id": "sanctuary-gate-open-restored",
+    "type": "wall",
+    "label": "Sanctuary · Restored gate",
+    "piece": "",
+    "file": "sanctuary/sanctuary-gate-open-restored.svg"
   }
 }
