@@ -491,6 +491,7 @@
   const {map,state}=session;
   const visible=E.phaseView(map,state.dayPhase);
   const garden=window.EFGarden.isGarden(map)?window.EFGarden.view(map,state.routes,window.EFArtCatalog):null;
+  const sanctuary=window.EFSanctuary.isSanctuary(map)?window.EFSanctuary.view(map,state.routes):null;
   // Routes update the board without calling update(); refresh the phase badge here.
   const priorPhase=board.dataset.dayPhase;
   board.dataset.dayPhase=state.dayPhase??'';
@@ -620,6 +621,9 @@
     window.EFBoardArt.setTerrain(tile,terrain,garden[i].spec);
     window.EFGarden.motion(tile,garden[i]);
    }else window.EFGarden.motion(tile,null);
+   if(sanctuary?.[i].effect==='gate')window.EFBoardArt.setTerrain(tile,terrain,{id:'sanctuary-gate-open-restored',rotation:cell.terrainArt.rotation??0});
+   else if(sanctuary)window.EFBoardArt.setTerrain(tile,terrain,cell.terrainArt);
+   window.EFSanctuary.motion(tile,sanctuary?.[i]);
    window.EFBoardArt.decorate(tile,pendingOpening??kind,{link,spec:pendingOpening?map.toolArt?.[pendingOpening]:appearance});
    window.EFBoardArt.setNode(tile,map.nodeAppearance,cell.node);
    const archive=map.nodeAppearance==='library'&&map.name===window.EFArchive.level.map.name;

@@ -805,3 +805,16 @@ body:has(#home:not([hidden])) .masthead { display:none; }
 .chamber-inspection { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:6px 12px; margin:8px 0; padding:8px 10px; border:1px solid #887548; border-radius:6px; font-size:clamp(13px,2.5vw,16px); }
 .chamber-inspection strong { color:#efc77b; }
 .chamber-inspection[hidden] { display:none; }
+
+/* Sanctuary restoration */
+.cell[data-sanctuary-effect="inlet"] .library-node-art{filter:drop-shadow(0 0 5px #fff0b5) brightness(1.25)}
+.cell[data-sanctuary-effect="heart"] .terrain-variant,.cell[data-sanctuary-effect="crystal"] .terrain-variant{animation:sanctuary-reveal 1.4s ease-out both}
+.cell[data-sanctuary-effect="gate"] .terrain-variant{animation:sanctuary-reveal 1s ease-out both;animation-delay:.5s}
+.cell[data-sanctuary-effect="light"]::after,.cell[data-sanctuary-effect="water"]::after,.cell[data-sanctuary-effect="crystal"]::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;border-radius:inherit}
+.cell[data-sanctuary-effect="light"]::after{background:radial-gradient(circle at 50% 32%,#ffe0a488,transparent 65%);animation:sanctuary-glow 3s ease-in-out infinite alternate}
+.cell[data-sanctuary-effect="crystal"]::after{background:radial-gradient(circle,#afffcb99,transparent 70%);animation:sanctuary-glow 3s ease-in-out infinite alternate}
+.cell[data-sanctuary-effect="water"]::after{background:radial-gradient(circle at 50% 50%,transparent 16%,#d7fff5a0 20%,transparent 24%,transparent 35%,#d7fff550 39%,transparent 43%);animation:sanctuary-ripple 2s ease-out infinite}
+@keyframes sanctuary-reveal{from{filter:brightness(.85)}to{filter:brightness(1.25) saturate(1.2)}}
+@keyframes sanctuary-glow{from{opacity:.4}to{opacity:.85}}
+@keyframes sanctuary-ripple{from{transform:scale(.65);opacity:.8}to{transform:scale(1.05);opacity:.15}}
+@media(prefers-reduced-motion:reduce){.cell[data-sanctuary-effect] .terrain-variant,.cell[data-sanctuary-effect]::after{animation:none!important}}

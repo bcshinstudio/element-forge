@@ -18,7 +18,7 @@
   const map=F.readLevel(level);
   const multi=E.hasMultiConfluence(map);
   const shifting=E.hasPhases(map);
-  const garden=map.nodeAppearance==='garden'&&map.name==='The Garden of Forgotten Wonders';
+  const garden=(map.nodeAppearance==='garden'&&map.name==='The Garden of Forgotten Wonders')||(map.nodeAppearance==='sanctuary'&&map.name==='The Sanctuary of Silent Guardians');
   const routeId=r=>E.routeKey(map,r.element,r.path[0]);
   const state={phase:'inspect',dayPhase:map.phaseRules?.initial??null,loadout:{},placements:{},routes:[],drafts:{},active:null};
   let history=[];
@@ -96,7 +96,7 @@
    if(!onboard(index)||!Object.hasOwn(state.placements,index))return fail('Choose a tool you placed.');
    const linked=E.linkPartner(map,index,state.placements);
    const tiles=linked<0?[index]:[index,linked];
-   if(garden&&state.routes.some(r=>r.path.some(i=>tiles.includes(i))))return fail('A delivered current cannot be changed. Restart to reset the garden.');
+   if(garden&&state.routes.some(r=>r.path.some(i=>tiles.includes(i))))return fail('A delivered current cannot be changed. Restart to reset the stage.');
    remember(true);
    for(const i of tiles)delete state.placements[i];
    const affected=route=>route.path.some(i=>tiles.includes(i));
