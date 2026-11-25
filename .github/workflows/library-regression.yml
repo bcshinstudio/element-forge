@@ -30,3 +30,12 @@ jobs:
           python3 -m playwright install --with-deps chromium
       - name: Developer story browser regression
         run: python3 game/tests/developer_story_browser.py
+      - name: Sanctuary restoration browser regression
+        run: python3 game/tests/sanctuary_browser.py
+      - name: Upload Sanctuary restoration screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sanctuary-restoration-screenshots
+          path: test-results/sanctuary/
+          if-no-files-found: warn
