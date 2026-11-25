@@ -7,7 +7,7 @@
  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
  const cache = new Map();
  let panels, panelIndex, onFinish, frameRequest, renderVersion = 0, textTimer;
- let voice=null,gardenMode=false;
+ let voice=null,gardenMode=false,sanctuaryMode=false;
  let audio,archiveMode=false,autoTimer=null,auto=true,paused=false;
  const autoKey='wellspring.story.autoplay';
  function autoPreference(){try{return localStorage.getItem(autoKey)!=='off';}catch{return true;}}
@@ -43,7 +43,7 @@
   const portrait=dialog.querySelector('.jeeah-portrait');
   dialog.querySelector('.jeeah-dialogue strong').textContent=speaker;
   portrait.dataset.speaker=speaker;
-  const portraitSrc=gardenMode?window.EFGarden.portraits[speaker]:null;
+  const portraitSrc=sanctuaryMode&&speaker==='Caelan'?window.EFSanctuaryStory.portraits[panel.expression]:gardenMode?window.EFGarden.portraits[speaker]:null;
   portrait.style.backgroundImage=portraitSrc?'url("'+portraitSrc+'")':'';
   portrait.style.backgroundSize=portraitSrc?'contain':'';
   portrait.style.backgroundPosition=portraitSrc?'center':'';
@@ -100,7 +100,7 @@
  }
 
  function open(chapter, type, label, callback) {
-  gardenMode=false;archiveMode=false;resetPlayback();
+  sanctuaryMode=false;gardenMode=false;archiveMode=false;resetPlayback();
   panels = window.EFStoryChapters[chapter][type];
   panelIndex = 0;
   onFinish = callback;
@@ -140,19 +140,26 @@
  control('Skip sequence',()=>finish.click());
  control('Full screen',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await dialog.requestFullscreen();}catch{}});
  function openArchive(type,label,callback){
-  gardenMode=false;archiveMode=true;resetPlayback();
+  sanctuaryMode=false;gardenMode=false;archiveMode=true;resetPlayback();
   panels=window.EFArchive.panels(type);panelIndex=0;onFinish=callback;
   window.EFArchive.art.forEach((src,i)=>window.EFStoryArt['archive-'+(i+1)]=src);
   $('world-intro-title').textContent='The Archive of First Currents';finish.textContent=label;
   if(!dialog.open)dialog.showModal();audio?.story(true);render();next.focus();
  }
  function openGarden(type,label,callback){
-  gardenMode=true;Object.assign(window.EFStoryArt,window.EFGarden.art);archiveMode=true;resetPlayback();
+  sanctuaryMode=false;gardenMode=true;Object.assign(window.EFStoryArt,window.EFGarden.art);archiveMode=true;resetPlayback();
   panels=window.EFGarden.panels(type);panelIndex=0;onFinish=callback;
   $('world-intro-title').textContent='The Garden of Forgotten Wonders';finish.textContent=label;
   if(!dialog.open)dialog.showModal();audio?.story(true);render();next.focus();
  }
- window.EFStory = {openArchive,openGarden,
+ function openSanctuary(type,label,callback){
+  sanctuaryMode=true;gardenMode=true;archiveMode=true;resetPlayback();
+  Object.assign(window.EFStoryArt,window.EFSanctuaryStory.art);
+  panels=window.EFSanctuaryStory.panels(type);panelIndex=0;onFinish=callback;
+  $('world-intro-title').textContent='The Sanctuary of Silent Guardians';finish.textContent=label;
+  if(!dialog.open)dialog.showModal();audio?.story(true);render();next.focus();
+ }
+ window.EFStory = {openArchive,openGarden,openSanctuary,
   open, close,
   configureAudio(controller) { audio = controller; },
  };

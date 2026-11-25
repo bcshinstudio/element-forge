@@ -29,13 +29,16 @@ def run():
                 page.locator("#studio-credit").click()
                 expect(page.locator("#developer-tools")).to_be_visible()
                 choices=page.locator("#stage-list button")
-                expect(choices).to_have_count(122)
+                expect(choices).to_have_count(123)
                 labels=choices.all_text_contents()
                 assert [int(label.split(".")[0]) for label in labels if label.split(".")[0].isdigit()]==list(range(1,121))
                 assert "Archive of First Currents" in labels[36]
                 assert "Garden of Forgotten Wonders" in labels[61]
                 assert labels[60].startswith("60.")
                 assert labels[62].startswith("61.")
+                assert labels[97].startswith("96.")
+                assert "Sanctuary of Silent Guardians" in labels[98]
+                assert labels[99].startswith("97.")
                 choices.nth(35).click()
                 expect(page.locator("#stage-number")).to_have_text("Chapter 3 · Stage 12")
                 page.locator("#developer-complete").click()

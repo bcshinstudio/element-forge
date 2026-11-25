@@ -24,16 +24,20 @@
  for(const chapter of chapters.slice(3))chapter.start++;
  const gardenIndex=chapters[5].start;
  for(const chapter of chapters.slice(5))chapter.start++;
+ const sanctuaryIndex=chapters[8].start;
+ for(const chapter of chapters.slice(8))chapter.start++;
+ const isSanctuary=index=>index===sanctuaryIndex;
  const isGarden=index=>index===gardenIndex;
- const isInterlude=index=>isArchive(index)||isGarden(index);
- const interludeName=index=>isGarden(index)?'The Garden of Forgotten Wonders':'The Archive of First Currents';
+ const isInterlude=index=>isArchive(index)||isGarden(index)||isSanctuary(index);
+ const interludeName=index=>isSanctuary(index)?'The Sanctuary of Silent Guardians':isGarden(index)?'The Garden of Forgotten Wonders':'The Archive of First Currents';
  const chapterAt=index=>chapters.findLast(chapter=>index>=chapter.start);
  const isArchive=index=>index===archiveIndex;
- const stageLabel=index=>isInterlude(index)?'Interlude':String(index+1-(index>archiveIndex?1:0)-(index>gardenIndex?1:0));
+ const stageLabel=index=>isInterlude(index)?'Interlude':String(index+1-(index>archiveIndex?1:0)-(index>gardenIndex?1:0)-(index>sanctuaryIndex?1:0));
  const isChapterEnd=index=>!isInterlude(index)&&index<campaignSize&&index===chapterAt(index).start+chapterAt(index).stages.length-1;
  const levels=chapters.flatMap((chapter,index)=>chapter.stages.map(level=>window.EFVariants.campaignLevel(level,index)));
  levels.splice(archiveIndex,0,window.EFArchive.level);
  levels.splice(gardenIndex,0,window.EFGarden.level);
+ levels.splice(sanctuaryIndex,0,window.EFSanctuary.level);
  const campaignSize=levels.length;
  const tutorials=[...window.EFLevels.catalog,window.EFLevels.prototype,...window.EFChapter.archivedTutorials];
  levels.push(...tutorials);
@@ -180,7 +184,7 @@
   $('puzzle').textContent=map.name;
   const chapter=index<campaignSize?chapterAt(index):null;
   $('stage-number').hidden=!chapter;
-  $('stage-number').textContent=isGarden(index)?'Interlude · The Garden':isArchive(index)?'Interlude · The Archive':chapter?`Chapter ${chapters.indexOf(chapter)+1} · Stage ${index-chapter.start+1}`:'';
+  $('stage-number').textContent=isSanctuary(index)?'Interlude · The Sanctuary':isGarden(index)?'Interlude · The Garden':isArchive(index)?'Interlude · The Archive':chapter?`Chapter ${chapters.indexOf(chapter)+1} · Stage ${index-chapter.start+1}`:'';
 
   const rules=$('routing-restrictions');
   const ruleItems=[];
@@ -1382,7 +1386,7 @@
   document.body.classList.toggle('chapter-restored',Boolean(target?.complete));
   $('continue').disabled=!target||Boolean(target.complete);
   $('home-total').textContent=target?.complete?'Campaign complete · The Confluence Forges awakened':
-   target?`${isInterlude(target.index)?'Interlude · '+interludeName(target.index):`Chapter ${chapters.indexOf(chapterAt(target.index))+1} · Stage ${stageLabel(target.index)} of ${campaignSize-2}`} · Best total ${progress.total()}`:'Chapter 1 · The Sleeping Valley';
+   target?`${isInterlude(target.index)?'Interlude · '+interludeName(target.index):`Chapter ${chapters.indexOf(chapterAt(target.index))+1} · Stage ${stageLabel(target.index)} of ${campaignSize-3}`} · Best total ${progress.total()}`:'Chapter 1 · The Sleeping Valley';
   renderChallengeChoices();
   showPanel(null);
   renderChoices();
@@ -1390,6 +1394,7 @@
   (target&&!target.complete?$('continue'):$('new-campaign')).focus();
  }
  function showChapterOpening(index,playMode=developerReviewUnlocked?'review':'run'){
+  if(isSanctuary(index)){story.openSanctuary('opening','Restore the currents',()=>openLevel(index,null,playMode));return;}
   if(isGarden(index)){story.openGarden('opening','Restore the currents',()=>openLevel(index,null,playMode));return;}
   if(isArchive(index)){story.openArchive('opening','Restore the currents',()=>openLevel(index,null,playMode));return;}
   story.open(chapters.indexOf(chapterAt(index)),'opening','Begin',()=>{
@@ -1403,10 +1408,11 @@
  }
  function showChapterEnding(index,playMode=developerReviewUnlocked?'review':'run'){
   stopAnimation();
+  if(isSanctuary(index)){story.openSanctuary('ending','Start Chapter Nine',()=>showChapterOpening(index+1,playMode));return;}
   if(isGarden(index)){story.openGarden('ending','Start Chapter Six',()=>showChapterOpening(index+1,playMode));return;}
   if(isArchive(index)){story.openArchive('ending','Start Chapter Four',()=>showChapterOpening(index+1,playMode));return;}
   const last=index===campaignSize-1;
-  const label=last?'Campaign Summary':isGarden(index+1)?'Enter the Garden':isArchive(index+1)?'Enter the Archive':`Start ${chapterAt(index+1).title}`;
+  const label=last?'Campaign Summary':isSanctuary(index+1)?'Enter the Sanctuary':isGarden(index+1)?'Enter the Garden':isArchive(index+1)?'Enter the Archive':`Start ${chapterAt(index+1).title}`;
   story.open(chapters.indexOf(chapterAt(index)),'ending',label,()=>{
    if(!last){showChapterOpening(index+1,playMode);return;}
    if(playMode==='review'){showHome();showPanel('stage-list');return;}
@@ -1444,6 +1450,8 @@
   action(developerTools,'developer-ending','Replay chapter ending',()=>showChapterEnding(chapters[Number(selection.value)].start+chapters[Number(selection.value)].stages.length-1,'review'));
   action(developerTools,'developer-archive','Visit the Archive',()=>showChapterOpening(archiveIndex,'review'));
   action(developerTools,'developer-garden','Visit the Garden',()=>showChapterOpening(gardenIndex,'review'));
+  action(developerTools,'developer-sanctuary','Visit the Sanctuary',()=>showChapterOpening(sanctuaryIndex,'review'));
+  action(developerTools,'developer-sanctuary-ending','Play Sanctuary ending',()=>showChapterEnding(sanctuaryIndex,'review'));
   action(developerTools,'developer-garden-ending','Play Garden ending',()=>showChapterEnding(gardenIndex,'review'));
   action(developerTools,'developer-archive-ending','Play Archive ending',()=>showChapterEnding(archiveIndex,'review'));
   action(developerTools,'developer-reset-chapter','Restart selected chapter',()=>openLevel(chapters[Number(selection.value)].start,null,'review'));

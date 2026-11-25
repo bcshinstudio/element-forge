@@ -14,7 +14,7 @@
  [['Jeeah','Are you ready?'],['Caelan','I am.','reassuring'],['Tessa','Do you think the Forges will have any interesting ancient mechanisms?'],['Caelan','Almost certainly.'],['Tessa','Dangerous ones?'],['Caelan','Almost certainly.'],['Tessa','Wonderful.'],['Caelan','I suppose this is what traveling with you is going to be like.','reassuring'],['Jeeah','You’ll get used to it.'],['Narrator','And so, the guardian who had spent years protecting a single sanctuary began a new journey. His promise had not ended. It had simply grown to embrace a greater world.']]
  ];
  const effects=['motes','motes','motes','motes','sparks','water','gold','gold','petals','gold'];
- const art=Object.fromEntries(titles.map((_,i)=>['sanctuary-'+(i+1),'../art/story/sanctuary-'+(i+1)+'.webp']));
+ const art={"sanctuary-1":"../art/story/sanctuary-1.webp","sanctuary-2":"../art/story/sanctuary-2.webp","sanctuary-3":"../art/story/sanctuary-3.webp","sanctuary-4":"../art/story/sanctuary-4.webp","sanctuary-5":"../art/story/sanctuary-5.webp","sanctuary-6":"../art/story/sanctuary-6.webp","sanctuary-7":"../art/story/sanctuary-7.webp","sanctuary-8":"../art/story/sanctuary-8.webp","sanctuary-9":"../art/story/sanctuary-9.webp","sanctuary-10":"../art/story/sanctuary-10.webp"};
  const portraits={calm:'../art/story/sanctuary-caelan-calm.webp',concerned:'../art/story/sanctuary-caelan-concerned.webp',reassuring:'../art/story/sanctuary-caelan-reassuring.webp'};
  const panels=type=>titles.flatMap((caption,i)=>(type==='opening'?i<5:i>=5)?dialogue[i].map(([speaker,line,expression],j)=>({caption,speaker,line,expression:expression||'calm',art:'sanctuary-'+(i+1),effect:effects[i],motion:'garden',duration:4500,voiceId:'sanctuary-'+(i+1)+'-'+(j+1)})):[]);
  const api={titles,art,portraits,panels};
