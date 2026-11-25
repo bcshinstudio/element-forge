@@ -3312,5 +3312,68 @@
     "label": "Sanctuary · Portal",
     "piece": "",
     "file": "sanctuary/sanctuary-portal.svg"
+  },
+  "sanctuary-grand-altar-nw": {
+    "id": "sanctuary-grand-altar-nw",
+    "type": "land",
+    "label": "Sanctuary · Grand altar NW",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-nw.svg"
+  },
+  "sanctuary-grand-altar-n": {
+    "id": "sanctuary-grand-altar-n",
+    "type": "wall",
+    "label": "Sanctuary · Grand altar N",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-n.svg"
+  },
+  "sanctuary-grand-altar-ne": {
+    "id": "sanctuary-grand-altar-ne",
+    "type": "land",
+    "label": "Sanctuary · Grand altar NE",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-ne.svg"
+  },
+  "sanctuary-grand-altar-w": {
+    "id": "sanctuary-grand-altar-w",
+    "type": "wall",
+    "label": "Sanctuary · Grand altar W",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-w.svg"
+  },
+  "sanctuary-grand-altar-center": {
+    "id": "sanctuary-grand-altar-center",
+    "type": "wall",
+    "label": "Sanctuary · Grand altar CENTER",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-center.svg"
+  },
+  "sanctuary-grand-altar-e": {
+    "id": "sanctuary-grand-altar-e",
+    "type": "wall",
+    "label": "Sanctuary · Grand altar E",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-e.svg"
+  },
+  "sanctuary-grand-altar-sw": {
+    "id": "sanctuary-grand-altar-sw",
+    "type": "land",
+    "label": "Sanctuary · Grand altar SW",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-sw.svg"
+  },
+  "sanctuary-grand-altar-s": {
+    "id": "sanctuary-grand-altar-s",
+    "type": "wall",
+    "label": "Sanctuary · Grand altar S",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-s.svg"
+  },
+  "sanctuary-grand-altar-se": {
+    "id": "sanctuary-grand-altar-se",
+    "type": "land",
+    "label": "Sanctuary · Grand altar SE",
+    "piece": "",
+    "file": "sanctuary/sanctuary-grand-altar-se.svg"
   }
 }
