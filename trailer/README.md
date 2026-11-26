@@ -7,3 +7,5 @@ Sequential scenes crossfade over 1.5 seconds using independent visual layers; ga
 The trailer avoids fixed chapter and stage counts so the campaign can continue to grow.
 
 Revision 5 introduces a five-shot opening hook, including a short real Stage 6 excerpt, and a restored-valley closing illustration. Upload the four trailer-*.webp assets into art/story/ on phone-playtest. Until uploaded, existing story art is used as a fallback. Full gameplay scenes remain unchanged.
+
+Revision 6 extends scenes 1, 2, 4, 5 and 16 to accommodate all supplied narration alternatives. Narration remains external for OpenShot editing. All gameplay timings are unchanged.

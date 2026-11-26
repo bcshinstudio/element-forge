@@ -2,7 +2,7 @@ window.TRAILER_SCENES = [
   {
     "asset": "trailer-broken-currents",
     "fallback": "heart",
-    "duration": 3.5,
+    "duration": 5.5,
     "title": "The currents are broken",
     "subtitle": "A world slowly falls silent.",
     "theme": "valley",
@@ -11,7 +11,7 @@ window.TRAILER_SCENES = [
   {
     "asset": "trailer-jeeah-currents",
     "fallback": "archive-2",
-    "duration": 4,
+    "duration": 5.5,
     "title": "Feel the elemental currents",
     "subtitle": "Become a Conduit Weaver.",
     "theme": "valley",
@@ -31,7 +31,7 @@ window.TRAILER_SCENES = [
   {
     "asset": "trailer-awakening",
     "fallback": "loom-core",
-    "duration": 4,
+    "duration": 5,
     "title": "Awaken ancient wonders",
     "subtitle": "Bring a forgotten world back to life.",
     "theme": "valley",
@@ -39,7 +39,7 @@ window.TRAILER_SCENES = [
   },
   {
     "asset": "forge",
-    "duration": 3.5,
+    "duration": 5.5,
     "title": "WELLSPRING",
     "subtitle": "A fantasy puzzle adventure.",
     "theme": "home",
@@ -129,7 +129,7 @@ window.TRAILER_SCENES = [
   },
   {
     "asset": "river",
-    "duration": 6,
+    "duration": 6.5,
     "title": "A journey of discovery",
     "subtitle": "An evolving world of puzzles, stories and adventure.",
     "theme": "heart"
