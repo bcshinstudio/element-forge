@@ -1,24 +1,49 @@
 window.TRAILER_SCENES = [
   {
-    "asset": "valley",
-    "duration": 7,
-    "title": "A world once sustained by living currents",
-    "subtitle": "Now the ancient World-Engines are falling silent.",
-    "theme": "valley"
+    "asset": "trailer-broken-currents",
+    "fallback": "heart",
+    "duration": 3.5,
+    "title": "The currents are broken",
+    "subtitle": "A world slowly falls silent.",
+    "theme": "valley",
+    "intro": true
   },
   {
-    "asset": "heart",
-    "duration": 6,
-    "title": "The currents still remain",
-    "subtitle": "Their paths are broken.",
-    "theme": "valley"
+    "asset": "trailer-jeeah-currents",
+    "fallback": "archive-2",
+    "duration": 4,
+    "title": "Feel the elemental currents",
+    "subtitle": "Become a Conduit Weaver.",
+    "theme": "valley",
+    "intro": true
+  },
+  {
+    "asset": "6",
+    "duration": 4.5,
+    "title": "Reconnect the elements",
+    "subtitle": "Find a path. Restore the flow.",
+    "theme": "valley",
+    "rate": 1.5,
+    "lead": 1,
+    "offset": 5,
+    "teaser": true
+  },
+  {
+    "asset": "trailer-awakening",
+    "fallback": "loom-core",
+    "duration": 4,
+    "title": "Awaken ancient wonders",
+    "subtitle": "Bring a forgotten world back to life.",
+    "theme": "valley",
+    "intro": true
   },
   {
     "asset": "forge",
-    "duration": 6,
+    "duration": 3.5,
     "title": "WELLSPRING",
-    "subtitle": "Restore the flow. Restore the world.",
-    "theme": "home"
+    "subtitle": "A fantasy puzzle adventure.",
+    "theme": "home",
+    "intro": true
   },
   {
     "asset": "6",
@@ -110,10 +135,11 @@ window.TRAILER_SCENES = [
     "theme": "heart"
   },
   {
-    "asset": "valley",
+    "asset": "trailer-restored-valley",
     "duration": 10,
     "title": "WELLSPRING",
     "subtitle": "Play free · bcshinstudio.github.io/wellspring/game/",
-    "theme": "home"
+    "theme": "home",
+    "fallback": "river"
   }
 ];
