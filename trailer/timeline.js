@@ -22,12 +22,12 @@ window.TRAILER_SCENES = [
   },
   {
     "asset": "6",
-    "duration": 19.8,
+    "duration": 20.650000000000002,
     "title": "Become a Conduit Weaver",
     "subtitle": "Connect each element to its matching inlet.",
     "theme": "valley",
     "rate": 1,
-    "lead": 0.65,
+    "lead": 1.5,
     "hold": 1.2
   },
   {
@@ -46,46 +46,46 @@ window.TRAILER_SCENES = [
   },
   {
     "asset": "31",
-    "duration": 32.3,
+    "duration": 33.15,
     "title": "Every connection matters",
     "subtitle": "Plan ahead. Make room for every current.",
     "theme": "loom",
     "rate": 2,
-    "lead": 0.65,
+    "lead": 1.5,
     "hold": 1.2
   },
   {
     "asset": "gardens",
     "duration": 6,
-    "title": "Beyond the next horizon",
-    "subtitle": "Explore a world filled with forgotten wonders.",
+    "title": "Follow the ancient currents",
+    "subtitle": "Their paths lead to wonders waiting to be awakened.",
     "theme": "home"
   },
   {
     "asset": "loom-core",
     "duration": 6,
-    "title": "Bring forgotten wonders to life",
-    "subtitle": "Restore the energy of a silent world.",
+    "title": "Awaken the World-Engines",
+    "subtitle": "Reconnect the currents that once sustained this world.",
     "theme": "heart"
   },
   {
     "asset": "21",
-    "duration": 18.5,
+    "duration": 19.35,
     "title": "Master the terrain",
     "subtitle": "Find a path through elemental restrictions.",
     "theme": "loom",
     "rate": 1.5,
-    "lead": 0.65,
+    "lead": 1.5,
     "hold": 1.2
   },
   {
     "asset": "33",
-    "duration": 22.7,
+    "duration": 23.55,
     "title": "Think beyond the obvious",
     "subtitle": "Every route changes the possibilities.",
     "theme": "loom",
     "rate": 2,
-    "lead": 0.65,
+    "lead": 1.5,
     "hold": 1.2
   },
   {
@@ -105,8 +105,8 @@ window.TRAILER_SCENES = [
   {
     "asset": "river",
     "duration": 6,
-    "title": "Ten chapters · 120 stages",
-    "subtitle": "A fantasy puzzle adventure.",
+    "title": "A journey of discovery",
+    "subtitle": "An evolving world of puzzles, stories and adventure.",
     "theme": "heart"
   },
   {
