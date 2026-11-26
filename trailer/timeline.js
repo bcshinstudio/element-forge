@@ -22,7 +22,7 @@ window.TRAILER_SCENES = [
   },
   {
     "asset": "6",
-    "duration": 22,
+    "duration": 17.3,
     "title": "Become a Conduit Weaver",
     "subtitle": "Connect each element to its matching inlet.",
     "theme": "valley",
@@ -44,7 +44,7 @@ window.TRAILER_SCENES = [
   },
   {
     "asset": "31",
-    "duration": 32,
+    "duration": 29.8,
     "title": "Every connection matters",
     "subtitle": "Plan ahead. Make room for every current.",
     "theme": "loom",
@@ -66,7 +66,7 @@ window.TRAILER_SCENES = [
   },
   {
     "asset": "21",
-    "duration": 9,
+    "duration": 16,
     "title": "Master the terrain",
     "subtitle": "Find a path through elemental restrictions.",
     "theme": "loom",
@@ -74,7 +74,7 @@ window.TRAILER_SCENES = [
   },
   {
     "asset": "33",
-    "duration": 13,
+    "duration": 20.2,
     "title": "Think beyond the obvious",
     "subtitle": "Every route changes the possibilities.",
     "theme": "loom",
