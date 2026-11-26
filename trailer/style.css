@@ -2,3 +2,6 @@
 /* Portrait gameplay: use the full frame height and bring the title closer to the board. */
 .gameplay .layer video{width:58%;height:100%;object-fit:contain;object-position:right center;background:transparent}.gameplay #words{left:62%;right:5%;bottom:24%}.gameplay h1{font-size:3.8cqw}.gameplay #subtitle{font-size:1.85cqw}.gameplay .vignette{background:linear-gradient(90deg,transparent 58%,#071410 62%)}
 .recording #screen{max-height:100vh;margin:auto}.recording #screen:fullscreen{width:100vw;height:100vh;max-height:none}
+
+/* Timeline-driven dip to dark, including the title, on every scene boundary. */
+#screen::after{content:'';position:absolute;inset:0;background:#071410;opacity:var(--scene-fade,0);pointer-events:none;z-index:5}#notice{z-index:6}

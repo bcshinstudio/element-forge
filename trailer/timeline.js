@@ -22,43 +22,47 @@ window.TRAILER_SCENES = [
   },
   {
     "asset": "6",
-    "duration": 17.3,
+    "duration": 19.8,
     "title": "Become a Conduit Weaver",
     "subtitle": "Connect each element to its matching inlet.",
     "theme": "valley",
-    "rate": 1
+    "rate": 1,
+    "lead": 0.65,
+    "hold": 1.2
   },
   {
     "asset": "archive-2",
     "duration": 6,
-    "title": "Discover forgotten knowledge",
-    "subtitle": "Meet Jeeah and Eldrin.",
+    "title": "Uncover a forgotten world",
+    "subtitle": "As the journey unfolds, ancient secrets come to light.",
     "theme": "home"
   },
   {
     "asset": "archive-5",
     "duration": 5,
-    "title": "An ancient world awaits",
-    "subtitle": "Every discovery opens another path.",
+    "title": "The story grows with every step",
+    "subtitle": "New discoveries reveal the world’s hidden history.",
     "theme": "home"
   },
   {
     "asset": "31",
-    "duration": 29.8,
+    "duration": 32.3,
     "title": "Every connection matters",
     "subtitle": "Plan ahead. Make room for every current.",
     "theme": "loom",
-    "rate": 2
+    "rate": 2,
+    "lead": 0.65,
+    "hold": 1.2
   },
   {
-    "asset": "garden-2",
+    "asset": "gardens",
     "duration": 6,
-    "title": "Meet Tessa and Pip",
-    "subtitle": "Wonder waits in unexpected places.",
+    "title": "Beyond the next horizon",
+    "subtitle": "Explore a world filled with forgotten wonders.",
     "theme": "home"
   },
   {
-    "asset": "garden-6",
+    "asset": "loom-core",
     "duration": 6,
     "title": "Bring forgotten wonders to life",
     "subtitle": "Restore the energy of a silent world.",
@@ -66,25 +70,29 @@ window.TRAILER_SCENES = [
   },
   {
     "asset": "21",
-    "duration": 16,
+    "duration": 18.5,
     "title": "Master the terrain",
     "subtitle": "Find a path through elemental restrictions.",
     "theme": "loom",
-    "rate": 1.5
+    "rate": 1.5,
+    "lead": 0.65,
+    "hold": 1.2
   },
   {
     "asset": "33",
-    "duration": 20.2,
+    "duration": 22.7,
     "title": "Think beyond the obvious",
     "subtitle": "Every route changes the possibilities.",
     "theme": "loom",
-    "rate": 2
+    "rate": 2,
+    "lead": 0.65,
+    "hold": 1.2
   },
   {
     "asset": "sanctuary-2",
     "duration": 6,
-    "title": "Meet Caelan",
-    "subtitle": "Courage is not a solitary journey.",
+    "title": "You will not journey alone",
+    "subtitle": "New friends join you as the story unfolds.",
     "theme": "heart"
   },
   {
