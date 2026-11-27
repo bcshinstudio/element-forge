@@ -323,6 +323,59 @@ function generateInteriorDetour(seed='1042'){
  return {status:'verified',map:m,verification,challenge:'interior-detour',islands};
 }
 
+// Sample each detour with and without a bridge, then check every result
+// on the original board with the original inventory.
+function generateInteriorChoices(seed='1042'){
+ const base=generateCrossingChoice(seed);
+ if(base.status!=='verified')return base;
+ const E=root.EFEngine,m=base.map,w=m.width,rand=random(seed+'-interior-choices');
+ const vertical=E.pairs(m).find(p=>p.source%w===p.destination%w);
+ const x=vertical.source%w;
+ const horizontal=E.pairs(m).find(p=>p.element!==vertical.element);
+ const crossingRow=Math.floor(horizontal.source/w);
+ m.cells[x]=m.cells[w+x];
+ m.cells[w+x]={terrain:'land'};
+ const row=1+Math.floor(rand()*(crossingRow-2));
+ const center=row*w+x;
+ m.cells[center]={terrain:'mountain'};
+ for(const side of [-1,1]){
+  for(let y=row-1;y<=row+1;y++){
+   const i=y*w+x+side;
+   if(!m.cells[i].node)m.cells[i]={terrain:'land'};
+  }
+ }
+ const solutions=[];
+ for(const side of [-1,1]){
+  for(const bridge of [1,0]){
+   const cells=m.cells.slice();
+   cells[center-side]={terrain:'wall'};
+   const constraints=bridge?{[horizontal.element]:{requireComponents:['bridge']}}:undefined;
+   const variant={...m,cells,inventory:{...m.inventory,bridge},constraints};
+   const solution=E.solve(variant,{limit:120000});
+   if(solution.status!=='solved'||E.checkAll(m,solution.routes,solution.placements).length)continue;
+   if(!solution.routes.find(r=>r.element===vertical.element).path.includes(center+side))continue;
+   if(solutions.some(s=>s.side===side&&s.score.components===solution.score.components))continue;
+   solutions.push({...solution,side});
+  }
+ }
+ if(new Set(solutions.map(s=>s.side)).size<2||
+    new Set(solutions.map(s=>s.score.components)).size<2){
+  return {status:'failed',message:'Could not verify both detours and a bridge tradeoff within the search budget.'};
+ }
+ solutions.sort((a,b)=>a.score.cost-b.score.cost);
+ const verification=solutions[0];
+ const profiles=solutions.map(s=>({...analyze(m,s),cost:s.score.cost}));
+ const difficulty={
+  verifiedChoices:solutions.length,
+  trackRange:[Math.min(...profiles.map(p=>p.track)),Math.max(...profiles.map(p=>p.track))],
+  turnRange:[Math.min(...profiles.map(p=>p.turns)),Math.max(...profiles.map(p=>p.turns))],
+  costRange:[profiles[0].cost,profiles.at(-1).cost]
+ };
+ m.name=`Interior choices · ${seed}`;
+ m.description='Detour around the interior mountain and choose between building a bridge and taking a dry route.';
+ return {status:'verified',map:m,verification,solutions,difficulty,challenge:'interior-choices'};
+}
+
 function generateCuratedMaze(seed='1042',count=3){
  if(!Number.isInteger(count)||count<1||count>8)return {status:'failed',message:'Candidate count must be 1–8'};
  const candidates=[];const rejected=[];
@@ -354,15 +407,16 @@ function analyze(m,verification){
   searchNodes:verification?.nodes||0,constructionAttempts:verification?.constructionAttempts||0,
   note:'Descriptive solution metrics, not a calibrated human difficulty rating or optimality proof'};
 }
-const api={generate,generateConstruction,generateDualConstruction,generateCrossing,generateCrossingChoice,generateDoubleCrossing,generateBranching,generateMaze,generateCuratedMaze,generateInteriorDetour,mazeQuality,solutionTradeoff,gameplayQuality,analyze,hash};root.EFGenerator=api;if(typeof module!=='undefined')module.exports=api;
+const api={generate,generateConstruction,generateDualConstruction,generateCrossing,generateCrossingChoice,generateDoubleCrossing,generateBranching,generateMaze,generateCuratedMaze,generateInteriorDetour,generateInteriorChoices,mazeQuality,solutionTradeoff,gameplayQuality,analyze,hash};root.EFGenerator=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
 if(typeof document!=='undefined'){
  document.getElementById('generate').onclick=()=>{
   if(window.EFPlay?.isActive()){document.getElementById('generatorMessages').textContent='Exit Playtest before replacing the map.';return;}
   if(typeof dirty!=='undefined'&&dirty&&!confirm('Replace the current unsaved map with a generated puzzle?'))return;
   const seed=document.getElementById('genSeed').value.trim()||'1042',difficulty=document.getElementById('genDifficulty').value;
-  const result=difficulty==='interior-detour'?window.EFGenerator.generateInteriorDetour(seed):difficulty==='curated-maze'?window.EFGenerator.generateCuratedMaze(seed):difficulty==='maze'?window.EFGenerator.generateMaze(seed):difficulty==='branching'?window.EFGenerator.generateBranching(seed):difficulty==='double-crossing'?window.EFGenerator.generateDoubleCrossing(seed):difficulty==='crossing-choice'?window.EFGenerator.generateCrossingChoice(seed):difficulty.startsWith('crossing')?window.EFGenerator.generateCrossing(seed,difficulty==='crossing'?'intersection':'intersection-bridge'):difficulty.startsWith('dual-')?window.EFGenerator.generateDualConstruction(seed,difficulty.slice(5)):['portal','tunnel'].includes(difficulty)?window.EFGenerator.generateConstruction(seed,difficulty):window.EFGenerator.generate(seed,difficulty),msg=document.getElementById('generatorMessages');
+  const result=difficulty==='interior-choices'?window.EFGenerator.generateInteriorChoices(seed):difficulty==='interior-detour'?window.EFGenerator.generateInteriorDetour(seed):difficulty==='curated-maze'?window.EFGenerator.generateCuratedMaze(seed):difficulty==='maze'?window.EFGenerator.generateMaze(seed):difficulty==='branching'?window.EFGenerator.generateBranching(seed):difficulty==='double-crossing'?window.EFGenerator.generateDoubleCrossing(seed):difficulty==='crossing-choice'?window.EFGenerator.generateCrossingChoice(seed):difficulty.startsWith('crossing')?window.EFGenerator.generateCrossing(seed,difficulty==='crossing'?'intersection':'intersection-bridge'):difficulty.startsWith('dual-')?window.EFGenerator.generateDualConstruction(seed,difficulty.slice(5)):['portal','tunnel'].includes(difficulty)?window.EFGenerator.generateConstruction(seed,difficulty):window.EFGenerator.generate(seed,difficulty),msg=document.getElementById('generatorMessages');
   if(result.status!=='verified'){msg.className='messages warn';msg.textContent=result.message;return;}
-  map=result.map;history=[];future=[];syncMeta();render();dirty=true;document.getElementById('dirty').textContent='Generated · unsaved';msg.className='messages ok';const a=window.EFGenerator.analyze(result.map,result.verification);msg.textContent=`Verified ${difficulty} candidate${result.challenge==='curated-maze'?` (selected from ${result.evaluated}/${result.requested} verified candidates; ${result.quality.junctions} junctions, ${result.quality.deadEnds} dead ends, ${result.quality.choiceBonus} route-choice points)`:''} · ${a.elementPairs} element pairs · ${a.track} track · ${a.turns} turns · ${Object.entries(a.components).map(([k,v])=>`${v} ${k}`).join(', ')||'no placed components'} · ${a.searchNodes} search nodes · cost ${result.verification.score.cost}. Editable/exportable; not a calibrated difficulty or optimality claim.`;
+  map=result.map;history=[];future=[];syncMeta();render();dirty=true;document.getElementById('dirty').textContent='Generated · unsaved';msg.className='messages ok';const a=window.EFGenerator.analyze(result.map,result.verification);msg.textContent=`Verified ${difficulty} candidate${result.challenge==='curated-maze'?` (selected from ${result.evaluated}/${result.requested} verified candidates; ${result.quality.junctions} junctions, ${result.quality.deadEnds} dead ends, ${result.quality.choiceBonus} route-choice points)`:''} · ${a.elementPairs} element pairs · ${a.track} track · ${a.turns} turns · ${Object.entries(a.components).map(([k,v])=>`${v} ${k}`).join(', ')||'no placed components'} · ${a.searchNodes} search nodes · cost ${result.verification.score.cost}. Editable/exportable.`;
+  if(result.difficulty){const d=result.difficulty;msg.textContent+=` ${d.verifiedChoices} verified choices · track ${d.trackRange.join("–")} · turns ${d.turnRange.join("–")} · cost ${d.costRange.join("–")}. These ranges describe the sampled solutions.`;}
  };
 }

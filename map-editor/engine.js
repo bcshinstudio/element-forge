@@ -60,7 +60,15 @@ function validatePath(m,element,path,other=[],placements={}){
 }
 function checkAll(m,routes,placements={}){const errors=[];const counts={};for(const [i,v] of Object.entries(placements)){const k=placementKind(v);if(!canPlace(m,Object.fromEntries(Object.entries(placements).filter(([j])=>j!==i)),+i,k))errors.push(`Invalid ${k} placement at ${+i+1}`);counts[k]=(counts[k]||0)+1;}for(const [k,n] of Object.entries(counts))if(n>(m.inventory?.[k]||0))errors.push(`Inventory exceeded: ${k}`);
  for(let i=0;i<m.cells.length;i++)if(['portal','tunnel'].includes(effective(m,placements,i))&&linkPartner(m,i,placements)<0)errors.push(`Invalid or unpaired ${effective(m,placements,i)} at cell ${i+1}`);
- for(const p of pairs(m)){if(p.source<0||p.destination<0){errors.push(`${p.element}: unmatched endpoints`);continue;}const r=routes.find(r=>r.element===p.element);if(!r){errors.push(`${p.element}: missing route`);continue;}const err=validatePath(m,p.element,r.path,routes.filter(x=>x!==r),placements);if(err)errors.push(`${p.element}: ${err}`);for(let i=0;i<m.cells.length;i++){const c=m.cells[i];if(c.component==='checkpoint'&&['any',p.element].includes(c.props?.element)&&!r.path.includes(i))errors.push(`${p.element}: required checkpoint not visited`);}}
+ const boardPairs=pairs(m);
+ if(!boardPairs.length)errors.push('Add at least one source/destination pair');
+ const routeElements=new Set();
+ for(const route of routes){
+  if(routeElements.has(route.element))errors.push(`${route.element}: duplicate route`);
+  if(!boardPairs.some(p=>p.element===route.element))errors.push(`${route.element}: unexpected route`);
+  routeElements.add(route.element);
+ }
+ for(const p of boardPairs){if(p.source<0||p.destination<0){errors.push(`${p.element}: unmatched endpoints`);continue;}const r=routes.find(r=>r.element===p.element);if(!r){errors.push(`${p.element}: missing route`);continue;}const err=validatePath(m,p.element,r.path,routes.filter(x=>x!==r),placements);if(err)errors.push(`${p.element}: ${err}`);for(let i=0;i<m.cells.length;i++){const c=m.cells[i];if(c.component==='checkpoint'&&['any',p.element].includes(c.props?.element)&&!r.path.includes(i))errors.push(`${p.element}: required checkpoint not visited`);}}
  return errors;}
 function score(m,routes,placements={}){const track=routes.reduce((s,r)=>s+r.path.length-1,0),components=Object.values(placements).length,cost=track+components*5;return {track,components,cost};}
 /* Bounded search: route first; when water encountered, may consume bridge; when another route is present, may consume intersection.

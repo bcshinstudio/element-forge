@@ -1,9 +1,9 @@
 {
   "name": "element-forge-map-editor",
-  "version": "1.7.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
-    "test": "node --test tests/advanced.test.js tests/paired-placement.test.js tests/construction-generator.test.js tests/dual-generator.test.js tests/crossing-generator.test.js tests/ui-generator.test.js tests/route-choice.test.js tests/double-crossing.test.js tests/branching.test.js tests/maze.test.js tests/curated-maze.test.js tests/gameplay-quality.test.js tests/interior-detour.test.js && node tests/legacy-regression.js && node tests/legacy-links.js",
-    "check": "node --check engine.js && node --check app.js && node --check play.js && node --check generator.js"
+    "test": "node --test tests/*.test.js && node tests/legacy-regression.js && node tests/legacy-links.js",
+    "check": "node --check engine.js && node --check app.js && node --check play.js && node --check generator.js && node --check map-format.js"
   }
 }
